@@ -1,0 +1,73 @@
+.root-pane {
+    -fx-background-color: #fafafa;
+}
+
+.top-bar {
+    -fx-background-color: linear-gradient(to bottom, #1f3550, #173049);
+    -fx-text-fill: white;
+}
+
+.app-title {
+    -fx-text-fill: white;
+}
+
+.app-subtitle {
+    -fx-text-fill: #d0e0f0;
+}
+
+.section-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f3550;
+    -fx-padding: 4 0 2 0;
+}
+
+.primary-button {
+    -fx-background-color: #1f6feb;
+    -fx-text-fill: white;
+    -fx-padding: 6 18;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+}
+
+.primary-button:disabled {
+    -fx-background-color: #b6c4d3;
+    -fx-text-fill: #f0f0f0;
+}
+
+.status-label {
+    -fx-text-fill: #444;
+    -fx-font-style: italic;
+}
+
+.form-area {
+    -fx-background-color: white;
+}
+
+.score-card {
+    -fx-background-color: white;
+    -fx-border-color: #d0d8e0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 10 14;
+    -fx-min-width: 180;
+}
+
+.score-card .label.title {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6a7785;
+    -fx-font-weight: bold;
+}
+
+.score-card .label.value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.score-good   { -fx-text-fill: #1a7f3a; }
+.score-warn   { -fx-text-fill: #b07a00; }
+.score-poor   { -fx-text-fill: #b00020; }
+
+.severity-error { -fx-text-fill: #b00020; -fx-font-weight: bold; }
+.severity-warn  { -fx-text-fill: #b07a00; -fx-font-weight: bold; }
+.severity-info  { -fx-text-fill: #1f6feb; }

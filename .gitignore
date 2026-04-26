@@ -1,0 +1,22 @@
+# Maven
+target/
+*.class
+*.jar.original
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+nbproject/
+
+# OS
+.DS_Store
+Thumbs.db
+._*
+
+# Logs
+*.log

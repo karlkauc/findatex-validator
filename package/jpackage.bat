@@ -31,6 +31,9 @@ if exist "%INPUT_DIR%" rmdir /s /q "%INPUT_DIR%"
 mkdir "%INPUT_DIR%"
 copy /Y "%SHADED_JAR%" "%INPUT_DIR%\" >nul
 
+set "ICON_ARG="
+if exist "%SCRIPT_DIR%icon.ico" set "ICON_ARG=--icon "%SCRIPT_DIR%icon.ico""
+
 jpackage ^
   --type msi ^
   --name "%APP_NAME%" ^
@@ -40,6 +43,7 @@ jpackage ^
   --input "%INPUT_DIR%" ^
   --main-jar "tpt-validator-%APP_VERSION%-shaded.jar" ^
   --main-class com.tpt.validator.AppLauncher ^
+  %ICON_ARG% ^
   --dest "%OUT_DIR%" ^
   --win-shortcut --win-menu
 

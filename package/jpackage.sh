@@ -38,6 +38,11 @@ rm -rf "$INPUT_DIR"
 mkdir -p "$INPUT_DIR"
 cp "$SHADED_JAR" "$INPUT_DIR/"
 
+ICON_ARG=()
+if [[ -f "$SCRIPT_DIR/icon.png" ]]; then
+  ICON_ARG=(--icon "$SCRIPT_DIR/icon.png")
+fi
+
 jpackage \
   --type "$PKG_TYPE" \
   --name "$APP_NAME" \
@@ -47,6 +52,7 @@ jpackage \
   --input "$INPUT_DIR" \
   --main-jar "$(basename "$SHADED_JAR")" \
   --main-class com.tpt.validator.AppLauncher \
+  "${ICON_ARG[@]}" \
   --dest "$OUT_DIR"
 
 echo "Installer artefacts at $OUT_DIR:"

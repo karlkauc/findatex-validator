@@ -7,8 +7,10 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.io.InputStream;
 import java.util.Objects;
 
 public final class App extends Application {
@@ -31,8 +33,18 @@ public final class App extends Application {
         Scene scene = new Scene(root, 1100, 720);
         scene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
 
+        loadAppIcons(stage);
+
         stage.setTitle("TPT V7 Validator");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private static void loadAppIcons(Stage stage) {
+        for (int size : new int[]{16, 32, 48, 64, 128, 256, 512}) {
+            try (InputStream in = App.class.getResourceAsStream("/icons/icon-" + size + ".png")) {
+                if (in != null) stage.getIcons().add(new Image(in));
+            } catch (Exception ignored) { /* best effort — missing icon isn't fatal */ }
+        }
     }
 }

@@ -20,8 +20,13 @@ import java.util.regex.Pattern;
 /** Validates the lexical format of a single field according to its codification. */
 public final class FormatRule implements Rule {
 
-    private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final Pattern NACE_PATTERN = Pattern.compile("^[A-U](?:[\\.0-9]{0,5})$");
+    /** Strict ISO 8601 date — uses the {@code STRICT} resolver style with a proleptic year
+     *  ({@code uuuu}) so impossible dates like 2025-02-30 are rejected instead of being
+     *  clamped to the last valid day of the month. */
+    private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ofPattern("uuuu-MM-dd")
+            .withResolverStyle(java.time.format.ResolverStyle.STRICT);
+    /** NACE V2.1: a single sector letter A..U optionally followed by 1..4 digits (no dots, per spec). */
+    private static final Pattern NACE_PATTERN = Pattern.compile("^[A-U]\\d{0,4}$");
     private static final Pattern CIC_PATTERN = Pattern.compile("^[A-Z]{2}[0-9A-F][0-9A-Z]$");
     private static final Set<String> CURRENCY_EXTRA =
             Set.of("CNH", "CNT", "GGP", "IMP", "JEP", "KID", "NIS", "PRB", "TVD");

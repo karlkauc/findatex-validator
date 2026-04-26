@@ -74,8 +74,9 @@ public final class SpecLoader {
             String num  = stringValue(row, COL_NUM_DATA);
             String path = stringValue(row, COL_PATH);
             if (isBlank(num) && isBlank(path)) continue;
-            // Section headers: have num but no path.
-            if (isBlank(path)) continue;
+            // Section headers: NUM_DATA without an underscore-prefixed number AND no path.
+            // Genuine fields may have only a NUM_DATA (e.g. "1000_TPT_Version"); keep those.
+            if (isBlank(path) && !looksLikeFieldLabel(num)) continue;
 
             String definition = stringValue(row, COL_DEFINITION);
             String comment    = stringValue(row, COL_COMMENT);
@@ -171,5 +172,16 @@ public final class SpecLoader {
 
     private static boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
+    }
+
+    /** True if the NUM_DATA cell looks like a field label ("1000_..." or "12_..."), not a section header. */
+    private static boolean looksLikeFieldLabel(String num) {
+        if (isBlank(num)) return false;
+        String t = num.trim();
+        int us = t.indexOf('_');
+        if (us <= 0) return false;
+        String prefix = t.substring(0, us);
+        // Numeric prefix (with optional trailing letter like "8b", "105a") indicates a field row.
+        return prefix.chars().anyMatch(Character::isDigit);
     }
 }

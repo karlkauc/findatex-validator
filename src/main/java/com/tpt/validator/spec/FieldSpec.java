@@ -75,14 +75,7 @@ public final class FieldSpec {
     public static String extractNumKey(String numData) {
         if (numData == null) return "";
         String trimmed = numData.trim();
-        int i = 0;
-        while (i < trimmed.length() && (Character.isLetterOrDigit(trimmed.charAt(i)))) {
-            // stop at the first underscore
-            i++;
-        }
-        // The numeric token sits before the first underscore.
         int us = trimmed.indexOf('_');
-        if (us < 0) return trimmed;
-        return trimmed.substring(0, us);
+        return us < 0 ? trimmed : trimmed.substring(0, us);
     }
 }

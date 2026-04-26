@@ -21,7 +21,10 @@ Active regulatory profiles:
 | `src/main/java/com/tpt/validator/` | Application sources (spec, ingest, validation, report, ui) |
 | `src/main/resources/spec/` | Bundled TPT V7 spec xlsx + PIK guidelines (loaded at startup) |
 | `src/test/java/...` / `src/test/resources/sample/` | Tests + synthetic samples |
-| `package/jpackage.sh` / `.bat` | Native installer build scripts |
+| `package/jpackage.sh` / `.bat` | Native installer build scripts (auto-detect Linux/macOS/Windows) |
+| `package/icon.{png,ico,icns}` | jpackage icon assets (Linux PNG, Windows ICO, macOS ICNS) |
+| `src/main/resources/icons/icon-{16..512}.png` | JavaFX `Stage.getIcons()` raster sizes |
+| `tools/generate_icon.py` | Re-generates all icon sizes + ICO + ICNS via Pillow |
 
 ## Build & run
 

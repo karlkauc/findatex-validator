@@ -11,6 +11,7 @@ Outputs:
   - src/main/resources/icons/icon-{16,32,48,64,128,256,512}.png  (UI)
   - package/icon.png   (master 512 px, jpackage --icon for Linux)
   - package/icon.ico   (multi-size, jpackage --icon for Windows)
+  - package/icon.icns  (multi-size, jpackage --icon for macOS)
 """
 from __future__ import annotations
 
@@ -182,6 +183,14 @@ def main() -> int:
     ico_path = PKG_DIR / "icon.ico"
     ico_imgs[0].save(ico_path, format="ICO", sizes=ico_sizes, append_images=ico_imgs[1:])
     print(f"Wrote {ico_path.relative_to(ROOT)}")
+
+    # ICNS for macOS bundles. Pillow needs a single source image and derives
+    # sizes; we feed it the 1024 px master so retina (256@2x, 512@2x) layers
+    # come out crisp.
+    icns_src = render(1024)
+    icns_path = PKG_DIR / "icon.icns"
+    icns_src.save(icns_path, format="ICNS")
+    print(f"Wrote {icns_path.relative_to(ROOT)}")
 
     return 0
 

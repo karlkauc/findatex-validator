@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# Build a Linux native installer (.deb on Debian/Ubuntu, .rpm on Red Hat) using jpackage.
+# Build a native installer using jpackage:
+#   - Linux:  .deb (Debian/Ubuntu) or .rpm (Red Hat)  [icon: package/icon.png]
+#   - macOS:  .dmg / .pkg                              [icon: package/icon.icns]
+#   - other:  app-image fallback
+#
 # Run after `mvn -DskipTests package`.
 set -euo pipefail
 
@@ -24,24 +28,51 @@ OUT_DIR="$TARGET_DIR/installer"
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"
 
-# Auto-detect type based on package manager.
-if command -v dpkg >/dev/null 2>&1; then
-  PKG_TYPE="deb"
-elif command -v rpm >/dev/null 2>&1; then
-  PKG_TYPE="rpm"
-else
-  PKG_TYPE="app-image"
-fi
-
 INPUT_DIR="$TARGET_DIR/jpackage-input"
 rm -rf "$INPUT_DIR"
 mkdir -p "$INPUT_DIR"
 cp "$SHADED_JAR" "$INPUT_DIR/"
 
+# Detect platform.
+UNAME_S="$(uname -s)"
+EXTRA_ARGS=()
+ICON_PATH=""
+
+case "$UNAME_S" in
+  Darwin)
+    PKG_TYPE="dmg"
+    ICON_PATH="$SCRIPT_DIR/icon.icns"
+    EXTRA_ARGS+=(
+      --mac-package-name "TPT Validator"
+      --mac-package-identifier "com.tpt.validator"
+    )
+    ;;
+  Linux)
+    if command -v dpkg >/dev/null 2>&1; then
+      PKG_TYPE="deb"
+    elif command -v rpm >/dev/null 2>&1; then
+      PKG_TYPE="rpm"
+    else
+      PKG_TYPE="app-image"
+    fi
+    ICON_PATH="$SCRIPT_DIR/icon.png"
+    EXTRA_ARGS+=(
+      --linux-shortcut
+      --linux-app-category "Office"
+    )
+    ;;
+  *)
+    PKG_TYPE="app-image"
+    ICON_PATH="$SCRIPT_DIR/icon.png"
+    ;;
+esac
+
 ICON_ARG=()
-if [[ -f "$SCRIPT_DIR/icon.png" ]]; then
-  ICON_ARG=(--icon "$SCRIPT_DIR/icon.png")
+if [[ -n "$ICON_PATH" && -f "$ICON_PATH" ]]; then
+  ICON_ARG=(--icon "$ICON_PATH")
 fi
+
+echo "Building $PKG_TYPE installer for $UNAME_S using ${ICON_ARG[*]:-no icon}..."
 
 jpackage \
   --type "$PKG_TYPE" \
@@ -53,6 +84,7 @@ jpackage \
   --main-jar "$(basename "$SHADED_JAR")" \
   --main-class com.tpt.validator.AppLauncher \
   "${ICON_ARG[@]}" \
+  "${EXTRA_ARGS[@]}" \
   --dest "$OUT_DIR"
 
 echo "Installer artefacts at $OUT_DIR:"

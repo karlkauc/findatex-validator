@@ -10,6 +10,9 @@ public final class CodificationParser {
 
     private static final Pattern CLOSED_LIST_LINE =
             Pattern.compile("^\\s*(\\d+[a-zA-Z]?)\\s*[-–.]\\s*(.+)$", Pattern.MULTILINE);
+    /** Quoted token list, e.g. {@code "Bullet", "Sinkable"} or {@code "Y" ; "N"; "EPM"}. */
+    private static final Pattern QUOTED_TOKEN =
+            Pattern.compile("\"([A-Za-z0-9 _-]{1,40})\"");
     private static final Pattern ALPHANUM_PATTERN =
             Pattern.compile("alphanum(?:eric)?\\s*\\(?\\s*(?:max\\s*)?(\\d+)\\s*\\)?", Pattern.CASE_INSENSITIVE);
     private static final Pattern ALPHA_PATTERN =
@@ -80,6 +83,20 @@ public final class CodificationParser {
         // positives, drop entries when the same field's label looks like a sentence (>120 chars
         // or contains a period followed by a capital letter).
         entries.removeIf(e -> e.label().length() > 200);
+        if (!entries.isEmpty()) return entries;
+
+        // Fall back to quoted-token closed lists ("Bullet", "Sinkable" / "Y" ; "N" / etc.).
+        // Only treat as a closed list when at least two distinct short tokens are quoted —
+        // single-quoted prose like "Y =  have you completed..." should not qualify.
+        Matcher qm = QUOTED_TOKEN.matcher(text);
+        java.util.LinkedHashSet<String> tokens = new java.util.LinkedHashSet<>();
+        while (qm.find()) {
+            String t = qm.group(1).trim();
+            if (!t.isEmpty()) tokens.add(t);
+        }
+        if (tokens.size() >= 2) {
+            for (String t : tokens) entries.add(new CodificationDescriptor.ClosedListEntry(t, t));
+        }
         return entries;
     }
 }

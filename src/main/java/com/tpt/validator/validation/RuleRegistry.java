@@ -45,13 +45,15 @@ public final class RuleRegistry {
             }
         }
 
-        // Identifier checksum rules — only meaningful when the codification system field equals 1 (ISIN/LEI).
+        // Identifier checksum rules.
+        // Fields 15 and 69 use the full ISIN/CUSIP/SEDOL/... closed list where "1" = ISIN.
         rules.add(new IsinRule("14", "15"));        // instrument
-        rules.add(new IsinRule("47", "48"));        // issuer (when codification=1 → ISIN)
-        rules.add(new IsinRule("50", "51"));        // issuer group
         rules.add(new IsinRule("68", "69"));        // underlying
-        rules.add(new IsinRule("81", "82"));        // underlying issuer
-        rules.add(new LeiRule("47", "48"));         // issuer LEI also possible (system encoded as 1 in EIOPA combined)
+        // Fields 48, 51, 82, 85, 141 use the short list where "1" = LEI.
+        rules.add(new LeiRule("47", "48"));         // issuer
+        rules.add(new LeiRule("50", "51"));         // issuer group
+        rules.add(new LeiRule("81", "82"));         // underlying issuer
+        rules.add(new LeiRule("84", "85"));         // underlying issuer group
         rules.add(new LeiRule("140", "141"));       // custodian
 
         // Cross-field rules.

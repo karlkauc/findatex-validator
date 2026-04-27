@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
+import java.util.function.IntConsumer;
 
 public final class OpenFigiClient {
 
@@ -34,9 +36,12 @@ public final class OpenFigiClient {
         this.apiKey = apiKey == null ? "" : apiKey;
     }
 
-    public Map<String, IsinRecord> lookup(List<String> isins) {
+    public Map<String, IsinRecord> lookup(List<String> isins,
+                                          BooleanSupplier cancelled,
+                                          IntConsumer onBatchDone) {
         Map<String, IsinRecord> out = new HashMap<>();
         for (int i = 0; i < isins.size(); i += BATCH) {
+            if (cancelled.getAsBoolean()) break;
             List<String> chunk = isins.subList(i, Math.min(i + BATCH, isins.size()));
             try {
                 String body = buildBody(chunk);
@@ -68,11 +73,17 @@ public final class OpenFigiClient {
                         log.warn("OpenFIGI parse error: {}", e.getMessage());
                     }
                 });
+                onBatchDone.accept(Math.min(i + BATCH, isins.size()));
             } catch (Exception e) {
                 log.warn("OpenFIGI request build error: {}", e.getMessage());
             }
         }
         return out;
+    }
+
+    /** Backwards-compatible overload: no cancel, no progress. */
+    public Map<String, IsinRecord> lookup(List<String> isins) {
+        return lookup(isins, () -> false, n -> {});
     }
 
     private static String buildBody(List<String> chunk) {

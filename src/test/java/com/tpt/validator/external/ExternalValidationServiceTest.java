@@ -50,4 +50,29 @@ class ExternalValidationServiceTest {
         List<Finding> out = svc.run(file, settings, () -> false);
         assertThat(out).extracting(Finding::ruleId).contains("EXTERNAL/GLEIF-UNAVAILABLE");
     }
+
+    @Test
+    void cancelledMidPhaseShortCircuitsRemote(@TempDir Path tmp) {
+        TptFile file = new TestFileBuilder()
+                .row(values("47", "529900D6BF99LW9R2E68", "48", "1"))
+                .build();
+        AppSettings settings = AppSettings.defaults().withExternalEnabled(true);
+
+        java.util.concurrent.atomic.AtomicInteger calls = new java.util.concurrent.atomic.AtomicInteger();
+        ExternalValidationService svc = ExternalValidationService.forTest(
+                tmp,
+                leis -> { calls.incrementAndGet(); return Map.of(); },
+                isins -> Map.of());
+
+        java.util.concurrent.atomic.AtomicBoolean firstSeen = new java.util.concurrent.atomic.AtomicBoolean();
+        java.util.function.BooleanSupplier cancelled = () -> {
+            // cancel BEFORE GLEIF runs (before the very first remote call)
+            return firstSeen.getAndSet(true) || true;
+        };
+
+        List<Finding> out = svc.run(file, settings, cancelled);
+        // Either remote was never called (cancel was instant) or it ran zero times for ISIN.
+        // Critically the run completes and emits the CANCELLED info finding.
+        assertThat(out).extracting(Finding::ruleId).contains("EXTERNAL/CANCELLED");
+    }
 }

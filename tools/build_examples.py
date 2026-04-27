@@ -26,7 +26,7 @@ from pathlib import Path
 import openpyxl
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "samples"
+OUT = ROOT / "samples" / "tpt"
 OUT.mkdir(parents=True, exist_ok=True)
 
 HEADERS = [

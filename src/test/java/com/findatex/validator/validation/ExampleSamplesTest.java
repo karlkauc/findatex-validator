@@ -37,7 +37,7 @@ class ExampleSamplesTest {
     }
 
     private static Path samplesDir() {
-        return Paths.get("").toAbsolutePath().resolve("samples");
+        return Paths.get("").toAbsolutePath().resolve("samples").resolve("tpt");
     }
 
     @Test

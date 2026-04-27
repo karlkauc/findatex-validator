@@ -3,7 +3,6 @@ package com.tpt.validator.external;
 import com.tpt.validator.config.AppSettings;
 import com.tpt.validator.domain.TptFile;
 import com.tpt.validator.external.gleif.LeiRecord;
-import com.tpt.validator.external.openfigi.IsinRecord;
 import com.tpt.validator.validation.Finding;
 import com.tpt.validator.validation.Severity;
 import com.tpt.validator.validation.TestFileBuilder;

@@ -1,5 +1,9 @@
 package com.findatex.validator.validation;
 
+import com.findatex.validator.domain.TptFile;
+import com.findatex.validator.ingest.TptFileLoader;
+import com.findatex.validator.spec.SpecCatalog;
+import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.ept.EptProfiles;
 import com.findatex.validator.template.ept.EptTemplate;
 import org.junit.jupiter.api.Test;
@@ -16,15 +20,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Smoke-tests the EPT V2.1 sample fixtures under {@code samples/ept/}.
  * Disabled if the generator hasn't been run.
- *
- * <p>Uses {@link TemplateSampleHarness} to drive {@link EptTemplate}'s rule
- * set directly — see that class's Javadoc for the architectural reason.</p>
  */
 @EnabledIf("samplesPresent")
 class EptExampleSamplesTest {
 
-    private static final TemplateSampleHarness HARNESS = new TemplateSampleHarness(
-            new EptTemplate(), EptTemplate.V2_1, Set.of(EptProfiles.PRIIPS_KID));
+    private static final EptTemplate TEMPLATE = new EptTemplate();
+    private static final SpecCatalog CATALOG =
+            TEMPLATE.specLoaderFor(EptTemplate.V2_1).load();
+    private static final ValidationEngine ENGINE =
+            new ValidationEngine(CATALOG, TEMPLATE.ruleSetFor(EptTemplate.V2_1));
+    private static final Set<ProfileKey> PROFILES = Set.of(EptProfiles.PRIIPS_KID);
 
     static boolean samplesPresent() {
         return Files.isDirectory(samplesDir());
@@ -64,6 +69,7 @@ class EptExampleSamplesTest {
     private List<Finding> run(String filename) throws Exception {
         Path p = samplesDir().resolve(filename);
         assertThat(Files.exists(p)).as("missing sample %s", p).isTrue();
-        return HARNESS.run(p);
+        TptFile file = new TptFileLoader(CATALOG).load(p);
+        return ENGINE.validate(file, PROFILES);
     }
 }

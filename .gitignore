@@ -24,3 +24,4 @@ Thumbs.db
 # WebDAV / production data drops — never commit real fund files.
 .DAV/
 20260331_TPTV7_*.xlsx
+tools/__pycache__/

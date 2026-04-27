@@ -6,6 +6,7 @@ import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
+import com.findatex.validator.template.tpt.TptRuleSet;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class UserFileVerificationTest {
     void noQuantityWarningOnBE21Position() throws Exception {
         SpecCatalog catalog = SpecLoader.loadBundled();
         TptFile file = new TptFileLoader(catalog).load(USER_FILE);
-        List<Finding> findings = new ValidationEngine(catalog)
+        List<Finding> findings = new ValidationEngine(catalog, new TptRuleSet())
                 .validate(file, Set.of(TptProfiles.SOLVENCY_II));
 
         long be21Warnings = findings.stream()

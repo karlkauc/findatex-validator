@@ -3,6 +3,7 @@ package com.findatex.validator.validation;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
+import com.findatex.validator.template.tpt.TptRuleSet;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
 import org.junit.jupiter.api.Test;
@@ -114,7 +115,7 @@ class FindingEnricherTest {
                         "21", "ZZZ"))           // invalid currency → triggers FORMAT/21
                 .build();
 
-        List<Finding> findings = new ValidationEngine(CATALOG)
+        List<Finding> findings = new ValidationEngine(CATALOG, new TptRuleSet())
                 .validate(file, Set.of(TptProfiles.SOLVENCY_II));
 
         assertThat(findings).isNotEmpty();

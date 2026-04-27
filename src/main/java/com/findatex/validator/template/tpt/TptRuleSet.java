@@ -37,9 +37,7 @@ import java.util.stream.Collectors;
 
 /**
  * TPT rule set. Holds the canonical {@link ConditionalRequirement} list and the rule-build logic
- * that was historically in {@code com.findatex.validator.validation.RuleRegistry}. The legacy class
- * remains as a thin facade for backward compatibility (and is removed in a later phase if no
- * external callers remain).
+ * that was historically in {@code com.findatex.validator.validation.RuleRegistry} (since removed).
  */
 public final class TptRuleSet implements TemplateRuleSet {
 

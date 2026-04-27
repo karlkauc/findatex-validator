@@ -7,6 +7,7 @@ import com.findatex.validator.report.QualityScorer;
 import com.findatex.validator.report.ScoreCategory;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
+import com.findatex.validator.template.tpt.TptRuleSet;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
 import org.junit.jupiter.api.Test;
@@ -140,7 +141,7 @@ class ExampleSamplesTest {
         Path p = samplesDir().resolve(filename);
         assertThat(Files.exists(p)).as("missing sample %s", p).isTrue();
         TptFile file = new TptFileLoader(CATALOG).load(p);
-        List<Finding> findings = new ValidationEngine(CATALOG).validate(file, ALL);
+        List<Finding> findings = new ValidationEngine(CATALOG, new TptRuleSet()).validate(file, ALL);
         return new QualityScorer(CATALOG).score(file, ALL, findings);
     }
 }

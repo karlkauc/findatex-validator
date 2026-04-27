@@ -13,6 +13,7 @@ import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.TemplateDefinition;
 import com.findatex.validator.template.api.TemplateId;
+import com.findatex.validator.template.api.TemplateRuleSet;
 import com.findatex.validator.template.api.TemplateVersion;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.FindingEnricher;
@@ -312,7 +313,8 @@ public final class TemplateTabController {
             @Override
             protected QualityReport call() throws Exception {
                 TptFile file = new TptFileLoader(cat).load(path);
-                List<Finding> findings = new ValidationEngine(cat).validate(file, profiles);
+                TemplateRuleSet ruleSet = template.ruleSetFor(selectedVersion);
+                List<Finding> findings = new ValidationEngine(cat, ruleSet).validate(file, profiles);
 
                 if (externalSupported && settings.external().enabled()) {
                     Path cacheDir = settings.external().cache().directory().isEmpty()

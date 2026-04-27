@@ -34,7 +34,7 @@ class XlsxReportWriterTest {
         QualityReport report = buildReportFor("/sample/bad_formats.xlsx");
         Path out = tmp.resolve("report.xlsx");
 
-        new XlsxReportWriter(CATALOG).write(report, out);
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL).write(report, out);
 
         assertThat(Files.exists(out)).isTrue();
         assertThat(Files.size(out)).isGreaterThan(2_000);
@@ -66,13 +66,18 @@ class XlsxReportWriterTest {
                     "Instrument code", "Instrument name",
                     "Weight", "Value", "Message");
 
-            // Field Coverage tab carries 142 rows + header. Header now includes a SST column.
+            // Field Coverage tab carries 142 rows + header. Header has one column per
+            // profile in the active template's ProfileSet, using displayName().
             Sheet coverage = wb.getSheet("Field Coverage");
             assertThat(coverage.getLastRowNum()).isEqualTo(CATALOG.fields().size());
             org.apache.poi.ss.usermodel.Row covHdr = coverage.getRow(0);
             java.util.List<String> covHeaders = new java.util.ArrayList<>();
             for (int c = 0; c < covHdr.getLastCellNum(); c++) covHeaders.add(covHdr.getCell(c).getStringCellValue());
-            assertThat(covHeaders).contains("SST");
+            assertThat(covHeaders).contains(
+                    TptProfiles.SOLVENCY_II.displayName(),
+                    TptProfiles.IORP_EIOPA_ECB.displayName(),
+                    TptProfiles.NW_675.displayName(),
+                    TptProfiles.SST.displayName());
 
             Sheet perPos = wb.getSheet("Per Position");
             assertThat(perPos.getLastRowNum()).isEqualTo(report.file().rows().size());
@@ -90,7 +95,7 @@ class XlsxReportWriterTest {
     void scoresAreWrittenAsPercentages(@TempDir Path tmp) throws Exception {
         QualityReport report = buildReportFor("/sample/clean_v7.xlsx");
         Path out = tmp.resolve("scores.xlsx");
-        new XlsxReportWriter(CATALOG).write(report, out);
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL).write(report, out);
 
         try (InputStream in = Files.newInputStream(out);
              Workbook wb = new XSSFWorkbook(in)) {

@@ -407,7 +407,8 @@ public final class TemplateTabController {
         Path target = out.toPath();
         Task<Void> task = new Task<>() {
             @Override protected Void call() throws Exception {
-                new XlsxReportWriter(cat).write(currentReport, target);
+                new XlsxReportWriter(cat, template.profilesFor(selectedVersion))
+                        .write(currentReport, target);
                 return null;
             }
         };

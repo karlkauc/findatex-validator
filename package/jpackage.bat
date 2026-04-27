@@ -42,7 +42,7 @@ jpackage ^
   --description "Quality and conformance validator for TPT V7 files" ^
   --input "%INPUT_DIR%" ^
   --main-jar "tpt-validator-%APP_VERSION%-shaded.jar" ^
-  --main-class com.tpt.validator.AppLauncher ^
+  --main-class com.findatex.validator.AppLauncher ^
   %ICON_ARG% ^
   --dest "%OUT_DIR%" ^
   --win-shortcut --win-menu

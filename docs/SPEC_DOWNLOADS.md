@@ -34,7 +34,7 @@ to reflect what's currently present.
 | Version | Release    | Target path                                                  | Status   | Source page |
 |---------|------------|--------------------------------------------------------------|----------|-------------|
 | V7.0    | 2024-11-25 | `src/main/resources/spec/tpt/TPT_V7_20241125.xlsx`           | present  | findatex.eu → Templates → Tripartite Template (TPT) |
-| V6.0    | 2022-01    | `src/main/resources/spec/tpt/TPT_V6_<release-date>.xlsx`     | _missing_ | findatex.eu → Templates → Tripartite Template (TPT) → Archive |
+| V6.0    | 2022-03-14 | `src/main/resources/spec/tpt/TPT_V6_20220314.xlsx`           | present  | findatex.eu → Templates → Tripartite Template (TPT) → Archive |
 
 Companion artefact: `PIK guidelines 240913.xlsx` (Payment-in-Kind loan rules,
 referenced by TPT V7 cross-field rule `PikRule`). Currently bundled in the
@@ -45,8 +45,8 @@ spec XLSX.
 
 | Version | Release    | Target path                                                  | Status    | Source page |
 |---------|------------|--------------------------------------------------------------|-----------|-------------|
-| V1.1.3  | 2024-12    | `src/main/resources/spec/eet/EET_v1_1_3_<release-date>.xlsx` | _missing_ | findatex.eu → Templates → European ESG Template (EET) |
-| V1.1.2  | 2023-12    | `src/main/resources/spec/eet/EET_v1_1_2_<release-date>.xlsx` | _missing_ | findatex.eu → Templates → European ESG Template (EET) → Archive |
+| V1.1.3  | 2024-10-04 | `src/main/resources/spec/eet/EET_V1_1_3_20260410.xlsx`       | present  | findatex.eu → Templates → European ESG Template (EET) |
+| V1.1.2  | 2023-12-05 | `src/main/resources/spec/eet/EET_V1_1_2_20231205.xlsx`       | present  | findatex.eu → Templates → European ESG Template (EET) → Archive |
 
 Profiles to expect in the spec header (research from spec, do not invent):
 SFDR Article 6 / 8 / 9, MiFID II ESG, Taxonomy alignment, PAI (Principal
@@ -56,8 +56,8 @@ Adverse Impacts).
 
 | Version | Release    | Target path                                                  | Status    | Source page |
 |---------|------------|--------------------------------------------------------------|-----------|-------------|
-| V4.3    | 2026-01    | `src/main/resources/spec/emt/EMT_V4_3_<release-date>.xlsx`   | _missing_ | findatex.eu → Templates → European MiFID Template (EMT) |
-| V4.2    | 2024-04    | `src/main/resources/spec/emt/EMT_V4_2_<release-date>.xlsx`   | _missing_ | findatex.eu → Templates → European MiFID Template (EMT) → Archive |
+| V4.3    | 2025-12-17 | `src/main/resources/spec/emt/EMT_V4_3_20251217.xlsx`         | present  | findatex.eu → Templates → European MiFID Template (EMT) |
+| V4.2    | 2024-04-22 | `src/main/resources/spec/emt/EMT_V4_2_20240422.xlsx`         | present  | findatex.eu → Templates → European MiFID Template (EMT) → Archive |
 
 Profiles to expect: MiFID II target market suitability tiers per jurisdiction;
 V4.3 adds three optional "Value Cost Advantage" fields for structured products
@@ -67,8 +67,8 @@ in France.
 
 | Version | Release    | Target path                                                  | Status    | Source page |
 |---------|------------|--------------------------------------------------------------|-----------|-------------|
-| V2.1    | 2022-09    | `src/main/resources/spec/ept/EPT_V2_1_<release-date>.xlsx`   | _missing_ | findatex.eu → Templates → European PRIIPs Template (EPT) |
-| V2.0    | 2022-02    | `src/main/resources/spec/ept/EPT_V2_0_<release-date>.xlsx`   | _missing_ | findatex.eu → Templates → European PRIIPs Template (EPT) → Archive |
+| V2.1    | 2022-10-12 | `src/main/resources/spec/ept/EPT_V2_1_20221012.xlsx`         | present  | findatex.eu → Templates → European PRIIPs Template (EPT) |
+| V2.0    | 2022-02-15 | `src/main/resources/spec/ept/EPT_V2_0_20220215.xlsx`         | present  | findatex.eu → Templates → European PRIIPs Template (EPT) → Archive |
 
 Profiles to expect: PRIIPs categories 1 / 2 / 3 / 4 (per RTS scenario logic);
 UK FCA compliance provisions are embedded in the spec.

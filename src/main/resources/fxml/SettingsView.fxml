@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 
 <TabPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-         fx:controller="com.tpt.validator.ui.SettingsController"
+         fx:controller="com.findatex.validator.ui.SettingsController"
          tabClosingPolicy="UNAVAILABLE" prefWidth="640" prefHeight="540">
   <tabs>
     <Tab text="External Validation">

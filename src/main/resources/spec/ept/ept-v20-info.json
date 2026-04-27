@@ -1,0 +1,21 @@
+{
+  "templateId": "EPT",
+  "version": "V2.0",
+  "releaseDate": "2022-02-15",
+  "sheetName": "EPT 2.0 ",
+  "firstDataRow": 8,
+  "columns": {
+    "numData": 1,
+    "path": 2,
+    "definition": 3,
+    "codification": 4,
+    "comment": 5,
+    "primaryFlag": 7
+  },
+  "applicabilityColumns": { "kind": "none" },
+  "profileColumns": [
+    {"code": "PRIIPS_SYNC", "display": "PRIIPs Sync", "column": 6, "kind": "flag"},
+    {"code": "PRIIPS_KID",  "display": "PRIIPs KID",  "column": 7, "kind": "flag"},
+    {"code": "UCITS_KIID",  "display": "UCITS KIID",  "column": 8, "kind": "flag"}
+  ]
+}

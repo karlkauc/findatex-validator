@@ -1,0 +1,26 @@
+{
+  "templateId": "EET",
+  "version": "V1.1.2",
+  "releaseDate": "2023-12-05",
+  "sheetName": "EET",
+  "firstDataRow": 7,
+  "columns": {
+    "numData": 1,
+    "path": 2,
+    "definition": 3,
+    "codification": 4,
+    "comment": 5,
+    "primaryFlag": 9
+  },
+  "applicabilityColumns": { "kind": "none" },
+  "profileColumns": [
+    {"code": "SFDR_PERIODIC",      "display": "SFDR Periodic",         "column": 9,  "kind": "flag"},
+    {"code": "SFDR_PRECONTRACT",   "display": "SFDR Pre-contract",     "column": 10, "kind": "flag"},
+    {"code": "SFDR_ENTITY",        "display": "SFDR Entity",           "column": 11, "kind": "flag"},
+    {"code": "MIFID_PRODUCTS",     "display": "MiFID Products",        "column": 12, "kind": "flag"},
+    {"code": "IDD_PRODUCTS",       "display": "IDD Products",          "column": 13, "kind": "flag"},
+    {"code": "MIFID_DISTRIBUTORS", "display": "MiFID Distributors",    "column": 14, "kind": "flag"},
+    {"code": "IDD_INSURERS",       "display": "IDD Insurers",          "column": 15, "kind": "flag"},
+    {"code": "LOOK_THROUGH",       "display": "Look-through (FoF)",    "column": 17, "kind": "flag"}
+  ]
+}

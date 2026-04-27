@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.tpt</groupId>
+    <groupId>com.findatex</groupId>
     <artifactId>tpt-validator</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
@@ -26,7 +26,7 @@
         <assertj.version>3.26.3</assertj.version>
         <jackson.version>2.18.2</jackson.version>
 
-        <main.class>com.tpt.validator.App</main.class>
+        <main.class>com.findatex.validator.App</main.class>
     </properties>
 
     <dependencies>
@@ -152,7 +152,7 @@
                             <shadedClassifierName>shaded</shadedClassifierName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.tpt.validator.AppLauncher</mainClass>
+                                    <mainClass>com.findatex.validator.AppLauncher</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>

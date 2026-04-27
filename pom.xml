@@ -24,6 +24,7 @@
         <logback.version>1.5.12</logback.version>
         <junit.version>5.11.3</junit.version>
         <assertj.version>3.26.3</assertj.version>
+        <jackson.version>2.18.2</jackson.version>
 
         <main.class>com.tpt.validator.App</main.class>
     </properties>
@@ -66,6 +67,12 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>

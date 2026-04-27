@@ -61,6 +61,11 @@ The validator walks the spec catalog and emits the following rule families:
 - **ISIN/<num>/<typeNum>** — Luhn checksum on instrument/issuer codes when the codification system field = 1 (ERROR).
 - **LEI/<num>/<typeNum>** — ISO 17442 mod-97 checksum when the type field flags an LEI (ERROR).
 - **XF-01..XF-15** — cross-field rules (e.g., field 11 = Y → SCR contributions mandatory, position weights sum ≈ 1, NAV ≈ price × shares, coupon frequency closed list, custodian code/type pair, interest-rate-type triggers, date order, maturity ≥ reporting, PIK case patterns, underlying CIC mandatory for derivatives, TPT version = V7).
+- **LEI-LIVE / ISIN-LIVE** — optional online cross-check against GLEIF and
+  OpenFIGI when the user opens *Settings…* and enables online validation.
+  Off by default. Works behind corporate HTTP/NTLM proxies via
+  *System proxy* mode (recommended) or manual proxy with encrypted
+  credentials. See `docs/superpowers/specs/2026-04-27-external-validation-gleif-openfigi-design.md`.
 
 Quality scoring categories (weighted into an overall score 0–100 %):
 

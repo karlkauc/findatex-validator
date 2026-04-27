@@ -4,7 +4,6 @@ import com.tpt.validator.config.AppSettings;
 import com.tpt.validator.config.PasswordCipher;
 import com.tpt.validator.config.SettingsService;
 import com.tpt.validator.external.gleif.GleifClient;
-import com.tpt.validator.external.http.HttpClientFactory;
 import com.tpt.validator.external.openfigi.OpenFigiClient;
 import com.tpt.validator.external.proxy.ProxyConfig;
 import com.tpt.validator.external.proxy.ProxyService;
@@ -124,7 +123,6 @@ public final class SettingsController {
         ProxyConfig cfg = ProxyConfig.from(collected.proxy(),
                 PasswordCipher.decrypt(collected.proxy().manual().passwordEncrypted()));
         ProxyService.applyMode(cfg);
-        HttpClientFactory.rebuild();
     }
 
     private static String quickGet(URI uri) {

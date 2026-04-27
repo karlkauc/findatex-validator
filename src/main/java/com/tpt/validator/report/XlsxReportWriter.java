@@ -5,6 +5,7 @@ import com.tpt.validator.spec.FieldSpec;
 import com.tpt.validator.spec.Profile;
 import com.tpt.validator.spec.SpecCatalog;
 import com.tpt.validator.validation.Finding;
+import com.tpt.validator.validation.FindingContext;
 import com.tpt.validator.validation.Severity;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -108,7 +109,10 @@ public final class XlsxReportWriter {
         Sheet s = wb.createSheet("Findings");
         int row = 0;
         addRow(s, row++, header,
-                "Severity", "Profile", "Rule", "Field#", "Field name", "Row", "Value", "Message");
+                "Severity", "Profile", "Rule",
+                "Fund ID", "Fund name", "Valuation date",
+                "Field#", "Field name", "Row", "Instrument code", "Instrument name",
+                "Weight", "Value", "Message");
         for (Finding f : r.findings()) {
             Row rr = s.createRow(row++);
             CellStyle style = switch (f.severity()) {
@@ -116,20 +120,30 @@ public final class XlsxReportWriter {
                 case WARNING -> warn;
                 case INFO -> null;
             };
+            FindingContext ctx = f.context() == null ? FindingContext.EMPTY : f.context();
+
             org.apache.poi.ss.usermodel.Cell c0 = rr.createCell(0);
             c0.setCellValue(f.severity().name());
             if (style != null) c0.setCellStyle(style);
             rr.createCell(1).setCellValue(f.profile() == null ? "" : f.profile().displayName());
             rr.createCell(2).setCellValue(f.ruleId());
-            rr.createCell(3).setCellValue(f.fieldNum() == null ? "" : f.fieldNum());
-            rr.createCell(4).setCellValue(f.fieldName() == null ? "" : f.fieldName());
-            rr.createCell(5).setCellValue(f.rowIndex() == null ? "" : f.rowIndex().toString());
-            rr.createCell(6).setCellValue(f.value() == null ? "" : f.value());
-            rr.createCell(7).setCellValue(f.message() == null ? "" : f.message());
+            rr.createCell(3).setCellValue(nz(ctx.portfolioId()));
+            rr.createCell(4).setCellValue(nz(ctx.portfolioName()));
+            rr.createCell(5).setCellValue(nz(ctx.valuationDate()));
+            rr.createCell(6).setCellValue(nz(f.fieldNum()));
+            rr.createCell(7).setCellValue(nz(f.fieldName()));
+            rr.createCell(8).setCellValue(f.rowIndex() == null ? "" : f.rowIndex().toString());
+            rr.createCell(9).setCellValue(nz(ctx.instrumentCode()));
+            rr.createCell(10).setCellValue(nz(ctx.instrumentName()));
+            rr.createCell(11).setCellValue(nz(ctx.valuationWeight()));
+            rr.createCell(12).setCellValue(nz(f.value()));
+            rr.createCell(13).setCellValue(nz(f.message()));
         }
-        s.createFreezePane(0, 1);
-        for (int c = 0; c < 8; c++) s.autoSizeColumn(c);
+        s.createFreezePane(3, 1);
+        for (int c = 0; c < 14; c++) s.autoSizeColumn(c);
     }
+
+    private static String nz(String s) { return s == null ? "" : s; }
 
     private void writeFieldCoverage(Workbook wb, QualityReport r, CellStyle header) {
         Sheet s = wb.createSheet("Field Coverage");

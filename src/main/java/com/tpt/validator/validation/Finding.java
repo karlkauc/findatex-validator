@@ -10,7 +10,13 @@ public record Finding(
         String fieldName,           // human-readable
         Integer rowIndex,           // null for portfolio/global
         String value,               // raw cell value (or null)
-        String message) {
+        String message,
+        FindingContext context) {   // attached by FindingEnricher; null until enrichment
+
+    public Finding(Severity severity, String ruleId, Profile profile, String fieldNum,
+                   String fieldName, Integer rowIndex, String value, String message) {
+        this(severity, ruleId, profile, fieldNum, fieldName, rowIndex, value, message, null);
+    }
 
     public static Finding error(String ruleId, Profile p, String fieldNum, String fieldName,
                                 Integer rowIdx, String value, String message) {
@@ -25,5 +31,10 @@ public record Finding(
     public static Finding info(String ruleId, Profile p, String fieldNum, String fieldName,
                                Integer rowIdx, String value, String message) {
         return new Finding(Severity.INFO, ruleId, p, fieldNum, fieldName, rowIdx, value, message);
+    }
+
+    /** Returns a new Finding with the given context attached (immutable). */
+    public Finding withContext(FindingContext ctx) {
+        return new Finding(severity, ruleId, profile, fieldNum, fieldName, rowIndex, value, message, ctx);
     }
 }

@@ -70,10 +70,16 @@ public final class MainController {
     @FXML private TableView<FindingRow> findingsTable;
     @FXML private TableColumn<FindingRow, String> colSeverity;
     @FXML private TableColumn<FindingRow, String> colProfile;
+    @FXML private TableColumn<FindingRow, String> colFundId;
+    @FXML private TableColumn<FindingRow, String> colFundName;
+    @FXML private TableColumn<FindingRow, String> colDate;
+    @FXML private TableColumn<FindingRow, String> colRow;
+    @FXML private TableColumn<FindingRow, String> colInstCode;
+    @FXML private TableColumn<FindingRow, String> colInstName;
+    @FXML private TableColumn<FindingRow, String> colWeight;
     @FXML private TableColumn<FindingRow, String> colRule;
     @FXML private TableColumn<FindingRow, String> colField;
     @FXML private TableColumn<FindingRow, String> colFieldName;
-    @FXML private TableColumn<FindingRow, String> colRow;
     @FXML private TableColumn<FindingRow, String> colMessage;
 
     public MainController(SpecCatalog catalog) {
@@ -88,10 +94,16 @@ public final class MainController {
     public void initialize() {
         colSeverity.setCellValueFactory(new PropertyValueFactory<>("severity"));
         colProfile.setCellValueFactory(new PropertyValueFactory<>("profile"));
+        colFundId.setCellValueFactory(new PropertyValueFactory<>("fundId"));
+        colFundName.setCellValueFactory(new PropertyValueFactory<>("fundName"));
+        colDate.setCellValueFactory(new PropertyValueFactory<>("valuationDate"));
+        colRow.setCellValueFactory(new PropertyValueFactory<>("rowIndex"));
+        colInstCode.setCellValueFactory(new PropertyValueFactory<>("instrumentCode"));
+        colInstName.setCellValueFactory(new PropertyValueFactory<>("instrumentName"));
+        colWeight.setCellValueFactory(new PropertyValueFactory<>("weight"));
         colRule.setCellValueFactory(new PropertyValueFactory<>("rule"));
         colField.setCellValueFactory(new PropertyValueFactory<>("field"));
         colFieldName.setCellValueFactory(new PropertyValueFactory<>("fieldName"));
-        colRow.setCellValueFactory(new PropertyValueFactory<>("rowIndex"));
         colMessage.setCellValueFactory(new PropertyValueFactory<>("message"));
 
         filteredFindings = new FilteredList<>(allFindings, fr -> true);
@@ -246,28 +258,62 @@ public final class MainController {
     public static final class FindingRow {
         private final String severity;
         private final String profile;
+        private final String fundId;
+        private final String fundName;
+        private final String valuationDate;
+        private final String rowIndex;
+        private final String instrumentCode;
+        private final String instrumentName;
+        private final String weight;
         private final String rule;
         private final String field;
         private final String fieldName;
-        private final String rowIndex;
         private final String message;
 
         private FindingRow(Finding f) {
-            this.severity  = f.severity().name();
-            this.profile   = f.profile() == null ? "" : f.profile().displayName();
-            this.rule      = f.ruleId();
-            this.field     = f.fieldNum() == null ? "" : f.fieldNum();
-            this.fieldName = f.fieldName() == null ? "" : f.fieldName();
-            this.rowIndex  = f.rowIndex() == null ? "" : Integer.toString(f.rowIndex());
-            this.message   = f.message() == null ? "" : f.message();
+            com.tpt.validator.validation.FindingContext c =
+                    f.context() == null ? com.tpt.validator.validation.FindingContext.EMPTY : f.context();
+            this.severity       = f.severity().name();
+            this.profile        = f.profile() == null ? "" : f.profile().displayName();
+            this.fundId         = nz(c.portfolioId());
+            this.fundName       = nz(c.portfolioName());
+            this.valuationDate  = nz(c.valuationDate());
+            this.rowIndex       = f.rowIndex() == null ? "" : Integer.toString(f.rowIndex());
+            this.instrumentCode = nz(c.instrumentCode());
+            this.instrumentName = nz(c.instrumentName());
+            this.weight         = formatWeight(c.valuationWeight());
+            this.rule           = f.ruleId();
+            this.field          = nz(f.fieldNum());
+            this.fieldName      = nz(f.fieldName());
+            this.message        = nz(f.message());
         }
+
+        private static String nz(String s) { return s == null ? "" : s; }
+
+        /** Render the raw weight as a percentage with 2 decimals when parseable; otherwise pass through. */
+        private static String formatWeight(String raw) {
+            if (raw == null || raw.isBlank()) return "";
+            try {
+                double d = Double.parseDouble(raw.replace(",", "."));
+                return String.format("%.2f %%", d * 100);
+            } catch (NumberFormatException e) {
+                return raw;
+            }
+        }
+
         public static FindingRow of(Finding f) { return new FindingRow(f); }
-        public String getSeverity()  { return severity; }
-        public String getProfile()   { return profile; }
-        public String getRule()      { return rule; }
-        public String getField()     { return field; }
-        public String getFieldName() { return fieldName; }
-        public String getRowIndex()  { return rowIndex; }
-        public String getMessage()   { return message; }
+        public String getSeverity()       { return severity; }
+        public String getProfile()        { return profile; }
+        public String getFundId()         { return fundId; }
+        public String getFundName()       { return fundName; }
+        public String getValuationDate()  { return valuationDate; }
+        public String getRowIndex()       { return rowIndex; }
+        public String getInstrumentCode() { return instrumentCode; }
+        public String getInstrumentName() { return instrumentName; }
+        public String getWeight()         { return weight; }
+        public String getRule()           { return rule; }
+        public String getField()          { return field; }
+        public String getFieldName()      { return fieldName; }
+        public String getMessage()        { return message; }
     }
 }

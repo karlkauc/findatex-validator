@@ -63,13 +63,19 @@
 
                 <TableView fx:id="findingsTable" prefHeight="320">
                     <columns>
-                        <TableColumn fx:id="colSeverity" text="Severity" prefWidth="90"/>
-                        <TableColumn fx:id="colProfile" text="Profile" prefWidth="160"/>
-                        <TableColumn fx:id="colRule" text="Rule" prefWidth="220"/>
-                        <TableColumn fx:id="colField" text="Field" prefWidth="100"/>
-                        <TableColumn fx:id="colFieldName" text="Field name" prefWidth="280"/>
-                        <TableColumn fx:id="colRow" text="Row" prefWidth="70"/>
-                        <TableColumn fx:id="colMessage" text="Message" prefWidth="500"/>
+                        <TableColumn fx:id="colSeverity"   text="Severity"        prefWidth="90"/>
+                        <TableColumn fx:id="colProfile"    text="Profile"         prefWidth="140"/>
+                        <TableColumn fx:id="colFundId"     text="Fund ID"         prefWidth="130"/>
+                        <TableColumn fx:id="colFundName"   text="Fund name"       prefWidth="180"/>
+                        <TableColumn fx:id="colDate"       text="Valuation date"  prefWidth="100"/>
+                        <TableColumn fx:id="colRow"        text="Row"             prefWidth="60"/>
+                        <TableColumn fx:id="colInstCode"   text="Instrument code" prefWidth="160"/>
+                        <TableColumn fx:id="colInstName"   text="Instrument"      prefWidth="180"/>
+                        <TableColumn fx:id="colWeight"     text="Weight"          prefWidth="80"/>
+                        <TableColumn fx:id="colRule"       text="Rule"            prefWidth="180"/>
+                        <TableColumn fx:id="colField"      text="Field"           prefWidth="80"/>
+                        <TableColumn fx:id="colFieldName"  text="Field name"      prefWidth="220"/>
+                        <TableColumn fx:id="colMessage"    text="Message"         prefWidth="380"/>
                     </columns>
                 </TableView>
             </VBox>

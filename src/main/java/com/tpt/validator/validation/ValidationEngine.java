@@ -31,6 +31,9 @@ public final class ValidationEngine {
                 log.warn("Rule {} threw {}: {}", r.id(), e.getClass().getSimpleName(), e.getMessage());
             }
         }
+        // Enrich with portfolio + position context so reports / UI can show fund name,
+        // ISIN, valuation date and (per-row) the affected instrument and its weight.
+        findings = FindingEnricher.enrich(file, findings);
         log.info("Validation produced {} findings ({} rules, {} rows)",
                 findings.size(), rules.size(), file.rows().size());
         return findings;

@@ -52,9 +52,18 @@ class XlsxReportWriterTest {
                     .as("Findings sheet should contain at least the header row + data rows")
                     .isGreaterThan(report.findings().size() - 5); // tolerate any zero-indexing slack
 
-            // Header row sanity
-            assertThat(findings.getRow(0).getCell(0).getStringCellValue()).isEqualTo("Severity");
-            assertThat(findings.getRow(0).getCell(7).getStringCellValue()).isEqualTo("Message");
+            // Header row sanity — the Findings tab now has 14 columns including
+            // portfolio + position context (Fund ID, Fund name, Valuation date,
+            // Instrument code, Instrument name, Weight).
+            org.apache.poi.ss.usermodel.Row hdr = findings.getRow(0);
+            java.util.List<String> headers = new java.util.ArrayList<>();
+            for (int c = 0; c < hdr.getLastCellNum(); c++) headers.add(hdr.getCell(c).getStringCellValue());
+            assertThat(headers).containsExactly(
+                    "Severity", "Profile", "Rule",
+                    "Fund ID", "Fund name", "Valuation date",
+                    "Field#", "Field name", "Row",
+                    "Instrument code", "Instrument name",
+                    "Weight", "Value", "Message");
 
             // Field Coverage tab carries 142 rows + header.
             Sheet coverage = wb.getSheet("Field Coverage");

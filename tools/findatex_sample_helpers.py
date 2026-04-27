@@ -12,7 +12,6 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 
 import openpyxl
 
@@ -56,9 +55,7 @@ def load_spec(template_id: str, version: str) -> tuple[dict, list[FieldRow]]:
     for r in range(manifest["firstDataRow"], sheet.max_row + 1):
         num = sheet.cell(r, cols["numData"]).value
         path = sheet.cell(r, cols["path"]).value
-        if num is None and path is None:
-            continue
-        # Section-header rows have a non-numeric NUM and no path.
+        # Section-header rows have a NUM but no path; drop them.
         if path is None:
             continue
         flag = sheet.cell(r, cols["primaryFlag"]).value or ""
@@ -75,7 +72,7 @@ def load_spec(template_id: str, version: str) -> tuple[dict, list[FieldRow]]:
 # ---------- value heuristics ----------------------------------------------
 
 # Hand-rolled: matches by case-insensitive substring, first hit wins. Order matters.
-def value_for(codif: str, num: str = "") -> str:
+def value_for(codif: str) -> str:
     c = (codif or "").lower()
 
     # Version-literal fields (EET row 1, EMT row 1, EPT row 1) get their literal token.
@@ -101,7 +98,7 @@ def value_for(codif: str, num: str = "") -> str:
         return "EUR"
 
     # ISIN priority cell ("Use the following priority: - ISO 6166 code...") → valid ISIN
-    if "iso 6166" in c or "isin" in c:
+    if "iso 6166" in c or c.strip() == "isin":
         return "DE0007164600"  # SAP SE — valid Luhn
 
     # Closed list of small numeric codes ("0 / 6 / 8 / 9")
@@ -122,6 +119,9 @@ def value_for(codif: str, num: str = "") -> str:
         # Strip surrounding quotes/punctuation
         first = first.strip("\"' ,")
         if first:
+            # If the first option is a short token (likely a code like "S", "ETC"),
+            # return it verbatim. Long tokens mean the cell is a prose explanation
+            # rather than a real closed list — fall back to a known-good code.
             return first.upper() if len(first) <= 4 else "S"
 
     # "1 to 4", "number [1 - 7]", "1, or 2, or 3", "number [1 - 6]"
@@ -152,6 +152,11 @@ def value_for(codif: str, num: str = "") -> str:
     return "Sample"
 
 
+# Note: ISIN/LEI checksum helpers (make_isin / make_lei) intentionally live in
+# tools/build_examples.py rather than being re-exported here — the EET/EMT/EPT
+# generators do not need synthetic checksum-valid identifiers (they use
+# DE0007164600 directly via value_for).
+
 # ---------- writers --------------------------------------------------------
 
 def write_xlsx(path: Path, sheet_name: str, headers: list[str], rows: list[list[str]]) -> None:
@@ -179,5 +184,5 @@ if __name__ == "__main__":
               f"(sheet={manifest['sheetName']!r})")
         sample_idx = [r for r in rows if r.flag == "M"][:3]
         for r in sample_idx:
-            v = value_for(r.codif, r.num)
+            v = value_for(r.codif)
             print(f"  num={r.num} path={r.path}  →  {v!r}")

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="com.tpt.validator.ui.SettingsController"
+         tabClosingPolicy="UNAVAILABLE" prefWidth="640" prefHeight="540">
+  <tabs>
+    <Tab text="External Validation">
+      <content>
+        <VBox spacing="14">
+          <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+
+          <TitledPane text="GLEIF (LEI)" collapsible="false">
+            <VBox spacing="6">
+              <CheckBox fx:id="leiEnabled" text="Enable GLEIF lookup"/>
+              <CheckBox fx:id="leiLapsed" text="Flag lapsed/retired LEIs"/>
+              <CheckBox fx:id="leiName"   text="Compare issuer name (field 46) with GLEIF"/>
+              <CheckBox fx:id="leiCountry" text="Compare issuer country (field 52) with GLEIF"/>
+              <Button fx:id="testGleif" text="Test GLEIF connection" onAction="#onTestGleif"/>
+              <Label fx:id="testGleifResult"/>
+            </VBox>
+          </TitledPane>
+
+          <TitledPane text="OpenFIGI (ISIN)" collapsible="false">
+            <VBox spacing="6">
+              <CheckBox fx:id="isinEnabled" text="Enable OpenFIGI lookup"/>
+              <HBox spacing="6">
+                <Label text="API key (optional):"/>
+                <TextField fx:id="figiKey" prefColumnCount="32"/>
+              </HBox>
+              <CheckBox fx:id="isinCcy" text="Compare quotation currency (field 21)"/>
+              <CheckBox fx:id="isinCic" text="Compare CIC vs OpenFIGI security type"/>
+              <Button fx:id="testFigi" text="Test OpenFIGI connection" onAction="#onTestFigi"/>
+              <Label fx:id="testFigiResult"/>
+            </VBox>
+          </TitledPane>
+
+          <TitledPane text="Cache" collapsible="false">
+            <HBox spacing="10">
+              <Label text="TTL (days):"/>
+              <Spinner fx:id="ttlDays" min="1" max="365" initialValue="7"/>
+              <Button fx:id="clearCache" text="Clear cache" onAction="#onClearCache"/>
+            </HBox>
+          </TitledPane>
+        </VBox>
+      </content>
+    </Tab>
+
+    <Tab text="Network / Proxy">
+      <content>
+        <VBox spacing="10">
+          <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+          <Label text="Proxy mode:"/>
+          <RadioButton fx:id="modeSystem" text="Use system proxy (recommended)"/>
+          <RadioButton fx:id="modeManual" text="Manual proxy"/>
+          <RadioButton fx:id="modeNone"   text="Direct connection (no proxy)"/>
+
+          <TitledPane text="Manual proxy" collapsible="false">
+            <GridPane hgap="8" vgap="6">
+              <Label text="Host:"     GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+              <TextField fx:id="pxHost" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+              <Label text="Port:"     GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+              <TextField fx:id="pxPort" prefColumnCount="6" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+              <Label text="User:"     GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+              <TextField fx:id="pxUser" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+              <Label text="Password:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+              <PasswordField fx:id="pxPass" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+              <Label text="No-proxy:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+              <TextField fx:id="pxBypass" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+            </GridPane>
+          </TitledPane>
+
+          <Label fx:id="diagnosticsLabel" text=""/>
+        </VBox>
+      </content>
+    </Tab>
+  </tabs>
+</TabPane>

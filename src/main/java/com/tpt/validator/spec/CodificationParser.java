@@ -8,8 +8,19 @@ import java.util.regex.Pattern;
 
 public final class CodificationParser {
 
+    /**
+     * Closed-list bullet line. Two branches:
+     * <ul>
+     *   <li>Digit-led code (e.g. {@code 1}, {@code 3L}) followed by {@code -}, {@code –} or {@code .}.</li>
+     *   <li>Pure-letter code (e.g. {@code A}, {@code L}) followed only by {@code -} or {@code –}.
+     *       Period is intentionally excluded for letter-led codes; otherwise narrative bullets
+     *       like {@code e.g. "BLOOMBERG"...} would be misparsed as a closed-list entry with
+     *       code {@code e}.</li>
+     * </ul>
+     * Group 1 captures a digit-led code, group 2 captures a pure-letter code, group 3 is the label.
+     */
     private static final Pattern CLOSED_LIST_LINE =
-            Pattern.compile("^\\s*(\\d+[a-zA-Z]?|[A-Za-z])\\s*[-–.]\\s*(.+)$", Pattern.MULTILINE);
+            Pattern.compile("^\\s*(?:(\\d+[a-zA-Z]?)\\s*[-–.]|([A-Za-z])\\s*[-–])\\s*(.+)$", Pattern.MULTILINE);
     /** Quoted token list, e.g. {@code "Bullet", "Sinkable"} or {@code "Y" ; "N"; "EPM"}. */
     private static final Pattern QUOTED_TOKEN =
             Pattern.compile("\"([A-Za-z0-9 _-]{1,40})\"");
@@ -75,8 +86,8 @@ public final class CodificationParser {
         List<CodificationDescriptor.ClosedListEntry> entries = new ArrayList<>();
         Matcher m = CLOSED_LIST_LINE.matcher(text);
         while (m.find()) {
-            String code = m.group(1).trim();
-            String label = m.group(2).trim();
+            String code = (m.group(1) != null ? m.group(1) : m.group(2)).trim();
+            String label = m.group(3).trim();
             entries.add(new CodificationDescriptor.ClosedListEntry(code, label));
         }
         // The regex also matches free-text bullets like "1. ISO 6166". To reduce false

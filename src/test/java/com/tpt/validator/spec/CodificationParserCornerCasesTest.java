@@ -168,4 +168,29 @@ class CodificationParserCornerCasesTest {
                         "1", "2", "3L", "3X", "4", "5", "6", "7", "8", "9", "0",
                         "A", "B", "C", "D", "E", "F", "L");
     }
+
+    /** Field 35 spec text is free-text with an example, not a closed list. */
+    @Test
+    void exampleStringDoesNotBecomeClosedList() {
+        CodificationDescriptor d = CodificationParser.parse(
+                " e.g. \"BLOOMBERG\" or empty (if internal codification)");
+        assertThat(d.kind()).isNotEqualTo(CodificationKind.CLOSED_LIST);
+        assertThat(d.closedList()).isEmpty();
+    }
+
+    /** Pure-letter code with period must not match — narrative bullets like "i.e. ..." or "e.g. ...". */
+    @Test
+    void pureLetterCodeRequiresHyphenSeparator() {
+        // Hyphen-separated single-letter list is fine (≥1 entries detected).
+        CodificationDescriptor hyphen = CodificationParser.parse(
+                "Pick one:\nA - Alpha\nB - Beta");
+        assertThat(hyphen.closedList())
+                .extracting(CodificationDescriptor.ClosedListEntry::code)
+                .containsExactlyInAnyOrder("A", "B");
+
+        // Period-separated single-letter is NOT treated as a closed list.
+        CodificationDescriptor period = CodificationParser.parse(
+                "i.e. some explanation goes here");
+        assertThat(period.closedList()).isEmpty();
+    }
 }

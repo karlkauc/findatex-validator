@@ -4,8 +4,8 @@ import com.tpt.validator.domain.TptFile;
 import com.tpt.validator.domain.TptRow;
 import com.tpt.validator.spec.FieldSpec;
 import com.tpt.validator.spec.Flag;
-import com.tpt.validator.spec.Profile;
 import com.tpt.validator.spec.SpecCatalog;
+import com.tpt.validator.template.api.ProfileKey;
 import com.tpt.validator.validation.Finding;
 import com.tpt.validator.validation.Severity;
 
@@ -30,15 +30,15 @@ public final class QualityScorer {
         this.catalog = catalog;
     }
 
-    public QualityReport score(TptFile file, Set<Profile> active, List<Finding> findings) {
+    public QualityReport score(TptFile file, Set<ProfileKey> active, List<Finding> findings) {
         Map<ScoreCategory, Double> overall = new EnumMap<>(ScoreCategory.class);
-        Map<Profile, Map<ScoreCategory, Double>> perProfile = new LinkedHashMap<>();
+        Map<ProfileKey, Map<ScoreCategory, Double>> perProfile = new LinkedHashMap<>();
 
         long mandatoryAll = 0, mandatoryMissing = 0;
-        for (Profile p : active) {
+        for (ProfileKey p : active) {
             long total = countMandatorySlots(file, p);
             long missing = findings.stream()
-                    .filter(f -> f.profile() == p && f.severity() == Severity.ERROR)
+                    .filter(f -> p.equals(f.profile()) && f.severity() == Severity.ERROR)
                     .filter(f -> f.ruleId().startsWith("PRESENCE/"))
                     .count();
             double score = total == 0 ? 1.0 : 1.0 - (double) missing / total;
@@ -49,7 +49,7 @@ public final class QualityScorer {
 
             // Profile completeness combines M+C presence findings for the profile.
             long condMissing = findings.stream()
-                    .filter(f -> f.profile() == p)
+                    .filter(f -> p.equals(f.profile()))
                     .filter(f -> f.ruleId().startsWith("COND_PRESENCE/"))
                     .count();
             long condTotal = countConditionalSlots(file, p);
@@ -119,7 +119,7 @@ public final class QualityScorer {
         return f.message() != null && f.message().contains("closed list");
     }
 
-    private long countMandatorySlots(TptFile file, Profile p) {
+    private long countMandatorySlots(TptFile file, ProfileKey p) {
         long total = 0;
         for (FieldSpec spec : catalog.fields()) {
             if (spec.flag(p) != Flag.M) continue;
@@ -130,7 +130,7 @@ public final class QualityScorer {
         return total;
     }
 
-    private long countConditionalSlots(TptFile file, Profile p) {
+    private long countConditionalSlots(TptFile file, ProfileKey p) {
         long total = 0;
         for (FieldSpec spec : catalog.fields()) {
             if (spec.flag(p) != Flag.C) continue;

@@ -1,6 +1,7 @@
 package com.tpt.validator.validation;
 
-import com.tpt.validator.spec.Profile;
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
 import com.tpt.validator.spec.SpecCatalog;
 import com.tpt.validator.spec.SpecLoader;
 import com.tpt.validator.validation.rules.ConditionalPresenceRule;
@@ -9,7 +10,6 @@ import com.tpt.validator.validation.rules.crossfield.ConditionalFieldPresenceRul
 import com.tpt.validator.validation.rules.crossfield.ConditionalRequirement;
 import org.junit.jupiter.api.Test;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RuleRegistryTest {
 
     private static final SpecCatalog CATALOG = SpecLoader.loadBundled();
-    private static final Set<Profile> ALL = EnumSet.allOf(Profile.class);
+    private static final Set<ProfileKey> ALL = new java.util.HashSet<>(java.util.Arrays.asList(TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB, TptProfiles.NW_675, TptProfiles.SST));
 
     @Test
     void everyConditionalRequirementProducesARule() {

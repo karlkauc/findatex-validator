@@ -1,5 +1,8 @@
 package com.tpt.validator.spec;
 
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumMap;
@@ -84,6 +87,6 @@ class SpecCatalogEdgeCasesTest {
     private static FieldSpec stub(String numKey, String path) {
         return new FieldSpec(numKey + "_x", path, "def", "comment", "raw",
                 new CodificationDescriptor(CodificationKind.UNKNOWN, Optional.empty(), List.of(), "raw"),
-                new EnumMap<>(Profile.class), Set.of(), 1);
+                new java.util.HashMap<ProfileKey, Flag>(), Set.of(), 1);
     }
 }

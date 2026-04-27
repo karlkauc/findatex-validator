@@ -1,7 +1,8 @@
 package com.tpt.validator.report;
 
 import com.tpt.validator.domain.TptFile;
-import com.tpt.validator.spec.Profile;
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
 import com.tpt.validator.spec.SpecCatalog;
 import com.tpt.validator.spec.SpecLoader;
 import com.tpt.validator.validation.Finding;
@@ -10,9 +11,9 @@ import com.tpt.validator.validation.TestFileBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +27,7 @@ class QualityScorerEdgeCasesTest {
         TptFile empty = new TptFile(Path.of("empty.csv"), "csv", List.of(),
                 new LinkedHashMap<>(), List.of(), List.of());
         QualityReport report = new QualityScorer(CATALOG)
-                .score(empty, EnumSet.of(Profile.SOLVENCY_II), List.of());
+                .score(empty, Set.of(TptProfiles.SOLVENCY_II), List.of());
         assertThat(report.scores().get(ScoreCategory.MANDATORY_COMPLETENESS)).isEqualTo(1.0);
         assertThat(report.scores().get(ScoreCategory.FORMAT_CONFORMANCE)).isEqualTo(1.0);
         assertThat(report.scores().get(ScoreCategory.CLOSED_LIST_CONFORMANCE)).isEqualTo(1.0);
@@ -41,10 +42,10 @@ class QualityScorerEdgeCasesTest {
                 .build();
         // Synthetic missing-mandatory finding pretending field 5 is missing.
         List<Finding> findings = List.of(
-                Finding.error("PRESENCE/5/SOLVENCY_II", Profile.SOLVENCY_II, "5",
+                Finding.error("PRESENCE/5/SOLVENCY_II", TptProfiles.SOLVENCY_II, "5",
                         "5_NetAssetValuation", 1, null, "missing"));
         QualityReport r = new QualityScorer(CATALOG)
-                .score(file, EnumSet.of(Profile.SOLVENCY_II), findings);
+                .score(file, Set.of(TptProfiles.SOLVENCY_II), findings);
         assertThat(r.scores().get(ScoreCategory.MANDATORY_COMPLETENESS))
                 .as("one missing M field out of many → score drops slightly")
                 .isLessThan(1.0);
@@ -58,7 +59,7 @@ class QualityScorerEdgeCasesTest {
         List<Finding> findings = List.of(
                 Finding.error("FORMAT/21", null, "21", "Currency", 1, "ZZZ", "Unknown ISO 4217"));
         QualityReport r = new QualityScorer(CATALOG)
-                .score(file, EnumSet.of(Profile.SOLVENCY_II), findings);
+                .score(file, Set.of(TptProfiles.SOLVENCY_II), findings);
         assertThat(r.scores().get(ScoreCategory.FORMAT_CONFORMANCE)).isLessThan(1.0);
     }
 
@@ -70,7 +71,7 @@ class QualityScorerEdgeCasesTest {
         Finding closedListErr = Finding.error("FORMAT/15", null, "15", "CodifSystem", 1,
                 "42", "Value '42' is not in the closed list (1, 2, 99)");
         QualityReport r = new QualityScorer(CATALOG)
-                .score(file, EnumSet.of(Profile.SOLVENCY_II), List.of(closedListErr));
+                .score(file, Set.of(TptProfiles.SOLVENCY_II), List.of(closedListErr));
         // The scorer routes "closed list" errors to CLOSED_LIST_CONFORMANCE.
         assertThat(r.scores().get(ScoreCategory.CLOSED_LIST_CONFORMANCE)).isLessThan(1.0);
     }
@@ -82,7 +83,7 @@ class QualityScorerEdgeCasesTest {
                 .build();
         // Empty findings → all categories are 1.0 → overall must be 1.0.
         QualityReport perfect = new QualityScorer(CATALOG)
-                .score(file, EnumSet.of(Profile.SOLVENCY_II), List.of());
+                .score(file, Set.of(TptProfiles.SOLVENCY_II), List.of());
         assertThat(perfect.scores().get(ScoreCategory.OVERALL)).isEqualTo(1.0);
     }
 
@@ -92,9 +93,9 @@ class QualityScorerEdgeCasesTest {
                 .row(TestFileBuilder.values("12", "FR12"))
                 .build();
         QualityReport r = new QualityScorer(CATALOG)
-                .score(file, EnumSet.allOf(Profile.class), List.of());
-        assertThat(r.perProfileScores()).hasSize(Profile.values().length);
-        for (Profile p : Profile.values()) {
+                .score(file, new java.util.HashSet<>(java.util.Arrays.asList(TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB, TptProfiles.NW_675, TptProfiles.SST)), List.of());
+        assertThat(r.perProfileScores()).hasSize(TptProfiles.ALL.all().size());
+        for (ProfileKey p : TptProfiles.ALL.all()) {
             assertThat(r.perProfileScores()).containsKey(p);
             assertThat(r.perProfileScores().get(p)).containsKey(ScoreCategory.PROFILE_COMPLETENESS);
         }
@@ -112,7 +113,7 @@ class QualityScorerEdgeCasesTest {
             manyErrors.add(Finding.error("FORMAT/12", null, "12", "x", 1, "y", "z"));
         }
         QualityReport r = new QualityScorer(CATALOG)
-                .score(file, EnumSet.of(Profile.SOLVENCY_II), manyErrors);
+                .score(file, Set.of(TptProfiles.SOLVENCY_II), manyErrors);
         // No score may exceed 1.0 or be negative.
         for (Double v : r.scores().values()) {
             assertThat(v).isBetween(0.0, 1.0);
@@ -134,7 +135,7 @@ class QualityScorerEdgeCasesTest {
                 Finding.warn ("XF-04/POSITION_WEIGHT_SUM", null, "26", "Weight", null, "0.7", "off"),
                 Finding.info ("XF-15/TPT_VERSION", null, "1000", "Version", null, null, "missing"));
         QualityReport r = new QualityScorer(CATALOG)
-                .score(file, EnumSet.of(Profile.SOLVENCY_II), findings);
+                .score(file, Set.of(TptProfiles.SOLVENCY_II), findings);
 
         long e = r.findings().stream().filter(f -> f.severity() == Severity.ERROR).count();
         long w = r.findings().stream().filter(f -> f.severity() == Severity.WARNING).count();

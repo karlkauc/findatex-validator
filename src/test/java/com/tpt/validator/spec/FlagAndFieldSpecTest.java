@@ -1,5 +1,8 @@
 package com.tpt.validator.spec;
 
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -61,25 +64,25 @@ class FlagAndFieldSpecTest {
 
     @Test
     void flagAccessorsReturnDefaultUnknownForMissingProfile() {
-        FieldSpec spec = makeFieldSpec(Map.of(Profile.SOLVENCY_II, Flag.M));
-        assertThat(spec.flag(Profile.SOLVENCY_II)).isEqualTo(Flag.M);
-        assertThat(spec.flag(Profile.NW_675)).isEqualTo(Flag.UNKNOWN);
+        FieldSpec spec = makeFieldSpec(Map.of(TptProfiles.SOLVENCY_II, Flag.M));
+        assertThat(spec.flag(TptProfiles.SOLVENCY_II)).isEqualTo(Flag.M);
+        assertThat(spec.flag(TptProfiles.NW_675)).isEqualTo(Flag.UNKNOWN);
     }
 
     @Test
     void mandatoryAndConditionalFlagShortcutsWork() {
-        FieldSpec mandatory = makeFieldSpec(Map.of(Profile.SOLVENCY_II, Flag.M));
-        FieldSpec conditional = makeFieldSpec(Map.of(Profile.SOLVENCY_II, Flag.C));
-        FieldSpec optional = makeFieldSpec(Map.of(Profile.SOLVENCY_II, Flag.O));
+        FieldSpec mandatory = makeFieldSpec(Map.of(TptProfiles.SOLVENCY_II, Flag.M));
+        FieldSpec conditional = makeFieldSpec(Map.of(TptProfiles.SOLVENCY_II, Flag.C));
+        FieldSpec optional = makeFieldSpec(Map.of(TptProfiles.SOLVENCY_II, Flag.O));
 
-        assertThat(mandatory.isMandatoryFor(Profile.SOLVENCY_II)).isTrue();
-        assertThat(mandatory.isConditionalFor(Profile.SOLVENCY_II)).isFalse();
+        assertThat(mandatory.isMandatoryFor(TptProfiles.SOLVENCY_II)).isTrue();
+        assertThat(mandatory.isConditionalFor(TptProfiles.SOLVENCY_II)).isFalse();
 
-        assertThat(conditional.isMandatoryFor(Profile.SOLVENCY_II)).isFalse();
-        assertThat(conditional.isConditionalFor(Profile.SOLVENCY_II)).isTrue();
+        assertThat(conditional.isMandatoryFor(TptProfiles.SOLVENCY_II)).isFalse();
+        assertThat(conditional.isConditionalFor(TptProfiles.SOLVENCY_II)).isTrue();
 
-        assertThat(optional.isMandatoryFor(Profile.SOLVENCY_II)).isFalse();
-        assertThat(optional.isConditionalFor(Profile.SOLVENCY_II)).isFalse();
+        assertThat(optional.isMandatoryFor(TptProfiles.SOLVENCY_II)).isFalse();
+        assertThat(optional.isConditionalFor(TptProfiles.SOLVENCY_II)).isFalse();
     }
 
     @Test
@@ -124,12 +127,12 @@ class FlagAndFieldSpecTest {
         assertThat(futuresOnly.appliesToCic("a")).isTrue();
     }
 
-    private static FieldSpec makeFieldSpec(Map<Profile, Flag> flags) {
+    private static FieldSpec makeFieldSpec(Map<ProfileKey, Flag> flags) {
         return makeFieldSpec(flags, Set.of());
     }
 
-    private static FieldSpec makeFieldSpec(Map<Profile, Flag> flags, Set<String> cics) {
-        Map<Profile, Flag> map = new EnumMap<>(Profile.class);
+    private static FieldSpec makeFieldSpec(Map<ProfileKey, Flag> flags, Set<String> cics) {
+        Map<ProfileKey, Flag> map = new java.util.HashMap<ProfileKey, Flag>();
         map.putAll(flags);
         return new FieldSpec("12_test", "Position / Test", "def", "comment",
                 "raw", new CodificationDescriptor(CodificationKind.UNKNOWN, java.util.Optional.empty(),

@@ -2,7 +2,7 @@ package com.tpt.validator.validation.rules;
 
 import com.tpt.validator.domain.TptRow;
 import com.tpt.validator.spec.FieldSpec;
-import com.tpt.validator.spec.Profile;
+import com.tpt.validator.template.api.ProfileKey;
 import com.tpt.validator.validation.Finding;
 import com.tpt.validator.validation.Rule;
 import com.tpt.validator.validation.ValidationContext;
@@ -18,15 +18,15 @@ import java.util.List;
 public final class ConditionalPresenceRule implements Rule {
 
     private final FieldSpec spec;
-    private final Profile profile;
+    private final ProfileKey profile;
 
-    public ConditionalPresenceRule(FieldSpec spec, Profile profile) {
+    public ConditionalPresenceRule(FieldSpec spec, ProfileKey profile) {
         this.spec = spec;
         this.profile = profile;
     }
 
     @Override
-    public String id() { return "COND_PRESENCE/" + spec.numKey() + "/" + profile.name(); }
+    public String id() { return "COND_PRESENCE/" + spec.numKey() + "/" + profile.code(); }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

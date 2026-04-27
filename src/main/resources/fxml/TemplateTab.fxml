@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Template-agnostic tab content. Hosted inside the MainView TabPane (one tab per registered
+    TemplateDefinition). The TemplateTabController populates the version ComboBox and the
+    profile FlowPane dynamically from its TemplateDefinition; the rest of the markup is
+    identical across all templates so layout drift is impossible.
+-->
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fitToWidth="true" styleClass="template-tab">
+    <VBox spacing="14" styleClass="form-area">
+        <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+
+        <Label fx:id="emptySpecNotice" managed="false" visible="false"
+               text="Spec nicht installiert — siehe docs/SPEC_DOWNLOADS.md"
+               styleClass="status-label"/>
+
+        <Label text="1. Version" styleClass="section-title"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <ComboBox fx:id="versionCombo" prefWidth="320"/>
+            <Label fx:id="versionDateLabel" styleClass="status-label"/>
+        </HBox>
+
+        <Label text="2. Choose a file" styleClass="section-title"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="filePathField" prefWidth="700" promptText="Pick an .xlsx or .csv file..."/>
+            <Button text="Browse..." fx:id="browseButton" onAction="#onBrowse" styleClass="primary-button"/>
+        </HBox>
+
+        <Label text="3. Select regulatory profiles to validate" styleClass="section-title"/>
+        <FlowPane fx:id="profilePane" hgap="20" vgap="6"/>
+
+        <HBox fx:id="externalRow" spacing="10" alignment="CENTER_LEFT">
+            <CheckBox fx:id="externalEnabled" text="Online validation (GLEIF + OpenFIGI)"/>
+            <Label fx:id="externalStatusLabel" text="" style="-fx-text-fill: #b00020;"/>
+        </HBox>
+
+        <Separator/>
+
+        <Label text="4. Run" styleClass="section-title"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button text="Validate" fx:id="validateButton" onAction="#onValidate"
+                    styleClass="primary-button" disable="true"/>
+            <Button text="Export Excel report..." fx:id="exportButton"
+                    onAction="#onExport" disable="true"/>
+            <ProgressIndicator fx:id="progress" visible="false" prefHeight="22" prefWidth="22"/>
+            <Label fx:id="statusLabel" styleClass="status-label"/>
+        </HBox>
+
+        <Separator/>
+
+        <Label text="Quality scores" styleClass="section-title"/>
+        <FlowPane fx:id="scorePane" hgap="20" vgap="14" prefWrapLength="1000"/>
+
+        <Label text="Findings" styleClass="section-title"/>
+        <HBox spacing="14" alignment="CENTER_LEFT">
+            <CheckBox fx:id="filterErrors" text="Errors" selected="true"/>
+            <CheckBox fx:id="filterWarnings" text="Warnings" selected="true"/>
+            <CheckBox fx:id="filterInfo" text="Info" selected="true"/>
+            <Label fx:id="findingCountLabel"/>
+        </HBox>
+
+        <TableView fx:id="findingsTable" prefHeight="320">
+            <columns>
+                <TableColumn fx:id="colSeverity"   text="Severity"        prefWidth="90"/>
+                <TableColumn fx:id="colProfile"    text="Profile"         prefWidth="140"/>
+                <TableColumn fx:id="colFundId"     text="Fund ID"         prefWidth="130"/>
+                <TableColumn fx:id="colFundName"   text="Fund name"       prefWidth="180"/>
+                <TableColumn fx:id="colDate"       text="Valuation date"  prefWidth="100"/>
+                <TableColumn fx:id="colRow"        text="Row"             prefWidth="60"/>
+                <TableColumn fx:id="colInstCode"   text="Instrument code" prefWidth="160"/>
+                <TableColumn fx:id="colInstName"   text="Instrument"      prefWidth="180"/>
+                <TableColumn fx:id="colWeight"     text="Weight"          prefWidth="80"/>
+                <TableColumn fx:id="colRule"       text="Rule"            prefWidth="180"/>
+                <TableColumn fx:id="colField"      text="Field"           prefWidth="80"/>
+                <TableColumn fx:id="colFieldName"  text="Field name"      prefWidth="220"/>
+                <TableColumn fx:id="colMessage"    text="Message"         prefWidth="380"/>
+            </columns>
+        </TableView>
+    </VBox>
+</ScrollPane>

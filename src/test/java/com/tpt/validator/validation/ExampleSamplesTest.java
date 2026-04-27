@@ -5,7 +5,8 @@ import com.tpt.validator.ingest.TptFileLoader;
 import com.tpt.validator.report.QualityReport;
 import com.tpt.validator.report.QualityScorer;
 import com.tpt.validator.report.ScoreCategory;
-import com.tpt.validator.spec.Profile;
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
 import com.tpt.validator.spec.SpecCatalog;
 import com.tpt.validator.spec.SpecLoader;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.condition.EnabledIf;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ExampleSamplesTest {
 
     private static final SpecCatalog CATALOG = SpecLoader.loadBundled();
-    private static final Set<Profile> ALL = EnumSet.allOf(Profile.class);
+    private static final Set<ProfileKey> ALL = new java.util.HashSet<>(java.util.Arrays.asList(TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB, TptProfiles.NW_675, TptProfiles.SST));
 
     static boolean samplesPresent() {
         return Files.isDirectory(samplesDir());

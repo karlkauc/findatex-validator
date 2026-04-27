@@ -10,8 +10,8 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>TPT V7 Validator</name>
-    <description>JavaFX desktop application that validates FinDatEx TPT V7 files for quality and conformance.</description>
+    <name>FinDatEx Validator</name>
+    <description>JavaFX desktop application that validates FinDatEx data templates (TPT, EET, EMT, EPT) for quality and conformance.</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

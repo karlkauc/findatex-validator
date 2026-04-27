@@ -20,9 +20,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 
 import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Duration;
 
 public final class SettingsController {
 
@@ -132,15 +129,20 @@ public final class SettingsController {
 
     private static String quickGet(URI uri) {
         long start = System.currentTimeMillis();
+        java.net.HttpURLConnection conn = null;
         try {
-            HttpRequest req = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(15))
-                    .GET().build();
-            var r = HttpClientFactory.get().send(req, BodyHandlers.discarding());
+            conn = (java.net.HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(10_000);
+            conn.setReadTimeout(15_000);
+            conn.setInstanceFollowRedirects(true);
+            int status = conn.getResponseCode();
             long ms = System.currentTimeMillis() - start;
-            return "HTTP " + r.statusCode() + " in " + ms + " ms";
+            return "HTTP " + status + " in " + ms + " ms";
         } catch (Exception e) {
             return "FAILED: " + e.getClass().getSimpleName() + " — " + e.getMessage();
+        } finally {
+            if (conn != null) conn.disconnect();
         }
     }
 }

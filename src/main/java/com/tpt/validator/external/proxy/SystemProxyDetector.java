@@ -87,6 +87,8 @@ public final class SystemProxyDetector {
         System.setProperty("jdk.http.auth.proxying.disabledSchemes", "");
         // Prefer IPv4 (helps with some corporate proxies)
         System.setProperty("java.net.preferIPv4Stack", "true");
+        // Force TLS 1.2/1.3 (some corporate MITM proxies block legacy TLS handshakes)
+        System.setProperty("https.protocols", "TLSv1.2,TLSv1.3");
 
         // Install Authenticator that uses Windows session credentials
         // Returning null tells JVM to use integrated Windows authentication

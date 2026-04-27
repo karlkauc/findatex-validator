@@ -8,9 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,10 +46,8 @@ public final class GleifClient {
             String filter = URLEncoder.encode(String.join(",", chunk), StandardCharsets.UTF_8);
             URI uri = URI.create(base + "/api/v1/lei-records?filter%5Blei%5D=" + filter
                     + "&page%5Bsize%5D=" + chunk.size());
-            HttpRequest req = HttpRequest.newBuilder(uri)
-                    .header("Accept", "application/vnd.api+json")
-                    .timeout(Duration.ofSeconds(15))
-                    .GET().build();
+            HttpExecutor.Request req = HttpExecutor.Request.get(uri,
+                    Map.of("Accept", "application/vnd.api+json"));
             http.send(req).ifPresent(r -> {
                 if (r.statusCode() != 200) {
                     log.warn("GLEIF returned HTTP {} for batch starting {}", r.statusCode(), chunk.get(0));

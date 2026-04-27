@@ -69,15 +69,9 @@ public final class XlsxLoader {
     }
 
     private static Sheet pickSheet(Workbook wb) {
-        // Prefer a sheet whose name contains "tpt" (case-insensitive); else first non-empty sheet.
-        for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-            Sheet s = wb.getSheetAt(i);
-            if (s.getSheetName() != null && s.getSheetName().toLowerCase().contains("tpt")) return s;
-        }
-        for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-            Sheet s = wb.getSheetAt(i);
-            if (s.getLastRowNum() > 0) return s;
-        }
+        // Always load the first sheet, regardless of name. FinDatEx files typically
+        // place the data sheet at index 0; the catalog's header matching does the
+        // template-aware filtering downstream.
         return wb.getNumberOfSheets() > 0 ? wb.getSheetAt(0) : null;
     }
 

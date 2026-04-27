@@ -56,9 +56,22 @@ class SubcategoryQualifierTest {
     }
 
     @Test
-    void unquotedTokensAreNotPicked() {
-        Set<String> subs = SpecLoader.parseSubcategoryQualifier("x for 22 and 29", "CIC2");
-        assertThat(subs).isEmpty();
+    void unquotedTokensAfterForKeywordArePicked() {
+        // The original spec uses both quoted and unquoted styles. The unquoted style is
+        // dominant (e.g. 'x for 22', 'x for D4, D5', 'x for 73, 74, 75').
+        assertThat(SpecLoader.parseSubcategoryQualifier("x for 22 and 29", "CIC2"))
+                .containsExactlyInAnyOrder("2", "9");
+        assertThat(SpecLoader.parseSubcategoryQualifier("x for D4, D5", "CICD"))
+                .containsExactlyInAnyOrder("4", "5");
+    }
+
+    @Test
+    void unquotedTokensAreOnlyPickedAfterAStandaloneForKeyword() {
+        // No 'for' keyword → no unquoted extraction (cross-field 'if item X is "1"' clauses
+        // must not contribute false positives even when they contain 2-char digit pairs).
+        assertThat(SpecLoader.parseSubcategoryQualifier("x if item 22 is set", "CIC2")).isEmpty();
+        assertThat(SpecLoader.parseSubcategoryQualifier("if item 42 is Equal to Cal or Put", "CIC1"))
+                .isEmpty();
     }
 
     @ParameterizedTest

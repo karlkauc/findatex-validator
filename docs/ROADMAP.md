@@ -23,15 +23,14 @@ new ConditionalRequirement("XF-26/PE_BETA",
         "135", Severity.INFO),
 ```
 
-### 1.2 Narrative Rule für Feld 95 (Look-through-Identifikation)
+### 1.2 Narrative Rule für Feld 95 (Look-through-Identifikation) — **teilweise erledigt**
 
 | Aspekt | Inhalt |
 |---|---|
-| **Spec-Zelle** | Row 115, alle CIC: `If coming from the lookthrough of an underlying fund` |
+| **Spec-Zelle** | Row 115, alle 16 CIC: `If coming from the lookthrough of an underlying fund` |
 | **Flag** | `C` |
-| **Problem** | Bedingung ist nicht maschinell aus den anderen Feldern ableitbar. |
-| **Optionen** | (a) INFO-Rule mit dem Spec-Comment-Text als Hinweis; (b) explizites UI-Toggle "Look-through-Modus" pro Datei, das die Pflicht aktiviert; (c) Heuristik: Look-through erkennt man am Vorhandensein einer Portfolio-ID auf Position-Ebene, die von der File-Portfolio-ID abweicht. |
-| **Empfehlung** | Vorerst auslassen, weil Heuristiken brüchig sind. Ggf. UI-Schalter ergänzen, wenn der User das wünscht. |
+| **Status** | Generic ConditionalPresenceRule für Feld 95 wird in `RuleRegistry.ADDITIONALLY_SUPPRESSED_FROM_GENERIC_RULES` unterdrückt — sonst hätte jede Position in einer normalen TPT-Datei eine `COND_PRESENCE/95`-Warning ausgelöst (bei 100 Positionen = 100 False Positives). |
+| **Offen** | Ein expliziter UI-Schalter "Look-through-Modus" könnte die Pflicht für Feld 95 reaktivieren, wenn der User die Datei als Look-through markiert. Heuristik (Position-Portfolio-ID weicht von Datei-Portfolio-ID ab) bleibt zu unzuverlässig. |
 
 ### 1.3 Erweiterte Closed-List-Werte für Feld 32 (Interest_rate_type)
 

@@ -185,19 +185,34 @@ public final class SpecLoader {
     /**
      * Quoted CIC sub-codes inside qualifier text, e.g. {@code "22"}, {@code "A1"}, {@code "B4"}.
      * The first char identifies the CIC class (digit or A..F), the second is the sub-category.
-     * Plain digit-pairs without quotes are deliberately not matched — too many false positives in
-     * codification or comment-style cells.
      */
     private static final Pattern QUOTED_CIC_SUBCODE = Pattern.compile("\"([0-9A-Fa-f][0-9A-Za-z])\"");
 
+    /** A standalone "for" keyword — anchors the unquoted sub-code list. */
+    private static final Pattern FOR_KEYWORD = Pattern.compile("\\bfor\\b", Pattern.CASE_INSENSITIVE);
+
+    /** Splits the post-{@code for} tail at any non-alphanumeric run (commas, whitespace, etc.). */
+    private static final Pattern NON_ALNUM_SPLITTER = Pattern.compile("[^A-Za-z0-9]+");
+
     /**
-     * Extract the sub-category whitelist from a per-CIC qualifier string. For example,
-     * {@code 'x for convertible bonds "22" or other corporate bonds "29" quoted in units'}
-     * paired with {@code cicName=CIC2} returns {@code {"2", "9"}}; tokens whose category prefix
-     * does not match {@code cicName} are ignored.
+     * Extract the sub-category whitelist from a per-CIC qualifier string. For example:
+     * <ul>
+     *   <li>{@code 'x for convertible bonds "22" or other corporate bonds "29" quoted in units'}
+     *       paired with {@code CIC2} → {@code {"2", "9"}} (quoted style).</li>
+     *   <li>{@code 'x for D4, D5'} paired with {@code CICD} → {@code {"4", "5"}} (unquoted style,
+     *       the dominant variant in the spec).</li>
+     *   <li>{@code 'x\nif item 32 set to "Floating"'} paired with any CIC → {@code {}} (cross-field
+     *       conditional text — handled by separate XF rules, not by sub-category restriction).</li>
+     * </ul>
      *
-     * <p>Returns an empty set when there is no quoted sub-code (i.e. the field applies to every
-     * sub-category in that CIC class).
+     * <p>The parser runs two passes that may both contribute:
+     * <ol>
+     *   <li>Quoted 2-char tokens whose first char matches the CIC class.</li>
+     *   <li>Unquoted 2-char tokens appearing <strong>after</strong> a standalone {@code for}
+     *       keyword, again filtered by class. Restricting unquoted detection to text that follows
+     *       {@code for} keeps cross-field clauses ({@code if item X set to ...}) from contributing
+     *       false positives.</li>
+     * </ol>
      */
     static Set<String> parseSubcategoryQualifier(String cellText, String cicName) {
         if (cellText == null || cellText.isBlank()) return Set.of();
@@ -205,11 +220,27 @@ public final class SpecLoader {
         char expectedClass = Character.toUpperCase(cicName.charAt(3));
 
         Set<String> subs = new LinkedHashSet<>();
-        Matcher m = QUOTED_CIC_SUBCODE.matcher(cellText);
-        while (m.find()) {
-            String token = m.group(1).toUpperCase(Locale.ROOT);
+
+        // Pass 1: quoted 2-char tokens — robust against any prose around them.
+        Matcher q = QUOTED_CIC_SUBCODE.matcher(cellText);
+        while (q.find()) {
+            String token = q.group(1).toUpperCase(Locale.ROOT);
             if (token.charAt(0) == expectedClass) {
                 subs.add(String.valueOf(token.charAt(1)));
+            }
+        }
+
+        // Pass 2: unquoted tokens after a "for" keyword (e.g. "x for 22", "x for D4, D5").
+        Matcher forM = FOR_KEYWORD.matcher(cellText);
+        if (forM.find()) {
+            String tail = cellText.substring(forM.end());
+            for (String tok : NON_ALNUM_SPLITTER.split(tail)) {
+                if (tok.length() != 2) continue;
+                char a = Character.toUpperCase(tok.charAt(0));
+                char b = Character.toUpperCase(tok.charAt(1));
+                if (a == expectedClass && Character.isLetterOrDigit(b)) {
+                    subs.add(String.valueOf(b));
+                }
             }
         }
         return subs;

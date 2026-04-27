@@ -1,7 +1,7 @@
 package com.tpt.validator.report;
 
 import com.tpt.validator.domain.TptFile;
-import com.tpt.validator.spec.Profile;
+import com.tpt.validator.template.api.ProfileKey;
 import com.tpt.validator.validation.Finding;
 
 import java.time.Instant;
@@ -11,9 +11,9 @@ import java.util.Set;
 
 public record QualityReport(
         TptFile file,
-        Set<Profile> activeProfiles,
+        Set<ProfileKey> activeProfiles,
         List<Finding> findings,
         Map<ScoreCategory, Double> scores,
-        Map<Profile, Map<ScoreCategory, Double>> perProfileScores,
+        Map<ProfileKey, Map<ScoreCategory, Double>> perProfileScores,
         Instant generatedAt) {
 }

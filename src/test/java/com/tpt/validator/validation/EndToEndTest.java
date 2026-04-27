@@ -5,14 +5,14 @@ import com.tpt.validator.ingest.TptFileLoader;
 import com.tpt.validator.report.QualityReport;
 import com.tpt.validator.report.QualityScorer;
 import com.tpt.validator.report.ScoreCategory;
-import com.tpt.validator.spec.Profile;
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
 import com.tpt.validator.spec.SpecCatalog;
 import com.tpt.validator.spec.SpecLoader;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +25,7 @@ class EndToEndTest {
     @Test
     void cleanXlsxYieldsHighScore() throws Exception {
         QualityReport r = run("/sample/clean_v7.xlsx",
-                EnumSet.of(Profile.SOLVENCY_II, Profile.IORP_EIOPA_ECB, Profile.NW_675));
+                Set.of(TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB, TptProfiles.NW_675));
 
         assertThat(r.file().rows()).hasSize(3);
         assertThat(r.scores().get(ScoreCategory.OVERALL))
@@ -42,7 +42,7 @@ class EndToEndTest {
     @Test
     void missingMandatoryProducesPresenceErrors() throws Exception {
         QualityReport r = run("/sample/missing_mandatory.csv",
-                EnumSet.of(Profile.SOLVENCY_II));
+                Set.of(TptProfiles.SOLVENCY_II));
 
         long missing = r.findings().stream()
                 .filter(f -> f.severity() == Severity.ERROR)
@@ -73,7 +73,7 @@ class EndToEndTest {
                 .build();
 
         java.util.List<Finding> findings = new ValidationEngine(CATALOG)
-                .validate(file, EnumSet.of(Profile.SOLVENCY_II));
+                .validate(file, Set.of(TptProfiles.SOLVENCY_II));
 
         assertThat(findings)
                 .as("field 95 is a narrative look-through marker — must not auto-warn")
@@ -106,7 +106,7 @@ class EndToEndTest {
                 .build();
 
         java.util.List<Finding> findings = new ValidationEngine(CATALOG)
-                .validate(file, EnumSet.of(Profile.SOLVENCY_II));
+                .validate(file, Set.of(TptProfiles.SOLVENCY_II));
 
         // 32 and 33 are excluded by the sub-category whitelist (CICE = "x for E1").
         // 34 must be excluded by the XF-10 suppression in RuleRegistry.
@@ -125,7 +125,7 @@ class EndToEndTest {
         // expect a non-empty stream of PRESENCE/.../SST findings — and zero
         // SOLVENCY_II / NW_675 / IORP_EIOPA_ECB presence findings since those
         // profiles are not active.
-        QualityReport r = run("/sample/clean_v7.xlsx", EnumSet.of(Profile.SST));
+        QualityReport r = run("/sample/clean_v7.xlsx", Set.of(TptProfiles.SST));
         long sstPresence = r.findings().stream()
                 .filter(f -> f.severity() == Severity.ERROR)
                 .filter(f -> f.ruleId().startsWith("PRESENCE/") && f.ruleId().endsWith("/SST"))
@@ -142,7 +142,7 @@ class EndToEndTest {
     @Test
     void badFormatsAreFlagged() throws Exception {
         QualityReport r = run("/sample/bad_formats.xlsx",
-                EnumSet.of(Profile.SOLVENCY_II));
+                Set.of(TptProfiles.SOLVENCY_II));
 
         boolean badCurrency = r.findings().stream()
                 .anyMatch(f -> f.ruleId().equals("FORMAT/21")
@@ -157,7 +157,7 @@ class EndToEndTest {
         assertThat(badCoupon).as("coupon frequency 3 should be flagged").isTrue();
     }
 
-    private QualityReport run(String resourcePath, Set<Profile> profiles) throws Exception {
+    private QualityReport run(String resourcePath, Set<ProfileKey> profiles) throws Exception {
         URL url = EndToEndTest.class.getResource(resourcePath);
         assertThat(url).as("missing resource " + resourcePath).isNotNull();
         Path p = Path.of(url.toURI());

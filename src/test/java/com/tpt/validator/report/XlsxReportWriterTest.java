@@ -2,7 +2,8 @@ package com.tpt.validator.report;
 
 import com.tpt.validator.domain.TptFile;
 import com.tpt.validator.ingest.TptFileLoader;
-import com.tpt.validator.spec.Profile;
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
 import com.tpt.validator.spec.SpecCatalog;
 import com.tpt.validator.spec.SpecLoader;
 import com.tpt.validator.validation.Finding;
@@ -17,7 +18,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,7 +79,7 @@ class XlsxReportWriterTest {
             // Summary lists every active profile.
             Sheet summary = wb.getSheet("Summary");
             String summaryDump = dumpStrings(summary);
-            for (Profile p : report.activeProfiles()) {
+            for (ProfileKey p : report.activeProfiles()) {
                 assertThat(summaryDump).contains(p.displayName());
             }
         }
@@ -135,7 +135,7 @@ class XlsxReportWriterTest {
         assertThat(url).as("missing test resource %s", resourcePath).isNotNull();
         Path p = Path.of(url.toURI());
         TptFile file = new TptFileLoader(CATALOG).load(p);
-        Set<Profile> profiles = EnumSet.allOf(Profile.class);
+        Set<ProfileKey> profiles = new java.util.HashSet<>(java.util.Arrays.asList(TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB, TptProfiles.NW_675, TptProfiles.SST));
         List<Finding> findings = new ValidationEngine(CATALOG).validate(file, profiles);
         return new QualityScorer(CATALOG).score(file, profiles, findings);
     }

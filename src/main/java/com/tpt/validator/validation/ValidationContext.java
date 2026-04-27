@@ -1,8 +1,8 @@
 package com.tpt.validator.validation;
 
 import com.tpt.validator.domain.TptFile;
-import com.tpt.validator.spec.Profile;
 import com.tpt.validator.spec.SpecCatalog;
+import com.tpt.validator.template.api.ProfileKey;
 
 import java.util.Set;
 
@@ -10,9 +10,9 @@ public final class ValidationContext {
 
     private final TptFile file;
     private final SpecCatalog catalog;
-    private final Set<Profile> activeProfiles;
+    private final Set<ProfileKey> activeProfiles;
 
-    public ValidationContext(TptFile file, SpecCatalog catalog, Set<Profile> activeProfiles) {
+    public ValidationContext(TptFile file, SpecCatalog catalog, Set<ProfileKey> activeProfiles) {
         this.file = file;
         this.catalog = catalog;
         this.activeProfiles = Set.copyOf(activeProfiles);
@@ -20,5 +20,5 @@ public final class ValidationContext {
 
     public TptFile file() { return file; }
     public SpecCatalog catalog() { return catalog; }
-    public Set<Profile> activeProfiles() { return activeProfiles; }
+    public Set<ProfileKey> activeProfiles() { return activeProfiles; }
 }

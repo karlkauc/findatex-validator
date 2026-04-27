@@ -1,5 +1,8 @@
 package com.tpt.validator.spec;
 
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumMap;
@@ -14,10 +17,10 @@ class FieldSpecAccessorsTest {
 
     @Test
     void everyAccessorReturnsConstructorInputs() {
-        Map<Profile, Flag> flags = new EnumMap<>(Profile.class);
-        flags.put(Profile.SOLVENCY_II, Flag.M);
-        flags.put(Profile.IORP_EIOPA_ECB, Flag.C);
-        flags.put(Profile.NW_675, Flag.O);
+        Map<ProfileKey, Flag> flags = new java.util.HashMap<ProfileKey, Flag>();
+        flags.put(TptProfiles.SOLVENCY_II, Flag.M);
+        flags.put(TptProfiles.IORP_EIOPA_ECB, Flag.C);
+        flags.put(TptProfiles.NW_675, Flag.O);
 
         CodificationDescriptor codif = new CodificationDescriptor(
                 CodificationKind.NUMERIC, Optional.of(7),
@@ -36,9 +39,9 @@ class FieldSpecAccessorsTest {
         assertThat(spec.codification()).isSameAs(codif);
         assertThat(spec.applicableCic()).containsExactlyInAnyOrder("CIC1", "CIC2");
         assertThat(spec.sourceRow()).isEqualTo(99);
-        assertThat(spec.flag(Profile.SOLVENCY_II)).isEqualTo(Flag.M);
-        assertThat(spec.flag(Profile.IORP_EIOPA_ECB)).isEqualTo(Flag.C);
-        assertThat(spec.flag(Profile.NW_675)).isEqualTo(Flag.O);
+        assertThat(spec.flag(TptProfiles.SOLVENCY_II)).isEqualTo(Flag.M);
+        assertThat(spec.flag(TptProfiles.IORP_EIOPA_ECB)).isEqualTo(Flag.C);
+        assertThat(spec.flag(TptProfiles.NW_675)).isEqualTo(Flag.O);
     }
 
     @Test

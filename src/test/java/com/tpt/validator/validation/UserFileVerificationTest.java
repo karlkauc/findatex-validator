@@ -4,7 +4,8 @@ import com.tpt.validator.domain.CicCode;
 import com.tpt.validator.domain.TptFile;
 import com.tpt.validator.domain.TptRow;
 import com.tpt.validator.ingest.TptFileLoader;
-import com.tpt.validator.spec.Profile;
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
 import com.tpt.validator.spec.SpecCatalog;
 import com.tpt.validator.spec.SpecLoader;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,8 @@ import org.junit.jupiter.api.condition.EnabledIf;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +42,7 @@ class UserFileVerificationTest {
         SpecCatalog catalog = SpecLoader.loadBundled();
         TptFile file = new TptFileLoader(catalog).load(USER_FILE);
         List<Finding> findings = new ValidationEngine(catalog)
-                .validate(file, EnumSet.of(Profile.SOLVENCY_II));
+                .validate(file, Set.of(TptProfiles.SOLVENCY_II));
 
         long be21Warnings = findings.stream()
                 .filter(f -> "COND_PRESENCE/18/SOLVENCY_II".equals(f.ruleId()))

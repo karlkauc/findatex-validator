@@ -2,8 +2,9 @@ package com.tpt.validator.report;
 
 import com.tpt.validator.domain.TptRow;
 import com.tpt.validator.spec.FieldSpec;
-import com.tpt.validator.spec.Profile;
 import com.tpt.validator.spec.SpecCatalog;
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
 import com.tpt.validator.validation.Finding;
 import com.tpt.validator.validation.FindingContext;
 import com.tpt.validator.validation.Severity;
@@ -65,7 +66,7 @@ public final class XlsxReportWriter {
         addRow(s, row++, null,   "Mapped fields",    Integer.toString(r.file().headerToNumKey().size()));
         addRow(s, row++, null,   "Unmapped headers", String.join(", ", r.file().unmappedHeaders()));
         addRow(s, row++, null,   "Active profiles",
-                r.activeProfiles().stream().map(Profile::displayName).collect(Collectors.joining(", ")));
+                r.activeProfiles().stream().map(ProfileKey::displayName).collect(Collectors.joining(", ")));
         row++;
         addRow(s, row++, header, "Findings by severity");
         long e = r.findings().stream().filter(f -> f.severity() == Severity.ERROR).count();
@@ -91,7 +92,7 @@ public final class XlsxReportWriter {
         row++;
         addRow(s, row++, header, "Per-profile scores");
         addRow(s, row++, header, "Profile", "Category", "Score");
-        for (Map.Entry<Profile, Map<ScoreCategory, Double>> pe : r.perProfileScores().entrySet()) {
+        for (Map.Entry<ProfileKey, Map<ScoreCategory, Double>> pe : r.perProfileScores().entrySet()) {
             for (Map.Entry<ScoreCategory, Double> ce : pe.getValue().entrySet()) {
                 Row rr = s.createRow(row++);
                 rr.createCell(0).setCellValue(pe.getKey().displayName());
@@ -177,10 +178,10 @@ public final class XlsxReportWriter {
             rr.createCell(0).setCellValue(spec.numKey());
             rr.createCell(1).setCellValue(spec.numData());
             rr.createCell(2).setCellValue(spec.fundXmlPath() == null ? "" : spec.fundXmlPath());
-            rr.createCell(3).setCellValue(spec.flag(Profile.SOLVENCY_II).name());
-            rr.createCell(4).setCellValue(spec.flag(Profile.IORP_EIOPA_ECB).name());
-            rr.createCell(5).setCellValue(spec.flag(Profile.NW_675).name());
-            rr.createCell(6).setCellValue(spec.flag(Profile.SST).name());
+            rr.createCell(3).setCellValue(spec.flag(TptProfiles.SOLVENCY_II).name());
+            rr.createCell(4).setCellValue(spec.flag(TptProfiles.IORP_EIOPA_ECB).name());
+            rr.createCell(5).setCellValue(spec.flag(TptProfiles.NW_675).name());
+            rr.createCell(6).setCellValue(spec.flag(TptProfiles.SST).name());
             rr.createCell(7).setCellValue(c == null ? 0 : c[0]);
             rr.createCell(8).setCellValue(c == null ? 0 : c[1]);
             rr.createCell(9).setCellValue(c == null ? 0 : c[2]);

@@ -1,8 +1,8 @@
 package com.tpt.validator.validation;
 
 import com.tpt.validator.domain.TptFile;
-import com.tpt.validator.spec.Profile;
 import com.tpt.validator.spec.SpecCatalog;
+import com.tpt.validator.template.api.ProfileKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ public final class ValidationEngine {
         this.catalog = catalog;
     }
 
-    public List<Finding> validate(TptFile file, Set<Profile> activeProfiles) {
+    public List<Finding> validate(TptFile file, Set<ProfileKey> activeProfiles) {
         List<Rule> rules = RuleRegistry.build(catalog, activeProfiles);
         ValidationContext ctx = new ValidationContext(file, catalog, activeProfiles);
         List<Finding> findings = new ArrayList<>();

@@ -1,9 +1,9 @@
 package com.tpt.validator.spec;
 
+import com.tpt.validator.template.api.ProfileKey;
+
 import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,33 +16,62 @@ public final class FieldSpec {
     private final String comment;
     private final String codificationRaw;
     private final CodificationDescriptor codification;
-    private final Map<Profile, Flag> flags;
-    private final Set<String> applicableCic;
-    private final Map<String, Set<String>> applicableSubcategories;
+    /** Storage is keyed by profile code (e.g. {@code "SOLVENCY_II"}) so non-TPT templates can reuse this class. */
+    private final Map<String, Flag> flags;
+    private final ApplicabilityScope applicabilityScope;
     private final int sourceRow;
 
+    /** Convenience constructor accepting profile-key-keyed flags and a CIC set, no sub-categories. */
     public FieldSpec(String numData,
                      String fundXmlPath,
                      String definition,
                      String comment,
                      String codificationRaw,
                      CodificationDescriptor codification,
-                     Map<Profile, Flag> flags,
+                     Map<ProfileKey, Flag> profileFlags,
                      Set<String> applicableCic,
                      int sourceRow) {
         this(numData, fundXmlPath, definition, comment, codificationRaw, codification,
-                flags, applicableCic, Map.of(), sourceRow);
+                profileFlags, applicableCic, Map.of(), sourceRow);
     }
 
+    /** Convenience constructor accepting profile-key-keyed flags, a CIC set and sub-categories. */
     public FieldSpec(String numData,
                      String fundXmlPath,
                      String definition,
                      String comment,
                      String codificationRaw,
                      CodificationDescriptor codification,
-                     Map<Profile, Flag> flags,
+                     Map<ProfileKey, Flag> profileFlags,
                      Set<String> applicableCic,
                      Map<String, Set<String>> applicableSubcategories,
+                     int sourceRow) {
+        this(numData, fundXmlPath, definition, comment, codificationRaw, codification,
+                profileKeyedToCodes(profileFlags),
+                (applicableCic == null || applicableCic.isEmpty())
+                        && (applicableSubcategories == null || applicableSubcategories.isEmpty())
+                        ? EmptyApplicabilityScope.INSTANCE
+                        : new CicApplicabilityScope(applicableCic, applicableSubcategories),
+                sourceRow);
+    }
+
+    private static Map<String, Flag> profileKeyedToCodes(Map<ProfileKey, Flag> in) {
+        Map<String, Flag> out = new LinkedHashMap<>();
+        for (Map.Entry<ProfileKey, Flag> e : in.entrySet()) {
+            out.put(e.getKey().code(), e.getValue());
+        }
+        return out;
+    }
+
+    /** Direct constructor for templates that supply a scope explicitly (post-Phase-0 callers). */
+    public FieldSpec(String numData,
+                     String fundXmlPath,
+                     String definition,
+                     String comment,
+                     String codificationRaw,
+                     CodificationDescriptor codification,
+                     Map<String, Flag> codeKeyedFlags,
+                     ApplicabilityScope applicabilityScope,
                      int sourceRow) {
         this.numData = numData;
         this.numKey = extractNumKey(numData);
@@ -51,13 +80,8 @@ public final class FieldSpec {
         this.comment = comment;
         this.codificationRaw = codificationRaw;
         this.codification = codification;
-        this.flags = new EnumMap<>(flags);
-        this.applicableCic = Set.copyOf(applicableCic);
-        Map<String, Set<String>> sub = new HashMap<>();
-        for (Map.Entry<String, Set<String>> e : applicableSubcategories.entrySet()) {
-            sub.put(e.getKey(), Set.copyOf(e.getValue()));
-        }
-        this.applicableSubcategories = Collections.unmodifiableMap(sub);
+        this.flags = Collections.unmodifiableMap(new LinkedHashMap<>(codeKeyedFlags));
+        this.applicabilityScope = applicabilityScope == null ? EmptyApplicabilityScope.INSTANCE : applicabilityScope;
         this.sourceRow = sourceRow;
     }
 
@@ -70,11 +94,26 @@ public final class FieldSpec {
     public CodificationDescriptor codification() { return codification; }
     public int sourceRow() { return sourceRow; }
 
-    public Flag flag(Profile p) {
-        return flags.getOrDefault(p, Flag.UNKNOWN);
+    /** Look up a flag by profile code (e.g. {@code "SOLVENCY_II"}). Used by template-agnostic code paths. */
+    public Flag flag(String profileCode) {
+        return flags.getOrDefault(profileCode, Flag.UNKNOWN);
     }
 
-    public Set<String> applicableCic() { return applicableCic; }
+    /** Look up a flag by {@link ProfileKey} — the post-Phase-0 way to address profiles. */
+    public Flag flag(ProfileKey p) {
+        return flags.getOrDefault(p.code(), Flag.UNKNOWN);
+    }
+
+    /** Read-only view of the flag map keyed by profile code. */
+    public Map<String, Flag> flagsByCode() {
+        return flags;
+    }
+
+    public ApplicabilityScope applicabilityScope() { return applicabilityScope; }
+
+    public Set<String> applicableCic() {
+        return applicabilityScope instanceof CicApplicabilityScope cic ? cic.applicableCic() : Set.of();
+    }
 
     /**
      * Sub-category restrictions per CIC class, e.g. {@code CIC2 -> {"2", "9"}} when the
@@ -83,11 +122,13 @@ public final class FieldSpec {
      * restriction" — every sub-category in that class applies.
      */
     public Map<String, Set<String>> applicableSubcategories() {
-        return applicableSubcategories;
+        return applicabilityScope instanceof CicApplicabilityScope cic
+                ? cic.applicableSubcategories()
+                : Map.of();
     }
 
     public boolean appliesToAllCic() {
-        return applicableCic.isEmpty() || applicableCic.size() == 16;
+        return applicabilityScope.appliesAlways();
     }
 
     /** Backward-compatible category-only check. Use {@link #appliesToCic(String, String)} when the sub-category is known. */
@@ -98,33 +139,20 @@ public final class FieldSpec {
     /**
      * Tests whether the field applies to a position with the given CIC category digit (3rd char,
      * e.g. {@code "2"}) and sub-category char (4th char, e.g. {@code "1"} for {@code BE21}).
-     *
-     * <p>Logic:
-     * <ol>
-     *   <li>If the field has no CIC restrictions, applies always.</li>
-     *   <li>Otherwise the CIC class (e.g. {@code CIC2}) must be listed.</li>
-     *   <li>If the CIC class carries a sub-category whitelist, the sub-category char must be in it.</li>
-     *   <li>If no sub-category is supplied (null) but a whitelist exists, fall back to applicable=true
-     *       so we err on the side of reporting (the missing CIC means the row's CIC didn't parse).</li>
-     * </ol>
+     * Delegates to {@link CicApplicabilityScope}; templates without a CIC dimension always return true.
      */
     public boolean appliesToCic(String cicCategoryDigit, String cicSubcategoryChar) {
-        if (cicCategoryDigit == null) return appliesToAllCic();
-        if (applicableCic.isEmpty()) return true;
-        String cicName = "CIC" + cicCategoryDigit.toUpperCase(Locale.ROOT);
-        if (!applicableCic.contains(cicName)) return false;
-
-        Set<String> allowedSubs = applicableSubcategories.get(cicName);
-        if (allowedSubs == null || allowedSubs.isEmpty()) return true;       // no restriction
-        if (cicSubcategoryChar == null) return true;                         // unknown — be lenient
-        return allowedSubs.contains(cicSubcategoryChar.toUpperCase(Locale.ROOT));
+        if (applicabilityScope instanceof CicApplicabilityScope cic) {
+            return cic.appliesToCic(cicCategoryDigit, cicSubcategoryChar);
+        }
+        return true;
     }
 
-    public boolean isMandatoryFor(Profile p) {
+    public boolean isMandatoryFor(ProfileKey p) {
         return flag(p) == Flag.M;
     }
 
-    public boolean isConditionalFor(Profile p) {
+    public boolean isConditionalFor(ProfileKey p) {
         return flag(p) == Flag.C;
     }
 

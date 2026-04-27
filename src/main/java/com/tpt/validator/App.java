@@ -5,8 +5,7 @@ import com.tpt.validator.config.PasswordCipher;
 import com.tpt.validator.config.SettingsService;
 import com.tpt.validator.external.proxy.ProxyConfig;
 import com.tpt.validator.external.proxy.ProxyService;
-import com.tpt.validator.spec.SpecCatalog;
-import com.tpt.validator.spec.SpecLoader;
+import com.tpt.validator.template.api.TemplateRegistry;
 import com.tpt.validator.ui.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -29,9 +28,9 @@ public final class App extends Application {
     /** Set the AWT app name early so the macOS menu bar / dock label reads "TPT Validator", not "App". */
     static {
         // -Xdock:name on macOS, plus the Apple-specific system properties.
-        System.setProperty("apple.awt.application.name", "TPT Validator");
+        System.setProperty("apple.awt.application.name", "FinDatEx Validator");
         System.setProperty("apple.awt.application.appearance", "system");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "TPT Validator");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "FinDatEx Validator");
     }
 
     public static void main(String[] args) {
@@ -47,11 +46,14 @@ public final class App extends Application {
         ProxyService.clearJvmProxyProperties();
         ProxyService.applyMode(ProxyConfig.from(settings.proxy(),
                 PasswordCipher.decrypt(settings.proxy().manual().passwordEncrypted())));
-        SpecCatalog catalog = SpecLoader.loadBundled();
+
+        // Templates self-register via TemplateRegistry.init(); MainController.initialize() then
+        // builds one TabPane entry per registered template via TemplateTabController.
+        TemplateRegistry.init();
 
         FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(
                 getClass().getResource("/fxml/MainView.fxml")));
-        MainController controller = new MainController(catalog);
+        MainController controller = new MainController();
         loader.setController(controller);
         Parent root = loader.load();
         controller.setStage(stage);
@@ -61,7 +63,7 @@ public final class App extends Application {
 
         loadStageIcons(stage);
 
-        stage.setTitle("TPT V7 Validator");
+        stage.setTitle("FinDatEx Validator");
         stage.setScene(scene);
         stage.show();
     }

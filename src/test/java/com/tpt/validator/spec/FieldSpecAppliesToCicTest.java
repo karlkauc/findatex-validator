@@ -1,5 +1,8 @@
 package com.tpt.validator.spec;
 
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -44,7 +47,7 @@ class FieldSpecAppliesToCicTest {
     void cicWithoutSubcategoryRestrictionAcceptsEverySubcategory() {
         FieldSpec field = new FieldSpec("99_test", "Position / X", "def", "comment", "raw",
                 stubCodif(),
-                new EnumMap<>(Profile.class),
+                new java.util.HashMap<ProfileKey, Flag>(),
                 Set.of("CIC2"),                  // no sub restrictions registered
                 Map.of(),
                 42);
@@ -171,7 +174,7 @@ class FieldSpecAppliesToCicTest {
         // CIC2 has subs {"2","9"}; CIC0/CIC3/CIC4 have no sub restriction (anything goes).
         return new FieldSpec("18_Quantity", "Position / Quantity", "def", "comment", "raw",
                 stubCodif(),
-                new EnumMap<>(Profile.class),
+                new java.util.HashMap<ProfileKey, Flag>(),
                 Set.of("CIC0", "CIC2", "CIC3", "CIC4"),
                 Map.of("CIC2", Set.of("2", "9")),
                 30);

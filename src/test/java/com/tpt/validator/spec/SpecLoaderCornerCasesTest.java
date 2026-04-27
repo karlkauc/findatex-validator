@@ -1,5 +1,8 @@
 package com.tpt.validator.spec;
 
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -130,11 +133,11 @@ class SpecLoaderCornerCasesTest {
             data.createCell(31).setCellValue("C0110 - X"); // EIOPA pos cell — presence
             SpecCatalog c = SpecLoader.load(wb);
             FieldSpec spec = c.byNumKey("12").orElseThrow();
-            assertThat(spec.flag(Profile.SOLVENCY_II)).isEqualTo(Flag.O);
-            assertThat(spec.flag(Profile.NW_675)).isEqualTo(Flag.C);
-            assertThat(spec.flag(Profile.SST)).isEqualTo(Flag.M);
+            assertThat(spec.flag(TptProfiles.SOLVENCY_II)).isEqualTo(Flag.O);
+            assertThat(spec.flag(TptProfiles.NW_675)).isEqualTo(Flag.C);
+            assertThat(spec.flag(TptProfiles.SST)).isEqualTo(Flag.M);
             // IORP_EIOPA_ECB merges IORP=M with EIOPA=M → strictest is M.
-            assertThat(spec.flag(Profile.IORP_EIOPA_ECB)).isEqualTo(Flag.M);
+            assertThat(spec.flag(TptProfiles.IORP_EIOPA_ECB)).isEqualTo(Flag.M);
         }
     }
 
@@ -153,9 +156,9 @@ class SpecLoaderCornerCasesTest {
             data.createCell(30).setCellValue("");        // IORP blank
             SpecCatalog c = SpecLoader.load(wb);
             FieldSpec spec = c.byNumKey("99").orElseThrow();
-            assertThat(spec.flag(Profile.NW_675)).isEqualTo(Flag.UNKNOWN);
-            assertThat(spec.flag(Profile.SST)).isEqualTo(Flag.C);
-            assertThat(spec.flag(Profile.IORP_EIOPA_ECB)).isEqualTo(Flag.UNKNOWN);
+            assertThat(spec.flag(TptProfiles.NW_675)).isEqualTo(Flag.UNKNOWN);
+            assertThat(spec.flag(TptProfiles.SST)).isEqualTo(Flag.C);
+            assertThat(spec.flag(TptProfiles.IORP_EIOPA_ECB)).isEqualTo(Flag.UNKNOWN);
         }
     }
 
@@ -171,7 +174,7 @@ class SpecLoaderCornerCasesTest {
                 data.createCell(1).setCellValue("Position / Test");
                 data.createCell(col).setCellValue("C0123 - foo");
                 SpecCatalog c = SpecLoader.load(wb);
-                assertThat(c.byNumKey("12").get().flag(Profile.IORP_EIOPA_ECB))
+                assertThat(c.byNumKey("12").get().flag(TptProfiles.IORP_EIOPA_ECB))
                         .as("col %d should lift profile to M", col)
                         .isEqualTo(Flag.M);
             }

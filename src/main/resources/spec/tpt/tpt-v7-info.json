@@ -1,0 +1,28 @@
+{
+  "templateId": "TPT",
+  "version": "V7.0",
+  "releaseDate": "2024-11-25",
+  "sheetName": "TPT V7.0",
+  "firstDataRow": 8,
+  "columns": {
+    "numData": 1,
+    "path": 2,
+    "definition": 3,
+    "codification": 4,
+    "comment": 5,
+    "primaryFlag": 11
+  },
+  "applicabilityColumns": {
+    "kind": "CIC",
+    "first": 12,
+    "last": 27,
+    "names": ["CIC0", "CIC1", "CIC2", "CIC3", "CIC4", "CIC5", "CIC6", "CIC7",
+              "CIC8", "CIC9", "CICA", "CICB", "CICC", "CICD", "CICE", "CICF"]
+  },
+  "profileColumns": [
+    {"code": "SOLVENCY_II",    "display": "Solvency II",        "column": 11, "kind": "flag"},
+    {"code": "NW_675",         "display": "NW 675",             "column": 29, "kind": "flag"},
+    {"code": "SST",            "display": "SST (FINMA)",        "column": 30, "kind": "flag"},
+    {"code": "IORP_EIOPA_ECB", "display": "IORP / EIOPA / ECB", "columns": [31, 32, 33, 34, 35], "kind": "presenceMerge"}
+  ]
+}

@@ -6,7 +6,8 @@ import com.tpt.validator.domain.TptRow;
 import com.tpt.validator.spec.CodificationDescriptor;
 import com.tpt.validator.spec.CodificationKind;
 import com.tpt.validator.spec.FieldSpec;
-import com.tpt.validator.spec.Profile;
+import com.tpt.validator.template.api.ProfileKey;
+import com.tpt.validator.template.tpt.TptProfiles;
 import com.tpt.validator.spec.SpecCatalog;
 import com.tpt.validator.validation.Finding;
 import com.tpt.validator.validation.Severity;
@@ -17,7 +18,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.file.Path;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -231,7 +231,7 @@ class FormatRuleCornerCasesTest {
         }
         TptFile file = new TptFile(Path.of("x.csv"), "csv", List.of(),
                 new LinkedHashMap<>(), List.of(), List.of(row));
-        return new ValidationContext(file, SpecCatalog_for(numKey, rule), EnumSet.allOf(Profile.class));
+        return new ValidationContext(file, SpecCatalog_for(numKey, rule), new java.util.HashSet<>(java.util.Arrays.asList(TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB, TptProfiles.NW_675, TptProfiles.SST)));
     }
 
     private static SpecCatalog SpecCatalog_for(String numKey, FormatRule rule) {
@@ -262,7 +262,7 @@ class FormatRuleCornerCasesTest {
     }
 
     private static FieldSpec makeField(String numKey, CodificationDescriptor codif) {
-        Map<Profile, com.tpt.validator.spec.Flag> flags = new EnumMap<>(Profile.class);
+        Map<ProfileKey, com.tpt.validator.spec.Flag> flags = new java.util.HashMap<>();
         return new FieldSpec(numKey + "_field", "Position / Test", "def", "comment",
                 "raw", codif, flags, Set.of(), 1);
     }

@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +34,7 @@ public final class SpecLoader {
 
     private static final Logger log = LoggerFactory.getLogger(SpecLoader.class);
 
-    private static final String RESOURCE = "/spec/TPT_V7  20241125_updated.xlsx";
+    private static final String RESOURCE = "/spec/tpt/TPT_V7_20241125.xlsx";
 
     private static final int COL_NUM_DATA   = 1;
     private static final int COL_PATH       = 2;
@@ -99,19 +99,26 @@ public final class SpecLoader {
                 if (!subs.isEmpty()) applicableSubs.put(cicName, subs);
             }
 
-            Map<Profile, Flag> flags = new EnumMap<>(Profile.class);
-            flags.put(Profile.SOLVENCY_II, Flag.parse(stringValue(row, COL_FLAG)));
-            flags.put(Profile.NW_675,      Flag.parse(stringValue(row, COL_NW675)));
-            flags.put(Profile.SST,         Flag.parse(stringValue(row, COL_SST)));
-            flags.put(Profile.IORP_EIOPA_ECB, mergeFlags(
+            // Profile codes match com.tpt.validator.template.tpt.TptProfiles.* and the legacy
+            // Profile enum's name() values. Hard-coded here to keep the spec package free of
+            // template-package imports.
+            Map<String, Flag> flags = new LinkedHashMap<>();
+            flags.put("SOLVENCY_II",     Flag.parse(stringValue(row, COL_FLAG)));
+            flags.put("NW_675",          Flag.parse(stringValue(row, COL_NW675)));
+            flags.put("SST",             Flag.parse(stringValue(row, COL_SST)));
+            flags.put("IORP_EIOPA_ECB",  mergeFlags(
                     Flag.parse(stringValue(row, COL_IORP)),
                     presenceFlag(row, COL_EIOPA_POS),
                     presenceFlag(row, COL_EIOPA_ASS),
                     presenceFlag(row, COL_EIOPA_LT),
                     presenceFlag(row, COL_ECB)));
 
+            ApplicabilityScope scope = applicableCic.isEmpty() && applicableSubs.isEmpty()
+                    ? EmptyApplicabilityScope.INSTANCE
+                    : new CicApplicabilityScope(applicableCic, applicableSubs);
+
             FieldSpec spec = new FieldSpec(num.trim(), path.trim(), definition, comment,
-                    codifRaw, codif, flags, applicableCic, applicableSubs, rIdx + 1);
+                    codifRaw, codif, flags, scope, rIdx + 1);
             fields.add(spec);
         }
         log.info("Loaded {} TPT V7 spec fields", fields.size());
@@ -143,7 +150,8 @@ public final class SpecLoader {
         };
     }
 
-    private static String stringValue(Row row, int col1Indexed) {
+    /** Package-private so {@link ManifestDrivenSpecLoader} can reuse the cell-reading helper. */
+    static String stringValue(Row row, int col1Indexed) {
         if (row == null) return "";
         Cell cell = row.getCell(col1Indexed - 1);
         if (cell == null) return "";
@@ -180,7 +188,7 @@ public final class SpecLoader {
         return Double.toString(d);
     }
 
-    private static boolean isBlank(String s) {
+    static boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
     }
 
@@ -249,7 +257,7 @@ public final class SpecLoader {
     }
 
     /** True if the NUM_DATA cell looks like a field label ("1000_..." or "12_..."), not a section header. */
-    private static boolean looksLikeFieldLabel(String num) {
+    static boolean looksLikeFieldLabel(String num) {
         if (isBlank(num)) return false;
         String t = num.trim();
         int us = t.indexOf('_');

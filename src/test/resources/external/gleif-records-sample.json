@@ -1,0 +1,30 @@
+{
+  "data": [
+    {
+      "type": "lei-records",
+      "id": "529900D6BF99LW9R2E68",
+      "attributes": {
+        "lei": "529900D6BF99LW9R2E68",
+        "entity": {
+          "legalName": { "name": "SAP SE" },
+          "legalAddress": { "country": "DE" },
+          "status": "ACTIVE"
+        },
+        "registration": { "status": "ISSUED" }
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "5493001KJTIIGC8Y1R12",
+      "attributes": {
+        "lei": "5493001KJTIIGC8Y1R12",
+        "entity": {
+          "legalName": { "name": "BAYERISCHE MOTOREN WERKE AKTIENGESELLSCHAFT" },
+          "legalAddress": { "country": "DE" },
+          "status": "ACTIVE"
+        },
+        "registration": { "status": "LAPSED" }
+      }
+    }
+  ]
+}

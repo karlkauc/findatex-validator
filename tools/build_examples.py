@@ -15,7 +15,7 @@
   10_dates_and_derivatives.xlsx       — reporting < valuation, maturity in past,
                                         futures without underlying CIC, PIK code on equity.
 
-Outputs land in samples/ at the project root.
+Outputs land in samples/tpt/ at the project root.
 """
 from __future__ import annotations
 
@@ -439,7 +439,7 @@ def main() -> int:
         else:
             write_xlsx(path, rows)
 
-    # Generate a small README inside samples/ documenting each file.
+    # Generate a small README inside samples/tpt/ documenting each file.
     readme = OUT / "README.md"
     lines = [
         "# Example TPT V7 files",

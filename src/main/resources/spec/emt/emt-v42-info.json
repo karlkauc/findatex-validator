@@ -1,0 +1,19 @@
+{
+  "templateId": "EMT",
+  "version": "V4.2",
+  "releaseDate": "2024-04-22",
+  "sheetName": "EMT V4.1",
+  "firstDataRow": 7,
+  "columns": {
+    "numData": 1,
+    "path": 2,
+    "definition": 4,
+    "codification": 5,
+    "comment": 6,
+    "primaryFlag": 7
+  },
+  "applicabilityColumns": { "kind": "none" },
+  "profileColumns": [
+    {"code": "EMT_BASE", "display": "EMT (Mandatory)", "column": 7, "kind": "flag"}
+  ]
+}

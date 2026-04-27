@@ -7,5 +7,5 @@
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
-    <logger name="com.tpt.validator" level="DEBUG"/>
+    <logger name="com.findatex.validator" level="DEBUG"/>
 </configuration>

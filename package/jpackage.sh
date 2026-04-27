@@ -44,7 +44,7 @@ case "$UNAME_S" in
     ICON_PATH="$SCRIPT_DIR/icon.icns"
     EXTRA_ARGS+=(
       --mac-package-name "TPT Validator"
-      --mac-package-identifier "com.tpt.validator"
+      --mac-package-identifier "com.findatex.validator"
     )
     ;;
   Linux)
@@ -82,7 +82,7 @@ jpackage \
   --description "Quality and conformance validator for TPT V7 files" \
   --input "$INPUT_DIR" \
   --main-jar "$(basename "$SHADED_JAR")" \
-  --main-class com.tpt.validator.AppLauncher \
+  --main-class com.findatex.validator.AppLauncher \
   "${ICON_ARG[@]}" \
   "${EXTRA_ARGS[@]}" \
   --dest "$OUT_DIR"

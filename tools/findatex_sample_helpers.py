@@ -10,6 +10,7 @@ accept.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -71,6 +72,11 @@ def load_spec(template_id: str, version: str) -> tuple[dict, list[FieldRow]]:
 
 # ---------- value heuristics ----------------------------------------------
 
+# A bullet-list code prefix at line start: "1 -", "2 –", "10 -", "99.", "3L -", etc.
+# Matches what CodificationParser.CLOSED_LIST_LINE recognizes as a digit-led entry.
+_CLOSED_LIST_BULLET = re.compile(r"(?m)^\s*(\d+[a-zA-Z]?)\s*[-–.]")
+
+
 # Hand-rolled: matches by case-insensitive substring, first hit wins. Order matters.
 def value_for(codif: str) -> str:
     c = (codif or "").lower()
@@ -86,16 +92,26 @@ def value_for(codif: str) -> str:
     if "y / n" in c or "y/n" in c or c.strip().startswith("y ,") or c.strip().startswith("y,"):
         return "Y"
 
-    # ISO 8601 datetime (date + hh:mm:ss)
-    if "iso 8601" in c and "hh:mm:ss" in c:
-        return "2025-12-31 12:00:00"
-    # ISO 8601 date only
+    # ISO 8601 — the validator's FormatRule classifies any "iso 8601" cell as a
+    # plain DATE (YYYY-MM-DD), even when the codification text mentions
+    # "hh:mm:ss". So always return a bare date, never a datetime.
     if "iso 8601" in c:
         return "2025-12-31"
 
     # ISO 4217 currency
     if "iso 4217" in c:
         return "EUR"
+
+    # Multi-line closed list ("1 - ISO 6166 ...\n2 - CUSIP ..."): the Java
+    # CodificationParser treats this as CLOSED_LIST and will reject any value
+    # that is not one of the numeric codes — even if the prose mentions
+    # "ISO 6166" or "ISIN". Detect at least two digit-led bullet lines and
+    # return the first listed code. This must come BEFORE the ISO-6166
+    # branch below; otherwise type-of-identification fields would be filled
+    # with an ISIN literal and fail FORMAT.
+    bullets = _CLOSED_LIST_BULLET.findall(codif or "")
+    if len(bullets) >= 2:
+        return bullets[0]
 
     # ISIN priority cell ("Use the following priority: - ISO 6166 code...") → valid ISIN
     if "iso 6166" in c or c.strip() == "isin":

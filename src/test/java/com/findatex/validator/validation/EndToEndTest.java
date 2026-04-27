@@ -7,6 +7,7 @@ import com.findatex.validator.report.QualityScorer;
 import com.findatex.validator.report.ScoreCategory;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
+import com.findatex.validator.template.tpt.TptRuleSet;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ class EndToEndTest {
         // positions_embedded_in_a_fund) carries the narrative qualifier "If coming
         // from the lookthrough of an underlying fund" in every CIC column. Without
         // suppression, every single position emits a COND_PRESENCE/95 warning even
-        // for non-look-through TPT files. After the suppression in RuleRegistry,
+        // for non-look-through TPT files. After the suppression in TptRuleSet,
         // field 95 generates no presence/conditional warnings.
         com.findatex.validator.domain.TptFile file = new com.findatex.validator.validation.TestFileBuilder()
                 .row(com.findatex.validator.validation.TestFileBuilder.values(
@@ -72,7 +73,7 @@ class EndToEndTest {
                         "12", "XL71", "14", "Cash-EUR", "17", "Cash account"))
                 .build();
 
-        java.util.List<Finding> findings = new ValidationEngine(CATALOG)
+        java.util.List<Finding> findings = new ValidationEngine(CATALOG, new TptRuleSet())
                 .validate(file, Set.of(TptProfiles.SOLVENCY_II));
 
         assertThat(findings)
@@ -105,11 +106,11 @@ class EndToEndTest {
                         "26", "0"))
                 .build();
 
-        java.util.List<Finding> findings = new ValidationEngine(CATALOG)
+        java.util.List<Finding> findings = new ValidationEngine(CATALOG, new TptRuleSet())
                 .validate(file, Set.of(TptProfiles.SOLVENCY_II));
 
         // 32 and 33 are excluded by the sub-category whitelist (CICE = "x for E1").
-        // 34 must be excluded by the XF-10 suppression in RuleRegistry.
+        // 34 must be excluded by the XF-10 suppression in TptRuleSet.
         for (String fieldNum : new String[]{"32", "33", "34"}) {
             assertThat(findings)
                     .as("XTE2 must not trigger any presence/conditional finding for field %s", fieldNum)
@@ -162,7 +163,7 @@ class EndToEndTest {
         assertThat(url).as("missing resource " + resourcePath).isNotNull();
         Path p = Path.of(url.toURI());
         TptFile file = new TptFileLoader(CATALOG).load(p);
-        List<Finding> findings = new ValidationEngine(CATALOG).validate(file, profiles);
+        List<Finding> findings = new ValidationEngine(CATALOG, new TptRuleSet()).validate(file, profiles);
         return new QualityScorer(CATALOG).score(file, profiles, findings);
     }
 }

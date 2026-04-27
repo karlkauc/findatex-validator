@@ -4,6 +4,7 @@ import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
+import com.findatex.validator.template.tpt.TptRuleSet;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
 import com.findatex.validator.validation.Finding;
@@ -136,7 +137,7 @@ class XlsxReportWriterTest {
         Path p = Path.of(url.toURI());
         TptFile file = new TptFileLoader(CATALOG).load(p);
         Set<ProfileKey> profiles = new java.util.HashSet<>(java.util.Arrays.asList(TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB, TptProfiles.NW_675, TptProfiles.SST));
-        List<Finding> findings = new ValidationEngine(CATALOG).validate(file, profiles);
+        List<Finding> findings = new ValidationEngine(CATALOG, new TptRuleSet()).validate(file, profiles);
         return new QualityScorer(CATALOG).score(file, profiles, findings);
     }
 }

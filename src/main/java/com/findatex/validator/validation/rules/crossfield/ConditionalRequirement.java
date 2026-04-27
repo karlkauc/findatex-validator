@@ -11,8 +11,8 @@ import com.findatex.validator.validation.Severity;
  *   if field 138 ∈ {"1","2","3"} ⇒  field 139 must be present
  * </pre>
  *
- * <p>One requirement maps to one {@link ConditionalFieldPresenceRule} instance
- * via {@link com.findatex.validator.validation.RuleRegistry}.
+ * <p>One requirement maps to one {@link ConditionalFieldPresenceRule} instance,
+ * built by the active template's {@link com.findatex.validator.template.api.TemplateRuleSet}.
  *
  * @param ruleId               unique rule identifier for finding output (e.g. {@code "XF-20/ISSUER_LEI_PRESENT"})
  * @param sourceFieldNum       NUM_DATA key of the trigger field (e.g. {@code "48"})

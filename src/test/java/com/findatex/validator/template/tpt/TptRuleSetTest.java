@@ -1,9 +1,9 @@
-package com.findatex.validator.validation;
+package com.findatex.validator.template.tpt;
 
-import com.findatex.validator.template.api.ProfileKey;
-import com.findatex.validator.template.tpt.TptProfiles;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
+import com.findatex.validator.template.api.ProfileKey;
+import com.findatex.validator.validation.Rule;
 import com.findatex.validator.validation.rules.ConditionalPresenceRule;
 import com.findatex.validator.validation.rules.PresenceRule;
 import com.findatex.validator.validation.rules.crossfield.ConditionalFieldPresenceRule;
@@ -15,15 +15,17 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RuleRegistryTest {
+class TptRuleSetTest {
 
     private static final SpecCatalog CATALOG = SpecLoader.loadBundled();
-    private static final Set<ProfileKey> ALL = new java.util.HashSet<>(java.util.Arrays.asList(TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB, TptProfiles.NW_675, TptProfiles.SST));
+    private static final TptRuleSet RULE_SET = new TptRuleSet();
+    private static final Set<ProfileKey> ALL = new java.util.HashSet<>(java.util.Arrays.asList(
+            TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB, TptProfiles.NW_675, TptProfiles.SST));
 
     @Test
     void everyConditionalRequirementProducesARule() {
-        List<Rule> rules = RuleRegistry.build(CATALOG, ALL);
-        for (ConditionalRequirement req : RuleRegistry.CONDITIONAL_REQUIREMENTS) {
+        List<Rule> rules = RULE_SET.build(CATALOG, ALL);
+        for (ConditionalRequirement req : TptRuleSet.CONDITIONAL_REQUIREMENTS) {
             assertThat(rules)
                     .as("rule registered for %s", req.ruleId())
                     .anyMatch(r -> r instanceof ConditionalFieldPresenceRule cf
@@ -33,7 +35,7 @@ class RuleRegistryTest {
 
     @Test
     void targetsCoveredByXfRulesHaveNoGenericPresenceRule() {
-        List<Rule> rules = RuleRegistry.build(CATALOG, ALL);
+        List<Rule> rules = RULE_SET.build(CATALOG, ALL);
         // Declarative XF targets (CONDITIONAL_REQUIREMENTS) +
         //   33, 34 (XF-10 InterestRateTypeRule),
         //   67    (XF-14 UnderlyingCicRule),
@@ -60,7 +62,7 @@ class RuleRegistryTest {
 
     @Test
     void otherFieldsStillGetGenericRules() {
-        List<Rule> rules = RuleRegistry.build(CATALOG, ALL);
+        List<Rule> rules = RULE_SET.build(CATALOG, ALL);
 
         // Field 12 (CIC) is M for SOLVENCY_II — must still get a PresenceRule.
         assertThat(rules)
@@ -76,7 +78,7 @@ class RuleRegistryTest {
     @Test
     void allConditionalTargetFieldsAreRecognisedInTheCatalog() {
         // Sanity check: every targetFieldNum referenced by a requirement must exist in the spec.
-        for (ConditionalRequirement req : RuleRegistry.CONDITIONAL_REQUIREMENTS) {
+        for (ConditionalRequirement req : TptRuleSet.CONDITIONAL_REQUIREMENTS) {
             assertThat(CATALOG.byNumKey(req.targetFieldNum()))
                     .as("target field %s of %s exists in catalog", req.targetFieldNum(), req.ruleId())
                     .isPresent();

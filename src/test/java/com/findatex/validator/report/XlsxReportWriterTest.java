@@ -46,7 +46,8 @@ class XlsxReportWriterTest {
                 sheetNames.add(wb.getSheetAt(i).getSheetName());
             }
             assertThat(sheetNames)
-                    .containsExactlyInAnyOrder("Summary", "Scores", "Findings", "Field Coverage", "Per Position");
+                    .containsExactlyInAnyOrder("Summary", "Scores", "Findings", "Field Coverage",
+                            "Per Position", "Annotated Source");
 
             Sheet findings = wb.getSheet("Findings");
             assertThat(findings.getLastRowNum())
@@ -87,6 +88,96 @@ class XlsxReportWriterTest {
             String summaryDump = dumpStrings(summary);
             for (ProfileKey p : report.activeProfiles()) {
                 assertThat(summaryDump).contains(p.displayName());
+            }
+        }
+    }
+
+    @Test
+    void writesAnnotatedSourceWithHighlightsAndComments(@TempDir Path tmp) throws Exception {
+        QualityReport report = buildReportFor("/sample/bad_formats.xlsx");
+        Path out = tmp.resolve("annotated.xlsx");
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL).write(report, out);
+
+        try (InputStream in = Files.newInputStream(out);
+             Workbook wb = new XSSFWorkbook(in)) {
+            Sheet annotated = wb.getSheet("Annotated Source");
+            assertThat(annotated).as("Annotated Source tab must be present").isNotNull();
+
+            Finding target = report.findings().stream()
+                    .filter(f -> f.severity() == com.findatex.validator.validation.Severity.ERROR)
+                    .filter(f -> f.fieldNum() != null && f.rowIndex() != null)
+                    .findFirst()
+                    .orElse(null);
+            assertThat(target)
+                    .as("bad_formats.xlsx should produce at least one cell-level ERROR")
+                    .isNotNull();
+
+            com.findatex.validator.domain.TptRow tptRow = report.file().rows().stream()
+                    .filter(rr -> rr.rowIndex() == target.rowIndex())
+                    .findFirst()
+                    .orElseThrow();
+            com.findatex.validator.domain.RawCell rc = tptRow.all().get(target.fieldNum());
+            assertThat(rc).as("RawCell for finding's field must exist").isNotNull();
+
+            int mirrorRow = rc.sourceRow() - 1;
+            int mirrorCol = rc.sourceCol(); // shifted by +1 to account for Zeile column
+            org.apache.poi.ss.usermodel.Row poiRow = annotated.getRow(mirrorRow);
+            assertThat(poiRow).isNotNull();
+            org.apache.poi.ss.usermodel.Cell cell = poiRow.getCell(mirrorCol);
+            assertThat(cell).as("target cell at (%d,%d)", mirrorRow, mirrorCol).isNotNull();
+
+            assertThat(cell.getCellStyle().getFillForegroundColor())
+                    .as("error cell should be coloured rose")
+                    .isEqualTo(org.apache.poi.ss.usermodel.IndexedColors.ROSE.getIndex());
+
+            org.apache.poi.ss.usermodel.Comment comment = cell.getCellComment();
+            assertThat(comment).as("error cell should carry a comment").isNotNull();
+            String text = comment.getString().getString();
+            assertThat(text).contains("[ERROR]");
+            assertThat(text).contains(target.ruleId());
+            assertThat(text).contains(target.message());
+
+            boolean foundZeile = false;
+            for (int r = 0; r <= annotated.getLastRowNum(); r++) {
+                org.apache.poi.ss.usermodel.Row rr = annotated.getRow(r);
+                if (rr == null) continue;
+                org.apache.poi.ss.usermodel.Cell c0 = rr.getCell(0);
+                if (c0 != null
+                        && c0.getCellType() == org.apache.poi.ss.usermodel.CellType.STRING
+                        && "Zeile".equals(c0.getStringCellValue())) {
+                    foundZeile = true;
+                    break;
+                }
+            }
+            assertThat(foundZeile)
+                    .as("Annotated Source must label the Zeile helper column")
+                    .isTrue();
+
+            java.util.Set<Integer> rowsWithFindings = report.findings().stream()
+                    .filter(f -> f.rowIndex() != null)
+                    .map(Finding::rowIndex)
+                    .collect(java.util.stream.Collectors.toSet());
+            com.findatex.validator.domain.TptRow cleanRow = report.file().rows().stream()
+                    .filter(rr -> !rowsWithFindings.contains(rr.rowIndex()))
+                    .findFirst()
+                    .orElse(null);
+            if (cleanRow != null) {
+                com.findatex.validator.domain.RawCell anyCell = cleanRow.all().values().stream()
+                        .filter(rcc -> !rcc.isEmpty())
+                        .findFirst()
+                        .orElse(null);
+                if (anyCell != null) {
+                    org.apache.poi.ss.usermodel.Row pr = annotated.getRow(anyCell.sourceRow() - 1);
+                    if (pr != null) {
+                        org.apache.poi.ss.usermodel.Cell pc = pr.getCell(anyCell.sourceCol());
+                        if (pc != null) {
+                            assertThat(pc.getCellComment())
+                                    .as("clean cell at (%d,%d) should have no comment",
+                                            anyCell.sourceRow() - 1, anyCell.sourceCol())
+                                    .isNull();
+                        }
+                    }
+                }
             }
         }
     }

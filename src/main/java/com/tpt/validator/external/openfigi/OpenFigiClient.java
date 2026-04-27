@@ -7,11 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -45,12 +43,10 @@ public final class OpenFigiClient {
             List<String> chunk = isins.subList(i, Math.min(i + BATCH, isins.size()));
             try {
                 String body = buildBody(chunk);
-                HttpRequest.Builder b = HttpRequest.newBuilder(URI.create(base + "/v3/mapping"))
-                        .header("Content-Type", "application/json")
-                        .timeout(Duration.ofSeconds(20))
-                        .POST(BodyPublishers.ofString(body));
-                if (!apiKey.isEmpty()) b.header("X-OPENFIGI-APIKEY", apiKey);
-                HttpRequest req = b.build();
+                java.util.Map<String, String> headers = new java.util.LinkedHashMap<>();
+                headers.put("Content-Type", "application/json");
+                if (!apiKey.isEmpty()) headers.put("X-OPENFIGI-APIKEY", apiKey);
+                HttpExecutor.Request req = HttpExecutor.Request.post(URI.create(base + "/v3/mapping"), headers, body);
                 http.send(req).ifPresent(r -> {
                     if (r.statusCode() != 200) {
                         log.warn("OpenFIGI returned HTTP {} for batch starting {}", r.statusCode(), chunk.get(0));

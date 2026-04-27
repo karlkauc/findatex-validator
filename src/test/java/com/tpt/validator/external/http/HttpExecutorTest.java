@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.net.http.HttpRequest;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,8 +35,7 @@ class HttpExecutorTest {
             ex.close();
         });
         HttpExecutor exec = new HttpExecutor(new RateLimiter(100, 10));
-        var req = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/ok")).GET().build();
-        var res = exec.send(req);
+        var res = exec.send(HttpExecutor.Request.get(URI.create("http://127.0.0.1:" + port + "/ok")));
         assertThat(res).isPresent();
         assertThat(res.get().statusCode()).isEqualTo(200);
         assertThat(res.get().body()).isEqualTo("hello");
@@ -52,8 +50,7 @@ class HttpExecutorTest {
             ex.close();
         });
         HttpExecutor exec = new HttpExecutor(new RateLimiter(100, 10), 1);
-        var req = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/down")).GET().build();
-        var res = exec.send(req);
+        var res = exec.send(HttpExecutor.Request.get(URI.create("http://127.0.0.1:" + port + "/down")));
         assertThat(res).isEmpty();
         assertThat(calls.get()).isEqualTo(3);
     }

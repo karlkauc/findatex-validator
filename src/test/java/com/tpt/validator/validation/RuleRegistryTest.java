@@ -1,0 +1,82 @@
+package com.tpt.validator.validation;
+
+import com.tpt.validator.spec.Profile;
+import com.tpt.validator.spec.SpecCatalog;
+import com.tpt.validator.spec.SpecLoader;
+import com.tpt.validator.validation.rules.ConditionalPresenceRule;
+import com.tpt.validator.validation.rules.PresenceRule;
+import com.tpt.validator.validation.rules.crossfield.ConditionalFieldPresenceRule;
+import com.tpt.validator.validation.rules.crossfield.ConditionalRequirement;
+import org.junit.jupiter.api.Test;
+
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class RuleRegistryTest {
+
+    private static final SpecCatalog CATALOG = SpecLoader.loadBundled();
+    private static final Set<Profile> ALL = EnumSet.allOf(Profile.class);
+
+    @Test
+    void everyConditionalRequirementProducesARule() {
+        List<Rule> rules = RuleRegistry.build(CATALOG, ALL);
+        for (ConditionalRequirement req : RuleRegistry.CONDITIONAL_REQUIREMENTS) {
+            assertThat(rules)
+                    .as("rule registered for %s", req.ruleId())
+                    .anyMatch(r -> r instanceof ConditionalFieldPresenceRule cf
+                            && cf.requirement().ruleId().equals(req.ruleId()));
+        }
+    }
+
+    @Test
+    void targetsCoveredByXfRulesHaveNoGenericPresenceRule() {
+        List<Rule> rules = RuleRegistry.build(CATALOG, ALL);
+        Set<String> handled = Set.of(
+                "31", "35", "36", "37", "43", "44", "45",
+                "47", "50", "84", "115", "119", "139");
+
+        // Generic PresenceRule for those fields must NOT exist for any profile.
+        for (Rule r : rules) {
+            if (r instanceof PresenceRule pr) {
+                String fnum = pr.id().split("/")[1];
+                assertThat(handled)
+                        .as("PresenceRule for handled field %s should be suppressed (id=%s)", fnum, pr.id())
+                        .doesNotContain(fnum);
+            }
+            if (r instanceof ConditionalPresenceRule cr) {
+                String fnum = cr.id().split("/")[1];
+                assertThat(handled)
+                        .as("ConditionalPresenceRule for handled field %s should be suppressed (id=%s)", fnum, cr.id())
+                        .doesNotContain(fnum);
+            }
+        }
+    }
+
+    @Test
+    void otherFieldsStillGetGenericRules() {
+        List<Rule> rules = RuleRegistry.build(CATALOG, ALL);
+
+        // Field 12 (CIC) is M for SOLVENCY_II — must still get a PresenceRule.
+        assertThat(rules)
+                .as("field 12 must keep its generic PresenceRule")
+                .anyMatch(r -> r instanceof PresenceRule pr && pr.id().contains("/12/"));
+
+        // Field 13 (Economic_zone) is C for SOLVENCY_II — must still get a ConditionalPresenceRule.
+        assertThat(rules)
+                .as("field 13 must keep its generic ConditionalPresenceRule")
+                .anyMatch(r -> r instanceof ConditionalPresenceRule cr && cr.id().contains("/13/"));
+    }
+
+    @Test
+    void allConditionalTargetFieldsAreRecognisedInTheCatalog() {
+        // Sanity check: every targetFieldNum referenced by a requirement must exist in the spec.
+        for (ConditionalRequirement req : RuleRegistry.CONDITIONAL_REQUIREMENTS) {
+            assertThat(CATALOG.byNumKey(req.targetFieldNum()))
+                    .as("target field %s of %s exists in catalog", req.targetFieldNum(), req.ruleId())
+                    .isPresent();
+        }
+    }
+}

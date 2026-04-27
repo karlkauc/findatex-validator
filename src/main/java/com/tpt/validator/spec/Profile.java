@@ -3,7 +3,8 @@ package com.tpt.validator.spec;
 public enum Profile {
     SOLVENCY_II("Solvency II"),
     IORP_EIOPA_ECB("IORP / EIOPA / ECB"),
-    NW_675("NW 675");
+    NW_675("NW 675"),
+    SST("SST (FINMA)");
 
     private final String displayName;
 

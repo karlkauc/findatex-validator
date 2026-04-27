@@ -116,6 +116,8 @@ class SpecLoaderCornerCasesTest {
     @Test
     void mergesFlagsTakingTheStrictest() throws Exception {
         // EIOPA + IORP cells contain text codes — the loader should merge them as M (presence).
+        // Column indices (0-based): K=10 (Solvency II), AC=28 (NW675), AD=29 (SST),
+        // AE=30 (IORP), AF=31 (EIOPA pos).
         try (Workbook wb = new XSSFWorkbook()) {
             Sheet s = wb.createSheet("TPT V7.0");
             Row data = s.createRow(7);
@@ -123,14 +125,37 @@ class SpecLoaderCornerCasesTest {
             data.createCell(1).setCellValue("Position / Test");
             data.createCell(10).setCellValue("O");      // SOLVENCY_II = O
             data.createCell(28).setCellValue("C");      // NW675 = C
+            data.createCell(29).setCellValue("M");      // SST = M
             data.createCell(30).setCellValue("M");      // IORP = M
             data.createCell(31).setCellValue("C0110 - X"); // EIOPA pos cell — presence
             SpecCatalog c = SpecLoader.load(wb);
             FieldSpec spec = c.byNumKey("12").orElseThrow();
             assertThat(spec.flag(Profile.SOLVENCY_II)).isEqualTo(Flag.O);
             assertThat(spec.flag(Profile.NW_675)).isEqualTo(Flag.C);
+            assertThat(spec.flag(Profile.SST)).isEqualTo(Flag.M);
             // IORP_EIOPA_ECB merges IORP=M with EIOPA=M → strictest is M.
             assertThat(spec.flag(Profile.IORP_EIOPA_ECB)).isEqualTo(Flag.M);
+        }
+    }
+
+    @Test
+    void sstFlagIsParsedIndependentlyOfNw675() throws Exception {
+        // Confirms the SST column (AD = index 29) is not confused with NW675 (AC = 28)
+        // or IORP (AE = 30). Each column gets its own flag.
+        try (Workbook wb = new XSSFWorkbook()) {
+            Sheet s = wb.createSheet("TPT V7.0");
+            Row data = s.createRow(7);
+            data.createCell(0).setCellValue("99_test");
+            data.createCell(1).setCellValue("Position / Test");
+            data.createCell(10).setCellValue("M");       // SOLVENCY_II
+            data.createCell(28).setCellValue("");        // NW675 blank
+            data.createCell(29).setCellValue("C");       // SST = C
+            data.createCell(30).setCellValue("");        // IORP blank
+            SpecCatalog c = SpecLoader.load(wb);
+            FieldSpec spec = c.byNumKey("99").orElseThrow();
+            assertThat(spec.flag(Profile.NW_675)).isEqualTo(Flag.UNKNOWN);
+            assertThat(spec.flag(Profile.SST)).isEqualTo(Flag.C);
+            assertThat(spec.flag(Profile.IORP_EIOPA_ECB)).isEqualTo(Flag.UNKNOWN);
         }
     }
 

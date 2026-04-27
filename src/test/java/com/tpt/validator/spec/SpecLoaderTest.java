@@ -38,4 +38,28 @@ class SpecLoaderTest {
         assertThat(equityOnly.appliesToCic("3")).isTrue();
         assertThat(equityOnly.appliesToCic("0")).isFalse();
     }
+
+    @Test
+    void sstColumnIsParsedForKnownFields() {
+        // Spec column AD carries the FINMA SST flags. Sample expectations sourced
+        // directly from the bundled spec — these break loudly if the column shifts.
+        SpecCatalog c = SpecLoader.loadBundled();
+
+        // Mandatory under SST: identifying portfolio + position fields.
+        assertThat(c.byNumKey("1") .orElseThrow().flag(Profile.SST)).isEqualTo(Flag.M);
+        assertThat(c.byNumKey("3") .orElseThrow().flag(Profile.SST)).isEqualTo(Flag.M);
+        assertThat(c.byNumKey("4") .orElseThrow().flag(Profile.SST)).isEqualTo(Flag.M);
+        assertThat(c.byNumKey("12").orElseThrow().flag(Profile.SST)).isEqualTo(Flag.M);
+
+        // Optional under SST: Cash_ratio, Portfolio_modified_duration.
+        assertThat(c.byNumKey("9") .orElseThrow().flag(Profile.SST)).isEqualTo(Flag.O);
+        assertThat(c.byNumKey("10").orElseThrow().flag(Profile.SST)).isEqualTo(Flag.O);
+    }
+
+    @Test
+    void allFourProfilesEnumerated() {
+        assertThat(Profile.values()).containsExactly(
+                Profile.SOLVENCY_II, Profile.IORP_EIOPA_ECB, Profile.NW_675, Profile.SST);
+        assertThat(Profile.SST.displayName()).isEqualTo("SST (FINMA)");
+    }
 }

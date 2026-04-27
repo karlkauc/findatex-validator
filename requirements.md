@@ -11,7 +11,8 @@ This document mirrors every datapoint in the spec. It is the input for the rule 
   - **Solvency II baseline** — column K (`Mandatory / Conditional / Optional / Indicative / N/A`).
   - **IORP / EIOPA / ECB** — combined: column AE (IORP), AF/AG (EIOPA PF.06.02.24 positions/assets), AH (EIOPA PF.06.03.24 look-through), AI (ECB Addon PFE.06.02.30).
   - **NW 675** — column AC.
-- **Out of scope:** SST (column AD), FunDataXML structured XML inputs, online ISIN/LEI lookups, PDF export.
+  - **SST (FINMA)** — column AD. Default off in the UI; opt-in for Swiss mandates.
+- **Out of scope:** FunDataXML structured XML inputs, online ISIN/LEI lookups, PDF export.
 
 ## Interpretation of flags
 

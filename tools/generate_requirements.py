@@ -139,7 +139,8 @@ def main() -> int:
     out.append("  - **Solvency II baseline** — column K (`Mandatory / Conditional / Optional / Indicative / N/A`).")
     out.append("  - **IORP / EIOPA / ECB** — combined: column AE (IORP), AF/AG (EIOPA PF.06.02.24 positions/assets), AH (EIOPA PF.06.03.24 look-through), AI (ECB Addon PFE.06.02.30).")
     out.append("  - **NW 675** — column AC.")
-    out.append("- **Out of scope:** SST (column AD), FunDataXML structured XML inputs, online ISIN/LEI lookups, PDF export.\n")
+    out.append("  - **SST (FINMA)** — column AD. Default off in the UI; opt-in for Swiss mandates.")
+    out.append("- **Out of scope:** FunDataXML structured XML inputs, online ISIN/LEI lookups, PDF export.\n")
 
     out.append("## Interpretation of flags\n")
     out.append("| Flag | Meaning |")

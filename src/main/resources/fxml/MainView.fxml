@@ -30,11 +30,12 @@
                 </HBox>
 
                 <Label text="2. Select regulatory profiles to validate" styleClass="section-title"/>
-                <HBox spacing="20">
+                <FlowPane hgap="20" vgap="6">
                     <CheckBox fx:id="profileSolvencyII" text="Solvency II (M/C/O baseline)" selected="true"/>
-                    <CheckBox fx:id="profileIorpEiopa" text="IORP / EIOPA / ECB" selected="true"/>
-                    <CheckBox fx:id="profileNw675" text="NW 675" selected="true"/>
-                </HBox>
+                    <CheckBox fx:id="profileIorpEiopa"  text="IORP / EIOPA / ECB"           selected="true"/>
+                    <CheckBox fx:id="profileNw675"      text="NW 675"                       selected="true"/>
+                    <CheckBox fx:id="profileSst"        text="SST (FINMA)"                  selected="false"/>
+                </FlowPane>
 
                 <Separator/>
 

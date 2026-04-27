@@ -60,6 +60,7 @@ public final class MainController {
     @FXML private CheckBox profileSolvencyII;
     @FXML private CheckBox profileIorpEiopa;
     @FXML private CheckBox profileNw675;
+    @FXML private CheckBox profileSst;
 
     @FXML private FlowPane scorePane;
 
@@ -139,6 +140,7 @@ public final class MainController {
         if (profileSolvencyII.isSelected()) profiles.add(Profile.SOLVENCY_II);
         if (profileIorpEiopa.isSelected())  profiles.add(Profile.IORP_EIOPA_ECB);
         if (profileNw675.isSelected())      profiles.add(Profile.NW_675);
+        if (profileSst.isSelected())        profiles.add(Profile.SST);
         if (profiles.isEmpty()) {
             statusLabel.setText("Select at least one profile");
             return;

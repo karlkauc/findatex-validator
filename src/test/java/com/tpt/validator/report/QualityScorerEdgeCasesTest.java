@@ -93,7 +93,7 @@ class QualityScorerEdgeCasesTest {
                 .build();
         QualityReport r = new QualityScorer(CATALOG)
                 .score(file, EnumSet.allOf(Profile.class), List.of());
-        assertThat(r.perProfileScores()).hasSize(3);
+        assertThat(r.perProfileScores()).hasSize(Profile.values().length);
         for (Profile p : Profile.values()) {
             assertThat(r.perProfileScores()).containsKey(p);
             assertThat(r.perProfileScores().get(p)).containsKey(ScoreCategory.PROFILE_COMPLETENESS);

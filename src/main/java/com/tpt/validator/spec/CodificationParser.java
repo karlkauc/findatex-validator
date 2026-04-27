@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public final class CodificationParser {
 
     private static final Pattern CLOSED_LIST_LINE =
-            Pattern.compile("^\\s*(\\d+[a-zA-Z]?)\\s*[-–.]\\s*(.+)$", Pattern.MULTILINE);
+            Pattern.compile("^\\s*(\\d+[a-zA-Z]?|[A-Za-z])\\s*[-–.]\\s*(.+)$", Pattern.MULTILINE);
     /** Quoted token list, e.g. {@code "Bullet", "Sinkable"} or {@code "Y" ; "N"; "EPM"}. */
     private static final Pattern QUOTED_TOKEN =
             Pattern.compile("\"([A-Za-z0-9 _-]{1,40})\"");

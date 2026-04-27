@@ -136,4 +136,36 @@ class CodificationParserCornerCasesTest {
         CodificationDescriptor list = CodificationParser.parse("1 - foo\n2 - bar");
         assertThat(list.hasClosedList()).isTrue();
     }
+
+    @Test
+    void closedListIncludesPureLetterCodes() {
+        String spec = """
+                One of the options in the following closed list shall be used:
+                1 - Government bonds
+                2 - Corporate bonds
+                3L - Listed equity
+                3X - Unlisted equity
+                4 - Collective Investment Undertakings
+                5 - Structured notes
+                6 - Collateralised securities
+                7 - Cash and deposits
+                8 - Mortgages and loans
+                9 - Properties
+                0 - Other investments (including receivables)
+                A – Futures
+                B – Call Options
+                C – Put Options
+                D – Swaps
+                E – Forwards
+                F – Credit derivatives
+                L - Liabilities""";
+
+        com.tpt.validator.spec.CodificationDescriptor d = com.tpt.validator.spec.CodificationParser.parse(spec);
+        assertThat(d.kind()).isEqualTo(com.tpt.validator.spec.CodificationKind.CLOSED_LIST);
+        assertThat(d.closedList())
+                .extracting(com.tpt.validator.spec.CodificationDescriptor.ClosedListEntry::code)
+                .containsExactlyInAnyOrder(
+                        "1", "2", "3L", "3X", "4", "5", "6", "7", "8", "9", "0",
+                        "A", "B", "C", "D", "E", "F", "L");
+    }
 }

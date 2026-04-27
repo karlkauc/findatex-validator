@@ -1,5 +1,10 @@
 package com.tpt.validator;
 
+import com.tpt.validator.config.AppSettings;
+import com.tpt.validator.config.PasswordCipher;
+import com.tpt.validator.config.SettingsService;
+import com.tpt.validator.external.proxy.ProxyConfig;
+import com.tpt.validator.external.proxy.ProxyService;
 import com.tpt.validator.spec.SpecCatalog;
 import com.tpt.validator.spec.SpecLoader;
 import com.tpt.validator.ui.MainController;
@@ -37,6 +42,11 @@ public final class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        AppSettings settings = SettingsService.getInstance().getCurrent();
+        ProxyService.enableNtlmAuthentication();
+        ProxyService.clearJvmProxyProperties();
+        ProxyService.applyMode(ProxyConfig.from(settings.proxy(),
+                PasswordCipher.decrypt(settings.proxy().manual().passwordEncrypted())));
         SpecCatalog catalog = SpecLoader.loadBundled();
 
         FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(

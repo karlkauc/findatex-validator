@@ -12,11 +12,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Loads the bundled TPT V7 spec xlsx and produces a {@link SpecCatalog}.
@@ -84,10 +88,14 @@ public final class SpecLoader {
             CodificationDescriptor codif = CodificationParser.parse(codifRaw);
 
             Set<String> applicableCic = new LinkedHashSet<>();
+            Map<String, Set<String>> applicableSubs = new HashMap<>();
             for (int i = 0; i < CIC_COLUMNS.length; i++) {
-                if (!isBlank(stringValue(row, CIC_COLUMNS[i]))) {
-                    applicableCic.add(CIC_NAMES[i]);
-                }
+                String cellText = stringValue(row, CIC_COLUMNS[i]);
+                if (isBlank(cellText)) continue;
+                String cicName = CIC_NAMES[i];
+                applicableCic.add(cicName);
+                Set<String> subs = parseSubcategoryQualifier(cellText, cicName);
+                if (!subs.isEmpty()) applicableSubs.put(cicName, subs);
             }
 
             Map<Profile, Flag> flags = new EnumMap<>(Profile.class);
@@ -101,7 +109,7 @@ public final class SpecLoader {
                     presenceFlag(row, COL_ECB)));
 
             FieldSpec spec = new FieldSpec(num.trim(), path.trim(), definition, comment,
-                    codifRaw, codif, flags, applicableCic, rIdx + 1);
+                    codifRaw, codif, flags, applicableCic, applicableSubs, rIdx + 1);
             fields.add(spec);
         }
         log.info("Loaded {} TPT V7 spec fields", fields.size());
@@ -172,6 +180,39 @@ public final class SpecLoader {
 
     private static boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
+    }
+
+    /**
+     * Quoted CIC sub-codes inside qualifier text, e.g. {@code "22"}, {@code "A1"}, {@code "B4"}.
+     * The first char identifies the CIC class (digit or A..F), the second is the sub-category.
+     * Plain digit-pairs without quotes are deliberately not matched — too many false positives in
+     * codification or comment-style cells.
+     */
+    private static final Pattern QUOTED_CIC_SUBCODE = Pattern.compile("\"([0-9A-Fa-f][0-9A-Za-z])\"");
+
+    /**
+     * Extract the sub-category whitelist from a per-CIC qualifier string. For example,
+     * {@code 'x for convertible bonds "22" or other corporate bonds "29" quoted in units'}
+     * paired with {@code cicName=CIC2} returns {@code {"2", "9"}}; tokens whose category prefix
+     * does not match {@code cicName} are ignored.
+     *
+     * <p>Returns an empty set when there is no quoted sub-code (i.e. the field applies to every
+     * sub-category in that CIC class).
+     */
+    static Set<String> parseSubcategoryQualifier(String cellText, String cicName) {
+        if (cellText == null || cellText.isBlank()) return Set.of();
+        if (cicName == null || !cicName.startsWith("CIC") || cicName.length() != 4) return Set.of();
+        char expectedClass = Character.toUpperCase(cicName.charAt(3));
+
+        Set<String> subs = new LinkedHashSet<>();
+        Matcher m = QUOTED_CIC_SUBCODE.matcher(cellText);
+        while (m.find()) {
+            String token = m.group(1).toUpperCase(Locale.ROOT);
+            if (token.charAt(0) == expectedClass) {
+                subs.add(String.valueOf(token.charAt(1)));
+            }
+        }
+        return subs;
     }
 
     /** True if the NUM_DATA cell looks like a field label ("1000_..." or "12_..."), not a section header. */

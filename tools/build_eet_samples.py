@@ -10,7 +10,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from findatex_sample_helpers import (
-    ROOT, FieldRow, load_spec, value_for, write_xlsx,
+    ROOT, FieldRow, load_spec, value_for, write_scenarios,
 )
 
 OUT = ROOT / "samples" / "eet"
@@ -41,10 +41,6 @@ def clean_row() -> dict[str, str]:
     row["40"] = "Y"
     row["41"] = "0.3"
     return row
-
-
-def to_row_list(d: dict[str, str]) -> list[str]:
-    return [d[n] for n in HEADER_NUMS]
 
 
 # ----- scenarios ----------------------------------------------------------
@@ -120,9 +116,7 @@ def write_readme() -> None:
 
 
 def main() -> int:
-    for filename, factory in SCENARIOS:
-        rows = [to_row_list(r) for r in factory()]
-        write_xlsx(OUT / filename, MANIFEST["sheetName"], HEADERS, rows)
+    write_scenarios(OUT, MANIFEST["sheetName"], HEADER_NUMS, HEADERS, SCENARIOS)
     write_readme()
     return 0
 

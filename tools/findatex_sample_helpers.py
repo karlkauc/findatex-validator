@@ -13,6 +13,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 import openpyxl
 
@@ -192,6 +193,25 @@ def write_xlsx(path: Path, sheet_name: str, headers: list[str], rows: list[list[
     path.parent.mkdir(parents=True, exist_ok=True)
     wb.save(path)
     print(f"Wrote {path.relative_to(ROOT)}")
+
+
+def to_row_list(row: dict[str, str], header_nums: list[str]) -> list[str]:
+    """Project a num→value dict into the column order defined by header_nums."""
+    return [row[n] for n in header_nums]
+
+
+def write_scenarios(
+    out_dir: Path,
+    sheet_name: str,
+    header_nums: list[str],
+    headers: list[str],
+    scenarios: list[tuple[str, "Callable[[], list[dict[str, str]]]"]],
+) -> None:
+    """Run every (filename, factory) pair, projecting each factory's dict rows
+    into the column order and writing one XLSX per scenario."""
+    for filename, factory in scenarios:
+        rows = [to_row_list(d, header_nums) for d in factory()]
+        write_xlsx(out_dir / filename, sheet_name, headers, rows)
 
 
 # ---------- self-check -----------------------------------------------------

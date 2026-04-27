@@ -9,7 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from findatex_sample_helpers import (
-    ROOT, FieldRow, load_spec, value_for, write_xlsx,
+    ROOT, FieldRow, load_spec, value_for, write_scenarios,
 )
 
 OUT = ROOT / "samples" / "emt"
@@ -28,10 +28,6 @@ BY_NUM: dict[str, FieldRow] = {r.num: r for r in FIELDS}
 
 def clean_row() -> dict[str, str]:
     return {n: value_for(BY_NUM[n].codif) for n in HEADER_NUMS}
-
-
-def to_row_list(d: dict[str, str]) -> list[str]:
-    return [d[n] for n in HEADER_NUMS]
 
 
 def s01_clean() -> list[dict[str, str]]:
@@ -82,9 +78,7 @@ def write_readme() -> None:
 
 
 def main() -> int:
-    for filename, factory in SCENARIOS:
-        rows = [to_row_list(r) for r in factory()]
-        write_xlsx(OUT / filename, MANIFEST["sheetName"], HEADERS, rows)
+    write_scenarios(OUT, MANIFEST["sheetName"], HEADER_NUMS, HEADERS, SCENARIOS)
     write_readme()
     return 0
 

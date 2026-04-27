@@ -4,7 +4,7 @@ import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.spec.FieldSpec;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.template.api.ProfileKey;
-import com.findatex.validator.template.tpt.TptProfiles;
+import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.FindingContext;
 import com.findatex.validator.validation.Severity;
@@ -30,9 +30,11 @@ import java.util.stream.Collectors;
 public final class XlsxReportWriter {
 
     private final SpecCatalog catalog;
+    private final ProfileSet profileSet;
 
-    public XlsxReportWriter(SpecCatalog catalog) {
-        this.catalog = catalog;
+    public XlsxReportWriter(SpecCatalog catalog, ProfileSet profileSet) {
+        this.catalog = java.util.Objects.requireNonNull(catalog, "catalog");
+        this.profileSet = java.util.Objects.requireNonNull(profileSet, "profileSet");
     }
 
     public void write(QualityReport report, Path out) throws IOException {
@@ -149,10 +151,16 @@ public final class XlsxReportWriter {
     private void writeFieldCoverage(Workbook wb, QualityReport r, CellStyle header) {
         Sheet s = wb.createSheet("Field Coverage");
         int row = 0;
-        addRow(s, row++, header,
-                "Field#", "NUM_DATA", "FunDataXML path",
-                "Solvency II", "IORP/EIOPA/ECB", "NW675", "SST",
-                "Present", "Missing", "Invalid");
+        java.util.List<ProfileKey> profiles = profileSet.all();
+        java.util.List<String> headers = new java.util.ArrayList<>();
+        headers.add("Field#");
+        headers.add("NUM_DATA");
+        headers.add("FunDataXML path");
+        for (ProfileKey p : profiles) headers.add(p.displayName());
+        headers.add("Present");
+        headers.add("Missing");
+        headers.add("Invalid");
+        addRow(s, row++, header, headers.toArray(new String[0]));
 
         Map<String, long[]> byField = new HashMap<>(); // numKey -> [present, missing, invalid]
         for (FieldSpec spec : catalog.fields()) byField.put(spec.numKey(), new long[3]);
@@ -175,19 +183,20 @@ public final class XlsxReportWriter {
         for (FieldSpec spec : catalog.fields()) {
             long[] c = byField.get(spec.numKey());
             Row rr = s.createRow(row++);
-            rr.createCell(0).setCellValue(spec.numKey());
-            rr.createCell(1).setCellValue(spec.numData());
-            rr.createCell(2).setCellValue(spec.fundXmlPath() == null ? "" : spec.fundXmlPath());
-            rr.createCell(3).setCellValue(spec.flag(TptProfiles.SOLVENCY_II).name());
-            rr.createCell(4).setCellValue(spec.flag(TptProfiles.IORP_EIOPA_ECB).name());
-            rr.createCell(5).setCellValue(spec.flag(TptProfiles.NW_675).name());
-            rr.createCell(6).setCellValue(spec.flag(TptProfiles.SST).name());
-            rr.createCell(7).setCellValue(c == null ? 0 : c[0]);
-            rr.createCell(8).setCellValue(c == null ? 0 : c[1]);
-            rr.createCell(9).setCellValue(c == null ? 0 : c[2]);
+            int col = 0;
+            rr.createCell(col++).setCellValue(spec.numKey());
+            rr.createCell(col++).setCellValue(spec.numData());
+            rr.createCell(col++).setCellValue(spec.fundXmlPath() == null ? "" : spec.fundXmlPath());
+            for (ProfileKey p : profiles) {
+                rr.createCell(col++).setCellValue(spec.flag(p).name());
+            }
+            rr.createCell(col++).setCellValue(c == null ? 0 : c[0]);
+            rr.createCell(col++).setCellValue(c == null ? 0 : c[1]);
+            rr.createCell(col++).setCellValue(c == null ? 0 : c[2]);
         }
         s.createFreezePane(2, 1);
-        for (int c = 0; c < 10; c++) s.autoSizeColumn(c);
+        int totalCols = 3 + profiles.size() + 3;
+        for (int c = 0; c < totalCols; c++) s.autoSizeColumn(c);
     }
 
     private static void writePerPosition(Workbook wb, QualityReport r,

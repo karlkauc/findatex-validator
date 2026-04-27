@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.tpt.validator.ui.LookupProgressController"
+      spacing="10" prefWidth="480">
+  <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+  <Label fx:id="phaseLabel" text="Local validation: complete"/>
+  <Label fx:id="gleifLabel" text="GLEIF lookup: 0/0"/>
+  <ProgressBar fx:id="gleifBar" prefWidth="450" progress="0"/>
+  <Label fx:id="figiLabel"  text="OpenFIGI lookup: 0/0"/>
+  <ProgressBar fx:id="figiBar"  prefWidth="450" progress="0"/>
+  <Label fx:id="cacheLabel" text=""/>
+  <HBox alignment="CENTER_RIGHT">
+    <Button fx:id="cancelButton" text="Cancel" onAction="#onCancel"/>
+  </HBox>
+</VBox>

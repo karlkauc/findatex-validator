@@ -16,6 +16,6 @@ final class CicApplicability {
             // No CIC parsed -- err on the side of applicable so missing fields surface.
             return true;
         }
-        return spec.appliesToCic(cic.get().categoryDigit());
+        return spec.appliesToCic(cic.get().categoryDigit(), cic.get().subcategory());
     }
 }

@@ -38,7 +38,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import com.tpt.validator.external.ExternalValidationService;
+import javafx.scene.Scene;
+import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,23 +171,68 @@ public final class MainController {
             return;
         }
 
+        AppSettings settings = SettingsService.getInstance().getCurrent();
+        externalStatusLabel.setText("");
+
         progress.setVisible(true);
         validateButton.setDisable(true);
         exportButton.setDisable(true);
         statusLabel.setText("Loading and validating " + path.getFileName() + " ...");
+
+        // Optional progress dialog — only loaded when external is on.
+        Stage progressStage = null;
+        LookupProgressController progressController = null;
+        if (settings.external().enabled()) {
+            try {
+                FXMLLoader pl = new FXMLLoader(getClass().getResource("/fxml/LookupProgressDialog.fxml"));
+                Parent pRoot = pl.load();
+                progressController = pl.getController();
+                progressStage = new Stage();
+                progressController.setStage(progressStage);
+                progressStage.initModality(Modality.APPLICATION_MODAL);
+                progressStage.setTitle("External validation");
+                progressStage.setScene(new Scene(pRoot));
+            } catch (Exception ex) {
+                log.warn("Could not load progress dialog: {}", ex.getMessage());
+            }
+        }
+        final Stage pStage = progressStage;
+        final LookupProgressController pCtrl = progressController;
 
         Task<QualityReport> task = new Task<>() {
             @Override
             protected QualityReport call() throws Exception {
                 TptFile file = new TptFileLoader(catalog).load(path);
                 List<Finding> findings = new ValidationEngine(catalog).validate(file, profiles);
+
+                if (settings.external().enabled()) {
+                    Path cacheDir = settings.external().cache().directory().isEmpty()
+                            ? Path.of(System.getProperty("user.home"),
+                                      ".config", "tpt-validator", "cache")
+                            : Path.of(settings.external().cache().directory());
+                    ExternalValidationService svc = ExternalValidationService.forProduction(
+                            cacheDir, settings.external().isin());
+                    BooleanSupplier cancelled = pCtrl != null ? pCtrl::isCancelled : () -> false;
+                    List<Finding> online = svc.run(file, settings, cancelled);
+                    List<Finding> all = new ArrayList<>(findings);
+                    all.addAll(online);
+                    findings = all;
+                }
+
                 return new QualityScorer(catalog).score(file, profiles, findings);
             }
         };
         task.setOnSucceeded(ev -> {
+            if (pCtrl != null) pCtrl.close();
             QualityReport report = task.getValue();
             currentReport = report;
             renderReport(report);
+            long extIssues = report.findings().stream()
+                    .filter(f -> f.ruleId().startsWith("EXTERNAL/")).count();
+            if (extIssues > 0) {
+                externalStatusLabel.setText("⚠ Online validation: " + extIssues
+                        + " issue(s) — see findings tab");
+            }
             progress.setVisible(false);
             validateButton.setDisable(false);
             exportButton.setDisable(false);
@@ -190,6 +240,7 @@ public final class MainController {
                     + " finding(s), " + report.file().rows().size() + " row(s).");
         });
         task.setOnFailed(ev -> {
+            if (pCtrl != null) pCtrl.close();
             Throwable th = task.getException();
             log.error("Validation failed", th);
             progress.setVisible(false);
@@ -199,6 +250,7 @@ public final class MainController {
                     "Validation failed:\n" + (th == null ? "(unknown)" : th.getMessage())).showAndWait();
         });
         new Thread(task, "tpt-validate").start();
+        if (pStage != null) pStage.show();
     }
 
     @FXML

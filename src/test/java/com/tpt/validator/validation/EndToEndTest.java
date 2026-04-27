@@ -56,6 +56,32 @@ class EndToEndTest {
     }
 
     @Test
+    void lookthroughField95DoesNotProduceSpuriousWarnings() throws Exception {
+        // Regression test: field 95 (Identification_of_the_original_portfolio_for_
+        // positions_embedded_in_a_fund) carries the narrative qualifier "If coming
+        // from the lookthrough of an underlying fund" in every CIC column. Without
+        // suppression, every single position emits a COND_PRESENCE/95 warning even
+        // for non-look-through TPT files. After the suppression in RuleRegistry,
+        // field 95 generates no presence/conditional warnings.
+        com.tpt.validator.domain.TptFile file = new com.tpt.validator.validation.TestFileBuilder()
+                .row(com.tpt.validator.validation.TestFileBuilder.values(
+                        "12", "FR12", "14", "FR0000571085", "17", "Treasury Bond"))
+                .row(com.tpt.validator.validation.TestFileBuilder.values(
+                        "12", "DE31", "14", "DE0007164600", "17", "Equity"))
+                .row(com.tpt.validator.validation.TestFileBuilder.values(
+                        "12", "XL71", "14", "Cash-EUR", "17", "Cash account"))
+                .build();
+
+        java.util.List<Finding> findings = new ValidationEngine(CATALOG)
+                .validate(file, EnumSet.of(Profile.SOLVENCY_II));
+
+        assertThat(findings)
+                .as("field 95 is a narrative look-through marker — must not auto-warn")
+                .noneMatch(f -> f.ruleId().startsWith("PRESENCE/95/")
+                        || f.ruleId().startsWith("COND_PRESENCE/95/"));
+    }
+
+    @Test
     void currencyForwardXte2DoesNotTriggerInterestRateFindings() throws Exception {
         // Regression test: a currency forward (CIC XTE2 — class E, sub-cat 2) must NOT
         // produce findings for fields 32, 33 (sub-cat-restricted to E1 in the spec) or

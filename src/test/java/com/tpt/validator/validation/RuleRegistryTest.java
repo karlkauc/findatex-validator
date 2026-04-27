@@ -34,11 +34,13 @@ class RuleRegistryTest {
     @Test
     void targetsCoveredByXfRulesHaveNoGenericPresenceRule() {
         List<Rule> rules = RuleRegistry.build(CATALOG, ALL);
-        // Declarative XF targets (CONDITIONAL_REQUIREMENTS) + hand-coded XF targets
-        // (33, 34 from XF-10 InterestRateTypeRule; 67 from XF-14 UnderlyingCicRule).
+        // Declarative XF targets (CONDITIONAL_REQUIREMENTS) +
+        //   33, 34 (XF-10 InterestRateTypeRule),
+        //   67    (XF-14 UnderlyingCicRule),
+        //   95    (narrative look-through condition — cannot be auto-checked).
         Set<String> handled = Set.of(
                 "31", "33", "34", "35", "36", "37", "43", "44", "45",
-                "47", "50", "67", "84", "115", "119", "139");
+                "47", "50", "67", "84", "95", "115", "119", "139");
 
         for (Rule r : rules) {
             if (r instanceof PresenceRule pr) {

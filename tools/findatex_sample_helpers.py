@@ -102,15 +102,18 @@ def value_for(codif: str) -> str:
     if "iso 4217" in c:
         return "EUR"
 
-    # Multi-line closed list ("1 - ISO 6166 ...\n2 - CUSIP ..."): the Java
-    # CodificationParser treats this as CLOSED_LIST and will reject any value
-    # that is not one of the numeric codes — even if the prose mentions
-    # "ISO 6166" or "ISIN". Detect at least two digit-led bullet lines and
-    # return the first listed code. This must come BEFORE the ISO-6166
-    # branch below; otherwise type-of-identification fields would be filled
-    # with an ISIN literal and fail FORMAT.
+    # Digit-led bullet lines ("1 - ISO 6166 ...\n2 - CUSIP ..." or
+    # "Floating decimal.\n1.15% = 0.0115\n..."): the Java
+    # CodificationParser treats ANY field with at least one such bullet as
+    # CLOSED_LIST and rejects values that are not one of the parsed codes —
+    # even when the prose mentions "ISO 6166" or "floating decimal". So
+    # match the parser's threshold (>= 1 bullet) and return the first code.
+    # This must come BEFORE the ISO-6166 / floating-decimal / "or" branches;
+    # otherwise EMT cost cells (`Floating decimal.\n1.15% = 0.0115\n...`)
+    # would be filled with `0.01` and fail the closed-list check whose only
+    # entry is `1`.
     bullets = _CLOSED_LIST_BULLET.findall(codif or "")
-    if len(bullets) >= 2:
+    if len(bullets) >= 1:
         return bullets[0]
 
     # ISIN priority cell ("Use the following priority: - ISO 6166 code...") → valid ISIN
@@ -129,6 +132,12 @@ def value_for(codif: str) -> str:
     if c.strip() == "l / n":
         return "L"
 
+    # Floating decimal / percentage. Must come BEFORE the " or " branch so
+    # cells like 'floating decimal or V or S or M or L or H' (EMT NUM=55)
+    # are recognised as NUMERIC by the validator and answered with a number.
+    if "floating decimal" in c or "percentage" in c:
+        return "0.5"
+
     # Closed list described as "S or SF or U or N or UM or NM or ETC or B"
     if " or " in c and "iso" not in c:
         first = c.split(" or ")[0].strip().split()[-1]
@@ -143,10 +152,6 @@ def value_for(codif: str) -> str:
     # "1 to 4", "number [1 - 7]", "1, or 2, or 3", "number [1 - 6]"
     if "1 to" in c or "[1 -" in c or "1, or" in c:
         return "1"
-
-    # Floating decimal / percentage
-    if "floating decimal" in c or "percentage" in c:
-        return "0.01"
 
     # Plain integer
     if c.strip() == "integer" or "(integer)" in c:

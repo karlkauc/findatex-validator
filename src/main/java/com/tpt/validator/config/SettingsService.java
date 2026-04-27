@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -43,13 +44,13 @@ public final class SettingsService {
 
     public synchronized void update(AppSettings next) {
         try {
-            Files.createDirectories(file.getParent());
+            if (file.getParent() != null) Files.createDirectories(file.getParent());
             Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
             MAPPER.writeValue(tmp.toFile(), next);
             Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             this.current = next;
         } catch (IOException e) {
-            log.error("Could not save settings to {}: {}", file, e.getMessage());
+            throw new UncheckedIOException("Could not save settings to " + file, e);
         }
     }
 

@@ -1,6 +1,5 @@
 package com.tpt.validator.external.proxy;
 
-import com.tpt.validator.config.AppSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

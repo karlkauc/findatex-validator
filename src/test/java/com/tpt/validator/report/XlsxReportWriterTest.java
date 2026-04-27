@@ -65,9 +65,13 @@ class XlsxReportWriterTest {
                     "Instrument code", "Instrument name",
                     "Weight", "Value", "Message");
 
-            // Field Coverage tab carries 142 rows + header.
+            // Field Coverage tab carries 142 rows + header. Header now includes a SST column.
             Sheet coverage = wb.getSheet("Field Coverage");
             assertThat(coverage.getLastRowNum()).isEqualTo(CATALOG.fields().size());
+            org.apache.poi.ss.usermodel.Row covHdr = coverage.getRow(0);
+            java.util.List<String> covHeaders = new java.util.ArrayList<>();
+            for (int c = 0; c < covHdr.getLastCellNum(); c++) covHeaders.add(covHdr.getCell(c).getStringCellValue());
+            assertThat(covHeaders).contains("SST");
 
             Sheet perPos = wb.getSheet("Per Position");
             assertThat(perPos.getLastRowNum()).isEqualTo(report.file().rows().size());

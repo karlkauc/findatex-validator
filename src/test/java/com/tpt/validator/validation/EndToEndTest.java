@@ -56,6 +56,27 @@ class EndToEndTest {
     }
 
     @Test
+    void sstProfileTriggersOwnPresenceFindings() throws Exception {
+        // The clean sample is a minimal Solvency-II-shaped file. Activating SST alone
+        // exposes SST-specific Mandatory fields that the sample doesn't fill, so we
+        // expect a non-empty stream of PRESENCE/.../SST findings — and zero
+        // SOLVENCY_II / NW_675 / IORP_EIOPA_ECB presence findings since those
+        // profiles are not active.
+        QualityReport r = run("/sample/clean_v7.xlsx", EnumSet.of(Profile.SST));
+        long sstPresence = r.findings().stream()
+                .filter(f -> f.severity() == Severity.ERROR)
+                .filter(f -> f.ruleId().startsWith("PRESENCE/") && f.ruleId().endsWith("/SST"))
+                .count();
+        assertThat(sstPresence).isGreaterThan(0);
+
+        long otherPresence = r.findings().stream()
+                .filter(f -> f.ruleId().startsWith("PRESENCE/"))
+                .filter(f -> !f.ruleId().endsWith("/SST"))
+                .count();
+        assertThat(otherPresence).isZero();
+    }
+
+    @Test
     void badFormatsAreFlagged() throws Exception {
         QualityReport r = run("/sample/bad_formats.xlsx",
                 EnumSet.of(Profile.SOLVENCY_II));

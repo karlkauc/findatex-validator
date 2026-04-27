@@ -150,7 +150,7 @@ public final class XlsxReportWriter {
         int row = 0;
         addRow(s, row++, header,
                 "Field#", "NUM_DATA", "FunDataXML path",
-                "Solvency II", "IORP/EIOPA/ECB", "NW675",
+                "Solvency II", "IORP/EIOPA/ECB", "NW675", "SST",
                 "Present", "Missing", "Invalid");
 
         Map<String, long[]> byField = new HashMap<>(); // numKey -> [present, missing, invalid]
@@ -180,12 +180,13 @@ public final class XlsxReportWriter {
             rr.createCell(3).setCellValue(spec.flag(Profile.SOLVENCY_II).name());
             rr.createCell(4).setCellValue(spec.flag(Profile.IORP_EIOPA_ECB).name());
             rr.createCell(5).setCellValue(spec.flag(Profile.NW_675).name());
-            rr.createCell(6).setCellValue(c == null ? 0 : c[0]);
-            rr.createCell(7).setCellValue(c == null ? 0 : c[1]);
-            rr.createCell(8).setCellValue(c == null ? 0 : c[2]);
+            rr.createCell(6).setCellValue(spec.flag(Profile.SST).name());
+            rr.createCell(7).setCellValue(c == null ? 0 : c[0]);
+            rr.createCell(8).setCellValue(c == null ? 0 : c[1]);
+            rr.createCell(9).setCellValue(c == null ? 0 : c[2]);
         }
         s.createFreezePane(2, 1);
-        for (int c = 0; c < 9; c++) s.autoSizeColumn(c);
+        for (int c = 0; c < 10; c++) s.autoSizeColumn(c);
     }
 
     private static void writePerPosition(Workbook wb, QualityReport r,

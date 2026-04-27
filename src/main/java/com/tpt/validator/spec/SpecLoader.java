@@ -48,6 +48,7 @@ public final class SpecLoader {
     private static final String[] CIC_NAMES = {"CIC0","CIC1","CIC2","CIC3","CIC4","CIC5","CIC6","CIC7","CIC8","CIC9","CICA","CICB","CICC","CICD","CICE","CICF"};
 
     private static final int COL_NW675 = 29;
+    private static final int COL_SST   = 30;
     private static final int COL_IORP  = 31;
     private static final int COL_EIOPA_POS = 32;
     private static final int COL_EIOPA_ASS = 33;
@@ -100,7 +101,8 @@ public final class SpecLoader {
 
             Map<Profile, Flag> flags = new EnumMap<>(Profile.class);
             flags.put(Profile.SOLVENCY_II, Flag.parse(stringValue(row, COL_FLAG)));
-            flags.put(Profile.NW_675, Flag.parse(stringValue(row, COL_NW675)));
+            flags.put(Profile.NW_675,      Flag.parse(stringValue(row, COL_NW675)));
+            flags.put(Profile.SST,         Flag.parse(stringValue(row, COL_SST)));
             flags.put(Profile.IORP_EIOPA_ECB, mergeFlags(
                     Flag.parse(stringValue(row, COL_IORP)),
                     presenceFlag(row, COL_EIOPA_POS),

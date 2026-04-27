@@ -55,14 +55,9 @@ Severity: WARNING (es sind Plausibilitäten, keine harten Pflichten).
 
 ## 2. Validierung jenseits des per-Datei-Snapshots
 
-### 2.1 SST-Profil aktivieren
+### 2.1 SST-Profil aktivieren ✅ (erledigt)
 
-Die SST-Spalte (AD) wird heute beim Spec-Loading bewusst übersprungen (siehe `SpecLoader.java`, Konstante `COL_SST = 30` ist nicht definiert; Profil-Map enthält nur SOLVENCY_II / IORP_EIOPA_ECB / NW_675). Aufwand: ~30 Minuten:
-
-1. `Profile.SST` ergänzen.
-2. `SpecLoader.load()` zusätzliche Spalte AD parsen.
-3. `MainView.fxml` einen Checkbox `profileSst` hinzufügen.
-4. Tests: SST-Pflichtfelder durchspielen (ähnlich `clean_v7.xlsx`).
+Implementiert: SST als viertes Profil neben Solvency II / IORP-EIOPA-ECB / NW 675. Spalte AD der Spec wird vom `SpecLoader` parsed; UI-Checkbox in `MainView.fxml` (default off, opt-in für Schweizer Mandate); Field-Coverage-Tab im Excel-Report bekommt eine SST-Spalte. Tests: SST-Pflichtfelder gegen die echte Spec assertioniert (`SpecLoaderTest#sstColumnIsParsedForKnownFields`), End-zu-End-Run mit `EnumSet.of(Profile.SST)` zeigt nur SST-Findings.
 
 ### 2.2 FunDataXML-Eingabe (echtes XML)
 

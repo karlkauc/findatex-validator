@@ -6,9 +6,10 @@ against the V7 specification dated 2024-11-25.
 
 Active regulatory profiles:
 
-- **Solvency II** (M/C/O baseline)
-- **IORP / EIOPA / ECB** (PF.06.02.24 positions/assets, PF.06.03.24 look-through, ECB Addon PFE.06.02.30)
-- **NW 675**
+- **Solvency II** (M/C/O baseline) — default on
+- **IORP / EIOPA / ECB** (PF.06.02.24 positions/assets, PF.06.03.24 look-through, ECB Addon PFE.06.02.30) — default on
+- **NW 675** — default on
+- **SST (FINMA)** — default off; opt-in for Swiss mandates
 
 ## Layout
 

@@ -14,6 +14,8 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
+import java.util.function.IntConsumer;
 
 public final class GleifClient {
 
@@ -36,9 +38,12 @@ public final class GleifClient {
      * Returns one record per LEI that GLEIF knows. LEIs absent from the response
      * are simply not present in the map (caller treats absence as "unknown").
      */
-    public Map<String, LeiRecord> lookup(List<String> leis) {
+    public Map<String, LeiRecord> lookup(List<String> leis,
+                                         BooleanSupplier cancelled,
+                                         IntConsumer onBatchDone) {
         Map<String, LeiRecord> out = new HashMap<>();
         for (int i = 0; i < leis.size(); i += BATCH) {
+            if (cancelled.getAsBoolean()) break;
             List<String> chunk = leis.subList(i, Math.min(i + BATCH, leis.size()));
             String filter = URLEncoder.encode(String.join(",", chunk), StandardCharsets.UTF_8);
             URI uri = URI.create(base + "/api/v1/lei-records?filter%5Blei%5D=" + filter
@@ -62,8 +67,14 @@ public final class GleifClient {
                     log.warn("GLEIF parse error: {}", e.getMessage());
                 }
             });
+            onBatchDone.accept(Math.min(i + BATCH, leis.size()));
         }
         return out;
+    }
+
+    /** Backwards-compatible overload: no cancel, no progress. */
+    public Map<String, LeiRecord> lookup(List<String> leis) {
+        return lookup(leis, () -> false, n -> {});
     }
 
     private static LeiRecord parse(JsonNode n) {

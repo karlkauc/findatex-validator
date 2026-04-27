@@ -29,10 +29,27 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
 
 public final class ExternalValidationService {
 
     private static final Logger log = LoggerFactory.getLogger(ExternalValidationService.class);
+
+    /** Sink for live progress events; all methods are no-ops by default. */
+    public interface ProgressSink {
+        ProgressSink NOOP = new ProgressSink() {};
+        default void leiTotal(int total) {}
+        default void leiDone(int done) {}
+        default void isinTotal(int total) {}
+        default void isinDone(int done) {}
+        default void cacheStats(int hits, int total) {}
+    }
+
+    /** Internal functional type that accepts cancel + progress callbacks. */
+    @FunctionalInterface
+    private interface RemoteLookup<V> {
+        Map<String, V> apply(List<String> keys, BooleanSupplier cancelled, IntConsumer onBatchDone);
+    }
 
     private static final List<String[]> LEI_PAIRS = List.of(
             new String[]{"47", "48"}, new String[]{"50", "51"},
@@ -45,12 +62,12 @@ public final class ExternalValidationService {
     );
 
     private final Path cacheDir;
-    private final Function<List<String>, Map<String, LeiRecord>> gleif;
-    private final Function<List<String>, Map<String, IsinRecord>> openFigi;
+    private final RemoteLookup<LeiRecord> gleif;
+    private final RemoteLookup<IsinRecord> openFigi;
 
     private ExternalValidationService(Path cacheDir,
-                                      Function<List<String>, Map<String, LeiRecord>> gleif,
-                                      Function<List<String>, Map<String, IsinRecord>> openFigi) {
+                                      RemoteLookup<LeiRecord> gleif,
+                                      RemoteLookup<IsinRecord> openFigi) {
         this.cacheDir = cacheDir;
         this.gleif = gleif;
         this.openFigi = openFigi;
@@ -62,16 +79,26 @@ public final class ExternalValidationService {
         HttpExecutor figiHttp = new HttpExecutor(new RateLimiter(figiRate, figiRate));
         GleifClient g = new GleifClient(gleifHttp);
         OpenFigiClient f = new OpenFigiClient(figiHttp, isinSettings.openFigiApiKey());
-        return new ExternalValidationService(cacheDir, g::lookup, f::lookup);
+        return new ExternalValidationService(cacheDir,
+                (leis, c, p) -> g.lookup(leis, c, p),
+                (isins, c, p) -> f.lookup(isins, c, p));
     }
 
     public static ExternalValidationService forTest(Path cacheDir,
                                              Function<List<String>, Map<String, LeiRecord>> gleif,
                                              Function<List<String>, Map<String, IsinRecord>> figi) {
-        return new ExternalValidationService(cacheDir, gleif, figi);
+        return new ExternalValidationService(cacheDir,
+                (leis, c, p) -> gleif.apply(leis),
+                (isins, c, p) -> figi.apply(isins));
     }
 
+    /** Convenience overload — uses NOOP progress sink. */
     public List<Finding> run(TptFile file, AppSettings settings, BooleanSupplier cancelled) {
+        return run(file, settings, cancelled, ProgressSink.NOOP);
+    }
+
+    public List<Finding> run(TptFile file, AppSettings settings,
+                             BooleanSupplier cancelled, ProgressSink sink) {
         if (!settings.external().enabled()) return List.of();
 
         List<Finding> out = new ArrayList<>();
@@ -84,8 +111,18 @@ public final class ExternalValidationService {
                         cacheDir.resolve("lei-cache.json"), ttl, new TypeReference<>() {});
                 List<LeiOnlineRule.LeiHit> hits = collectLeiHits(file);
                 if (!hits.isEmpty()) {
+                    LinkedHashSet<String> distinct = new LinkedHashSet<>();
+                    hits.forEach(h -> distinct.add(h.lei()));
+                    List<String> misses = new ArrayList<>();
+                    for (String k : distinct) {
+                        if (cache.get(k).isEmpty()) misses.add(k);
+                    }
+                    int leiHits = distinct.size() - misses.size();
+                    sink.cacheStats(leiHits, distinct.size());
+                    sink.leiTotal(misses.size());
+
                     Map<String, LeiRecord> records = lookupWithCache(hits, LeiOnlineRule.LeiHit::lei,
-                            gleif, cache);
+                            gleif, cache, cancelled, done -> sink.leiDone(done));
                     cache.flush();
                     for (String[] pair : LEI_PAIRS) {
                         List<LeiOnlineRule.LeiHit> sub = hits.stream()
@@ -114,8 +151,18 @@ public final class ExternalValidationService {
                         cacheDir.resolve("isin-cache.json"), ttl, new TypeReference<>() {});
                 List<IsinOnlineRule.IsinHit> hits = collectIsinHits(file);
                 if (!hits.isEmpty()) {
+                    LinkedHashSet<String> distinct = new LinkedHashSet<>();
+                    hits.forEach(h -> distinct.add(h.isin()));
+                    List<String> misses = new ArrayList<>();
+                    for (String k : distinct) {
+                        if (cache.get(k).isEmpty()) misses.add(k);
+                    }
+                    int isinHits = distinct.size() - misses.size();
+                    sink.cacheStats(isinHits, distinct.size());
+                    sink.isinTotal(misses.size());
+
                     Map<String, IsinRecord> records = lookupWithCache(hits, IsinOnlineRule.IsinHit::isin,
-                            openFigi, cache);
+                            openFigi, cache, cancelled, done -> sink.isinDone(done));
                     cache.flush();
                     for (String[] pair : ISIN_PAIRS) {
                         List<IsinOnlineRule.IsinHit> sub = hits.stream()
@@ -176,9 +223,11 @@ public final class ExternalValidationService {
     }
 
     private static <H, V> Map<String, V> lookupWithCache(List<H> hits,
-                                                        Function<H, String> keyFn,
-                                                        Function<List<String>, Map<String, V>> remote,
-                                                        JsonCache<V> cache) {
+                                                         Function<H, String> keyFn,
+                                                         RemoteLookup<V> remote,
+                                                         JsonCache<V> cache,
+                                                         BooleanSupplier cancelled,
+                                                         IntConsumer onBatchDone) {
         LinkedHashSet<String> distinct = new LinkedHashSet<>();
         hits.forEach(h -> distinct.add(keyFn.apply(h)));
         Map<String, V> out = new HashMap<>();
@@ -187,7 +236,7 @@ public final class ExternalValidationService {
             cache.get(k).ifPresentOrElse(v -> out.put(k, v), () -> misses.add(k));
         }
         if (!misses.isEmpty()) {
-            Map<String, V> fetched = remote.apply(misses);
+            Map<String, V> fetched = remote.apply(misses, cancelled, onBatchDone);
             fetched.forEach((k, v) -> { out.put(k, v); cache.put(k, v); });
         }
         return out;

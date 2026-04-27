@@ -213,7 +213,35 @@ public final class MainController {
                     ExternalValidationService svc = ExternalValidationService.forProduction(
                             cacheDir, settings.external().isin());
                     BooleanSupplier cancelled = pCtrl != null ? pCtrl::isCancelled : () -> false;
-                    List<Finding> online = svc.run(file, settings, cancelled);
+
+                    int[] leiState = {0, 0};   // [done, total]
+                    int[] isinState = {0, 0};
+                    int[] cache = {0, 0};      // [hits, total]
+                    ExternalValidationService.ProgressSink sink = new ExternalValidationService.ProgressSink() {
+                        @Override public void leiTotal(int total) {
+                            leiState[1] = total;
+                            if (pCtrl != null) pCtrl.update(leiState[0], leiState[1], isinState[0], isinState[1], cache[0], cache[1]);
+                        }
+                        @Override public void leiDone(int done) {
+                            leiState[0] = done;
+                            if (pCtrl != null) pCtrl.update(leiState[0], leiState[1], isinState[0], isinState[1], cache[0], cache[1]);
+                        }
+                        @Override public void isinTotal(int total) {
+                            isinState[1] = total;
+                            if (pCtrl != null) pCtrl.update(leiState[0], leiState[1], isinState[0], isinState[1], cache[0], cache[1]);
+                        }
+                        @Override public void isinDone(int done) {
+                            isinState[0] = done;
+                            if (pCtrl != null) pCtrl.update(leiState[0], leiState[1], isinState[0], isinState[1], cache[0], cache[1]);
+                        }
+                        @Override public void cacheStats(int hits, int total) {
+                            cache[0] += hits;   // accumulate across LEI + ISIN phases
+                            cache[1] += total;
+                            if (pCtrl != null) pCtrl.update(leiState[0], leiState[1], isinState[0], isinState[1], cache[0], cache[1]);
+                        }
+                    };
+
+                    List<Finding> online = svc.run(file, settings, cancelled, sink);
                     List<Finding> all = new ArrayList<>(findings);
                     all.addAll(online);
                     findings = all;

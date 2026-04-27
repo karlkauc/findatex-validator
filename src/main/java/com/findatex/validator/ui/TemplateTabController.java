@@ -15,6 +15,7 @@ import com.findatex.validator.template.api.TemplateDefinition;
 import com.findatex.validator.template.api.TemplateId;
 import com.findatex.validator.template.api.TemplateVersion;
 import com.findatex.validator.validation.Finding;
+import com.findatex.validator.validation.FindingEnricher;
 import com.findatex.validator.validation.ValidationEngine;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -349,7 +350,8 @@ public final class TemplateTabController {
                         }
                     };
 
-                    List<Finding> online = svc.run(file, settings, cancelled, sink);
+                    List<Finding> online = FindingEnricher.enrich(
+                            file, svc.run(file, settings, cancelled, sink));
                     List<Finding> all = new ArrayList<>(findings);
                     all.addAll(online);
                     findings = all;

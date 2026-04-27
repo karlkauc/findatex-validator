@@ -5,6 +5,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SettingsServiceTest {
 
@@ -42,5 +43,20 @@ class SettingsServiceTest {
         Files.writeString(file, "{\"external\":{\"enabled\":true,\"unknown\":42}}");
         SettingsService svc = new SettingsService(file);
         assertThat(svc.getCurrent().external().enabled()).isTrue();
+    }
+
+    @Test
+    void updateThrowsOnUnwritableTarget(@TempDir Path tmp) throws Exception {
+        // Use a path whose parent directory we just created and made read-only.
+        Path readOnlyDir = Files.createDirectory(tmp.resolve("readonly"));
+        Path file = readOnlyDir.resolve("settings.json");
+        try {
+            readOnlyDir.toFile().setWritable(false);
+            SettingsService svc = new SettingsService(file);
+            assertThatThrownBy(() -> svc.update(svc.getCurrent().withExternalEnabled(true)))
+                    .isInstanceOf(java.io.UncheckedIOException.class);
+        } finally {
+            readOnlyDir.toFile().setWritable(true);
+        }
     }
 }

@@ -56,6 +56,43 @@ class EndToEndTest {
     }
 
     @Test
+    void currencyForwardXte2DoesNotTriggerInterestRateFindings() throws Exception {
+        // Regression test: a currency forward (CIC XTE2 — class E, sub-cat 2) must NOT
+        // produce findings for fields 32, 33 (sub-cat-restricted to E1 in the spec) or
+        // field 34 (whose qualifier is purely the cross-field "if item 32 set to
+        // Floating" — handled by XF-10, not by a generic ConditionalPresenceRule).
+        com.tpt.validator.domain.TptFile file = new com.tpt.validator.validation.TestFileBuilder()
+                .row(com.tpt.validator.validation.TestFileBuilder.values(
+                        "1", "FR0010000001",
+                        "3", "Demo Fund",
+                        "6", "2025-12-31",
+                        "7", "2025-12-31",
+                        "12", "XTE2",
+                        "14", "FX-FWD-EUR-USD-001",
+                        "15", "99",
+                        "17", "EUR/USD forward",
+                        "21", "EUR",
+                        "22", "0",
+                        "23", "0",
+                        "24", "0",
+                        "25", "0",
+                        "26", "0"))
+                .build();
+
+        java.util.List<Finding> findings = new ValidationEngine(CATALOG)
+                .validate(file, EnumSet.of(Profile.SOLVENCY_II));
+
+        // 32 and 33 are excluded by the sub-category whitelist (CICE = "x for E1").
+        // 34 must be excluded by the XF-10 suppression in RuleRegistry.
+        for (String fieldNum : new String[]{"32", "33", "34"}) {
+            assertThat(findings)
+                    .as("XTE2 must not trigger any presence/conditional finding for field %s", fieldNum)
+                    .noneMatch(f -> ("PRESENCE/" + fieldNum + "/SOLVENCY_II").equals(f.ruleId())
+                            || ("COND_PRESENCE/" + fieldNum + "/SOLVENCY_II").equals(f.ruleId()));
+        }
+    }
+
+    @Test
     void sstProfileTriggersOwnPresenceFindings() throws Exception {
         // The clean sample is a minimal Solvency-II-shaped file. Activating SST alone
         // exposes SST-specific Mandatory fields that the sample doesn't fill, so we

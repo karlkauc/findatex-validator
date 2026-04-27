@@ -88,6 +88,28 @@ public final class RuleRegistry {
                     "139", Severity.ERROR)
     );
 
+    /**
+     * Target fields whose presence is checked by a hand-coded cross-field rule
+     * (i.e. <em>not</em> via {@link #CONDITIONAL_REQUIREMENTS}) and which therefore
+     * also need their generic Presence/ConditionalPresence registration suppressed
+     * to avoid duplicate findings.
+     *
+     * <ul>
+     *   <li>{@code 33} — covered by {@code XF-10 InterestRateTypeRule} (Fixed branch).</li>
+     *   <li>{@code 34} — covered by {@code XF-10 InterestRateTypeRule} (Floating/Variable).</li>
+     *   <li>{@code 67} — covered by {@code XF-14 UnderlyingCicRule}.</li>
+     * </ul>
+     *
+     * <p>Without this list the engine over-flags positions like {@code XTE2}
+     * (currency forward, sub-cat 2 within CIC E): the spec qualifier for field 34
+     * is {@code "x\\nif item 32 set to \"Floating\""} — purely a cross-field
+     * condition, no sub-category whitelist — so the generic rule has no way to
+     * tell the row that the requirement is conditional on field 32.
+     */
+    private static final Set<String> ADDITIONALLY_HANDLED_BY_HARD_CODED_XF = Set.of(
+            "33", "34", "67"
+    );
+
     public static List<Rule> build(SpecCatalog catalog, Set<Profile> profiles) {
         List<Rule> rules = new ArrayList<>();
 
@@ -97,6 +119,7 @@ public final class RuleRegistry {
         Set<String> handledByXf = CONDITIONAL_REQUIREMENTS.stream()
                 .map(ConditionalRequirement::targetFieldNum)
                 .collect(Collectors.toCollection(HashSet::new));
+        handledByXf.addAll(ADDITIONALLY_HANDLED_BY_HARD_CODED_XF);
 
         for (FieldSpec spec : catalog.fields()) {
             rules.add(new FormatRule(spec));

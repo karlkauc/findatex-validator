@@ -4,7 +4,6 @@ import com.tpt.validator.config.AppSettings;
 import com.tpt.validator.config.PasswordCipher;
 import com.tpt.validator.config.SettingsService;
 import com.tpt.validator.domain.TptFile;
-import com.tpt.validator.external.http.HttpClientFactory;
 import com.tpt.validator.external.proxy.ProxyConfig;
 import com.tpt.validator.external.proxy.ProxyService;
 import com.tpt.validator.ingest.TptFileLoader;
@@ -300,7 +299,6 @@ public final class MainController {
                 ProxyConfig cfg = ProxyConfig.from(next.proxy(),
                         PasswordCipher.decrypt(next.proxy().manual().passwordEncrypted()));
                 ProxyService.applyMode(cfg);
-                HttpClientFactory.rebuild();
                 externalEnabled.setSelected(next.external().enabled());
             }
         } catch (Exception e) {

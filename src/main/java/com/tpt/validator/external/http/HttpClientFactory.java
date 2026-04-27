@@ -9,5 +9,5 @@ package com.tpt.validator.external.http;
 @Deprecated
 public final class HttpClientFactory {
     private HttpClientFactory() {}
-    public static void rebuild() { /* no-op */ }
+    @Deprecated public static void rebuild() { /* no-op */ }
 }

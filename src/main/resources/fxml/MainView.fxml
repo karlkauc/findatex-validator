@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" styleClass="root-pane">
@@ -36,6 +37,12 @@
                     <CheckBox fx:id="profileNw675"      text="NW 675"                       selected="true"/>
                     <CheckBox fx:id="profileSst"        text="SST (FINMA)"                  selected="false"/>
                 </FlowPane>
+
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <CheckBox fx:id="externalEnabled" text="Online validation (GLEIF + OpenFIGI)"/>
+                    <Button fx:id="settingsButton" text="⚙ Settings…" onAction="#onSettings"/>
+                    <Label fx:id="externalStatusLabel" text="" style="-fx-text-fill: #b00020;"/>
+                </HBox>
 
                 <Separator/>
 

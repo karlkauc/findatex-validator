@@ -1,6 +1,12 @@
 package com.tpt.validator.ui;
 
+import com.tpt.validator.config.AppSettings;
+import com.tpt.validator.config.PasswordCipher;
+import com.tpt.validator.config.SettingsService;
 import com.tpt.validator.domain.TptFile;
+import com.tpt.validator.external.http.HttpClientFactory;
+import com.tpt.validator.external.proxy.ProxyConfig;
+import com.tpt.validator.external.proxy.ProxyService;
 import com.tpt.validator.ingest.TptFileLoader;
 import com.tpt.validator.report.QualityReport;
 import com.tpt.validator.report.QualityScorer;
@@ -16,9 +22,13 @@ import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
@@ -61,6 +71,10 @@ public final class MainController {
     @FXML private CheckBox profileIorpEiopa;
     @FXML private CheckBox profileNw675;
     @FXML private CheckBox profileSst;
+
+    @FXML private CheckBox externalEnabled;
+    @FXML private Button settingsButton;
+    @FXML private Label externalStatusLabel;
 
     @FXML private FlowPane scorePane;
 
@@ -116,6 +130,12 @@ public final class MainController {
 
         filePathField.textProperty().addListener((o, a, b) ->
                 validateButton.setDisable(b == null || b.trim().isEmpty()));
+
+        AppSettings cur = SettingsService.getInstance().getCurrent();
+        externalEnabled.setSelected(cur.external().enabled());
+        externalEnabled.selectedProperty().addListener((o, was, is) ->
+                SettingsService.getInstance().update(
+                        SettingsService.getInstance().getCurrent().withExternalEnabled(is)));
     }
 
     @FXML
@@ -179,6 +199,33 @@ public final class MainController {
                     "Validation failed:\n" + (th == null ? "(unknown)" : th.getMessage())).showAndWait();
         });
         new Thread(task, "tpt-validate").start();
+    }
+
+    @FXML
+    private void onSettings() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SettingsView.fxml"));
+            Parent root = loader.load();
+            SettingsController controller = loader.getController();
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Settings");
+            dialog.getDialogPane().setContent(root);
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+            var result = dialog.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                AppSettings next = controller.collect();
+                SettingsService.getInstance().update(next);
+                ProxyConfig cfg = ProxyConfig.from(next.proxy(),
+                        PasswordCipher.decrypt(next.proxy().manual().passwordEncrypted()));
+                ProxyService.applyMode(cfg);
+                HttpClientFactory.rebuild();
+                externalEnabled.setSelected(next.external().enabled());
+            }
+        } catch (Exception e) {
+            log.warn("Settings dialog failed: {}", e.getMessage());
+        }
     }
 
     private void renderReport(QualityReport report) {

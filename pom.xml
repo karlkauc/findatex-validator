@@ -28,6 +28,19 @@
         <url>https://github.com/karlkauc/tpt-validator</url>
     </scm>
 
+    <developers>
+        <developer>
+            <id>karlkauc</id>
+            <name>Karl Kauc</name>
+            <email>karl.kauc@gmail.com</email>
+            <url>https://github.com/karlkauc</url>
+            <roles>
+                <role>author</role>
+                <role>maintainer</role>
+            </roles>
+        </developer>
+    </developers>
+
     <modules>
         <module>core</module>
         <module>javafx-app</module>

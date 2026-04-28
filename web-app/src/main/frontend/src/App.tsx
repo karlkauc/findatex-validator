@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { HelpCircle, Loader2, ShieldCheck } from 'lucide-react';
+import { HelpCircle, Info, Loader2, ShieldCheck } from 'lucide-react';
 import { fetchTemplates, validateUpload } from './api/client';
 import { TemplatePicker } from './components/TemplatePicker';
 import { ProfileSelector } from './components/ProfileSelector';
@@ -9,6 +9,7 @@ import { ResultPanel } from './components/ResultPanel';
 import { ErrorBanner } from './components/ErrorBanner';
 import { ExternalValidationToggle } from './components/ExternalValidationToggle';
 import { HelpModal } from './components/HelpModal';
+import { AboutModal } from './components/AboutModal';
 import { ValidationResponse } from './types/api';
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
   const [isinCheckCic, setIsinCheckCic] = useState(false);
   const [openfigiApiKey, setOpenfigiApiKey] = useState('');
   const [helpOpen, setHelpOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   const templates = templatesQuery.data ?? [];
   const currentTemplate = templates.find((t) => t.id === templateId);
@@ -101,10 +103,20 @@ export default function App() {
             <HelpCircle className="h-4 w-4" aria-hidden="true" />
             Help
           </button>
+          <button
+            type="button"
+            onClick={() => setAboutOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            aria-haspopup="dialog"
+          >
+            <Info className="h-4 w-4" aria-hidden="true" />
+            About
+          </button>
         </div>
       </header>
 
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
 
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         {templatesQuery.isLoading && (

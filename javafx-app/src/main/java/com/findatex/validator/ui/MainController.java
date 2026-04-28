@@ -100,6 +100,15 @@ public final class MainController {
     }
 
     @FXML
+    private void onAbout() {
+        try {
+            AboutDialog.show(stage);
+        } catch (Exception e) {
+            log.warn("About dialog failed: {}", e.getMessage());
+        }
+    }
+
+    @FXML
     private void onSettings() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SettingsView.fxml"));

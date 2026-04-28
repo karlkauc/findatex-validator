@@ -65,3 +65,12 @@ export async function fetchHelp(): Promise<string> {
   }
   return res.text();
 }
+
+export async function fetchAbout(): Promise<string> {
+  const res = await fetch('/api/about');
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new ApiError(res.status, text || `${res.status} ${res.statusText}`);
+  }
+  return res.text();
+}

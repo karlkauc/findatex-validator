@@ -1,0 +1,118 @@
+# Deploys the web-app container to Google Cloud Run (europe-west3).
+#
+# Trigger: manual (workflow_dispatch) with the image tag to deploy.
+# The image is pulled from ghcr.io (built by release.yml) and mirrored into
+# Artifact Registry in the target region for fast cold-start pulls.
+#
+# Required GitHub repository **Variables** (Settings → Secrets and variables → Actions → Variables):
+#   GCP_PROJECT         GCP project id (e.g. findatex-validator-prod)
+#   GCP_WIF_PROVIDER    Full WIF provider resource name
+#                       (projects/<num>/locations/global/workloadIdentityPools/github/providers/findatex)
+#   GCP_DEPLOY_SA       Service account email
+#                       (github-deploy@<project>.iam.gserviceaccount.com)
+#
+# One-time GCP bootstrap commands are documented in the chat where this
+# workflow was generated; rerun gcloud commands if any of the above changes.
+
+name: Deploy to Cloud Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to deploy (e.g. v1.0.0-rc1, latest, edge)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write   # required for Workload Identity Federation
+
+concurrency:
+  group: deploy-cloudrun-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GCP_REGION: europe-west3
+  AR_REPO: findatex
+  IMAGE_NAME: findatex-validator-web
+  SERVICE_NAME: findatex-validator-web
+  GHCR_IMAGE: ghcr.io/karlkauc/findatex-validator-web
+
+jobs:
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TAG: ${{ inputs.tag }}
+      PROJECT: ${{ vars.GCP_PROJECT }}
+    steps:
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Set up crane
+        uses: imjasonh/setup-crane@v0.4
+
+      - name: Log in to GHCR (read-only via GITHUB_TOKEN)
+        env:
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "$GHCR_TOKEN" | crane auth login ghcr.io -u "$GHCR_USER" --password-stdin
+
+      - name: Configure docker auth for Artifact Registry
+        run: gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+
+      - name: Mirror GHCR image to Artifact Registry
+        run: |
+          set -euo pipefail
+          src="${GHCR_IMAGE}:${TAG}"
+          dst="${GCP_REGION}-docker.pkg.dev/${PROJECT}/${AR_REPO}/${IMAGE_NAME}:${TAG}"
+          echo "Copying $src -> $dst"
+          crane copy "$src" "$dst"
+          echo "image=$dst" >> "$GITHUB_ENV"
+
+      - name: Deploy to Cloud Run
+        run: |
+          set -euo pipefail
+          gcloud run deploy "${SERVICE_NAME}" \
+            --image="${image}" \
+            --region="${GCP_REGION}" \
+            --project="${PROJECT}" \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=8080 \
+            --memory=2Gi \
+            --cpu=1 \
+            --cpu-boost \
+            --concurrency=80 \
+            --max-instances=1 \
+            --min-instances=0 \
+            --timeout=300 \
+            --set-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=false \
+            --quiet
+
+      - name: Show service URL
+        run: |
+          set -euo pipefail
+          url="$(gcloud run services describe "${SERVICE_NAME}" \
+            --region="${GCP_REGION}" \
+            --project="${PROJECT}" \
+            --format='value(status.url)')"
+          echo "Deployed: $url"
+          {
+            echo "## Cloud Run deploy successful"
+            echo
+            echo "- Service: \`${SERVICE_NAME}\`"
+            echo "- Region: \`${GCP_REGION}\`"
+            echo "- Image tag: \`${TAG}\`"
+            echo "- URL: $url"
+          } >> "$GITHUB_STEP_SUMMARY"

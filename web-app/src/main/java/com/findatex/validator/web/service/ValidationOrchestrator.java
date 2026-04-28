@@ -228,7 +228,7 @@ public class ValidationOrchestrator {
         ValidationResponse.Summary summary = new ValidationResponse.Summary(
                 def.id().name(),
                 version.version(),
-                file.source().getFileName().toString(),
+                sanitizeFilename(file.source().getFileName().toString()),
                 file.rows().size(),
                 findings.size(),
                 (int) errors,
@@ -258,6 +258,17 @@ public class ValidationOrchestrator {
     private static WebApplicationException badRequest(String message) {
         return new WebApplicationException(
                 Response.status(Response.Status.BAD_REQUEST).entity(message).build());
+    }
+
+    /**
+     * Strips anything that isn't a word char, dot or dash from the user-supplied
+     * filename before echoing it in the JSON response. Defends against
+     * client-side mishandling that might render the filename as HTML.
+     */
+    private static String sanitizeFilename(String s) {
+        if (s == null || s.isBlank()) return "uploaded";
+        String cleaned = s.replaceAll("[^A-Za-z0-9._-]", "_");
+        return cleaned.length() > 200 ? cleaned.substring(0, 200) : cleaned;
     }
 
     @PreDestroy

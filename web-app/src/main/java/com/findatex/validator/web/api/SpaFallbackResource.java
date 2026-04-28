@@ -24,15 +24,13 @@ import java.io.InputStream;
 public class SpaFallbackResource {
 
     @GET
-    @Path("/{path:(?!api/).+}")
+    @Path("/{path:(?!api/|q/|_internal/).+}")
     @Produces(MediaType.TEXT_HTML)
     public Response fallback(@PathParam("path") String path) {
-        InputStream in = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream("META-INF/resources/index.html");
-        if (in == null) throw new NotFoundException();
-        try {
+        try (InputStream in = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("META-INF/resources/index.html")) {
+            if (in == null) throw new NotFoundException();
             byte[] bytes = in.readAllBytes();
-            in.close();
             return Response.ok(bytes, MediaType.TEXT_HTML)
                     .header("Cache-Control", "no-cache")
                     .build();

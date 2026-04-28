@@ -49,8 +49,10 @@ export function FindingsTable({ findings }: Props) {
               key={s}
               type="button"
               onClick={() => toggle(s)}
+              aria-pressed={enabled.has(s)}
               className={
-                'rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ' +
+                'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ' +
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-navy-500 ' +
                 (enabled.has(s)
                   ? severityActiveClass(s)
                   : 'border-slate-300 bg-white text-slate-500 hover:bg-slate-100')

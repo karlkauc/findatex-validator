@@ -31,6 +31,9 @@ Thumbs.db
 # Logs
 *.log
 
+# Claude Code scratch / per-project data
+.claude/
+
 # WebDAV / production data drops — never commit real fund files.
 .DAV/
 20260331_TPTV7_*.xlsx

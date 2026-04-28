@@ -33,6 +33,8 @@ public class RateLimitFilter implements ContainerRequestFilter {
     WebConfig config;
 
     private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final java.util.concurrent.atomic.AtomicBoolean unknownWarned =
+            new java.util.concurrent.atomic.AtomicBoolean(false);
     private int capacityPerHour;
     private Duration refillInterval;
 
@@ -74,7 +76,7 @@ public class RateLimitFilter implements ContainerRequestFilter {
         return Bucket.builder().addLimit(limit).build();
     }
 
-    private static String clientIp(ContainerRequestContext ctx) {
+    private String clientIp(ContainerRequestContext ctx) {
         String fwd = ctx.getHeaderString("X-Forwarded-For");
         if (fwd != null && !fwd.isBlank()) {
             // First hop is the real client; subsequent ones are reverse proxies.
@@ -83,11 +85,15 @@ public class RateLimitFilter implements ContainerRequestFilter {
         }
         String real = ctx.getHeaderString("X-Real-IP");
         if (real != null && !real.isBlank()) return real.trim();
-        // RestEasy Reactive: the request's remote-address is exposed via SecurityContext or
-        // through the request's underlying VertxHttpServerRequest. As a portable fallback,
-        // we key by a constant 'unknown' bucket — operators behind a proxy should set
-        // X-Forwarded-For. (Quarkus can be told to populate the request's remoteAddress
-        // by setting quarkus.http.proxy.proxy-address-forwarding=true.)
+        // No forwarded headers — log once so operators notice they're not behind a proxy
+        // (or that proxy-address-forwarding isn't configured). Falling into the "unknown"
+        // bucket means *all* anonymous traffic shares one rate limit, which is intentional
+        // for local-dev but a misconfiguration for production.
+        if (unknownWarned.compareAndSet(false, true)) {
+            log.warn("No X-Forwarded-For/X-Real-IP on incoming request — all such traffic "
+                    + "shares one rate-limit bucket. If you're in production, ensure your "
+                    + "reverse proxy sets these headers.");
+        }
         return "unknown";
     }
 }

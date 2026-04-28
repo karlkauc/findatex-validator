@@ -321,7 +321,7 @@ public final class TemplateTabController {
                 if (externalSupported && settings.external().enabled()) {
                     Path cacheDir = settings.external().cache().directory().isEmpty()
                             ? Path.of(System.getProperty("user.home"),
-                                    ".config", "tpt-validator", "cache")
+                                    ".config", "findatex-validator", "cache")
                             : Path.of(settings.external().cache().directory());
                     ExternalValidationService svc = ExternalValidationService.forProduction(
                             cacheDir, settings.external().isin());

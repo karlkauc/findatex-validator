@@ -9,8 +9,7 @@ core: a **JavaFX desktop app** (files never leave the user's machine) and a
 **Quarkus + React web app** (Docker-deployable, no login, throttled). Four
 templates are wired in: **TPT, EET, EMT, EPT** — each with the last two
 versions bundled. Maven groupId is `com.findatex` and the package root is
-`com.findatex.validator` (the directory name `tpt_test` is historical — do
-**not** rename packages back to `com.tpt`).
+`com.findatex.validator` — do **not** rename packages back to `com.tpt`.
 
 ## Repo layout (multi-module Maven)
 

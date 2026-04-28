@@ -58,8 +58,6 @@
     </dependencies>
 
     <build>
-        <finalName>tpt-validator-${project.version}</finalName>
-
         <plugins>
             <plugin>
                 <groupId>org.openjfx</groupId>

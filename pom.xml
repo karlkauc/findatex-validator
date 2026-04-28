@@ -51,7 +51,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
 
-        <javafx.version>21.0.5</javafx.version>
+        <javafx.version>21.0.11</javafx.version>
         <poi.version>5.5.1</poi.version>
         <commons.csv.version>1.14.1</commons.csv.version>
         <slf4j.version>2.0.17</slf4j.version>

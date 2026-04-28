@@ -250,6 +250,13 @@ python3 tools/generate_requirements.py         # rebuild requirements.md
 
 ---
 
+## Security
+
+Found a vulnerability? Please **do not open a public issue**. See
+[SECURITY.md](SECURITY.md) and use GitHub's private vulnerability
+reporting (Repository → *Security* → *Advisories* → *Report a
+vulnerability*). The maintainer will acknowledge within 72 hours.
+
 ## License
 
 Released under the [Apache License 2.0](LICENSE). You may use, modify,

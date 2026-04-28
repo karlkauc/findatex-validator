@@ -46,7 +46,7 @@ RUN $JAVA_HOME/bin/jlink \
     --output /custom-jre
 
 # ---- Stage 3: Runtime (Alpine + Custom-JRE) ---------------------------------
-FROM alpine:3.20
+FROM alpine:3.23
 
 # fontconfig + ttf-dejavu: Apache POI's autoSizeColumn calls into AWT, which
 # refuses to start without a font configuration on the system.

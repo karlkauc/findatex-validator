@@ -16,6 +16,7 @@ export interface TemplateInfo {
   id: 'TPT' | 'EET' | 'EMT' | 'EPT' | string;
   displayName: string;
   versions: VersionInfo[];
+  externalAvailable: boolean;
 }
 
 export type Severity = 'ERROR' | 'WARNING' | 'INFO';

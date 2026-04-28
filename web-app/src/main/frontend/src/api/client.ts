@@ -21,6 +21,15 @@ export interface ValidateArgs {
   templateVersion: string;
   profiles: string[];
   file: File;
+  externalEnabled?: boolean;
+  leiEnabled?: boolean;
+  leiCheckLapsed?: boolean;
+  leiCheckName?: boolean;
+  leiCheckCountry?: boolean;
+  isinEnabled?: boolean;
+  isinCheckCurrency?: boolean;
+  isinCheckCic?: boolean;
+  openfigiApiKey?: string;
 }
 
 export async function validateUpload(args: ValidateArgs): Promise<ValidationResponse> {
@@ -29,6 +38,17 @@ export async function validateUpload(args: ValidateArgs): Promise<ValidationResp
   fd.append('templateVersion', args.templateVersion);
   for (const p of args.profiles) fd.append('profiles', p);
   fd.append('file', args.file);
+  if (args.externalEnabled) {
+    fd.append('externalEnabled', 'true');
+    fd.append('leiEnabled', String(args.leiEnabled ?? true));
+    fd.append('leiCheckLapsed', String(args.leiCheckLapsed ?? true));
+    fd.append('leiCheckName', String(args.leiCheckName ?? false));
+    fd.append('leiCheckCountry', String(args.leiCheckCountry ?? false));
+    fd.append('isinEnabled', String(args.isinEnabled ?? true));
+    fd.append('isinCheckCurrency', String(args.isinCheckCurrency ?? false));
+    fd.append('isinCheckCic', String(args.isinCheckCic ?? false));
+    if (args.openfigiApiKey) fd.append('openfigiApiKey', args.openfigiApiKey);
+  }
   const res = await fetch('/api/validate', { method: 'POST', body: fd });
   return handle<ValidationResponse>(res);
 }

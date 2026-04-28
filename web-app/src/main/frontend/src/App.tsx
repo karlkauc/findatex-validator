@@ -7,6 +7,7 @@ import { ProfileSelector } from './components/ProfileSelector';
 import { FileUpload } from './components/FileUpload';
 import { ResultPanel } from './components/ResultPanel';
 import { ErrorBanner } from './components/ErrorBanner';
+import { ExternalValidationToggle } from './components/ExternalValidationToggle';
 import { ValidationResponse } from './types/api';
 
 export default function App() {
@@ -17,6 +18,17 @@ export default function App() {
   const [profiles, setProfiles] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<ValidationResponse | null>(null);
+
+  // Defaults match AppSettings.defaults() in core: master OFF, LEI lapsed ON, the rest OFF.
+  const [externalEnabled, setExternalEnabled] = useState(false);
+  const [leiEnabled, setLeiEnabled] = useState(true);
+  const [leiCheckLapsed, setLeiCheckLapsed] = useState(true);
+  const [leiCheckName, setLeiCheckName] = useState(false);
+  const [leiCheckCountry, setLeiCheckCountry] = useState(false);
+  const [isinEnabled, setIsinEnabled] = useState(true);
+  const [isinCheckCurrency, setIsinCheckCurrency] = useState(false);
+  const [isinCheckCic, setIsinCheckCic] = useState(false);
+  const [openfigiApiKey, setOpenfigiApiKey] = useState('');
 
   const templates = templatesQuery.data ?? [];
   const currentTemplate = templates.find((t) => t.id === templateId);
@@ -47,7 +59,24 @@ export default function App() {
   const submit = () => {
     if (!file || !version) return;
     setResult(null);
-    validateMutation.mutate({ templateId, templateVersion: version, profiles, file });
+    const useExternal = externalEnabled && (currentTemplate?.externalAvailable ?? false);
+    validateMutation.mutate({
+      templateId,
+      templateVersion: version,
+      profiles,
+      file,
+      externalEnabled: useExternal,
+      leiEnabled,
+      leiCheckLapsed,
+      leiCheckName,
+      leiCheckCountry,
+      isinEnabled,
+      isinCheckCurrency,
+      isinCheckCic,
+      openfigiApiKey: openfigiApiKey.trim() || undefined,
+    });
+    // Don't keep the user-entered key around once it's been sent.
+    setOpenfigiApiKey('');
   };
 
   return (
@@ -90,6 +119,27 @@ export default function App() {
                       onChange={setProfiles}
                     />
                   )}
+                  <ExternalValidationToggle
+                    available={currentTemplate?.externalAvailable ?? false}
+                    externalEnabled={externalEnabled}
+                    leiEnabled={leiEnabled}
+                    leiCheckLapsed={leiCheckLapsed}
+                    leiCheckName={leiCheckName}
+                    leiCheckCountry={leiCheckCountry}
+                    isinEnabled={isinEnabled}
+                    isinCheckCurrency={isinCheckCurrency}
+                    isinCheckCic={isinCheckCic}
+                    apiKey={openfigiApiKey}
+                    onExternalEnabledChange={setExternalEnabled}
+                    onLeiEnabledChange={setLeiEnabled}
+                    onLeiCheckLapsedChange={setLeiCheckLapsed}
+                    onLeiCheckNameChange={setLeiCheckName}
+                    onLeiCheckCountryChange={setLeiCheckCountry}
+                    onIsinEnabledChange={setIsinEnabled}
+                    onIsinCheckCurrencyChange={setIsinCheckCurrency}
+                    onIsinCheckCicChange={setIsinCheckCic}
+                    onApiKeyChange={setOpenfigiApiKey}
+                  />
                   <FileUpload file={file} onFileChange={setFile} />
                   <button
                     type="button"

@@ -41,4 +41,13 @@ class TemplateResourceTest {
                 .body("find { it.id == 'TPT' }.versions.size()", greaterThan(0))
                 .body("find { it.id == 'TPT' }.versions[0].profiles.size()", greaterThan(0));
     }
+
+    @Test
+    void externalAvailableIsFalseByDefault() {
+        given()
+                .when().get("/api/templates")
+                .then()
+                .statusCode(200)
+                .body("findAll { it.externalAvailable == false }.size()", is(4));
+    }
 }

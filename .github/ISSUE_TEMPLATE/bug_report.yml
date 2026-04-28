@@ -1,0 +1,87 @@
+name: Bug report
+description: Report something that is broken or behaves unexpectedly.
+title: "bug: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report.
+
+        **Never attach real fund data.** Use a synthetic sample from
+        `samples/<template>/` or a redacted snippet that reproduces the
+        problem.
+  - type: dropdown
+    id: ui
+    attributes:
+      label: Affected delivery mode
+      options:
+        - Desktop (JavaFX)
+        - Web (Quarkus + React)
+        - Docker container
+        - Other / not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: template
+    attributes:
+      label: Affected FinDatEx template
+      options:
+        - TPT V7
+        - TPT V6
+        - EET V1.1.3
+        - EET V1.1.2
+        - EMT V4.3
+        - EMT V4.2
+        - EPT V2.1
+        - EPT V2.0
+        - Multiple / not template-specific
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal sequence that demonstrates the bug.
+      placeholder: |
+        1. Open the EET tab
+        2. Load `samples/eet/01_clean.xlsx`
+        3. Click Validate
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include error messages, stack traces, or screenshots.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Validator version
+      description: From the About dialog, the JAR filename, or the container tag.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS + JDK (desktop) or browser (web) or Docker host.
+      placeholder: "macOS 14 / Temurin 21 / Chrome 124"
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Logs, related issues, regression hints, workarounds you tried.
+    validations:
+      required: false

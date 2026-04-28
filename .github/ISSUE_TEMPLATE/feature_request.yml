@@ -1,0 +1,42 @@
+name: Feature request
+description: Suggest a new capability or improvement.
+title: "feat: "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What user-facing problem are you trying to solve? Avoid jumping straight to a proposed implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like to see happen?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Affected area (if applicable)
+      multiple: true
+      options:
+        - TPT
+        - EET
+        - EMT
+        - EPT
+        - Cross-template / core engine
+        - Web app
+        - Desktop app
+        - Docker / deployment
+        - Documentation
+    validations:
+      required: false

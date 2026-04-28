@@ -1,0 +1,53 @@
+# Default: detect text vs binary, normalise text line endings to LF in the repo.
+* text=auto eol=lf
+
+# --- Text sources --------------------------------------------------------
+*.java       text eol=lf
+*.kt         text eol=lf
+*.xml        text eol=lf
+*.fxml       text eol=lf
+*.properties text eol=lf
+*.json       text eol=lf
+*.yaml       text eol=lf
+*.yml        text eol=lf
+*.md         text eol=lf
+*.txt        text eol=lf
+*.html       text eol=lf
+*.css        text eol=lf
+*.scss       text eol=lf
+*.ts         text eol=lf
+*.tsx        text eol=lf
+*.js         text eol=lf
+*.jsx        text eol=lf
+*.mjs        text eol=lf
+*.cjs        text eol=lf
+*.sh         text eol=lf
+
+# Windows-only artefacts keep CRLF on disk.
+*.bat        text eol=crlf
+*.cmd        text eol=crlf
+
+# --- Binaries: never normalise, never diff as text -----------------------
+*.xlsx       binary
+*.xls        binary
+*.xlsm       binary
+*.pdf        binary
+*.png        binary
+*.jpg        binary
+*.jpeg       binary
+*.gif        binary
+*.ico        binary
+*.icns       binary
+*.svg        binary
+*.jar        binary
+*.war        binary
+*.zip        binary
+*.gz         binary
+*.tgz        binary
+*.tar        binary
+*.7z         binary
+*.woff       binary
+*.woff2      binary
+*.ttf        binary
+*.otf        binary
+*.eot        binary

@@ -1,5 +1,7 @@
 package com.findatex.validator.template.tpt;
 
+import com.findatex.validator.external.ExternalValidationConfig;
+import com.findatex.validator.external.ExternalValidationConfig.IdentifierRef;
 import com.findatex.validator.spec.ManifestDrivenSpecLoader;
 import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.template.api.TemplateDefinition;
@@ -38,6 +40,42 @@ public final class TptTemplate implements TemplateDefinition {
 
     private static final List<TemplateVersion> VERSIONS = List.of(V7_0, V6_0);
 
+    /**
+     * TPT V7 column numbering for ISIN/LEI candidates and contextual cross-checks.
+     * Type-of-code flag {@code "1"} maps to ISIN (fields 14/68 with their sibling type
+     * columns 15/69) and to LEI (seven LEI/type column pairs).
+     */
+    public static final ExternalValidationConfig EXTERNAL_VALIDATION_V7 = new ExternalValidationConfig(
+            List.of(
+                    new IdentifierRef("14", "15", "1"),
+                    new IdentifierRef("68", "69", "1")),
+            List.of(
+                    new IdentifierRef("47", "48", "1"),
+                    new IdentifierRef("50", "51", "1"),
+                    new IdentifierRef("81", "82", "1"),
+                    new IdentifierRef("84", "85", "1"),
+                    new IdentifierRef("115", "116", "1"),
+                    new IdentifierRef("119", "120", "1"),
+                    new IdentifierRef("140", "141", "1")),
+            "21", "11", "46", "52");
+
+    /** V6 lacks the custodian LEI columns 140/141 introduced in V7; otherwise identical. */
+    public static final ExternalValidationConfig EXTERNAL_VALIDATION_V6 = new ExternalValidationConfig(
+            List.of(
+                    new IdentifierRef("14", "15", "1"),
+                    new IdentifierRef("68", "69", "1")),
+            List.of(
+                    new IdentifierRef("47", "48", "1"),
+                    new IdentifierRef("50", "51", "1"),
+                    new IdentifierRef("81", "82", "1"),
+                    new IdentifierRef("84", "85", "1"),
+                    new IdentifierRef("115", "116", "1"),
+                    new IdentifierRef("119", "120", "1")),
+            "21", "11", "46", "52");
+
+    /** Default-pointing constant for callers that don't care about version drift (tests, etc.). */
+    public static final ExternalValidationConfig EXTERNAL_VALIDATION = EXTERNAL_VALIDATION_V7;
+
     @Override
     public TemplateId id() {
         return TemplateId.TPT;
@@ -72,5 +110,12 @@ public final class TptTemplate implements TemplateDefinition {
             throw new NoSuchElementException("TPT does not support version " + version.version());
         }
         return new TptRuleSet(version);
+    }
+
+    @Override
+    public ExternalValidationConfig externalValidationConfigFor(TemplateVersion version) {
+        if (version == V7_0) return EXTERNAL_VALIDATION_V7;
+        if (version == V6_0) return EXTERNAL_VALIDATION_V6;
+        throw new NoSuchElementException("TPT does not support version " + version.version());
     }
 }

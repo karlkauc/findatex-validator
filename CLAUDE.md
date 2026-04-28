@@ -158,7 +158,7 @@ logic** for a non-TPT template.
 "if field X = Y then Z is mandatory" mechanism — prefer it over a new
 crossfield class when the spec text is reducible to that shape.
 
-### External validation (TPT only, opt-in)
+### External validation (opt-in, all templates)
 
 `ExternalValidationService` cross-checks ISIN against OpenFIGI and LEI against
 GLEIF. Off by default; configured per session via the Settings dialog. Works
@@ -167,12 +167,22 @@ encrypted manual creds (`PasswordCipher`). See
 `docs/superpowers/specs/2026-04-27-external-validation-gleif-openfigi-design.md`
 if extending.
 
+The service itself is template-agnostic — each `TemplateDefinition` declares its
+ISIN/LEI columns via `externalValidationConfigFor(version)` returning an
+`ExternalValidationConfig` (per-template constants live in `TptTemplate`,
+`EetTemplate`, `EmtTemplate`, `EptTemplate`). To extend: drop new column
+references into the constant; never add hardcoded field codes back into
+`ExternalValidationService`. Per-version drift is supported (TPT V6 omits the
+custodian LEI columns introduced in V7).
+
 ### UI shell (JavaFX)
 
 `MainView.fxml` is a `TabPane` built dynamically from `TemplateRegistry.all()`.
 `TemplateTab.fxml` is reused once per template (no template-specific FXML).
-The external-validation controls are hidden for non-TPT tabs. Window title
-is "FinDatEx Validator" and the macOS dock label uses `apple.awt.application.name`.
+The external-validation controls are shown for any template/version whose
+`externalValidationConfigFor(...)` is non-empty (currently all four). Window
+title is "FinDatEx Validator" and the macOS dock label uses
+`apple.awt.application.name`.
 
 ### Web layer (Quarkus + React)
 
@@ -191,9 +201,11 @@ REST endpoints (all under `/api`):
 
 External validation (GLEIF/OpenFIGI) is **off by default in the web layer**.
 Operators flip it on via `FINDATEX_WEB_EXTERNAL_ENABLED=true` and provide
-keys/proxy creds via env. The full ExternalValidationService wire-up in the
-orchestrator is intentionally minimal in the first cut — extend
-`ValidationOrchestrator.doValidate(...)` once a deployment actually needs it.
+keys/proxy creds via env. With the operator switch on, `TemplateResource`
+surfaces `externalAvailable=true` for every template that declares an
+`ExternalValidationConfig` (currently all four), and `ValidationOrchestrator`
+runs the GLEIF/OpenFIGI pipeline through that config when the per-request
+`externalEnabled=true` flag is set.
 
 The React frontend lives in `web-app/src/main/frontend/`. Vite writes the
 production bundle into `web-app/target/classes/META-INF/resources/`, which

@@ -1,5 +1,7 @@
 package com.findatex.validator.template.api;
 
+import com.findatex.validator.external.ExternalValidationConfig;
+
 import java.util.List;
 
 /**
@@ -37,4 +39,14 @@ public interface TemplateDefinition {
     TemplateSpecLoader specLoaderFor(TemplateVersion version);
 
     TemplateRuleSet ruleSetFor(TemplateVersion version);
+
+    /**
+     * Per-version configuration of the columns the GLEIF/OpenFIGI live-lookup pipeline should
+     * inspect. Default is {@link ExternalValidationConfig#empty()} — templates that want online
+     * validation override this and declare their ISIN/LEI columns. An empty config disables the
+     * external pipeline for the template/version pair.
+     */
+    default ExternalValidationConfig externalValidationConfigFor(TemplateVersion version) {
+        return ExternalValidationConfig.empty();
+    }
 }

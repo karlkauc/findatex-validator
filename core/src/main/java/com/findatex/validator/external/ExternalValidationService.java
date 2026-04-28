@@ -51,16 +51,6 @@ public final class ExternalValidationService {
         Map<String, V> apply(List<String> keys, BooleanSupplier cancelled, IntConsumer onBatchDone);
     }
 
-    private static final List<String[]> LEI_PAIRS = List.of(
-            new String[]{"47", "48"}, new String[]{"50", "51"},
-            new String[]{"81", "82"}, new String[]{"84", "85"},
-            new String[]{"115", "116"}, new String[]{"119", "120"},
-            new String[]{"140", "141"}
-    );
-    private static final List<String[]> ISIN_PAIRS = List.of(
-            new String[]{"14", "15"}, new String[]{"68", "69"}
-    );
-
     private final Path cacheDir;
     private final RemoteLookup<LeiRecord> gleif;
     private final RemoteLookup<IsinRecord> openFigi;
@@ -93,23 +83,24 @@ public final class ExternalValidationService {
     }
 
     /** Convenience overload — uses NOOP progress sink. */
-    public List<Finding> run(TptFile file, AppSettings settings, BooleanSupplier cancelled) {
-        return run(file, settings, cancelled, ProgressSink.NOOP);
+    public List<Finding> run(TptFile file, ExternalValidationConfig config,
+                             AppSettings settings, BooleanSupplier cancelled) {
+        return run(file, config, settings, cancelled, ProgressSink.NOOP);
     }
 
-    public List<Finding> run(TptFile file, AppSettings settings,
-                             BooleanSupplier cancelled, ProgressSink sink) {
-        if (!settings.external().enabled()) return List.of();
+    public List<Finding> run(TptFile file, ExternalValidationConfig config,
+                             AppSettings settings, BooleanSupplier cancelled, ProgressSink sink) {
+        if (!settings.external().enabled() || config == null || config.isEmpty()) return List.of();
 
         List<Finding> out = new ArrayList<>();
         Duration ttl = Duration.ofDays(settings.external().cache().ttlDays());
 
         // ---- LEI phase ----
-        if (settings.external().lei().enabled()) {
+        if (settings.external().lei().enabled() && !config.leiFields().isEmpty()) {
             try {
                 JsonCache<LeiRecord> cache = new JsonCache<>(
                         cacheDir.resolve("lei-cache.json"), ttl, new TypeReference<>() {});
-                List<LeiOnlineRule.LeiHit> hits = collectLeiHits(file);
+                List<LeiOnlineRule.LeiHit> hits = collectLeiHits(file, config);
                 if (!hits.isEmpty()) {
                     LinkedHashSet<String> distinct = new LinkedHashSet<>();
                     hits.forEach(h -> distinct.add(h.lei()));
@@ -124,12 +115,13 @@ public final class ExternalValidationService {
                     Map<String, LeiRecord> records = lookupWithCache(hits, LeiOnlineRule.LeiHit::lei,
                             gleif, cache, cancelled, done -> sink.leiDone(done));
                     cache.flush();
-                    for (String[] pair : LEI_PAIRS) {
+                    for (ExternalValidationConfig.IdentifierRef ref : config.leiFields()) {
                         List<LeiOnlineRule.LeiHit> sub = hits.stream()
-                                .filter(h -> h.codeNumKey().equals(pair[0])).toList();
+                                .filter(h -> h.codeNumKey().equals(ref.codeKey())
+                                        && h.typeNumKey().equals(ref.typeKey())).toList();
                         if (sub.isEmpty()) continue;
                         out.addAll(LeiOnlineRule.evaluate(new LeiOnlineRule.Input(
-                                pair[0], pair[1], sub, records, settings.external().lei())));
+                                ref.codeKey(), ref.typeKey(), sub, records, settings.external().lei())));
                     }
                 }
             } catch (Exception e) {
@@ -145,11 +137,11 @@ public final class ExternalValidationService {
         }
 
         // ---- ISIN phase ----
-        if (settings.external().isin().enabled()) {
+        if (settings.external().isin().enabled() && !config.isinFields().isEmpty()) {
             try {
                 JsonCache<IsinRecord> cache = new JsonCache<>(
                         cacheDir.resolve("isin-cache.json"), ttl, new TypeReference<>() {});
-                List<IsinOnlineRule.IsinHit> hits = collectIsinHits(file);
+                List<IsinOnlineRule.IsinHit> hits = collectIsinHits(file, config);
                 if (!hits.isEmpty()) {
                     LinkedHashSet<String> distinct = new LinkedHashSet<>();
                     hits.forEach(h -> distinct.add(h.isin()));
@@ -164,12 +156,13 @@ public final class ExternalValidationService {
                     Map<String, IsinRecord> records = lookupWithCache(hits, IsinOnlineRule.IsinHit::isin,
                             openFigi, cache, cancelled, done -> sink.isinDone(done));
                     cache.flush();
-                    for (String[] pair : ISIN_PAIRS) {
+                    for (ExternalValidationConfig.IdentifierRef ref : config.isinFields()) {
                         List<IsinOnlineRule.IsinHit> sub = hits.stream()
-                                .filter(h -> h.codeNumKey().equals(pair[0])).toList();
+                                .filter(h -> h.codeNumKey().equals(ref.codeKey())
+                                        && h.typeNumKey().equals(ref.typeKey())).toList();
                         if (sub.isEmpty()) continue;
                         out.addAll(IsinOnlineRule.evaluate(new IsinOnlineRule.Input(
-                                pair[0], pair[1], sub, records, settings.external().isin())));
+                                ref.codeKey(), ref.typeKey(), sub, records, settings.external().isin())));
                     }
                 }
             } catch (Exception e) {
@@ -188,38 +181,46 @@ public final class ExternalValidationService {
                 "External validation", 0, null, "User cancelled the online phase");
     }
 
-    private static List<LeiOnlineRule.LeiHit> collectLeiHits(TptFile file) {
+    private static List<LeiOnlineRule.LeiHit> collectLeiHits(TptFile file, ExternalValidationConfig config) {
         List<LeiOnlineRule.LeiHit> out = new ArrayList<>();
         for (TptRow row : file.rows()) {
-            String issuerName = row.stringValue("46").orElse("");
-            String issuerCountry = row.stringValue("52").orElse("");
-            for (String[] pair : LEI_PAIRS) {
-                String type = row.stringValue(pair[1]).orElse("");
-                if (!"1".equals(type.trim())) continue;
-                String code = row.stringValue(pair[0]).orElse("").trim().toUpperCase(Locale.ROOT);
+            String issuerName = lookup(row, config.issuerNameKey());
+            String issuerCountry = lookup(row, config.issuerCountryKey());
+            for (ExternalValidationConfig.IdentifierRef ref : config.leiFields()) {
+                if (ref.hasTypeFlag()) {
+                    String type = row.stringValue(ref.typeKey()).orElse("").trim();
+                    if (!ref.expectedTypeFlag().equals(type)) continue;
+                }
+                String code = row.stringValue(ref.codeKey()).orElse("").trim().toUpperCase(Locale.ROOT);
                 if (code.isEmpty() || !LeiRule.isValidLei(code)) continue;
-                out.add(new LeiOnlineRule.LeiHit(pair[0], pair[1], row.rowIndex(),
+                out.add(new LeiOnlineRule.LeiHit(ref.codeKey(), ref.typeKey(), row.rowIndex(),
                         code, issuerName, issuerCountry));
             }
         }
         return out;
     }
 
-    private static List<IsinOnlineRule.IsinHit> collectIsinHits(TptFile file) {
+    private static List<IsinOnlineRule.IsinHit> collectIsinHits(TptFile file, ExternalValidationConfig config) {
         List<IsinOnlineRule.IsinHit> out = new ArrayList<>();
         for (TptRow row : file.rows()) {
-            String currency = row.stringValue("21").orElse("");
-            String cic = row.stringValue("11").orElse("");
-            for (String[] pair : ISIN_PAIRS) {
-                String type = row.stringValue(pair[1]).orElse("");
-                if (!"1".equals(type.trim())) continue;
-                String code = row.stringValue(pair[0]).orElse("").trim().toUpperCase(Locale.ROOT);
+            String currency = lookup(row, config.currencyKey());
+            String cic = lookup(row, config.cicKey());
+            for (ExternalValidationConfig.IdentifierRef ref : config.isinFields()) {
+                if (ref.hasTypeFlag()) {
+                    String type = row.stringValue(ref.typeKey()).orElse("").trim();
+                    if (!ref.expectedTypeFlag().equals(type)) continue;
+                }
+                String code = row.stringValue(ref.codeKey()).orElse("").trim().toUpperCase(Locale.ROOT);
                 if (code.isEmpty() || !IsinRule.isValidIsin(code)) continue;
-                out.add(new IsinOnlineRule.IsinHit(pair[0], pair[1], row.rowIndex(),
+                out.add(new IsinOnlineRule.IsinHit(ref.codeKey(), ref.typeKey(), row.rowIndex(),
                         code, currency, cic));
             }
         }
         return out;
+    }
+
+    private static String lookup(TptRow row, String key) {
+        return key.isEmpty() ? "" : row.stringValue(key).orElse("");
     }
 
     private static <H, V> Map<String, V> lookupWithCache(List<H> hits,

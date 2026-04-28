@@ -2,6 +2,7 @@ package com.findatex.validator.web.service;
 
 import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.domain.TptFile;
+import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.external.ExternalValidationService;
 import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.report.QualityReport;
@@ -12,7 +13,6 @@ import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.template.api.TemplateDefinition;
-import com.findatex.validator.template.api.TemplateId;
 import com.findatex.validator.template.api.TemplateRegistry;
 import com.findatex.validator.template.api.TemplateRuleSet;
 import com.findatex.validator.template.api.TemplateVersion;
@@ -139,9 +139,10 @@ public class ValidationOrchestrator {
         List<Finding> findings = new ValidationEngine(bundle.catalog, bundle.ruleSet)
                 .validate(file, activeProfiles);
 
+        ExternalValidationConfig externalCfg = def.externalValidationConfigFor(version);
         if (externalOptions != null
                 && externalOptions.enabled()
-                && def.id() == TemplateId.TPT
+                && !externalCfg.isEmpty()
                 && config.external().enabled()
                 && externalFactory.enabled()) {
             try (ExternalValidationFactory.ServiceHandle handle =
@@ -150,7 +151,7 @@ public class ValidationOrchestrator {
                 if (svc != null) {
                     AppSettings settings = externalFactory.buildSettings(externalOptions);
                     List<Finding> online = FindingEnricher.enrich(file,
-                            svc.run(file, settings, () -> false,
+                            svc.run(file, externalCfg, settings, () -> false,
                                     ExternalValidationService.ProgressSink.NOOP));
                     List<Finding> merged = new ArrayList<>(findings);
                     merged.addAll(online);

@@ -3,6 +3,7 @@ package com.findatex.validator.external;
 import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.external.gleif.LeiRecord;
+import com.findatex.validator.template.tpt.TptTemplate;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.TestFileBuilder;
@@ -31,7 +32,7 @@ class ExternalValidationServiceTest {
                 leis -> Map.of(),
                 isins -> Map.of());
 
-        List<Finding> out = svc.run(file, settings, () -> false);
+        List<Finding> out = svc.run(file, TptTemplate.EXTERNAL_VALIDATION, settings, () -> false);
         assertThat(out).extracting(Finding::ruleId).contains("LEI-LIVE/47/48");
         assertThat(out).extracting(Finding::severity).contains(Severity.ERROR);
     }
@@ -47,7 +48,7 @@ class ExternalValidationServiceTest {
         };
         ExternalValidationService svc = ExternalValidationService.forTest(
                 tmp, failing, isins -> Map.of());
-        List<Finding> out = svc.run(file, settings, () -> false);
+        List<Finding> out = svc.run(file, TptTemplate.EXTERNAL_VALIDATION, settings, () -> false);
         assertThat(out).extracting(Finding::ruleId).contains("EXTERNAL/GLEIF-UNAVAILABLE");
     }
 
@@ -70,7 +71,7 @@ class ExternalValidationServiceTest {
             return firstSeen.getAndSet(true) || true;
         };
 
-        List<Finding> out = svc.run(file, settings, cancelled);
+        List<Finding> out = svc.run(file, TptTemplate.EXTERNAL_VALIDATION, settings, cancelled);
         // Either remote was never called (cancel was instant) or it ran zero times for ISIN.
         // Critically the run completes and emits the CANCELLED info finding.
         assertThat(out).extracting(Finding::ruleId).contains("EXTERNAL/CANCELLED");

@@ -3,6 +3,7 @@ package com.findatex.validator.ui;
 import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.config.SettingsService;
 import com.findatex.validator.domain.TptFile;
+import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.external.ExternalValidationService;
 import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.report.QualityReport;
@@ -12,7 +13,6 @@ import com.findatex.validator.report.XlsxReportWriter;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.TemplateDefinition;
-import com.findatex.validator.template.api.TemplateId;
 import com.findatex.validator.template.api.TemplateRuleSet;
 import com.findatex.validator.template.api.TemplateVersion;
 import com.findatex.validator.validation.Finding;
@@ -177,8 +177,9 @@ public final class TemplateTabController {
 
         rebuildProfilePane();
 
-        // External validation row — currently only TPT supports the GLEIF/OpenFIGI lookups.
-        boolean externalSupported = template.id() == TemplateId.TPT;
+        // External validation row — visible whenever the active template/version declares any
+        // ISIN/LEI columns to look up. Templates without external config keep the row hidden.
+        boolean externalSupported = !template.externalValidationConfigFor(selectedVersion).isEmpty();
         externalRow.setVisible(externalSupported);
         externalRow.setManaged(externalSupported);
 
@@ -288,7 +289,8 @@ public final class TemplateTabController {
         exportButton.setDisable(true);
         statusLabel.setText("Loading and validating " + path.getFileName() + " ...");
 
-        boolean externalSupported = template.id() == TemplateId.TPT;
+        ExternalValidationConfig externalConfig = template.externalValidationConfigFor(selectedVersion);
+        boolean externalSupported = !externalConfig.isEmpty();
 
         Stage progressStage = null;
         LookupProgressController progressController = null;
@@ -353,7 +355,7 @@ public final class TemplateTabController {
                     };
 
                     List<Finding> online = FindingEnricher.enrich(
-                            file, svc.run(file, settings, cancelled, sink));
+                            file, svc.run(file, externalConfig, settings, cancelled, sink));
                     List<Finding> all = new ArrayList<>(findings);
                     all.addAll(online);
                     findings = all;

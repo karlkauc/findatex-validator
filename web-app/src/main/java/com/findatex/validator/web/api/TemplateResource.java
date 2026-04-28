@@ -2,7 +2,6 @@ package com.findatex.validator.web.api;
 
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.TemplateDefinition;
-import com.findatex.validator.template.api.TemplateId;
 import com.findatex.validator.template.api.TemplateRegistry;
 import com.findatex.validator.template.api.TemplateVersion;
 import com.findatex.validator.web.config.WebConfig;
@@ -40,10 +39,12 @@ public class TemplateResource {
                         v.releaseDate() == null ? null : v.releaseDate().toString(),
                         profiles));
             }
-            // External validation is global (operator-controlled) AND template-restricted
-            // (only TPT has the ISIN/LEI lookup logic). Surface both as one flag so the
-            // frontend can decide whether to render the toggle at all.
-            boolean externalAvailable = operatorEnabled && def.id() == TemplateId.TPT;
+            // External validation is gated by operator opt-in (FINDATEX_WEB_EXTERNAL_ENABLED)
+            // and by the template declaring at least one ISIN/LEI column. We probe the latest
+            // version: per-version drift would require expanding TemplateInfo, which has not
+            // been needed yet.
+            boolean externalAvailable = operatorEnabled
+                    && !def.externalValidationConfigFor(def.latest()).isEmpty();
             result.add(new TemplateInfo(def.id().name(), def.displayName(), versions, externalAvailable));
         }
         return result;

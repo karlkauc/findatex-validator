@@ -113,7 +113,7 @@ export function ExternalValidationToggle(props: Props) {
                 value={props.apiKey}
                 onChange={(e) => props.onApiKeyChange(e.target.value)}
                 placeholder="Server-Default wird verwendet, wenn leer"
-                className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500 disabled:bg-slate-100 disabled:text-slate-400"
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-500 focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500 disabled:bg-slate-100 disabled:text-slate-500"
               />
               <p className="mt-1 text-[11px] text-slate-500">
                 Wird nur für diese Validierung verwendet und nicht gespeichert.
@@ -139,7 +139,7 @@ function CheckRow({ label, checked, disabled, bold, onChange }: CheckRowProps) {
     <label
       className={
         'flex items-center gap-2 text-xs ' +
-        (disabled ? 'text-slate-400' : bold ? 'font-medium text-slate-800' : 'text-slate-700') +
+        (disabled ? 'text-slate-500' : bold ? 'font-medium text-slate-800' : 'text-slate-700') +
         (disabled ? '' : ' cursor-pointer')
       }
     >

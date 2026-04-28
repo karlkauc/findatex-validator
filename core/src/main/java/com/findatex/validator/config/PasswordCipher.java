@@ -11,10 +11,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Machine-bound AES-GCM cipher for proxy passwords. The key is derived
- * from a stable per-machine seed (user.name + os.name + os.arch). This
- * does not protect against an attacker with code access — it only
- * defends against backup leaks and shoulder surfing of settings.json.
+ * Machine-bound AES-GCM cipher for proxy passwords. The key is derived from a
+ * stable per-user seed (user.home path + user.name + os.name + os.arch). The
+ * inclusion of {@code user.home} provides real per-user isolation on multi-user
+ * systems — the same OS/architecture/account-name combination held by another
+ * user will still produce a different key, because their home directory differs.
+ *
+ * <p>Defends against backup leaks and shoulder-surfing of {@code settings.json}.
+ * Does <strong>not</strong> protect against an attacker who can run code as the
+ * same OS user (they have full access to the same key derivation).
+ *
+ * <p>Tokens encrypted before the {@code user.home} mixin was added will fail to
+ * decrypt and {@link #decrypt(String)} returns the empty string — the JavaFX UI
+ * already handles that as "saved password absent, prompt again".
  */
 public final class PasswordCipher {
 
@@ -62,10 +71,11 @@ public final class PasswordCipher {
     }
 
     private static SecretKeySpec key() throws Exception {
-        String seed = System.getProperty("user.name", "u")
+        String seed = System.getProperty("user.home", "h")
+                + "|" + System.getProperty("user.name", "u")
                 + "|" + System.getProperty("os.name", "o")
                 + "|" + System.getProperty("os.arch", "a")
-                + "|tpt-validator-v1";
+                + "|tpt-validator-v2";
         byte[] hash = MessageDigest.getInstance("SHA-256").digest(seed.getBytes(StandardCharsets.UTF_8));
         return new SecretKeySpec(hash, "AES");
     }

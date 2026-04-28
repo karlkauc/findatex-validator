@@ -25,8 +25,10 @@ export function ProfileSelector({ profiles, selected, onChange }: Props) {
               key={p.code}
               type="button"
               onClick={() => toggle(p.code)}
+              aria-pressed={isSel}
               className={
-                'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ' +
+                'rounded-md border px-4 py-2 text-xs font-medium transition-colors ' +
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-navy-500 ' +
                 (isSel
                   ? 'border-navy-700 bg-navy-700 text-white'
                   : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100')

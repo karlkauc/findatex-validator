@@ -145,6 +145,7 @@ export default function App() {
                     type="button"
                     className="btn-primary w-full"
                     disabled={!canSubmit}
+                    aria-busy={validateMutation.isPending}
                     onClick={submit}
                   >
                     {validateMutation.isPending ? (
@@ -156,6 +157,9 @@ export default function App() {
                       'Validieren'
                     )}
                   </button>
+                  <div aria-live="polite" aria-atomic="true" className="sr-only">
+                    {validateMutation.isPending ? 'Validierung läuft' : ''}
+                  </div>
                 </div>
               </div>
 

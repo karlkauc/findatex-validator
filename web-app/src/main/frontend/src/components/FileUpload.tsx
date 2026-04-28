@@ -63,7 +63,7 @@ export function FileUpload({ file, onFileChange }: Props) {
       </p>
       <p className="mt-1 text-xs text-slate-500">.xlsx, .xlsm oder .csv — max 25&nbsp;MB</p>
       {fileRejections.length > 0 && (
-        <p className="mt-3 text-xs text-red-600">
+        <p className="mt-3 text-xs text-red-600" role="alert">
           {fileRejections[0].errors[0]?.message ?? 'Datei abgelehnt'}
         </p>
       )}

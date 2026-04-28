@@ -5,10 +5,10 @@ REM Run after `mvn -DskipTests package`.
 setlocal
 set "SCRIPT_DIR=%~dp0"
 set "PROJECT_DIR=%SCRIPT_DIR%.."
-set "TARGET_DIR=%PROJECT_DIR%\target"
+set "TARGET_DIR=%PROJECT_DIR%\javafx-app\target"
 set "APP_NAME=TPT Validator"
 set "APP_VERSION=1.0.0"
-set "SHADED_JAR=%TARGET_DIR%\tpt-validator-%APP_VERSION%-shaded.jar"
+set "SHADED_JAR=%TARGET_DIR%\findatex-validator-javafx-%APP_VERSION%-shaded.jar"
 
 if not exist "%SHADED_JAR%" (
   echo Shaded JAR not found: %SHADED_JAR%
@@ -41,7 +41,7 @@ jpackage ^
   --vendor "TPT Validator" ^
   --description "Quality and conformance validator for TPT V7 files" ^
   --input "%INPUT_DIR%" ^
-  --main-jar "tpt-validator-%APP_VERSION%-shaded.jar" ^
+  --main-jar "findatex-validator-javafx-%APP_VERSION%-shaded.jar" ^
   --main-class com.findatex.validator.AppLauncher ^
   %ICON_ARG% ^
   --dest "%OUT_DIR%" ^

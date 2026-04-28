@@ -9,10 +9,10 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-TARGET_DIR="$PROJECT_DIR/target"
+TARGET_DIR="$PROJECT_DIR/javafx-app/target"
 APP_NAME="TPT Validator"
 APP_VERSION="1.0.0"
-SHADED_JAR="$TARGET_DIR/tpt-validator-${APP_VERSION}-shaded.jar"
+SHADED_JAR="$TARGET_DIR/findatex-validator-javafx-${APP_VERSION}-shaded.jar"
 
 if [[ ! -f "$SHADED_JAR" ]]; then
   echo "Shaded JAR not found at $SHADED_JAR — run 'mvn -DskipTests package' first." >&2

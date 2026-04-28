@@ -1,0 +1,40 @@
+# Build output
+**/target/
+**/node_modules/
+
+# Operator drop zone — never goes into the image.
+specs/
+
+# Tooling/scripts not needed at build time
+samples/
+docs/
+package/
+tools/
+
+# Runtime / data
+*.log
+.DAV/
+20260331_TPTV7_*.xlsx
+
+# Editors / OS
+.idea/
+.vscode/
+.settings/
+*.iml
+.classpath
+.project
+.factorypath
+.DS_Store
+._*
+Thumbs.db
+
+# VCS / CI
+.git/
+.gitignore
+.github/
+.classpath
+
+# Plans / status / claude scratch
+.claude/
+RALPH_PROMPT.md
+RALPH_STATUS.md

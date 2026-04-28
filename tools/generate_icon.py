@@ -8,7 +8,7 @@ Design:
   - Green tick badge in the lower-right corner = validation / quality.
 
 Outputs:
-  - src/main/resources/icons/icon-{16,32,48,64,128,256,512}.png  (UI)
+  - javafx-app/src/main/resources/icons/icon-{16,32,48,64,128,256,512}.png  (UI)
   - package/icon.png   (master 512 px, jpackage --icon for Linux)
   - package/icon.ico   (multi-size, jpackage --icon for Windows)
   - package/icon.icns  (multi-size, jpackage --icon for macOS)
@@ -20,12 +20,12 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parent.parent
-RES_DIR = ROOT / "src" / "main" / "resources" / "icons"
+RES_DIR = ROOT / "javafx-app" / "src" / "main" / "resources" / "icons"
 PKG_DIR = ROOT / "package"
 RES_DIR.mkdir(parents=True, exist_ok=True)
 PKG_DIR.mkdir(parents=True, exist_ok=True)
 
-# Palette — aligned with src/main/resources/css/app.css
+# Palette — aligned with javafx-app/src/main/resources/css/app.css
 NAVY_TOP    = (42, 79, 122)    # #2a4f7a
 NAVY_BOTTOM = (23, 48, 73)     # #173049
 WHITE       = (255, 255, 255)

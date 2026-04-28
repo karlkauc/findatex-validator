@@ -1,12 +1,21 @@
 # FinDatEx Validator
 
-JavaFX desktop application that loads a [FinDatEx](https://findatex.eu) data
-template file (Excel `.xlsx` or CSV) and produces a quality & conformance
-report against the relevant template specification.
+Validator for [FinDatEx](https://findatex.eu) data-template files (`.xlsx`,
+`.csv`). Produces a quality & conformance report against the relevant
+template specification. Two ways to run it, sharing one validation core:
 
-Each supported template lives in its own UI tab, with its own version selector
-and regulatory profile checkboxes. The shared validation engine, codification
-parser, finding model and Excel report writer are template-agnostic.
+- **Desktop (JavaFX)** — for daily use at the asset manager. Files never
+  leave the user's machine. Native installer builds (`.deb`, `.rpm`, `.dmg`,
+  `.msi`) via jpackage.
+- **Web (Quarkus + React, Docker)** — self-hosted container for users who
+  can't install software locally or just need an occasional validation. No
+  login. Anti-misuse: per-IP rate limit, body-size cap, concurrency cap,
+  auto-delete of uploads + reports.
+
+Each supported template lives in its own UI tab (desktop) or selectable tab
+strip (web), with its own version selector and regulatory profile checkboxes.
+The shared validation engine, codification parser, finding model and Excel
+report writer are template-agnostic.
 
 ## Status overview
 
@@ -67,47 +76,77 @@ PRIIPs KID inputs.
 _Wird ergänzt — Phase 4.EPT. Requires manual download of the V2.1 and V2.0
 spec XLSX files from findatex.eu; see `docs/SPEC_DOWNLOADS.md`._
 
-## Layout
+## Layout (multi-module Maven)
 
 | Path | Purpose |
 |---|---|
-| `pom.xml` | Maven build (Java 21, JavaFX 21, POI 5.x, Commons CSV, JUnit 5) |
-| `requirements.md` | Auto-generated requirements mirroring all TPT V7 datapoints + cross-field rules |
+| `pom.xml` | Parent reactor (Java 21; modules: core, javafx-app, web-app) |
+| `core/` | UI-agnostic validation, scoring, ingest, report — `com.findatex.validator.{validation,report,ingest,spec,domain,template,external,config}` |
+| `core/src/main/resources/spec/` | Bundled template spec XLSX files |
+| `core/src/test/resources/sample/` | Canonical test fixtures (also used by web-app tests via relative path) |
+| `javafx-app/` | Desktop UI: `App`, `AppLauncher`, `ui/`, `fxml/`, `css/`, `icons/` |
+| `web-app/` | Quarkus REST + React SPA |
+| `web-app/src/main/java/com/findatex/validator/web/` | api/, service/, filter/, config/, dto/ |
+| `web-app/src/main/frontend/` | Vite + React + TS + Tailwind sources |
+| `Dockerfile` / `docker-compose.yml` / `.dockerignore` | Web-deployment artefacts |
 | `tools/generate_requirements.py` | Re-generates `requirements.md` from the bundled spec xlsx |
-| `tools/build_samples.py` | Builds the synthetic test samples used by JUnit |
-| `src/main/java/com/tpt/validator/` | Application sources (spec, ingest, validation, report, ui) |
-| `src/main/java/com/tpt/validator/template/api/` | Template-agnostic abstractions (`TemplateDefinition`, `TemplateRegistry`, `ProfileKey`, `ProfileSet`) |
-| `src/main/java/com/tpt/validator/template/tpt/` | TPT-specific definitions, profiles and rule set |
-| `src/main/resources/spec/` | Bundled template spec XLSX files (currently TPT V7 + PIK guidelines) |
-| `src/main/resources/fxml/MainView.fxml` | Top-level shell with TabPane |
-| `src/main/resources/fxml/TemplateTab.fxml` | Per-template tab markup (one instance per registered template) |
-| `src/test/java/...` / `src/test/resources/sample/` | Tests + synthetic samples |
-| `package/jpackage.sh` / `.bat` | Native installer build scripts (auto-detect Linux/macOS/Windows) |
-| `package/icon.{png,ico,icns}` | jpackage icon assets |
+| `tools/build_*_samples.py` | Builds the synthetic test samples used by JUnit |
+| `package/jpackage.sh` / `.bat` | Native desktop installer build scripts |
 | `docs/SPEC_DOWNLOADS.md` | Checklist of spec XLSX files that must be downloaded from findatex.eu |
 
 ## Build & run
 
+### Desktop (JavaFX)
+
 ```bash
-# Run the JavaFX UI directly:
-mvn javafx:run
+# Run the desktop UI directly:
+mvn -pl javafx-app javafx:run
 
-# Or build a fat JAR:
-mvn -DskipTests package
-java -jar target/tpt-validator-1.0.0-shaded.jar
-
-# Run all tests:
-mvn test
-
-# Re-generate the synthetic test samples (after spec changes):
-python3 tools/build_samples.py
-
-# Re-generate requirements.md from the spec:
-python3 tools/generate_requirements.py
+# Or build the shaded fat JAR:
+mvn -pl javafx-app -am -DskipTests package
+java -jar javafx-app/target/findatex-validator-javafx-1.0.0-shaded.jar
 
 # Build a native installer (Linux .deb/.rpm, macOS app, or Windows .msi):
 ./package/jpackage.sh        # Linux/macOS
 .\package\jpackage.bat       # Windows
+```
+
+### Web (Quarkus + React, Docker)
+
+```bash
+# Local dev mode (hot reload backend + Vite dev server with /api proxy):
+mvn -pl web-app -am quarkus:dev
+# in a second terminal:
+(cd web-app/src/main/frontend && npm install && npm run dev)
+# open http://localhost:5173
+
+# Build the production container:
+docker build -t findatex-validator-web:1.0.0 .
+docker run --rm -p 8080:8080 findatex-validator-web:1.0.0
+# open http://localhost:8080
+
+# Or via compose (reads docker-compose.yml with throttling defaults):
+docker compose up -d
+```
+
+Anti-misuse defaults (override via env vars; see
+`web-app/src/main/resources/application.properties`):
+
+| Env var | Default | Effect |
+|---|---|---|
+| `FINDATEX_WEB_RATE_LIMIT_PER_IP_PER_HOUR` | `10` | Per-IP token-bucket on `POST /api/validate` |
+| `FINDATEX_WEB_MAX_CONCURRENCY`            | `4`  | Global cap on simultaneous validations (overflow → 429) |
+| `FINDATEX_WEB_REPORT_TTL_MINUTES`         | `5`  | XLSX report download window |
+| `quarkus.http.limits.max-body-size`       | `25M`| Upload size cap (set via `QUARKUS_HTTP_LIMITS_MAX_BODY_SIZE`) |
+| `FINDATEX_WEB_EXTERNAL_ENABLED`           | `false` | Enable GLEIF/OpenFIGI cross-checks (TPT only) |
+
+### Tests / regenerators
+
+```bash
+mvn test                                       # all 520+ tests across all modules
+mvn -Dtest='*ExampleSamplesTest' test          # per-template sample regressions
+python3 tools/build_samples.py                 # → core/src/test/resources/sample/*
+python3 tools/generate_requirements.py         # → requirements.md from the TPT V7 spec
 ```
 
 ## Validation overview

@@ -16,6 +16,7 @@
                 </Label>
                 <Pane HBox.hgrow="ALWAYS"/>
                 <Button fx:id="helpButton" text="? Help" onAction="#onHelp"/>
+                <Button fx:id="aboutButton" text="ⓘ About" onAction="#onAbout"/>
                 <Button fx:id="settingsButton" text="⚙ Settings…" onAction="#onSettings"/>
             </HBox>
             <Label text="Load a FinDatEx data template file (Excel or CSV) and check it for completeness, format conformance and cross-field consistency."

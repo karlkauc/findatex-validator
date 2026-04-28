@@ -68,8 +68,8 @@ public final class SettingsService {
     private static Path defaultPath() {
         String os = System.getProperty("os.name", "").toLowerCase();
         Path base = os.contains("win")
-                ? Path.of(System.getenv().getOrDefault("APPDATA", System.getProperty("user.home")), "tpt-validator")
-                : Path.of(System.getProperty("user.home"), ".config", "tpt-validator");
+                ? Path.of(System.getenv().getOrDefault("APPDATA", System.getProperty("user.home")), "findatex-validator")
+                : Path.of(System.getProperty("user.home"), ".config", "findatex-validator");
         return base.resolve("settings.json");
     }
 }

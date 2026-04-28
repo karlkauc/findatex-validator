@@ -1,9 +1,9 @@
 # FinDatEx Validator
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![CI](https://github.com/karlkauc/tpt-validator/actions/workflows/ci.yml/badge.svg)](https://github.com/karlkauc/tpt-validator/actions/workflows/ci.yml)
+[![CI](https://github.com/karlkauc/findatex-validator/actions/workflows/ci.yml/badge.svg)](https://github.com/karlkauc/findatex-validator/actions/workflows/ci.yml)
 [![Java 21](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net/temurin/releases/?version=21)
-[![Container](https://img.shields.io/badge/container-ghcr.io-blue?logo=docker)](https://github.com/karlkauc/tpt-validator/pkgs/container/tpt-validator)
+[![Container](https://img.shields.io/badge/container-ghcr.io-blue?logo=docker)](https://github.com/karlkauc/findatex-validator/pkgs/container/findatex-validator)
 
 Validate FinDatEx data-template files (TPT, EET, EMT, EPT) against the
 official spec. Two delivery modes share the same validation core:
@@ -78,8 +78,8 @@ behind a reverse proxy (nginx / Traefik / caddy) that handles TLS and
 auth if needed.
 
 ```bash
-git clone https://github.com/karlkauc/tpt-validator.git
-cd tpt-validator
+git clone https://github.com/karlkauc/findatex-validator.git
+cd findatex-validator
 docker compose up -d
 # → http://127.0.0.1:18082
 ```
@@ -87,7 +87,7 @@ docker compose up -d
 A pre-built image is also published on each release tag:
 
 ```bash
-docker pull ghcr.io/karlkauc/tpt-validator:latest
+docker pull ghcr.io/karlkauc/findatex-validator:latest
 ```
 
 To customise behaviour, set the env vars in `docker-compose.yml` (or

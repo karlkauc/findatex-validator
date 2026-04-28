@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserFileVerificationTest {
 
     private static final Path USER_FILE = Path.of(
-            "/home/karl/webdav/tpt_test/20260331_TPTV7_CZ0008472271_2026-03-31.xlsx");
+            "/home/karl/webdav/findatex-validator/20260331_TPTV7_CZ0008472271_2026-03-31.xlsx");
 
     @SuppressWarnings("unused")
     static boolean userFilePresent() {

@@ -12,7 +12,7 @@
 
     <name>FinDatEx Validator (parent)</name>
     <description>Parent reactor for the FinDatEx Validator multi-module build (core, javafx-app, web-app).</description>
-    <url>https://github.com/karlkauc/tpt-validator</url>
+    <url>https://github.com/karlkauc/findatex-validator</url>
 
     <licenses>
         <license>
@@ -23,9 +23,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/karlkauc/tpt-validator.git</connection>
-        <developerConnection>scm:git:git@github.com:karlkauc/tpt-validator.git</developerConnection>
-        <url>https://github.com/karlkauc/tpt-validator</url>
+        <connection>scm:git:https://github.com/karlkauc/findatex-validator.git</connection>
+        <developerConnection>scm:git:git@github.com:karlkauc/findatex-validator.git</developerConnection>
+        <url>https://github.com/karlkauc/findatex-validator</url>
     </scm>
 
     <developers>

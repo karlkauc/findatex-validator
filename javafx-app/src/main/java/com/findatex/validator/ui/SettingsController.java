@@ -111,7 +111,7 @@ public final class SettingsController {
     @FXML
     private void onClearCache() {
         java.nio.file.Path dir = java.nio.file.Path.of(System.getProperty("user.home"),
-                ".config", "tpt-validator", "cache");
+                ".config", "findatex-validator", "cache");
         try {
             java.nio.file.Files.deleteIfExists(dir.resolve("lei-cache.json"));
             java.nio.file.Files.deleteIfExists(dir.resolve("isin-cache.json"));

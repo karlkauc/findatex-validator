@@ -25,7 +25,7 @@ public final class App extends Application {
 
     private static final Logger log = LoggerFactory.getLogger(App.class);
 
-    /** Set the AWT app name early so the macOS menu bar / dock label reads "TPT Validator", not "App". */
+    /** Set the AWT app name early so the macOS menu bar / dock label reads "FinDatEx Validator", not "App". */
     static {
         // -Xdock:name on macOS, plus the Apple-specific system properties.
         System.setProperty("apple.awt.application.name", "FinDatEx Validator");

@@ -6,7 +6,7 @@ Please **do not open a public GitHub issue** for security problems.
 
 Use GitHub's private vulnerability reporting:
 
-> [**Report a vulnerability**](https://github.com/karlkauc/tpt-validator/security/advisories/new)
+> [**Report a vulnerability**](https://github.com/karlkauc/findatex-validator/security/advisories/new)
 > (Repository → *Security* → *Advisories* → *Report a vulnerability*)
 
 This sends the report only to the maintainers and lets us work with you
@@ -49,7 +49,7 @@ In scope:
 - The validator code in this repository (`core/`, `javafx-app/`,
   `web-app/`).
 - The official Docker image published to
-  `ghcr.io/karlkauc/findatex-validator-web`.
+  `ghcr.io/karlkauc/findatex-validator`.
 - The bundled spec parsing and rule engine.
 
 Out of scope:

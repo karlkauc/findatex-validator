@@ -13,7 +13,7 @@ filed as public issues — see [`SECURITY.md`](SECURITY.md) instead.
 
 ## Ways to contribute
 
-- **Report bugs** via [GitHub Issues](https://github.com/karlkauc/tpt-validator/issues/new/choose)
+- **Report bugs** via [GitHub Issues](https://github.com/karlkauc/findatex-validator/issues/new/choose)
   using the "Bug report" template. Include the template + version, the
   affected UI (Desktop / Web / Docker), and a minimal reproducer.
   Never attach real fund data.
@@ -44,8 +44,8 @@ Requirements:
 Clone and bootstrap:
 
 ```bash
-git clone https://github.com/karlkauc/tpt-validator.git
-cd tpt-validator
+git clone https://github.com/karlkauc/findatex-validator.git
+cd findatex-validator
 mvn -B -DskipTests package      # one-off build to populate Maven cache
 mvn test                        # ~520 tests, must be green before any PR
 ```
@@ -113,8 +113,8 @@ than introducing new patterns. The non-obvious rules:
   overhead.
 - `javafx-app/` and `web-app/` both depend on `core/`, never on each
   other.
-- Package root is `com.findatex.validator` (the directory name
-  `tpt_test` is historical). Don't rename it back to `com.tpt.*`.
+- Package root is `com.findatex.validator`. Don't rename it back to
+  `com.tpt.*`.
 
 ### Adding a new template version
 
@@ -197,5 +197,5 @@ Common types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`,
 
 ## Questions?
 
-Open a [Discussion](https://github.com/karlkauc/tpt-validator/discussions)
+Open a [Discussion](https://github.com/karlkauc/findatex-validator/discussions)
 or a draft PR and tag it with `[help wanted]`.

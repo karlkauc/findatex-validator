@@ -49,5 +49,5 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/tpt-validator/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/karlkauc/tpt-validator/releases/tag/v1.0.0
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.0

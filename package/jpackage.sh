@@ -10,7 +10,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 TARGET_DIR="$PROJECT_DIR/javafx-app/target"
-APP_NAME="TPT Validator"
+APP_NAME="FinDatEx Validator"
 APP_VERSION="1.0.0"
 SHADED_JAR="$TARGET_DIR/findatex-validator-javafx-${APP_VERSION}-shaded.jar"
 

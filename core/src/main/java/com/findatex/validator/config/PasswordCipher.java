@@ -75,7 +75,7 @@ public final class PasswordCipher {
                 + "|" + System.getProperty("user.name", "u")
                 + "|" + System.getProperty("os.name", "o")
                 + "|" + System.getProperty("os.arch", "a")
-                + "|tpt-validator-v2";
+                + "|findatex-validator-v2";
         byte[] hash = MessageDigest.getInstance("SHA-256").digest(seed.getBytes(StandardCharsets.UTF_8));
         return new SecretKeySpec(hash, "AES");
     }

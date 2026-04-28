@@ -162,7 +162,7 @@ Heute zeigen die Score-Cards nur die Zahl. Echte Tachometer-Visuals (z. B. via J
 
 ### 4.4 Recent-Files-Liste
 
-Letzte 10 geöffnete Files unter `File → Recent`. Speichern in `~/.config/tpt-validator/recent.json`.
+Letzte 10 geöffnete Files unter `File → Recent`. Speichern in `~/.config/findatex-validator/recent.json`.
 
 ### 4.5 Drag & Drop in der Hauptansicht
 
@@ -234,7 +234,7 @@ Falls eine CLI-Variante hinzukommt: ein Docker-Image, das die Engine als Batch-P
 
 ### 7.3 CLI-Variante des Validators
 
-`java -jar tpt-validator-cli.jar input.xlsx --profiles=SOLVENCY_II,IORP_EIOPA_ECB --format=json` für headless-Pipelines. Reused den bestehenden `ValidationEngine` und schreibt JSON statt JavaFX-UI.
+`java -jar findatex-validator-cli.jar input.xlsx --profiles=SOLVENCY_II,IORP_EIOPA_ECB --format=json` für headless-Pipelines. Reused den bestehenden `ValidationEngine` und schreibt JSON statt JavaFX-UI.
 
 ---
 

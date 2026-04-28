@@ -16,6 +16,13 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      # JavaFX 22+ requires JDK 22+; project is on JDK 21. Revisit once
+      # the build moves to JDK 25 LTS.
+      - dependency-name: "org.openjfx:javafx-controls"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "org.openjfx:javafx-fxml"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "npm"
     directory: "/web-app/src/main/frontend"

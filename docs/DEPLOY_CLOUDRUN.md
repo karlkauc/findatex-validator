@@ -177,6 +177,53 @@ Avoid GoDaddy, IONOS / 1&1: markup pricing and clunky DNS interfaces.
 A subdomain frees the apex for marketing/redirects later. The rest of this
 document assumes a subdomain; the apex variant is in a sub-section below.
 
+### DNS records — quick reference
+
+Three things to enter at your registrar. Detailed walk-through follows
+below — this table is the checklist:
+
+**1) Domain-ownership verification (one-time, at the apex):**
+
+| Type  | Name / Host | Value                                                  | TTL |
+| ----- | ----------- | ------------------------------------------------------ | --- |
+| `TXT` | `@`         | `google-site-verification=<token from Search Console>` | 300 |
+
+**2a) Subdomain mapping** (`validator.example.com` → Cloud Run, recommended):
+
+| Type    | Name / Host | Value                            | TTL |
+| ------- | ----------- | -------------------------------- | --- |
+| `CNAME` | `validator` | `ghs.googlehosted.com.` *(trailing dot!)* | 300 |
+
+**2b) Apex mapping** (`example.com` → Cloud Run, alternative — four A *and* four AAAA records):
+
+| Type   | Name / Host | Value             | TTL |
+| ------ | ----------- | ----------------- | --- |
+| `A`    | `@`         | `216.239.32.21`   | 300 |
+| `A`    | `@`         | `216.239.34.21`   | 300 |
+| `A`    | `@`         | `216.239.36.21`   | 300 |
+| `A`    | `@`         | `216.239.38.21`   | 300 |
+| `AAAA` | `@`         | `2001:4860:4802:32::15` | 300 |
+| `AAAA` | `@`         | `2001:4860:4802:34::15` | 300 |
+| `AAAA` | `@`         | `2001:4860:4802:36::15` | 300 |
+| `AAAA` | `@`         | `2001:4860:4802:38::15` | 300 |
+
+**Gotchas:**
+
+- `@` is registrar shorthand for the apex (the domain itself). Some panels
+  show this as an empty host field or as the full domain name — both mean
+  the same thing.
+- Enter each A/AAAA value as a **separate record**, not as a comma list.
+- Bump TTL from `300` to `3600` after the mapping works — keeps the low
+  TTL only during setup so mistakes propagate fast.
+- **Cloudflare DNS users**: turn the orange-cloud proxy **off** (DNS-only,
+  grey cloud) for the validator record. The proxy intercepts traffic with
+  Cloudflare's IPs, which breaks Google's managed-cert validation — you'd
+  never get a cert issued.
+- Always verify the exact target value Cloud Run wants for *your* mapping
+  with `gcloud beta run domain-mappings describe … --format='value(status.resourceRecords)'`
+  before entering records — the canonical values above are stable but Google
+  reserves the right to rotate them.
+
 ### Step 1 — Verify domain ownership in Google Search Console
 
 This is required once per **registrable domain** (i.e. `example.com`

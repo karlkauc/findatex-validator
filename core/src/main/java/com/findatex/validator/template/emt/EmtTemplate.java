@@ -1,5 +1,7 @@
 package com.findatex.validator.template.emt;
 
+import com.findatex.validator.external.ExternalValidationConfig;
+import com.findatex.validator.external.ExternalValidationConfig.IdentifierRef;
 import com.findatex.validator.spec.ManifestDrivenSpecLoader;
 import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.template.api.TemplateDefinition;
@@ -40,6 +42,22 @@ public final class EmtTemplate implements TemplateDefinition {
 
     private static final List<TemplateVersion> VERSIONS = List.of(V4_3, V4_2);
 
+    /**
+     * V4.2 and V4.3 share the relevant column numbering. The catalog stores fields by their
+     * sequential counter (column A), not by the {@code 00010_*} data-name prefix. Field 9
+     * (a.k.a. "00010_Financial_Instrument_Identifying_Data") is the polymorphic identifier;
+     * paired with type flag 10 (a.k.a. "00020_..."): {@code "1"} = ISIN, {@code "10"} = LEI.
+     * Field 20 ("00073_Financial_Instrument_Manufacturer_LEI") and field 3 ("00003_EMT_Producer_LEI")
+     * are alphanum-only LEI columns with no type flag.
+     */
+    public static final ExternalValidationConfig EXTERNAL_VALIDATION = new ExternalValidationConfig(
+            List.of(new IdentifierRef("9", "10", "1")),
+            List.of(
+                    new IdentifierRef("9", "10", "10"),
+                    new IdentifierRef("20", "", ""),
+                    new IdentifierRef("3", "", "")),
+            "", "", "", "");
+
     @Override
     public TemplateId id() {
         return TemplateId.EMT;
@@ -74,5 +92,13 @@ public final class EmtTemplate implements TemplateDefinition {
             throw new NoSuchElementException("EMT does not support version " + version.version());
         }
         return new EmtRuleSet(version);
+    }
+
+    @Override
+    public ExternalValidationConfig externalValidationConfigFor(TemplateVersion version) {
+        if (!VERSIONS.contains(version)) {
+            throw new NoSuchElementException("EMT does not support version " + version.version());
+        }
+        return EXTERNAL_VALIDATION;
     }
 }

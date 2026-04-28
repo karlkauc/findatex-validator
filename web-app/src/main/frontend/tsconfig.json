@@ -8,8 +8,6 @@
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "composite": true,
-    "outDir": "./node_modules/.tsc-out/app",
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
@@ -18,9 +16,8 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "baseUrl": "./src",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     },
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },

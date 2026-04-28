@@ -45,6 +45,155 @@ jobs:
             --generate-notes \
             javafx-app/target/findatex-validator-javafx-*-shaded.jar
 
+  native-installers:
+    name: Native installer (${{ matrix.target }})
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: release
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest,  target: linux-x64,   installer_ext: deb, portable_ext: tar.gz }
+          - { os: windows-latest, target: windows-x64, installer_ext: msi, portable_ext: zip    }
+          - { os: macos-13,       target: macos-x64,   installer_ext: dmg, portable_ext: tar.gz }
+          - { os: macos-14,       target: macos-arm64, installer_ext: dmg, portable_ext: tar.gz }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build shaded JAR
+        shell: bash
+        run: mvn -B -ntp -pl javafx-app -am -DskipTests package
+
+      - name: Compute APP_VERSION from tag
+        id: version
+        shell: bash
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          tag="${REF_NAME#v}"          # v1.2.3 -> 1.2.3
+          numeric="${tag%%-*}"          # 1.2.3-rc1 -> 1.2.3 (Windows jpackage requires numeric-only)
+          echo "app_version=$numeric" >> "$GITHUB_OUTPUT"
+          echo "Computed APP_VERSION=$numeric"
+
+      - name: Build installer (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        env:
+          APP_VERSION: ${{ steps.version.outputs.app_version }}
+          APP_VENDOR: Karl Kauc
+        run: ./package/jpackage.sh
+
+      - name: Build portable app-image (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        env:
+          APP_VERSION: ${{ steps.version.outputs.app_version }}
+          APP_VENDOR: Karl Kauc
+          PACKAGE_TYPE: app-image
+        run: ./package/jpackage.sh
+
+      - name: Build installer (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        env:
+          APP_VERSION: ${{ steps.version.outputs.app_version }}
+          APP_VENDOR: Karl Kauc
+        run: package\jpackage.bat
+
+      - name: Build portable app-image (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        env:
+          APP_VERSION: ${{ steps.version.outputs.app_version }}
+          APP_VENDOR: Karl Kauc
+          PACKAGE_TYPE: app-image
+        run: package\jpackage.bat
+
+      - name: Stage release artifacts
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          INSTALLER_EXT: ${{ matrix.installer_ext }}
+          PORTABLE_EXT: ${{ matrix.portable_ext }}
+          APP_VERSION: ${{ steps.version.outputs.app_version }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-staging
+          base="findatex-validator-${APP_VERSION}-${TARGET}"
+
+          installer_src="$(find javafx-app/target/installer -maxdepth 1 -type f -name "*.${INSTALLER_EXT}" | head -n 1)"
+          if [[ -z "$installer_src" ]]; then
+            echo "No installer with extension .${INSTALLER_EXT} found." >&2
+            ls -la javafx-app/target/installer || true
+            exit 1
+          fi
+          cp "$installer_src" "release-staging/${base}.${INSTALLER_EXT}"
+
+          portable_root="javafx-app/target/portable"
+          portable_dir="$(find "$portable_root" -maxdepth 1 -mindepth 1 -type d | head -n 1)"
+          if [[ -z "$portable_dir" ]]; then
+            echo "No portable app-image directory under $portable_root." >&2
+            ls -la "$portable_root" || true
+            exit 1
+          fi
+          portable_name="$(basename "$portable_dir")"
+
+          if [[ "$PORTABLE_EXT" == "zip" ]]; then
+            (cd "$portable_root" && 7z a -tzip -mx=7 "../../../release-staging/${base}.zip" "$portable_name") >/dev/null
+          else
+            tar -C "$portable_root" -czf "release-staging/${base}.${PORTABLE_EXT}" "$portable_name"
+          fi
+
+          echo "Staged:"
+          ls -la release-staging
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.target }}
+          path: release-staging/*
+          if-no-files-found: error
+          retention-days: 7
+
+  release-assets:
+    name: Attach native installers to release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: native-installers
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all native artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: native-*
+          merge-multiple: true
+
+      - name: Upload to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          ls -la artifacts
+          gh release upload "$TAG" artifacts/* --clobber
+
   container:
     name: Container image (ghcr.io)
     runs-on: ubuntu-latest

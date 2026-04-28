@@ -226,7 +226,13 @@ Aktuell ist die UI bewusst nicht getestet (0 % Coverage). TestFX würde zumindes
 Bei jedem Push:
 - `mvn test` + JaCoCo
 - Coverage-Badge in README pflegen
-- Bei Tag-Push: `jpackage` Artifacts (Linux .deb, macOS .dmg, Windows .msi) als GitHub-Release-Asset bauen
+- Bei Tag-Push: `jpackage` Artifacts werden bereits gebaut — Linux `.deb`
+  + `.tar.gz`, Windows `.msi` + `.zip`, macOS `.dmg` + `.tar.gz` (Intel und
+  Apple Silicon getrennt) — und ans GitHub-Release angehängt. Siehe
+  `.github/workflows/release.yml` (`native-installers` + `release-assets`).
+  *Offen:* Code-Signing für macOS (Developer-ID + Notarisierung) und
+  Windows (Authenticode), damit Endanwender die Gatekeeper / SmartScreen-
+  Warnungen nicht mehr umgehen müssen.
 
 ### 7.2 Docker-Image für Headless-Modus
 

@@ -31,15 +31,37 @@ You have two options.
 
 **Native installer** *(no Java required on the target machine)*:
 
+Pre-built native packages for every tagged release are attached to the
+[GitHub Releases page](https://github.com/karlkauc/findatex-validator/releases).
+Each release ships two flavours per platform — a system installer that
+adds a start-menu / applications entry, and a portable archive that runs
+without admin rights:
+
+| Platform           | Installer (admin)                                | Portable (no admin)                                  |
+|--------------------|--------------------------------------------------|------------------------------------------------------|
+| Linux x64          | `findatex-validator-<v>-linux-x64.deb`           | `findatex-validator-<v>-linux-x64.tar.gz`            |
+| Windows x64        | `findatex-validator-<v>-windows-x64.msi`         | `findatex-validator-<v>-windows-x64.zip`             |
+| macOS Apple Silicon | `findatex-validator-<v>-macos-arm64.dmg`        | `findatex-validator-<v>-macos-arm64.tar.gz`          |
+| macOS Intel        | `findatex-validator-<v>-macos-x64.dmg`           | `findatex-validator-<v>-macos-x64.tar.gz`            |
+
+These binaries are **unsigned**, so the OS will warn on first launch.
+Override the warning once and you're good:
+- **macOS:** Right-click the `.app` → *Open* → confirm.
+- **Windows:** *More info* → *Run anyway* on the SmartScreen prompt.
+
+To build the same artefacts locally (any vanilla JDK 21+ works — the
+shaded jar already contains JavaFX):
+
 ```bash
-./package/jpackage.sh        # Linux .deb / .rpm or macOS .dmg
-package\jpackage.bat         # Windows .msi
+mvn -pl javafx-app -am -DskipTests package        # produces the shaded jar
+./package/jpackage.sh                              # Linux .deb / macOS .dmg
+PACKAGE_TYPE=app-image ./package/jpackage.sh       # portable directory in javafx-app/target/portable/
+package\jpackage.bat                               # Windows .msi
+set "PACKAGE_TYPE=app-image" && package\jpackage.bat   # Windows portable
 ```
 
-The resulting installer puts a `FinDatEx Validator` entry in your start
-menu / applications list. Files are read locally, the report is written
-locally, and there is no network traffic except the optional GLEIF /
-OpenFIGI lookup.
+Files are read locally, the report is written locally, and there is no
+network traffic except the optional GLEIF / OpenFIGI lookup.
 
 **Run from source** *(Java 21 required)*:
 

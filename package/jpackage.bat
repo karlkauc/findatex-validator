@@ -1,14 +1,27 @@
 @echo off
-REM Build a Windows .msi installer using jpackage.
+REM Build a Windows .msi installer or portable app-image using jpackage.
 REM Run after `mvn -DskipTests package`.
+REM
+REM Env overrides:
+REM   APP_VERSION    Installer version (default 1.0.0). Must be numeric.
+REM   APP_VENDOR     Vendor (default "Karl Kauc").
+REM   APP_NAME       Display name (default "FinDatEx Validator").
+REM   PACKAGE_TYPE   "msi" (default) or "app-image" for the no-admin .zip path.
+REM
+REM The shaded jar already contains JavaFX classes + native libraries, so we
+REM only enumerate JDK modules via jdeps for jlink. No --module-path javafx.*.
 
-setlocal
+setlocal EnableDelayedExpansion
 set "SCRIPT_DIR=%~dp0"
 set "PROJECT_DIR=%SCRIPT_DIR%.."
 set "TARGET_DIR=%PROJECT_DIR%\javafx-app\target"
-set "APP_NAME=TPT Validator"
-set "APP_VERSION=1.0.0"
-set "SHADED_JAR=%TARGET_DIR%\findatex-validator-javafx-%APP_VERSION%-shaded.jar"
+
+if "%APP_NAME%"==""    set "APP_NAME=FinDatEx Validator"
+if "%APP_VERSION%"=="" set "APP_VERSION=1.0.0"
+if "%APP_VENDOR%"==""  set "APP_VENDOR=Karl Kauc"
+if "%PACKAGE_TYPE%"=="" set "PACKAGE_TYPE=msi"
+
+set "SHADED_JAR=%TARGET_DIR%\findatex-validator-javafx-1.0.0-shaded.jar"
 
 if not exist "%SHADED_JAR%" (
   echo Shaded JAR not found: %SHADED_JAR%
@@ -22,7 +35,14 @@ if errorlevel 1 (
   exit /b 2
 )
 
-set "OUT_DIR=%TARGET_DIR%\installer"
+if /I "%PACKAGE_TYPE%"=="app-image" (
+  set "OUT_DIR=%TARGET_DIR%\portable"
+  set "INSTALLER_FLAGS="
+) else (
+  set "OUT_DIR=%TARGET_DIR%\installer"
+  set "INSTALLER_FLAGS=--win-shortcut --win-menu"
+)
+
 if exist "%OUT_DIR%" rmdir /s /q "%OUT_DIR%"
 mkdir "%OUT_DIR%"
 
@@ -34,20 +54,28 @@ copy /Y "%SHADED_JAR%" "%INPUT_DIR%\" >nul
 set "ICON_ARG="
 if exist "%SCRIPT_DIR%icon.ico" set "ICON_ARG=--icon "%SCRIPT_DIR%icon.ico""
 
+set "ADD_MODULES="
+for /f "usebackq delims=" %%M in (`jdeps --multi-release 21 --ignore-missing-deps --print-module-deps "%SHADED_JAR%" 2^>nul`) do set "ADD_MODULES=%%M"
+if "!ADD_MODULES!"=="" set "ADD_MODULES=java.base,java.desktop,java.naming,java.net.http,java.scripting,java.security.jgss,java.sql,java.xml,java.xml.crypto,java.logging,java.management,jdk.crypto.ec,jdk.jfr,jdk.unsupported"
+
+echo Building %PACKAGE_TYPE% for Windows - version %APP_VERSION%, vendor "%APP_VENDOR%"
+echo   add-modules: !ADD_MODULES!
+
 jpackage ^
-  --type msi ^
+  --type %PACKAGE_TYPE% ^
   --name "%APP_NAME%" ^
   --app-version %APP_VERSION% ^
-  --vendor "TPT Validator" ^
-  --description "Quality and conformance validator for TPT V7 files" ^
+  --vendor "%APP_VENDOR%" ^
+  --description "FinDatEx data-template validator (TPT, EET, EMT, EPT)" ^
   --input "%INPUT_DIR%" ^
-  --main-jar "findatex-validator-javafx-%APP_VERSION%-shaded.jar" ^
+  --main-jar "findatex-validator-javafx-1.0.0-shaded.jar" ^
   --main-class com.findatex.validator.AppLauncher ^
+  --add-modules !ADD_MODULES! ^
   %ICON_ARG% ^
-  --dest "%OUT_DIR%" ^
-  --win-shortcut --win-menu
+  %INSTALLER_FLAGS% ^
+  --dest "%OUT_DIR%"
 
 echo.
-echo Installer artefacts at %OUT_DIR%:
+echo Output at %OUT_DIR%:
 dir "%OUT_DIR%"
 endlocal

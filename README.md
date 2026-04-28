@@ -1,5 +1,10 @@
 # FinDatEx Validator
 
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![CI](https://github.com/karlkauc/tpt-validator/actions/workflows/ci.yml/badge.svg)](https://github.com/karlkauc/tpt-validator/actions/workflows/ci.yml)
+[![Java 21](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net/temurin/releases/?version=21)
+[![Container](https://img.shields.io/badge/container-ghcr.io-blue?logo=docker)](https://github.com/karlkauc/tpt-validator/pkgs/container/tpt-validator)
+
 Validate FinDatEx data-template files (TPT, EET, EMT, EPT) against the
 official spec. Two delivery modes share the same validation core:
 
@@ -73,10 +78,16 @@ behind a reverse proxy (nginx / Traefik / caddy) that handles TLS and
 auth if needed.
 
 ```bash
-git clone https://github.com/<your-org>/findatex-validator.git
-cd findatex-validator
+git clone https://github.com/karlkauc/tpt-validator.git
+cd tpt-validator
 docker compose up -d
 # → http://127.0.0.1:18082
+```
+
+A pre-built image is also published on each release tag:
+
+```bash
+docker pull ghcr.io/karlkauc/tpt-validator:latest
 ```
 
 To customise behaviour, set the env vars in `docker-compose.yml` (or
@@ -241,8 +252,17 @@ python3 tools/generate_requirements.py         # rebuild requirements.md
 
 ## License
 
-No `LICENSE` file ships with this repository yet. Add one before
-publishing the source publicly.
+Released under the [Apache License 2.0](LICENSE). You may use, modify,
+and distribute the source under the terms of that license; the patent
+grant in §3 applies to all contributions.
+
+## Contributing
+
+Bug reports, feature requests, and pull requests are welcome. See
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for the development setup, coding
+conventions, and PR checklist, and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
+for the community standards. Security issues should be reported privately
+via the process described in [`SECURITY.md`](SECURITY.md).
 
 ---
 

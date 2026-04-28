@@ -1,6 +1,8 @@
 package com.findatex.validator.web.service;
 
+import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.domain.TptFile;
+import com.findatex.validator.external.ExternalValidationService;
 import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.report.QualityReport;
 import com.findatex.validator.report.QualityScorer;
@@ -10,13 +12,16 @@ import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.template.api.TemplateDefinition;
+import com.findatex.validator.template.api.TemplateId;
 import com.findatex.validator.template.api.TemplateRegistry;
 import com.findatex.validator.template.api.TemplateRuleSet;
 import com.findatex.validator.template.api.TemplateVersion;
 import com.findatex.validator.validation.Finding;
+import com.findatex.validator.validation.FindingEnricher;
 import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationEngine;
 import com.findatex.validator.web.config.WebConfig;
+import com.findatex.validator.web.dto.ExternalOptions;
 import com.findatex.validator.web.dto.FindingDto;
 import com.findatex.validator.web.dto.ScoreDto;
 import com.findatex.validator.web.dto.ValidationResponse;
@@ -62,6 +67,9 @@ public class ValidationOrchestrator {
     @Inject
     ReportStore reportStore;
 
+    @Inject
+    ExternalValidationFactory externalFactory;
+
     private Semaphore concurrencyGate;
 
     /** Cache parsed spec catalogs per (template, version) so we don't re-parse XLSX on every request. */
@@ -78,7 +86,8 @@ public class ValidationOrchestrator {
                                        String templateVersion,
                                        List<String> profileCodes,
                                        InputStream upload,
-                                       String filename) {
+                                       String filename,
+                                       ExternalOptions externalOptions) {
         boolean acquired;
         try {
             acquired = concurrencyGate.tryAcquire(config.acquireTimeoutMillis(), TimeUnit.MILLISECONDS);
@@ -94,7 +103,7 @@ public class ValidationOrchestrator {
                             .build());
         }
         try {
-            return doValidate(templateId, templateVersion, profileCodes, upload, filename);
+            return doValidate(templateId, templateVersion, profileCodes, upload, filename, externalOptions);
         } finally {
             concurrencyGate.release();
         }
@@ -104,7 +113,8 @@ public class ValidationOrchestrator {
                                           String templateVersion,
                                           List<String> profileCodes,
                                           InputStream upload,
-                                          String filename) {
+                                          String filename,
+                                          ExternalOptions externalOptions) {
         TemplateDefinition def = resolveTemplate(templateId);
         TemplateVersion version = resolveVersion(def, templateVersion);
         ProfileSet profileSet = def.profilesFor(version);
@@ -129,12 +139,29 @@ public class ValidationOrchestrator {
         List<Finding> findings = new ValidationEngine(bundle.catalog, bundle.ruleSet)
                 .validate(file, activeProfiles);
 
-        // External validation is intentionally skipped here in the first cut. When
-        // findatex.web.external.enabled=true the orchestrator should call ExternalValidationService;
-        // wiring that up requires the proxy + GLEIF/OpenFIGI credentials from WebConfig.External
-        // and is tracked under the plan's Phase 3b extension.
-        if (config.external().enabled()) {
-            log.info("External validation requested but not yet wired in web orchestrator (TPT-only feature).");
+        if (externalOptions != null
+                && externalOptions.enabled()
+                && def.id() == TemplateId.TPT
+                && config.external().enabled()
+                && externalFactory.enabled()) {
+            try (ExternalValidationFactory.ServiceHandle handle =
+                         externalFactory.resolve(externalOptions.userOpenfigiKey())) {
+                ExternalValidationService svc = handle.service();
+                if (svc != null) {
+                    AppSettings settings = externalFactory.buildSettings(externalOptions);
+                    List<Finding> online = FindingEnricher.enrich(file,
+                            svc.run(file, settings, () -> false,
+                                    ExternalValidationService.ProgressSink.NOOP));
+                    List<Finding> merged = new ArrayList<>(findings);
+                    merged.addAll(online);
+                    findings = merged;
+                }
+            } catch (RuntimeException e) {
+                // The service swallows API failures internally and emits EXTERNAL/...UNAVAILABLE
+                // info findings. Anything reaching here is an unexpected programming error;
+                // keep the local findings and continue. Never log the user key.
+                log.warn("External validation phase aborted unexpectedly: {}", e.getMessage());
+            }
         }
 
         QualityReport report = new QualityScorer(bundle.catalog).score(file, activeProfiles, findings);

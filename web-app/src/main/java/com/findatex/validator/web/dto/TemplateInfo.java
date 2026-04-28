@@ -5,7 +5,8 @@ import java.util.List;
 public record TemplateInfo(
         String id,
         String displayName,
-        List<VersionInfo> versions
+        List<VersionInfo> versions,
+        boolean externalAvailable
 ) {
 
     public record VersionInfo(

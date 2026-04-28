@@ -48,6 +48,13 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.external.proxy-non-proxy-hosts")
     Optional<String> externalProxyNonProxyHosts;
 
+    @ConfigProperty(name = "findatex.web.external.cache-dir",
+            defaultValue = "${java.io.tmpdir}/findatex-cache")
+    String externalCacheDir;
+
+    @ConfigProperty(name = "findatex.web.external.cache-ttl-days", defaultValue = "7")
+    int externalCacheTtlDays;
+
     public RateLimit rateLimit() {
         return new RateLimit(rateLimitPerIpPerHour);
     }
@@ -73,7 +80,9 @@ public class WebConfig {
                 externalProxyPort,
                 externalProxyUsername.orElse(""),
                 externalProxyPassword.orElse(""),
-                externalProxyNonProxyHosts.orElse(""));
+                externalProxyNonProxyHosts.orElse(""),
+                externalCacheDir,
+                externalCacheTtlDays);
     }
 
     public record RateLimit(int perIpPerHour) {
@@ -90,7 +99,9 @@ public class WebConfig {
             int proxyPort,
             String proxyUsername,
             String proxyPassword,
-            String proxyNonProxyHosts
+            String proxyNonProxyHosts,
+            String cacheDir,
+            int cacheTtlDays
     ) {
     }
 }

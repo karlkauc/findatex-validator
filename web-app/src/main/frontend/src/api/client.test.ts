@@ -80,6 +80,64 @@ describe('api/client', () => {
       expect((sent as File).name).toBe('sample.xlsx');
     });
 
+    it('omits external-validation fields when externalEnabled is false/undefined', async () => {
+      fetchSpy.mockResolvedValue(ok({ summary: {}, scores: [], findings: [], reportId: 'r' }));
+      await validateUpload({
+        templateId: 'TPT',
+        templateVersion: 'V7.0',
+        profiles: [],
+        file,
+      });
+      const fd = (fetchSpy.mock.calls[0][1] as RequestInit).body as FormData;
+      expect(fd.get('externalEnabled')).toBeNull();
+      expect(fd.get('leiEnabled')).toBeNull();
+      expect(fd.get('isinEnabled')).toBeNull();
+      expect(fd.get('openfigiApiKey')).toBeNull();
+    });
+
+    it('appends external-validation flags + api key when externalEnabled is true', async () => {
+      fetchSpy.mockResolvedValue(ok({ summary: {}, scores: [], findings: [], reportId: 'r' }));
+      await validateUpload({
+        templateId: 'TPT',
+        templateVersion: 'V7.0',
+        profiles: [],
+        file,
+        externalEnabled: true,
+        leiEnabled: true,
+        leiCheckLapsed: true,
+        leiCheckName: false,
+        leiCheckCountry: true,
+        isinEnabled: true,
+        isinCheckCurrency: true,
+        isinCheckCic: false,
+        openfigiApiKey: 'user-supplied-key',
+      });
+      const fd = (fetchSpy.mock.calls[0][1] as RequestInit).body as FormData;
+      expect(fd.get('externalEnabled')).toBe('true');
+      expect(fd.get('leiEnabled')).toBe('true');
+      expect(fd.get('leiCheckLapsed')).toBe('true');
+      expect(fd.get('leiCheckName')).toBe('false');
+      expect(fd.get('leiCheckCountry')).toBe('true');
+      expect(fd.get('isinEnabled')).toBe('true');
+      expect(fd.get('isinCheckCurrency')).toBe('true');
+      expect(fd.get('isinCheckCic')).toBe('false');
+      expect(fd.get('openfigiApiKey')).toBe('user-supplied-key');
+    });
+
+    it('omits openfigiApiKey when externalEnabled is true but no key was provided', async () => {
+      fetchSpy.mockResolvedValue(ok({ summary: {}, scores: [], findings: [], reportId: 'r' }));
+      await validateUpload({
+        templateId: 'TPT',
+        templateVersion: 'V7.0',
+        profiles: [],
+        file,
+        externalEnabled: true,
+      });
+      const fd = (fetchSpy.mock.calls[0][1] as RequestInit).body as FormData;
+      expect(fd.get('externalEnabled')).toBe('true');
+      expect(fd.get('openfigiApiKey')).toBeNull();
+    });
+
     it('maps a 429 response into an ApiError carrying the Retry-After value', async () => {
       fetchSpy.mockResolvedValue(err(429, 'Rate limit exceeded.', { 'Retry-After': '42' }));
       try {

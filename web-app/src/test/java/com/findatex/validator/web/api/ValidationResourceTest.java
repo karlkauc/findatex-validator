@@ -71,4 +71,36 @@ class ValidationResourceTest {
                 .when().post("/api/validate")
                 .then().statusCode(400);
     }
+
+    @Test
+    void externalEnabledFormParamsAreAccepted() {
+        // Default profile has external.enabled=false, so the orchestrator silently ignores
+        // externalEnabled=true. The point of this test is that supplying the new form
+        // parameters does not break the request shape.
+        given()
+                .multiPart("templateId", "TPT")
+                .multiPart("templateVersion", "V7.0")
+                .multiPart("file", TestFixtures.CLEAN_V7_XLSX.toFile())
+                .multiPart("externalEnabled", "true")
+                .multiPart("leiEnabled", "true")
+                .multiPart("leiCheckLapsed", "true")
+                .multiPart("isinEnabled", "true")
+                .when().post("/api/validate")
+                .then().statusCode(200);
+    }
+
+    @Test
+    void userOpenfigiKeyDoesNotLeakIntoResponseBody() {
+        String secretKey = "do-not-leak-this-key-1234";
+        Response r = given()
+                .multiPart("templateId", "TPT")
+                .multiPart("templateVersion", "V7.0")
+                .multiPart("file", TestFixtures.CLEAN_V7_XLSX.toFile())
+                .multiPart("externalEnabled", "true")
+                .multiPart("openfigiApiKey", secretKey)
+                .when().post("/api/validate");
+
+        r.then().statusCode(200);
+        assertThat(r.asString()).doesNotContain(secretKey);
+    }
 }

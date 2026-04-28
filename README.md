@@ -257,6 +257,12 @@ Found a vulnerability? Please **do not open a public issue**. See
 reporting (Repository → *Security* → *Advisories* → *Report a
 vulnerability*). The maintainer will acknowledge within 72 hours.
 
+## Author
+
+Created and maintained by **Karl Kauc**
+([karl.kauc@gmail.com](mailto:karl.kauc@gmail.com),
+[github.com/karlkauc](https://github.com/karlkauc)).
+
 ## License
 
 Released under the [Apache License 2.0](LICENSE). You may use, modify,

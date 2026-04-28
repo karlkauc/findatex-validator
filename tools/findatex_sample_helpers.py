@@ -1,7 +1,7 @@
 """Shared utilities for the EET/EMT/EPT sample-file generators.
 
 Reads each template's bundled manifest JSON + spec XLSX from
-``src/main/resources/spec/<tmpl>/`` and produces the (num, path, flag,
+``core/src/main/resources/spec/<tmpl>/`` and produces the (num, path, flag,
 codification) tuples a generator needs. Also bundles a heuristic
 ``value_for(codif)`` so that "clean" fixtures auto-populate every
 M-flagged field with a value that the validator's FormatRule will
@@ -22,16 +22,16 @@ ROOT = Path(__file__).resolve().parent.parent
 # (templateId, versionToken) -> (manifest path, xlsx path) inside the JAR resources
 _SPEC_LOCATIONS: dict[tuple[str, str], tuple[str, str]] = {
     ("EET", "V1.1.3"): (
-        "src/main/resources/spec/eet/eet-v113-info.json",
-        "src/main/resources/spec/eet/EET_V1_1_3_20260410.xlsx",
+        "core/src/main/resources/spec/eet/eet-v113-info.json",
+        "core/src/main/resources/spec/eet/EET_V1_1_3_20260410.xlsx",
     ),
     ("EMT", "V4.3"): (
-        "src/main/resources/spec/emt/emt-v43-info.json",
-        "src/main/resources/spec/emt/EMT_V4_3_20251217.xlsx",
+        "core/src/main/resources/spec/emt/emt-v43-info.json",
+        "core/src/main/resources/spec/emt/EMT_V4_3_20251217.xlsx",
     ),
     ("EPT", "V2.1"): (
-        "src/main/resources/spec/ept/ept-v21-info.json",
-        "src/main/resources/spec/ept/EPT_V2_1_20221012.xlsx",
+        "core/src/main/resources/spec/ept/ept-v21-info.json",
+        "core/src/main/resources/spec/ept/EPT_V2_1_20221012.xlsx",
     ),
 }
 

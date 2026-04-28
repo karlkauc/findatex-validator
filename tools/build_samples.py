@@ -5,7 +5,7 @@
   - missing_mandatory.csv — same data but with field 5 (TotalNetAssets) and field 6 (ValuationDate) removed.
   - bad_formats.xlsx      — identical to clean but with bogus currency & coupon-frequency values.
 
-The sample files are written to src/test/resources/sample/.
+The sample files are written to core/src/test/resources/sample/.
 """
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from pathlib import Path
 import openpyxl
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "src" / "test" / "resources" / "sample"
+OUT = ROOT / "core" / "src" / "test" / "resources" / "sample"
 OUT.mkdir(parents=True, exist_ok=True)
 
 # Pick a curated subset of mandatory fields that cover the validation paths we care about.

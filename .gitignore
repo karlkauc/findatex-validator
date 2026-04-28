@@ -3,6 +3,12 @@ target/
 *.class
 *.jar.original
 
+# Frontend build artefacts (web-app/src/main/frontend/)
+node_modules/
+.tsc-out/
+*.tsbuildinfo
+dist/
+
 # IDE
 .idea/
 *.iml

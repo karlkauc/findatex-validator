@@ -16,7 +16,7 @@ from pathlib import Path
 import openpyxl
 
 ROOT = Path(__file__).resolve().parent.parent
-SPEC = ROOT / "src" / "main" / "resources" / "spec" / "TPT_V7  20241125_updated.xlsx"
+SPEC = ROOT / "core" / "src" / "main" / "resources" / "spec" / "TPT_V7  20241125_updated.xlsx"
 PIK = ROOT / "src" / "main" / "resources" / "spec" / "PIK guidelines 240913.xlsx"
 OUT = ROOT / "requirements.md"
 
@@ -125,7 +125,7 @@ def main() -> int:
 
     out: list[str] = []
     out.append("# TPT V7 Validator — Requirements\n")
-    out.append("Generated from `src/main/resources/spec/TPT_V7  20241125_updated.xlsx` "
+    out.append("Generated from `core/src/main/resources/spec/TPT_V7  20241125_updated.xlsx` "
                "(FinDatEx Tripartite Template V7.0, dated 2024-11-25).\n")
     out.append("This document mirrors every datapoint in the spec. It is the input "
                "for the rule engine — fields here drive the generated rules in "

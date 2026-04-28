@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # ---- Stage 1: Maven build (Ubuntu, has apt+maven prebuilt) ------------------
-FROM eclipse-temurin:21-jdk-jammy AS build
+FROM eclipse-temurin:25-jdk-jammy AS build
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends maven ca-certificates \
@@ -23,7 +23,7 @@ COPY web-app web-app
 RUN mvn -B -pl web-app -am -DskipTests package
 
 # ---- Stage 2: jlink Custom-JRE (Alpine JDK → musl-kompatibel) ---------------
-FROM eclipse-temurin:21-jdk-alpine AS jre-build
+FROM eclipse-temurin:25-jdk-alpine AS jre-build
 
 # Module set is hand-curated for Quarkus REST + Apache POI + Netty:
 #   java.base/logging      core

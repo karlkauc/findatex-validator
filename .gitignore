@@ -9,6 +9,10 @@ node_modules/
 *.tsbuildinfo
 dist/
 
+# Playwright MCP scratch + ad-hoc screenshots
+.playwright-mcp/
+validator-e2e-*.png
+
 # IDE
 .idea/
 *.iml

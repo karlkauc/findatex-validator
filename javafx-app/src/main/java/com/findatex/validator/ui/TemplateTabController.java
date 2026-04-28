@@ -264,7 +264,7 @@ public final class TemplateTabController {
     private void onValidate(ActionEvent e) {
         SpecCatalog cat = catalog();
         if (cat == null) {
-            statusLabel.setText("Spec nicht installiert");
+            statusLabel.setText("Spec not installed");
             return;
         }
 

@@ -16,13 +16,13 @@ export function ResultPanel({ result }: Props) {
     <div className="space-y-6">
       <div className="card">
         <div className="card-header flex flex-wrap items-center justify-between gap-3">
-          <span>Validierungs-Ergebnis</span>
+          <span>Validation result</span>
           <a
             href={reportDownloadUrl(result.reportId)}
             className="btn-primary text-xs"
             download={`findatex-report-${result.summary.filename}.xlsx`}
           >
-            <Download className="h-4 w-4" /> Excel-Report herunterladen
+            <Download className="h-4 w-4" /> Download Excel report
           </a>
         </div>
         <div className="card-body space-y-4">
@@ -34,7 +34,7 @@ export function ResultPanel({ result }: Props) {
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Scores</h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {overall && (
-            <ScoreBadge label="Gesamt-Score" percentage={overall.percentage} prominent />
+            <ScoreBadge label="Overall score" percentage={overall.percentage} prominent />
           )}
           {others.map((s) => (
             <ScoreBadge key={s.dimension} label={prettyDimension(s.dimension)} percentage={s.percentage} />
@@ -50,11 +50,11 @@ export function ResultPanel({ result }: Props) {
 function SummaryGrid({ result }: { result: ValidationResponse }) {
   const s = result.summary;
   const items: { label: string; value: string }[] = [
-    { label: 'Datei',     value: s.filename },
-    { label: 'Template',  value: `${s.templateId} ${s.templateVersion}` },
-    { label: 'Zeilen',    value: String(s.rowCount) },
-    { label: 'Findings',  value: `${s.findingCount} (${s.errorCount} E / ${s.warningCount} W / ${s.infoCount} I)` },
-    { label: 'Geprüft am', value: new Date(s.generatedAt).toLocaleString() },
+    { label: 'File',         value: s.filename },
+    { label: 'Template',     value: `${s.templateId} ${s.templateVersion}` },
+    { label: 'Rows',         value: String(s.rowCount) },
+    { label: 'Findings',     value: `${s.findingCount} (${s.errorCount} E / ${s.warningCount} W / ${s.infoCount} I)` },
+    { label: 'Validated at', value: new Date(s.generatedAt).toLocaleString() },
   ];
   return (
     <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">

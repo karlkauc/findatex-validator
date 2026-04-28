@@ -15,7 +15,7 @@ export function ProfileSelector({ profiles, selected, onChange }: Props) {
   return (
     <div>
       <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-        Aktive Profile
+        Active profiles
       </label>
       <div className="flex flex-wrap gap-2">
         {profiles.map((p) => {
@@ -41,7 +41,7 @@ export function ProfileSelector({ profiles, selected, onChange }: Props) {
       </div>
       {selected.length === 0 && (
         <p className="mt-2 text-xs text-slate-500">
-          Keine Auswahl = alle Profile gleichzeitig auswerten.
+          No selection = evaluate all profiles together.
         </p>
       )}
     </div>

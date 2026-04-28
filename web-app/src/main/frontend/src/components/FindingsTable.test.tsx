@@ -79,13 +79,13 @@ describe('FindingsTable', () => {
     await user.click(screen.getByRole('button', { name: 'ERROR (2)' }));
     await user.click(screen.getByRole('button', { name: 'WARNING (1)' }));
     await user.click(screen.getByRole('button', { name: 'INFO (1)' }));
-    expect(screen.getByText(/Keine Findings für die aktuelle Auswahl/)).toBeInTheDocument();
+    expect(screen.getByText(/No findings for the current selection/)).toBeInTheDocument();
   });
 
   it('renders an empty list as zero rows but still mounts without throwing', () => {
     render(<FindingsTable findings={[]} />);
     expect(screen.getByText('Findings (0)')).toBeInTheDocument();
-    expect(screen.getByText(/Keine Findings/)).toBeInTheDocument();
+    expect(screen.getByText(/No findings/)).toBeInTheDocument();
   });
 
   it('shows row index + instrument code when present', () => {

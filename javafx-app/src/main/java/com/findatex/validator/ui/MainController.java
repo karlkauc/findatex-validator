@@ -83,11 +83,20 @@ public final class MainController {
     }
 
     private static VBox buildMissingSpecPlaceholder() {
-        Label notice = new Label("Spec nicht installiert — siehe docs/SPEC_DOWNLOADS.md");
+        Label notice = new Label("Spec not installed — see docs/SPEC_DOWNLOADS.md");
         notice.getStyleClass().add("status-label");
         VBox box = new VBox(notice);
         box.setPadding(new Insets(40));
         return box;
+    }
+
+    @FXML
+    private void onHelp() {
+        try {
+            HelpDialog.show(stage);
+        } catch (Exception e) {
+            log.warn("Help dialog failed: {}", e.getMessage());
+        }
     }
 
     @FXML

@@ -34,11 +34,11 @@ export function ExternalValidationToggle(props: Props) {
   return (
     <div>
       <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-        Externe Online-Validierung
+        External online validation
       </label>
 
       <CheckRow
-        label="GLEIF / OpenFIGI Online-Prüfung aktivieren"
+        label="Enable GLEIF / OpenFIGI online checks"
         checked={props.externalEnabled}
         onChange={onCheckbox(props.onExternalEnabledChange)}
         bold
@@ -48,26 +48,26 @@ export function ExternalValidationToggle(props: Props) {
         <div className="mt-3 space-y-4 rounded-md border border-slate-200 bg-slate-50 p-3">
           <div>
             <CheckRow
-              label="LEI gegen GLEIF prüfen"
+              label="Check LEI against GLEIF"
               checked={props.leiEnabled}
               onChange={onCheckbox(props.onLeiEnabledChange)}
               bold
             />
             <div className="ml-6 mt-2 space-y-1.5">
               <CheckRow
-                label="Lapsed-Status"
+                label="Lapsed status"
                 checked={props.leiCheckLapsed}
                 disabled={!props.leiEnabled}
                 onChange={onCheckbox(props.onLeiCheckLapsedChange)}
               />
               <CheckRow
-                label="Issuer-Name"
+                label="Issuer name"
                 checked={props.leiCheckName}
                 disabled={!props.leiEnabled}
                 onChange={onCheckbox(props.onLeiCheckNameChange)}
               />
               <CheckRow
-                label="Issuer-Land"
+                label="Issuer country"
                 checked={props.leiCheckCountry}
                 disabled={!props.leiEnabled}
                 onChange={onCheckbox(props.onLeiCheckCountryChange)}
@@ -77,20 +77,20 @@ export function ExternalValidationToggle(props: Props) {
 
           <div>
             <CheckRow
-              label="ISIN gegen OpenFIGI prüfen"
+              label="Check ISIN against OpenFIGI"
               checked={props.isinEnabled}
               onChange={onCheckbox(props.onIsinEnabledChange)}
               bold
             />
             <div className="ml-6 mt-2 space-y-1.5">
               <CheckRow
-                label="Währung"
+                label="Currency"
                 checked={props.isinCheckCurrency}
                 disabled={!props.isinEnabled}
                 onChange={onCheckbox(props.onIsinCheckCurrencyChange)}
               />
               <CheckRow
-                label="CIC-Konsistenz"
+                label="CIC consistency"
                 checked={props.isinCheckCic}
                 disabled={!props.isinEnabled}
                 onChange={onCheckbox(props.onIsinCheckCicChange)}
@@ -102,7 +102,7 @@ export function ExternalValidationToggle(props: Props) {
                 htmlFor="openfigi-key"
                 className="mb-1 block text-xs font-medium text-slate-600"
               >
-                OpenFIGI API-Key (optional)
+                OpenFIGI API key (optional)
               </label>
               <input
                 id="openfigi-key"
@@ -112,11 +112,11 @@ export function ExternalValidationToggle(props: Props) {
                 disabled={!props.isinEnabled}
                 value={props.apiKey}
                 onChange={(e) => props.onApiKeyChange(e.target.value)}
-                placeholder="Server-Default wird verwendet, wenn leer"
+                placeholder="Server default will be used if empty"
                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-500 focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500 disabled:bg-slate-100 disabled:text-slate-500"
               />
               <p className="mt-1 text-[11px] text-slate-500">
-                Wird nur für diese Validierung verwendet und nicht gespeichert.
+                Used only for this validation and never stored.
               </p>
             </div>
           </div>

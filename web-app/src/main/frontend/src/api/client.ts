@@ -56,3 +56,12 @@ export async function validateUpload(args: ValidateArgs): Promise<ValidationResp
 export function reportDownloadUrl(reportId: string): string {
   return `/api/report/${reportId}`;
 }
+
+export async function fetchHelp(): Promise<string> {
+  const res = await fetch('/api/help');
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new ApiError(res.status, text || `${res.status} ${res.statusText}`);
+  }
+  return res.text();
+}

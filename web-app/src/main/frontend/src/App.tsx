@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Loader2, ShieldCheck } from 'lucide-react';
+import { HelpCircle, Loader2, ShieldCheck } from 'lucide-react';
 import { fetchTemplates, validateUpload } from './api/client';
 import { TemplatePicker } from './components/TemplatePicker';
 import { ProfileSelector } from './components/ProfileSelector';
@@ -8,6 +8,7 @@ import { FileUpload } from './components/FileUpload';
 import { ResultPanel } from './components/ResultPanel';
 import { ErrorBanner } from './components/ErrorBanner';
 import { ExternalValidationToggle } from './components/ExternalValidationToggle';
+import { HelpModal } from './components/HelpModal';
 import { ValidationResponse } from './types/api';
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
   const [isinCheckCurrency, setIsinCheckCurrency] = useState(false);
   const [isinCheckCic, setIsinCheckCic] = useState(false);
   const [openfigiApiKey, setOpenfigiApiKey] = useState('');
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const templates = templatesQuery.data ?? [];
   const currentTemplate = templates.find((t) => t.id === templateId);
@@ -84,18 +86,29 @@ export default function App() {
       <header className="bg-gradient-to-b from-navy-700 to-navy-800 text-white">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-5">
           <ShieldCheck className="h-7 w-7" aria-hidden="true" />
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-semibold tracking-tight">FinDatEx Validator</h1>
             <p className="text-xs text-navy-100/90">
-              TPT · EET · EMT · EPT — Quality &amp; Conformance gegen die offiziellen FinDatEx-Specs.
+              TPT · EET · EMT · EPT — quality and conformance against the official FinDatEx specs.
             </p>
           </div>
+          <button
+            type="button"
+            onClick={() => setHelpOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            aria-haspopup="dialog"
+          >
+            <HelpCircle className="h-4 w-4" aria-hidden="true" />
+            Help
+          </button>
         </div>
       </header>
 
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         {templatesQuery.isLoading && (
-          <p className="text-sm text-slate-500">Templates laden…</p>
+          <p className="text-sm text-slate-500">Loading templates…</p>
         )}
         {templatesQuery.isError && <ErrorBanner error={templatesQuery.error} />}
 
@@ -103,7 +116,7 @@ export default function App() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
             <section className="space-y-5">
               <div className="card">
-                <div className="card-header">Eingabe</div>
+                <div className="card-header">Input</div>
                 <div className="card-body space-y-5">
                   <TemplatePicker
                     templates={templates}
@@ -151,27 +164,27 @@ export default function App() {
                     {validateMutation.isPending ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Validiere…
+                        Validating…
                       </>
                     ) : (
-                      'Validieren'
+                      'Validate'
                     )}
                   </button>
                   <div aria-live="polite" aria-atomic="true" className="sr-only">
-                    {validateMutation.isPending ? 'Validierung läuft' : ''}
+                    {validateMutation.isPending ? 'Validation in progress' : ''}
                   </div>
                 </div>
               </div>
 
               <div className="rounded-md border border-slate-200 bg-white p-4 text-xs text-slate-500">
-                <p className="font-semibold text-slate-700">Hinweise</p>
+                <p className="font-semibold text-slate-700">Notes</p>
                 <ul className="mt-2 list-disc space-y-1 pl-4">
-                  <li>Hochgeladene Dateien werden serverseitig <strong>nicht persistiert</strong> und nach der Antwort sofort gelöscht.</li>
-                  <li>Excel-Reports stehen 5 Minuten lang unter einer einmal-gültigen URL bereit.</li>
-                  <li>Externe Validierung (GLEIF/OpenFIGI) ist im Web-Modus standardmäßig deaktiviert.</li>
+                  <li>Uploaded files are <strong>not persisted</strong> on the server and are deleted immediately after the response.</li>
+                  <li>Excel reports are available for 5 minutes via a single-use URL.</li>
+                  <li>External validation (GLEIF/OpenFIGI) is disabled by default in the web UI.</li>
                   <li>
-                    Für tägliche Validierungen ohne Web-Upload steht die Desktop-App zum Download
-                    bereit — Daten verlassen Ihren Rechner dabei nicht.
+                    For daily validations without web upload, the desktop app is available
+                    for download — your data never leaves your machine.
                   </li>
                 </ul>
               </div>
@@ -184,10 +197,10 @@ export default function App() {
               ) : (
                 <div className="card">
                   <div className="card-body text-center text-sm text-slate-500">
-                    <p className="text-base font-medium text-slate-700">Bereit zur Validierung</p>
+                    <p className="text-base font-medium text-slate-700">Ready to validate</p>
                     <p className="mt-2">
-                      Wählen Sie Template, Version, Profile und laden Sie eine Datei hoch.
-                      Die Ergebnisse erscheinen hier.
+                      Choose a template, version, and profiles, then upload a file.
+                      Results will appear here.
                     </p>
                   </div>
                 </div>

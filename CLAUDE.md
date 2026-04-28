@@ -62,8 +62,7 @@ Surefire passes `--enable-native-access=ALL-UNNAMED` (POI on Java 21).
 
 ## Architecture (template-agnostic core + per-template plugins)
 
-The codebase was extended from TPT-only to multi-template via the plan in
-`RALPH_PROMPT.md`; status lives in `RALPH_STATUS.md`. The shape now is:
+The codebase was extended from TPT-only to multi-template; the shape now is:
 
 ```
 core/  (com.findatex.validator)
@@ -150,9 +149,8 @@ plus XF-16..XF-25 conditional triggers). EET / EMT / EPT rule sets are
 intentionally **mechanical only** (presence + format + codification +
 spec-explicit conditional presence). Anything regulatory (SFDR, MiFID II
 target market, PRIIPs RTS scenarios) is marked
-`// DEFERRED: requires regulatory SME — <which regulation, which fields>` and
-listed under `DEFERRED:` in `RALPH_STATUS.md`. **Never invent regulatory
-logic** for a non-TPT template.
+`// DEFERRED: requires regulatory SME — <which regulation, which fields>`.
+**Never invent regulatory logic** for a non-TPT template.
 
 `ConditionalRequirement` + `ConditionalFieldPresenceRule` is the generic
 "if field X = Y then Z is mandatory" mechanism — prefer it over a new
@@ -163,9 +161,7 @@ crossfield class when the spec text is reducible to that shape.
 `ExternalValidationService` cross-checks ISIN against OpenFIGI and LEI against
 GLEIF. Off by default; configured per session via the Settings dialog. Works
 behind corporate NTLM proxies in *System proxy* mode (`ProxyService`) or with
-encrypted manual creds (`PasswordCipher`). See
-`docs/superpowers/specs/2026-04-27-external-validation-gleif-openfigi-design.md`
-if extending.
+encrypted manual creds (`PasswordCipher`).
 
 The service itself is template-agnostic — each `TemplateDefinition` declares its
 ISIN/LEI columns via `externalValidationConfigFor(version)` returning an
@@ -249,9 +245,8 @@ mirrors what's physically present in `core/src/main/resources/spec/`.
 
 ## When extending
 
-- Run `mvn test` after every change. The Ralph loop's contract is "never
-  break green tests"; honour the same baseline (currently 520+ tests across
-  `core` + `javafx-app` + `web-app`).
+- Run `mvn test` after every change. Never break green tests; honour the
+  current baseline (520+ tests across `core` + `javafx-app` + `web-app`).
 - Keep the manifest-driven path for new template versions — config-only
   additions are the goal.
 - Don't put JavaFX or Jakarta-EE imports into `core/`. The split exists so

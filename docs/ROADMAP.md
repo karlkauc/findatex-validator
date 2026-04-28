@@ -174,7 +174,7 @@ Datei in das Hauptfenster ziehen → automatisch laden. Heute nur über den File
 
 ### 5.1 ISIN-Lookup gegen ANNA / Open Figi ✅ (erledigt)
 
-Implementiert via OpenFIGI; siehe Spec: docs/superpowers/specs/2026-04-27-external-validation-gleif-openfigi-design.md.
+Implementiert via OpenFIGI.
 
 Heute prüft `IsinRule` nur die Luhn-Checksumme. Online-Lookup gegen die ANNA-Datenbank oder OpenFIGI bestätigt, dass die ISIN auch existiert (und dass Issuer/Country/Currency konsistent sind).
 
@@ -186,7 +186,7 @@ Heute prüft `IsinRule` nur die Luhn-Checksumme. Online-Lookup gegen die ANNA-Da
 
 ### 5.2 LEI-Lookup gegen GLEIF ✅ (erledigt)
 
-Implementiert; siehe Spec: docs/superpowers/specs/2026-04-27-external-validation-gleif-openfigi-design.md.
+Implementiert.
 
 Analog für LEIs. GLEIF stellt ein kostenloses öffentliches API. Lookup würde den Issuer-Namen, Land, Status (active/lapsed) zurückliefern → zusätzliche Konsistenz-Checks gegen Felder 46, 52.
 

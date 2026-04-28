@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
 @layer base {
   body {
@@ -13,10 +12,10 @@
     @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-500 disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply btn bg-navy-700 text-white hover:bg-navy-600;
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-500 disabled:opacity-50 disabled:pointer-events-none bg-navy-700 text-white hover:bg-navy-600;
   }
   .btn-secondary {
-    @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-100;
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-500 disabled:opacity-50 disabled:pointer-events-none border border-slate-300 bg-white text-slate-700 hover:bg-slate-100;
   }
   .card {
     @apply rounded-lg border border-slate-200 bg-white shadow-sm;
@@ -30,8 +29,8 @@
   .badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
-  .badge-error    { @apply badge bg-red-50    text-red-700    ring-1 ring-inset ring-red-200; }
-  .badge-warning  { @apply badge bg-amber-50  text-amber-800  ring-1 ring-inset ring-amber-200; }
-  .badge-info     { @apply badge bg-sky-50    text-sky-700    ring-1 ring-inset ring-sky-200; }
-  .badge-success  { @apply badge bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200; }
+  .badge-error    { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-50    text-red-700    ring-1 ring-inset ring-red-200; }
+  .badge-warning  { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-50  text-amber-800  ring-1 ring-inset ring-amber-200; }
+  .badge-info     { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-sky-50    text-sky-700    ring-1 ring-inset ring-sky-200; }
+  .badge-success  { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200; }
 }

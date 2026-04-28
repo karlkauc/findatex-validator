@@ -1,187 +1,260 @@
 # FinDatEx Validator
 
-Validator for [FinDatEx](https://findatex.eu) data-template files (`.xlsx`,
-`.csv`). Produces a quality & conformance report against the relevant
-template specification. Two ways to run it, sharing one validation core:
+Validate FinDatEx data-template files (TPT, EET, EMT, EPT) against the
+official spec. Two delivery modes share the same validation core:
 
-- **Desktop (JavaFX)** — for daily use at the asset manager. Files never
-  leave the user's machine. Native installer builds (`.deb`, `.rpm`, `.dmg`,
-  `.msi`) via jpackage.
-- **Web (Quarkus + React, Docker)** — self-hosted container for users who
-  can't install software locally or just need an occasional validation. No
-  login. Anti-misuse: per-IP rate limit, body-size cap, concurrency cap,
-  auto-delete of uploads + reports.
+- **Desktop (JavaFX)** — files never leave your machine. Best for daily
+  validation of confidential fund data.
+- **Web (Quarkus + React, Docker)** — same engine behind an upload form.
+  Useful when desktop install is blocked, or for self-service in-house
+  deployments.
 
-Each supported template lives in its own UI tab (desktop) or selectable tab
-strip (web), with its own version selector and regulatory profile checkboxes.
-The shared validation engine, codification parser, finding model and Excel
-report writer are template-agnostic.
+Bundled templates: **TPT V7.0 + V6.0**, **EET V1.1.3 + V1.1.2**,
+**EMT V4.3 + V4.2**, **EPT V2.1 + V2.0**.
 
-## Status overview
+End-user help (what gets validated, profiles, GLEIF/OpenFIGI lookup):
+[`HELP.md`](core/src/main/resources/help/HELP.md) — also reachable from
+the Help button in either UI.
 
-| Template | Versions configured | Spec installed | Validation depth |
-|----------|---------------------|----------------|------------------|
-| TPT      | V7.0 (default)      | ✓ V7.0          | full (~25 cross-field rules + presence + format + codification) |
-| TPT      | V6.0                | _missing_       | _planned, see `docs/SPEC_DOWNLOADS.md`_ |
-| EET      | V1.1.3, V1.1.2      | _missing_       | _planned (mechanical + DEFERRED for SFDR/Taxonomy/PAI cross-field rules)_ |
-| EMT      | V4.3, V4.2          | _missing_       | _planned (mechanical + DEFERRED for MiFID II target market consistency)_ |
-| EPT      | V2.1, V2.0          | _missing_       | _planned (mechanical + DEFERRED for PRIIPs scenario logic)_ |
+---
 
-A template whose spec XLSX is not bundled appears in the UI as a placeholder
-tab: _"Spec nicht installiert — siehe docs/SPEC_DOWNLOADS.md"_. Drop the
-official XLSX into `src/main/resources/spec/<template>/` and add a sibling
-`*-info.json` manifest to enable it.
+## Quick start
 
-## Screenshots
+### 1. Desktop app (recommended for daily use)
 
-_Placeholders — to be added once a screenshot pass is run on a system with a display._
+You have two options.
 
-- `docs/screenshots/main-tabpane.png` — top-level shell with all four template tabs
-- `docs/screenshots/tpt-tab-validate.png` — TPT tab after running validation on a real V7 file
-- `docs/screenshots/tpt-tab-export.png` — exported Excel report opened in Excel
-- `docs/screenshots/missing-spec-tab.png` — placeholder tab for an uninstalled template
-
-## Supported templates
-
-### TPT — Tripartite Template (Solvency II)
-
-Primary template for insurance-undertaking portfolio reporting.
-
-- **Versions**: V7.0 (2024-11-25, default) — V6.0 _(planned, requires download from findatex.eu)_
-- **Regulatory profiles**: Solvency II (M/C/O baseline), IORP / EIOPA / ECB
-  (PF.06.02.24 positions/assets, PF.06.03.24 look-through, ECB Addon
-  PFE.06.02.30), NW 675, SST (FINMA, opt-in)
-- **Validation depth**: 142 datapoints, ~25 cross-field rules (see
-  `requirements.md`); ISIN/LEI checksums; optional online cross-check against
-  GLEIF & OpenFIGI
-
-### EET — European ESG Template
-
-ESG / SFDR / Taxonomy / PAI data exchange.
-
-_Wird ergänzt — Phase 4.EET. Requires manual download of the V1.1.3 and V1.1.2
-spec XLSX files from findatex.eu (login required); see `docs/SPEC_DOWNLOADS.md`._
-
-### EMT — European MiFID Template
-
-MiFID II Target Market & costs.
-
-_Wird ergänzt — Phase 4.EMT. Requires manual download of the V4.3 and V4.2
-spec XLSX files from findatex.eu; see `docs/SPEC_DOWNLOADS.md`._
-
-### EPT — European PRIIPs Template
-
-PRIIPs KID inputs.
-
-_Wird ergänzt — Phase 4.EPT. Requires manual download of the V2.1 and V2.0
-spec XLSX files from findatex.eu; see `docs/SPEC_DOWNLOADS.md`._
-
-## Layout (multi-module Maven)
-
-| Path | Purpose |
-|---|---|
-| `pom.xml` | Parent reactor (Java 21; modules: core, javafx-app, web-app) |
-| `core/` | UI-agnostic validation, scoring, ingest, report — `com.findatex.validator.{validation,report,ingest,spec,domain,template,external,config}` |
-| `core/src/main/resources/spec/` | Bundled template spec XLSX files |
-| `core/src/test/resources/sample/` | Canonical test fixtures (also used by web-app tests via relative path) |
-| `javafx-app/` | Desktop UI: `App`, `AppLauncher`, `ui/`, `fxml/`, `css/`, `icons/` |
-| `web-app/` | Quarkus REST + React SPA |
-| `web-app/src/main/java/com/findatex/validator/web/` | api/, service/, filter/, config/, dto/ |
-| `web-app/src/main/frontend/` | Vite + React + TS + Tailwind sources |
-| `Dockerfile` / `docker-compose.yml` / `.dockerignore` | Web-deployment artefacts |
-| `tools/generate_requirements.py` | Re-generates `requirements.md` from the bundled spec xlsx |
-| `tools/build_*_samples.py` | Builds the synthetic test samples used by JUnit |
-| `package/jpackage.sh` / `.bat` | Native desktop installer build scripts |
-| `docs/SPEC_DOWNLOADS.md` | Checklist of spec XLSX files that must be downloaded from findatex.eu |
-
-## Build & run
-
-### Desktop (JavaFX)
+**Native installer** *(no Java required on the target machine)*:
 
 ```bash
-# Run the desktop UI directly:
-mvn -pl javafx-app javafx:run
+./package/jpackage.sh        # Linux .deb / .rpm or macOS .dmg
+package\jpackage.bat         # Windows .msi
+```
 
-# Or build the shaded fat JAR:
-mvn -pl javafx-app -am -DskipTests package
+The resulting installer puts a `FinDatEx Validator` entry in your start
+menu / applications list. Files are read locally, the report is written
+locally, and there is no network traffic except the optional GLEIF /
+OpenFIGI lookup.
+
+**Run from source** *(Java 21 required)*:
+
+```bash
+mvn -pl javafx-app javafx:run                                   # dev mode
+mvn -pl javafx-app -am -DskipTests package                      # build fat JAR
 java -jar javafx-app/target/findatex-validator-javafx-1.0.0-shaded.jar
-
-# Build a native installer (Linux .deb/.rpm, macOS app, or Windows .msi):
-./package/jpackage.sh        # Linux/macOS
-.\package\jpackage.bat       # Windows
 ```
 
-### Web (Quarkus + React, Docker)
+### 2. Hosted web instance
+
+> **Public URL:** `<YOUR_HOSTED_INSTANCE_URL>` *(to be filled in once a
+> public instance is available)*.
+
+The hosted web instance accepts an `.xlsx` / `.xlsm` / `.csv` upload
+(max 25 MB), runs the same validation engine as the desktop app, and
+returns a quality report plus a single-use Excel download URL valid for
+5 minutes. No login. Per-IP rate limiting and a body-size cap protect
+the instance against abuse.
+
+Privacy posture of the hosted instance:
+
+- Uploads are processed in memory and discarded the moment the response
+  is sent.
+- Reports are kept in memory until first download or 5-minute TTL,
+  whichever comes first, then deleted.
+- No file content is logged or persisted.
+- External validation (GLEIF/OpenFIGI) is **off** unless the operator
+  has enabled it server-side.
+
+### 3. Self-hosted Docker (in-house deployment)
+
+A multi-stage `Dockerfile` plus `docker-compose.yml` are provided. The
+default container binds to `127.0.0.1:18082` and is intended to sit
+behind a reverse proxy (nginx / Traefik / caddy) that handles TLS and
+auth if needed.
 
 ```bash
-# Local dev mode (hot reload backend + Vite dev server with /api proxy):
-mvn -pl web-app -am quarkus:dev
-# in a second terminal:
-(cd web-app/src/main/frontend && npm install && npm run dev)
-# open http://localhost:5173
-
-# Build the production container:
-docker build -t findatex-validator-web:1.0.0 .
-docker run --rm -p 8080:8080 findatex-validator-web:1.0.0
-# open http://localhost:8080
-
-# Or via compose (reads docker-compose.yml with throttling defaults):
+git clone https://github.com/<your-org>/findatex-validator.git
+cd findatex-validator
 docker compose up -d
+# → http://127.0.0.1:18082
 ```
 
-Anti-misuse defaults (override via env vars; see
-`web-app/src/main/resources/application.properties`):
+To customise behaviour, set the env vars in `docker-compose.yml` (or
+your orchestrator). Defaults below; override only what you need.
 
-| Env var | Default | Effect |
-|---|---|---|
-| `FINDATEX_WEB_RATE_LIMIT_PER_IP_PER_HOUR` | `10` | Per-IP token-bucket on `POST /api/validate` |
-| `FINDATEX_WEB_MAX_CONCURRENCY`            | `4`  | Global cap on simultaneous validations (overflow → 429) |
-| `FINDATEX_WEB_REPORT_TTL_MINUTES`         | `5`  | XLSX report download window |
-| `quarkus.http.limits.max-body-size`       | `25M`| Upload size cap (set via `QUARKUS_HTTP_LIMITS_MAX_BODY_SIZE`) |
-| `FINDATEX_WEB_EXTERNAL_ENABLED`           | `false` | Enable GLEIF/OpenFIGI cross-checks (TPT only) |
+| Env var | Default | What it does |
+|---------|---------|--------------|
+| `FINDATEX_WEB_RATE_LIMIT_PER_IP_PER_HOUR` | `10` | Per-IP token-bucket on `POST /api/validate`. Returns HTTP 429 on overflow. |
+| `FINDATEX_WEB_MAX_CONCURRENCY`            | `4`  | Cap on simultaneous validations across the instance. Returns HTTP 429 on overflow. |
+| `FINDATEX_WEB_ACQUIRE_TIMEOUT_MILLIS`     | `2000` | How long a request waits for a concurrency permit before returning 429. |
+| `FINDATEX_WEB_REPORT_TTL_MINUTES`         | `5`  | Excel report download window. |
+| `QUARKUS_HTTP_LIMITS_MAX_BODY_SIZE`       | `25M`| Upload size cap. Larger uploads return HTTP 413. |
+| `FINDATEX_WEB_EXTERNAL_ENABLED`           | `false` | Operator master switch for GLEIF/OpenFIGI lookup. UI per-request toggle is ignored unless this is `true`. |
+| `FINDATEX_WEB_EXTERNAL_OPENFIGI_KEY`      | *(empty)* | OpenFIGI API key. Optional; raises rate limit from 4 to 100 req/s. Users may also provide a per-request key (never stored). |
+| `FINDATEX_WEB_EXTERNAL_PROXY_MODE`        | `NONE` | One of `NONE`, `SYSTEM`, `MANUAL`. Container outbound network policy. |
+| `FINDATEX_WEB_EXTERNAL_PROXY_HOST`        | *(empty)* | Manual proxy host. |
+| `FINDATEX_WEB_EXTERNAL_PROXY_PORT`        | `0`  | Manual proxy port. |
+| `FINDATEX_WEB_EXTERNAL_PROXY_USERNAME`    | *(empty)* | Manual proxy username (NTLM-aware). |
+| `FINDATEX_WEB_EXTERNAL_PROXY_PASSWORD`    | *(empty)* | Manual proxy password. Pass via secret manager, not as a literal in compose. |
+| `FINDATEX_WEB_EXTERNAL_PROXY_NON_PROXY_HOSTS` | *(empty)* | Comma-separated bypass list (e.g. `localhost,*.internal`). |
+| `FINDATEX_WEB_EXTERNAL_CACHE_DIR`         | `/tmp/findatex-cache` | Persistent identifier-result cache. Mount a volume to keep it across restarts. |
+| `FINDATEX_WEB_EXTERNAL_CACHE_TTL_DAYS`    | `7`  | Cache entry lifetime. |
 
-### Tests / regenerators
+Health check: `GET /_internal/health/ready` (returns `200 OK` once
+templates have been loaded). The default compose file already wires
+this into Docker's healthcheck.
+
+Minimum host: any Linux with Docker 20.10+, 512 MB free RAM, ~1 GB disk
+for the image. The image bundles a custom 21-module jlink JRE — no
+host Java install needed.
+
+---
+
+## Architecture
+
+```
+findatex-validator/
+├── core/         UI-agnostic validation, scoring, ingest, reports (~520 tests)
+├── javafx-app/   Desktop UI (depends on core only)
+└── web-app/      Quarkus REST + React SPA (depends on core only)
+```
+
+The validation flow is identical across UIs:
+
+```
+TemplateRegistry.of(id)
+   → specLoaderFor(version).load()        // SpecCatalog
+   → TptFileLoader(catalog).load(...)     // TptFile
+   → ValidationEngine(catalog, ruleSet)
+        .validate(file, profiles)         // List<Finding>
+   → FindingEnricher.enrich
+   → QualityScorer / XlsxReportWriter     // QualityReport + .xlsx
+```
+
+The only difference is the loader entry point: JavaFX uses `load(Path)`
+(file picker), the web layer uses `load(InputStream, filename)` (no
+tempfile written through).
+
+Each template lives in its own package under `core/.../template/<t>/`
+with a `*Template`, `*Profiles`, and `*RuleSet` class. New template
+versions are config-only: drop the spec XLSX, author a sibling
+`*-info.json` manifest, register one constant in the per-template
+`*Template.java` (see "Adding a new template version" below).
+
+---
+
+## Configuration
+
+### Desktop app
+
+Settings live in `~/.config/findatex-validator/settings.json` (Linux),
+`~/Library/Application Support/findatex-validator/settings.json` (macOS),
+or `%APPDATA%\findatex-validator\settings.json` (Windows). The proxy
+password is encrypted with a machine-bound AES key — copying the file
+to another machine will silently invalidate the password but not the
+rest of the settings. All settings are reachable via Settings… in the
+toolbar.
+
+### Web app
+
+Configuration is via env vars (table above) or
+`web-app/src/main/resources/application.properties`. The Quarkus
+`@ConfigProperty` names follow `findatex.web.*`; all are overridable
+via `FINDATEX_WEB_*` environment variables.
+
+---
+
+## Adding a new template version
+
+Adding a new version of an existing template requires no Java changes.
+
+1. Drop the spec XLSX into `core/src/main/resources/spec/<template>/`.
+   Use a normalised name (e.g. `TPT_V8_20260601.xlsx`).
+2. Author a sibling `*-info.json` manifest. The schema is the
+   `SpecManifest` record — `tpt-v7-info.json` is a worked example. Key
+   fields: sheet name, `firstDataRow`, 1-based column indices,
+   `applicabilityColumns` (`kind: "CIC"` for TPT or `"none"` otherwise),
+   `profileColumns` (`kind: "flag"` or `"presenceMerge"`).
+3. Add a `TemplateVersion` constant in the per-template
+   `*Template.java` and include it in the `versions()` list.
+4. `mvn test` — `TemplateRegistryTest` and the per-template
+   `*SpecLoaderTest` / `*RuleSetTest` will pick up the new version
+   automatically.
+
+The UI's `MainController` probes `specLoaderFor(latest()).load()` per
+template at startup and silently downgrades a template to a "Spec not
+installed" placeholder tab if loading throws — so a manifest typo
+won't break the rest of the UI.
+
+Adding a brand-new template (rather than a version) requires writing
+the per-template `*Template`, `*Profiles`, and `*RuleSet` classes, plus
+registering the new `TemplateId` enum value. See the existing TPT
+implementation for the worked example.
+
+---
+
+## Building and testing
+
+Java 21 + Maven 3.9+. Node and npm are bundled by `frontend-maven-plugin`
+during the web-app build — no host install required.
 
 ```bash
-mvn test                                       # all 520+ tests across all modules
-mvn -Dtest='*ExampleSamplesTest' test          # per-template sample regressions
-python3 tools/build_samples.py                 # → core/src/test/resources/sample/*
-python3 tools/generate_requirements.py         # → requirements.md from the TPT V7 spec
+mvn test                                       # ~520 tests (all modules)
+mvn -DskipTests package                        # build everything
+mvn -pl core -am test                          # core only
+mvn -Dtest=ClassName test                      # one test class
+mvn -Dtest='*ExampleSamplesTest' test          # all per-template sample regressions
+mvn clean verify                               # full regression + JaCoCo report
+
+# Desktop
+mvn -pl javafx-app javafx:run                  # dev run
+xvfb-run mvn -pl javafx-app javafx:run         # headless smoke test
+
+# Web
+mvn -pl web-app -am quarkus:dev                # backend dev mode
+(cd web-app/src/main/frontend && npm run dev)  # vite on :5173
+mvn -pl web-app -am -P backend-only -DskipTests package   # backend without npm rebuild
+
+# Container
+docker build -t findatex-validator-web:1.0.0 .
+docker compose up -d
+
+# Generators
+python3 tools/build_samples.py                 # core test samples
+python3 tools/build_examples.py                # samples/tpt/*
+python3 tools/build_eet_samples.py             # samples/eet/*  (also _emt_, _ept_)
+python3 tools/generate_requirements.py         # rebuild requirements.md
+./package/jpackage.sh                          # native desktop installer
 ```
 
-## Validation overview
+---
 
-The validator walks the active template's spec catalog and emits the following
-rule families. Cross-field rules are template-specific; only TPT currently has
-a deep cross-field rule set (XF-01..XF-25). EET/EMT/EPT will start with
-mechanical rules only (presence + format + codification + spec-explicit
-conditional presence) and grow as regulatory expertise is added.
+## Privacy and data handling
 
-- **PRESENCE** — mandatory (`M`) field missing for an active profile (ERROR).
-- **COND_PRESENCE** — conditional (`C`) field missing for an active profile
-  when the row's applicability scope matches (WARNING).
-- **FORMAT/<num>** — wrong codification: numeric, ISO 8601 date, ISO 4217
-  currency, ISO 3166-1 alpha-2 country, NACE V2.1, CIC code, alpha/alphanumeric
-  length, closed-list values (ERROR).
-- **ISIN/<num>/<typeNum>**, **LEI/<num>/<typeNum>** — ID-checksum rules
-  attached per template via the rule set (TPT covers instrument/issuer/group/
-  underlying/fund-issuer/custodian fields).
-- **XF-01..XF-25** — TPT-specific cross-field rules (SCR delivery, position
-  weights, NAV consistency, coupon frequency, custodian pair, interest rate
-  type, date order, maturity ≥ reporting, PIK patterns, underlying CIC
-  mandatoriness, TPT version, conditional presence triggers XF-16..XF-25).
-- **LEI-LIVE / ISIN-LIVE** — optional online cross-check against GLEIF and
-  OpenFIGI; currently TPT only. Off by default. Works behind corporate
-  HTTP/NTLM proxies via *System proxy* mode (recommended) or manual proxy with
-  encrypted credentials. See `docs/superpowers/specs/2026-04-27-external-validation-gleif-openfigi-design.md`.
+| Mode | What happens to your data |
+|------|---------------------------|
+| **Desktop**         | Files are read from disk, validated locally, and the report is written locally. The only outbound network call is the optional GLEIF / OpenFIGI lookup — and only the identifiers in your file (LEIs, ISINs) are sent, not the full file. |
+| **Hosted web**      | You upload to the operator's server. Files are processed in memory and discarded immediately after the response. Reports live for 5 minutes via a single-use URL, then are deleted. No login, no per-file logging. External validation off by default. |
+| **Self-hosted Docker** | Same defaults as the hosted web mode, but on infrastructure you control. Operator decides whether to enable external validation, what proxy mode to use, and how long reports are retained. |
 
-Quality scoring categories (weighted into an overall score 0–100 %):
+---
 
-- Mandatory completeness (40 %)
-- Format conformance (20 %)
-- Closed-list conformance (15 %)
-- Cross-field consistency (15 %)
-- Profile completeness average (10 %)
+## License
 
-The Excel report (`Export Excel report…` button per tab) emits 5 sheets:
-`Summary`, `Scores`, `Findings`, `Field Coverage`, `Per Position`.
+No `LICENSE` file ships with this repository yet. Add one before
+publishing the source publicly.
+
+---
+
+## Links
+
+- [`HELP.md`](core/src/main/resources/help/HELP.md) — end-user help
+  (rendered in the apps via the Help button).
+- [`CLAUDE.md`](CLAUDE.md) — developer guide (architecture, conventions,
+  test structure).
+- [`docs/SPEC_DOWNLOADS.md`](docs/SPEC_DOWNLOADS.md) — operator
+  checklist for acquiring spec XLSX files from FinDatEx.
+- [`docs/SPEC_INVENTORY.md`](docs/SPEC_INVENTORY.md) — auto-maintained
+  list of bundled spec files.
+- [`samples/`](samples/) — per-template scenario fixtures (clean +
+  broken variants).

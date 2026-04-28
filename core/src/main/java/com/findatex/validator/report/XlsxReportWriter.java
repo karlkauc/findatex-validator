@@ -302,12 +302,12 @@ public final class XlsxReportWriter {
             log.warn("Could not re-read source file for Annotated Source tab: {}", ex.toString());
             Row rr = s.createRow(0);
             rr.createCell(0).setCellValue(
-                    "Originalfile nicht mehr verfügbar — siehe Tab 'Findings' für Details.");
+                    "Original file no longer available — see the Findings tab for details.");
             return;
         }
         if (src.rows().isEmpty()) {
             Row rr = s.createRow(0);
-            rr.createCell(0).setCellValue("Originalfile leer.");
+            rr.createCell(0).setCellValue("Original file is empty.");
             return;
         }
 
@@ -356,7 +356,7 @@ public final class XlsxReportWriter {
 
             Cell zeile = rr.createCell(0);
             if (isHeaderRow) {
-                zeile.setCellValue("Zeile");
+                zeile.setCellValue("Row");
                 zeile.setCellStyle(headerStyle);
             } else if (mirrorRowToLogical.containsKey(rIdx)) {
                 zeile.setCellValue(mirrorRowToLogical.get(rIdx));
@@ -439,7 +439,7 @@ public final class XlsxReportWriter {
             sb.append(msg);
             if (sb.length() > MAX_COMMENT_TEXT) {
                 sb.setLength(MAX_COMMENT_TEXT);
-                sb.append("\n…(gekürzt)");
+                sb.append("\n…(truncated)");
                 break;
             }
         }

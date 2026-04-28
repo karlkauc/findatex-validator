@@ -137,20 +137,20 @@ class XlsxReportWriterTest {
             assertThat(text).contains(target.ruleId());
             assertThat(text).contains(target.message());
 
-            boolean foundZeile = false;
+            boolean foundRowHeader = false;
             for (int r = 0; r <= annotated.getLastRowNum(); r++) {
                 org.apache.poi.ss.usermodel.Row rr = annotated.getRow(r);
                 if (rr == null) continue;
                 org.apache.poi.ss.usermodel.Cell c0 = rr.getCell(0);
                 if (c0 != null
                         && c0.getCellType() == org.apache.poi.ss.usermodel.CellType.STRING
-                        && "Zeile".equals(c0.getStringCellValue())) {
-                    foundZeile = true;
+                        && "Row".equals(c0.getStringCellValue())) {
+                    foundRowHeader = true;
                     break;
                 }
             }
-            assertThat(foundZeile)
-                    .as("Annotated Source must label the Zeile helper column")
+            assertThat(foundRowHeader)
+                    .as("Annotated Source must label the Row helper column")
                     .isTrue();
 
             java.util.Set<Integer> rowsWithFindings = report.findings().stream()

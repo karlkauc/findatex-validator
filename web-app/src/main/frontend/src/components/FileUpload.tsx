@@ -36,7 +36,7 @@ export function FileUpload({ file, onFileChange }: Props) {
           type="button"
           onClick={() => onFileChange(null)}
           className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-          aria-label="Datei entfernen"
+          aria-label="Remove file"
         >
           <X className="h-4 w-4" />
         </button>
@@ -59,12 +59,12 @@ export function FileUpload({ file, onFileChange }: Props) {
       <input {...getInputProps()} />
       <Upload className="mb-3 h-8 w-8 text-slate-400" aria-hidden="true" />
       <p className="text-sm font-medium text-slate-700">
-        {isDragActive ? 'Loslassen, um Datei zu wählen' : 'Datei hierher ziehen oder klicken'}
+        {isDragActive ? 'Drop the file to select' : 'Drag a file here or click to select'}
       </p>
-      <p className="mt-1 text-xs text-slate-500">.xlsx, .xlsm oder .csv — max 25&nbsp;MB</p>
+      <p className="mt-1 text-xs text-slate-500">.xlsx, .xlsm, or .csv — max 25&nbsp;MB</p>
       {fileRejections.length > 0 && (
         <p className="mt-3 text-xs text-red-600" role="alert">
-          {fileRejections[0].errors[0]?.message ?? 'Datei abgelehnt'}
+          {fileRejections[0].errors[0]?.message ?? 'File rejected'}
         </p>
       )}
     </div>

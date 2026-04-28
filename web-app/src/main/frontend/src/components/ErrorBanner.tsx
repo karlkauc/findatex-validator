@@ -22,21 +22,21 @@ function describe(error: unknown): { title: string; body: string } {
   if (error instanceof ApiError) {
     if (error.status === 429) {
       const wait = error.retryAfterSeconds
-        ? ` Versuchen Sie es in ca. ${error.retryAfterSeconds} Sekunden erneut.`
-        : ' Bitte versuchen Sie es später erneut.';
-      return { title: 'Rate-Limit erreicht', body: error.message + wait };
+        ? ` Try again in about ${error.retryAfterSeconds} seconds.`
+        : ' Please try again later.';
+      return { title: 'Rate limit exceeded', body: error.message + wait };
     }
     if (error.status === 413) {
       return {
-        title: 'Datei zu groß',
-        body: 'Das Limit für Uploads liegt bei 25 MB. Bitte wählen Sie eine kleinere Datei.',
+        title: 'File too large',
+        body: 'The upload limit is 25 MB. Please choose a smaller file.',
       };
     }
     if (error.status === 400) {
-      return { title: 'Ungültige Anfrage', body: error.message };
+      return { title: 'Invalid request', body: error.message };
     }
     return { title: `HTTP ${error.status}`, body: error.message };
   }
-  if (error instanceof Error) return { title: 'Fehler', body: error.message };
-  return { title: 'Fehler', body: 'Unbekannter Fehler bei der Validierung.' };
+  if (error instanceof Error) return { title: 'Error', body: error.message };
+  return { title: 'Error', body: 'Unknown validation error.' };
 }

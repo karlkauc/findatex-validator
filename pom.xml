@@ -31,6 +31,7 @@
         <junit.version>5.11.3</junit.version>
         <assertj.version>3.26.3</assertj.version>
         <jackson.version>2.18.2</jackson.version>
+        <commonmark.version>0.24.0</commonmark.version>
 
         <quarkus.platform.version>3.17.5</quarkus.platform.version>
         <bucket4j.version>8.10.1</bucket4j.version>
@@ -104,6 +105,17 @@
                 <groupId>com.bucket4j</groupId>
                 <artifactId>bucket4j-core</artifactId>
                 <version>${bucket4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commonmark</groupId>
+                <artifactId>commonmark</artifactId>
+                <version>${commonmark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.commonmark</groupId>
+                <artifactId>commonmark-ext-gfm-tables</artifactId>
+                <version>${commonmark.version}</version>
             </dependency>
 
             <dependency>

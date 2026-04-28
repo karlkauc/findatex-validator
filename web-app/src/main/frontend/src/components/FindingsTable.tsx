@@ -103,7 +103,7 @@ export function FindingsTable({ findings }: Props) {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-center text-sm text-slate-500">
-                  Keine Findings für die aktuelle Auswahl.
+                  No findings for the current selection.
                 </td>
               </tr>
             )}

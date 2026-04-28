@@ -16,7 +16,7 @@
         <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
 
         <Label fx:id="emptySpecNotice" managed="false" visible="false"
-               text="Spec nicht installiert — siehe docs/SPEC_DOWNLOADS.md"
+               text="Spec not installed — see docs/SPEC_DOWNLOADS.md"
                styleClass="status-label"/>
 
         <Label text="1. Version" styleClass="section-title"/>

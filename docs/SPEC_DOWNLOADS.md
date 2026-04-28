@@ -6,8 +6,8 @@ automatically — every FinDatEx download requires a free login at
 [https://findatex.eu](https://findatex.eu) and the consortium does not expose
 direct stable URLs.
 
-The companion file `docs/SPEC_INVENTORY.md` is updated automatically by Ralph
-to reflect what's currently present.
+The companion file `docs/SPEC_INVENTORY.md` mirrors what's currently present
+in `core/src/main/resources/spec/`.
 
 ## Procedure
 
@@ -73,16 +73,11 @@ in France.
 Profiles to expect: PRIIPs categories 1 / 2 / 3 / 4 (per RTS scenario logic);
 UK FCA compliance provisions are embedded in the spec.
 
-## What Ralph cannot do
+## Out of scope for this repository
 
-The Ralph loop driving this validator's development explicitly never:
-
-- Fetches a file from findatex.eu (the site is login-walled and there are no
-  stable URLs — automated download would be brittle and unauthorised).
-- Invents regulatory cross-field logic for non-TPT templates. SFDR / MiFID II /
-  PRIIPs cross-field rules are marked `// DEFERRED:` with a SME-input note in
-  the corresponding `*RuleSet.java` and tracked under `DEFERRED:` in
-  `RALPH_STATUS.md` until a regulatory expert reviews them.
-
-When a missing spec is added by the operator, re-running the loop will pick it
-up at the next `4.<T>.1` iteration and proceed with `4.<T>.2..8`.
+- Automated downloads from findatex.eu — the site is login-walled and there
+  are no stable URLs, so spec acquisition is a manual operator step.
+- Inventing regulatory cross-field logic for non-TPT templates. SFDR /
+  MiFID II / PRIIPs cross-field rules are marked `// DEFERRED:` with a
+  SME-input note in the corresponding `*RuleSet.java` until a regulatory
+  expert reviews them.

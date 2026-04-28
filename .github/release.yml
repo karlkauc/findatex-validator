@@ -1,0 +1,39 @@
+changelog:
+  exclude:
+    labels:
+      - skip-changelog
+      - duplicate
+      - invalid
+      - wontfix
+  categories:
+    - title: Features
+      labels:
+        - feat
+        - feature
+        - enhancement
+    - title: Bug fixes
+      labels:
+        - fix
+        - bug
+    - title: Documentation
+      labels:
+        - docs
+        - documentation
+    - title: Build, CI & tooling
+      labels:
+        - build
+        - ci
+        - chore
+    - title: Refactoring
+      labels:
+        - refactor
+    - title: Tests
+      labels:
+        - test
+        - tests
+    - title: Dependencies
+      labels:
+        - dependencies
+    - title: Other changes
+      labels:
+        - "*"

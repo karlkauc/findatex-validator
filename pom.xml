@@ -12,6 +12,21 @@
 
     <name>FinDatEx Validator (parent)</name>
     <description>Parent reactor for the FinDatEx Validator multi-module build (core, javafx-app, web-app).</description>
+    <url>https://github.com/karlkauc/tpt-validator</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:https://github.com/karlkauc/tpt-validator.git</connection>
+        <developerConnection>scm:git:git@github.com:karlkauc/tpt-validator.git</developerConnection>
+        <url>https://github.com/karlkauc/tpt-validator</url>
+    </scm>
 
     <modules>
         <module>core</module>

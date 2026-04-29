@@ -7,6 +7,8 @@ interface Props {
 
 const SEVERITIES: Severity[] = ['ERROR', 'WARNING', 'INFO'];
 
+const COLUMN_COUNT = 13;
+
 export function FindingsTable({ findings }: Props) {
   const [enabled, setEnabled] = useState<Set<Severity>>(new Set(SEVERITIES));
   const [query, setQuery] = useState('');
@@ -25,9 +27,15 @@ export function FindingsTable({ findings }: Props) {
       return (
         f.message.toLowerCase().includes(q) ||
         (f.fieldName ?? '').toLowerCase().includes(q) ||
+        (f.fieldNum ?? '').toLowerCase().includes(q) ||
         (f.ruleId ?? '').toLowerCase().includes(q) ||
+        (f.profileDisplayName ?? '').toLowerCase().includes(q) ||
+        (f.profileCode ?? '').toLowerCase().includes(q) ||
+        (f.portfolioId ?? '').toLowerCase().includes(q) ||
+        (f.portfolioName ?? '').toLowerCase().includes(q) ||
+        (f.valuationDate ?? '').toLowerCase().includes(q) ||
         (f.instrumentCode ?? '').toLowerCase().includes(q) ||
-        (f.portfolioId ?? '').toLowerCase().includes(q)
+        (f.instrumentName ?? '').toLowerCase().includes(q)
       );
     });
   }, [findings, enabled, query]);
@@ -74,35 +82,62 @@ export function FindingsTable({ findings }: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-              <th className="px-4 py-2 font-medium">Severity</th>
-              <th className="px-4 py-2 font-medium">Rule</th>
-              <th className="px-4 py-2 font-medium">Field</th>
-              <th className="px-4 py-2 font-medium">Position</th>
-              <th className="px-4 py-2 font-medium">Message</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Severity</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Profile</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Fund ID</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Fund name</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Valuation date</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Row</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Instrument code</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Instrument</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Weight</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Rule</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Field</th>
+              <th className="whitespace-nowrap px-3 py-2 font-medium">Field name</th>
+              <th className="px-3 py-2 font-medium">Message</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((f, idx) => (
               <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                <td className="px-4 py-2 align-top">
+                <td className="whitespace-nowrap px-3 py-2 align-top">
                   <span className={severityBadge(f.severity)}>{f.severity}</span>
                 </td>
-                <td className="px-4 py-2 align-top font-mono text-xs text-slate-600">{f.ruleId}</td>
-                <td className="px-4 py-2 align-top">
-                  <div className="font-medium text-slate-800">{f.fieldName ?? '—'}</div>
-                  {f.fieldNum && <div className="font-mono text-xs text-slate-500">#{f.fieldNum}</div>}
+                <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
+                  {f.profileDisplayName ?? f.profileCode ?? ''}
                 </td>
-                <td className="px-4 py-2 align-top text-xs text-slate-600">
-                  {f.rowIndex != null && <div>Row {f.rowIndex}</div>}
-                  {f.instrumentCode && <div className="font-mono">{f.instrumentCode}</div>}
-                  {f.instrumentName && <div className="truncate max-w-xs">{f.instrumentName}</div>}
+                <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">
+                  {f.portfolioId ?? ''}
                 </td>
-                <td className="px-4 py-2 align-top text-slate-700">{f.message}</td>
+                <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
+                  {f.portfolioName ?? ''}
+                </td>
+                <td className="whitespace-nowrap px-3 py-2 align-top text-xs text-slate-600">
+                  {f.valuationDate ?? ''}
+                </td>
+                <td className="whitespace-nowrap px-3 py-2 align-top text-right text-xs text-slate-600">
+                  {f.rowIndex != null ? f.rowIndex : ''}
+                </td>
+                <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">
+                  {f.instrumentCode ?? ''}
+                </td>
+                <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
+                  {f.instrumentName ?? ''}
+                </td>
+                <td className="whitespace-nowrap px-3 py-2 align-top text-right text-xs text-slate-600">
+                  {formatWeight(f.valuationWeight)}
+                </td>
+                <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">{f.ruleId}</td>
+                <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-500">
+                  {f.fieldNum ?? ''}
+                </td>
+                <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">{f.fieldName ?? ''}</td>
+                <td className="whitespace-normal break-words px-3 py-2 align-top text-slate-700">{f.message}</td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-sm text-slate-500">
+                <td colSpan={COLUMN_COUNT} className="px-4 py-6 text-center text-sm text-slate-500">
                   No findings for the current selection.
                 </td>
               </tr>
@@ -128,4 +163,12 @@ function severityActiveClass(s: Severity): string {
     case 'WARNING': return 'border-amber-300 bg-amber-50 text-amber-700';
     case 'INFO':    return 'border-sky-300 bg-sky-50 text-sky-700';
   }
+}
+
+// Mirrors FindingRow.formatWeight in javafx-app: "0.1234" → "12.34 %".
+function formatWeight(raw: string | null): string {
+  if (raw == null || raw.trim() === '') return '';
+  const d = Number.parseFloat(raw.replace(',', '.'));
+  if (!Number.isFinite(d)) return raw;
+  return `${(d * 100).toFixed(2)} %`;
 }

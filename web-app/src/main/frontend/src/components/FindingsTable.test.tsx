@@ -9,6 +9,7 @@ function f(over: Partial<FindingDto>): FindingDto {
     severity: 'INFO',
     ruleId: 'TEST/00',
     profileCode: null,
+    profileDisplayName: null,
     fieldNum: null,
     fieldName: null,
     rowIndex: null,

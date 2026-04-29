@@ -25,6 +25,7 @@ export interface FindingDto {
   severity: Severity;
   ruleId: string;
   profileCode: string | null;
+  profileDisplayName: string | null;
   fieldNum: string | null;
   fieldName: string | null;
   rowIndex: number | null;

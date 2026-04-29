@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FindingDto, Severity } from '../types/api';
 
 interface Props {
@@ -12,6 +12,14 @@ const COLUMN_COUNT = 13;
 export function FindingsTable({ findings }: Props) {
   const [enabled, setEnabled] = useState<Set<Severity>>(new Set(SEVERITIES));
   const [query, setQuery] = useState('');
+
+  // Double-scrollbar pattern: a thin scroll strip above the table mirrors the
+  // table's natural width, so users at the top of the page can see (and use)
+  // a horizontal scrollbar without first scrolling to the bottom of the table.
+  const topScrollRef = useRef<HTMLDivElement>(null);
+  const tableScrollRef = useRef<HTMLDivElement>(null);
+  const [innerWidth, setInnerWidth] = useState(0);
+  const syncing = useRef(false);
 
   const counts = useMemo(() => {
     const c: Record<Severity, number> = { ERROR: 0, WARNING: 0, INFO: 0 };
@@ -47,6 +55,35 @@ export function FindingsTable({ findings }: Props) {
     setEnabled(next);
   };
 
+  useEffect(() => {
+    const el = tableScrollRef.current;
+    if (!el) return;
+    const update = () => setInnerWidth(el.scrollWidth);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    // Children width changes (filter, severity toggle) also affect scrollWidth.
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => ro.disconnect();
+  }, [filtered.length]);
+
+  const onTopScroll = () => {
+    if (syncing.current) return;
+    syncing.current = true;
+    if (tableScrollRef.current && topScrollRef.current) {
+      tableScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+    }
+    syncing.current = false;
+  };
+  const onTableScroll = () => {
+    if (syncing.current) return;
+    syncing.current = true;
+    if (tableScrollRef.current && topScrollRef.current) {
+      topScrollRef.current.scrollLeft = tableScrollRef.current.scrollLeft;
+    }
+    syncing.current = false;
+  };
+
   return (
     <div className="card">
       <div className="card-header flex flex-wrap items-center justify-between gap-3">
@@ -78,7 +115,16 @@ export function FindingsTable({ findings }: Props) {
           />
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div
+        ref={topScrollRef}
+        onScroll={onTopScroll}
+        aria-hidden="true"
+        className="overflow-x-auto"
+        style={{ height: 14 }}
+      >
+        <div style={{ width: innerWidth, height: 1 }} />
+      </div>
+      <div ref={tableScrollRef} onScroll={onTableScroll} className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">

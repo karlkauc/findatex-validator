@@ -1,4 +1,5 @@
-import { Download } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, Download } from 'lucide-react';
 import { ValidationResponse } from '../types/api';
 import { reportDownloadUrl } from '../api/client';
 import { ScoreBadge } from './ScoreBadge';
@@ -11,6 +12,7 @@ interface Props {
 export function ResultPanel({ result }: Props) {
   const overall = result.scores.find((s) => s.dimension === 'OVERALL');
   const others = result.scores.filter((s) => s.dimension !== 'OVERALL');
+  const [scoresOpen, setScoresOpen] = useState(true);
 
   return (
     <div className="space-y-6">
@@ -31,15 +33,32 @@ export function ResultPanel({ result }: Props) {
       </div>
 
       <div>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Scores</h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {overall && (
-            <ScoreBadge label="Overall score" percentage={overall.percentage} prominent />
-          )}
-          {others.map((s) => (
-            <ScoreBadge key={s.dimension} label={prettyDimension(s.dimension)} percentage={s.percentage} />
-          ))}
-        </div>
+        <button
+          type="button"
+          onClick={() => setScoresOpen((v) => !v)}
+          aria-expanded={scoresOpen}
+          aria-controls="scores-grid"
+          className="mb-3 inline-flex items-center gap-2 rounded-md text-sm font-semibold uppercase tracking-wide text-slate-500 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 focus-visible:ring-offset-1"
+        >
+          <ChevronDown
+            className={'h-4 w-4 transition-transform ' + (scoresOpen ? '' : '-rotate-90')}
+            aria-hidden="true"
+          />
+          Scores
+        </button>
+        {scoresOpen && (
+          <div
+            id="scores-grid"
+            className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {overall && (
+              <ScoreBadge label="Overall score" percentage={overall.percentage} prominent />
+            )}
+            {others.map((s) => (
+              <ScoreBadge key={s.dimension} label={prettyDimension(s.dimension)} percentage={s.percentage} />
+            ))}
+          </div>
+        )}
       </div>
 
       <FindingsTable findings={result.findings} />

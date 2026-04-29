@@ -60,7 +60,7 @@ class XlsxReportWriterEetTest {
         QualityReport report = new QualityScorer(CATALOG).score(file, active, findings);
 
         Path out = tmp.resolve("eet-report.xlsx");
-        new XlsxReportWriter(CATALOG, PROFILES).write(report, out);
+        new XlsxReportWriter(CATALOG, PROFILES, EetTemplate.V1_1_3, GenerationUi.WEB).write(report, out);
 
         try (InputStream in = Files.newInputStream(out);
              Workbook wb = new XSSFWorkbook(in)) {
@@ -89,7 +89,7 @@ class XlsxReportWriterEetTest {
         QualityReport report = new QualityScorer(CATALOG).score(file, active, findings);
 
         Path out = tmp.resolve("eet-report.xlsx");
-        new XlsxReportWriter(CATALOG, PROFILES).write(report, out);
+        new XlsxReportWriter(CATALOG, PROFILES, EetTemplate.V1_1_3, GenerationUi.WEB).write(report, out);
 
         try (InputStream in = Files.newInputStream(out);
              Workbook wb = new XSSFWorkbook(in)) {

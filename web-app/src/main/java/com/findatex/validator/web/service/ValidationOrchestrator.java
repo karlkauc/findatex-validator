@@ -170,7 +170,11 @@ public class ValidationOrchestrator {
         Path xlsxPath;
         try {
             xlsxPath = Files.createTempFile("findatex-report-", ".xlsx");
-            new XlsxReportWriter(bundle.catalog, bundle.profileSet).write(report, xlsxPath);
+            new XlsxReportWriter(bundle.catalog,
+                    bundle.profileSet,
+                    version,
+                    com.findatex.validator.report.GenerationUi.WEB)
+                    .write(report, xlsxPath);
         } catch (IOException e) {
             throw new WebApplicationException(
                     Response.serverError().entity("Could not write report: " + e.getMessage()).build());

@@ -5,6 +5,7 @@ import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
 import com.findatex.validator.template.tpt.TptRuleSet;
+import com.findatex.validator.template.tpt.TptTemplate;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
 import com.findatex.validator.validation.Finding;
@@ -34,7 +35,7 @@ class XlsxReportWriterTest {
         QualityReport report = buildReportFor("/sample/bad_formats.xlsx");
         Path out = tmp.resolve("report.xlsx");
 
-        new XlsxReportWriter(CATALOG, TptProfiles.ALL).write(report, out);
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.DESKTOP).write(report, out);
 
         assertThat(Files.exists(out)).isTrue();
         assertThat(Files.size(out)).isGreaterThan(2_000);
@@ -96,7 +97,7 @@ class XlsxReportWriterTest {
     void writesAnnotatedSourceWithHighlightsAndComments(@TempDir Path tmp) throws Exception {
         QualityReport report = buildReportFor("/sample/bad_formats.xlsx");
         Path out = tmp.resolve("annotated.xlsx");
-        new XlsxReportWriter(CATALOG, TptProfiles.ALL).write(report, out);
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.DESKTOP).write(report, out);
 
         try (InputStream in = Files.newInputStream(out);
              Workbook wb = new XSSFWorkbook(in)) {
@@ -186,7 +187,7 @@ class XlsxReportWriterTest {
     void scoresAreWrittenAsPercentages(@TempDir Path tmp) throws Exception {
         QualityReport report = buildReportFor("/sample/clean_v7.xlsx");
         Path out = tmp.resolve("scores.xlsx");
-        new XlsxReportWriter(CATALOG, TptProfiles.ALL).write(report, out);
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.DESKTOP).write(report, out);
 
         try (InputStream in = Files.newInputStream(out);
              Workbook wb = new XSSFWorkbook(in)) {

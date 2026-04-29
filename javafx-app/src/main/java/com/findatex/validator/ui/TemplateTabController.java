@@ -409,7 +409,10 @@ public final class TemplateTabController {
         Path target = out.toPath();
         Task<Void> task = new Task<>() {
             @Override protected Void call() throws Exception {
-                new XlsxReportWriter(cat, template.profilesFor(selectedVersion))
+                new XlsxReportWriter(cat,
+                        template.profilesFor(selectedVersion),
+                        selectedVersion,
+                        com.findatex.validator.report.GenerationUi.DESKTOP)
                         .write(currentReport, target);
                 return null;
             }

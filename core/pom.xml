@@ -17,6 +17,25 @@
     <name>FinDatEx Validator (core)</name>
     <description>UI-agnostic validation, scoring, ingest and report logic shared by both the JavaFX desktop UI and the web app.</description>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>META-INF/findatex-validator.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>META-INF/findatex-validator.properties</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.poi</groupId>

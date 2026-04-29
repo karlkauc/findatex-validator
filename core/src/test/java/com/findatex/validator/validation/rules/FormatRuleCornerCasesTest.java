@@ -75,7 +75,7 @@ class FormatRuleCornerCasesTest {
     // -------------------------------------------------------------- ISO_3166
 
     @ParameterizedTest
-    @ValueSource(strings = {"DE", "FR", "US", "GB", "XK", "XL", "XV", "XT", "EU"})
+    @ValueSource(strings = {"DE", "FR", "US", "GB", "XK", "XL", "XV", "XT", "XA", "EU"})
     void countryValidIncludesAdditions(String v) {
         assertNoErrors(countryRule(), v);
     }

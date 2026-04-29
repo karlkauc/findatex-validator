@@ -25,7 +25,9 @@ public final class IsoData {
         ctry.add("XL");
         ctry.add("XV");
         ctry.add("XT");
-        // EU and UK pre-Brexit codes occasionally turn up.
+        // TPT V7 issuer-country closed list adds "XA" (supranational issuers) and "EU"
+        // (European Union institutions) on top of ISO 3166-1 alpha-2.
+        ctry.add("XA");
         ctry.add("EU");
         ctry.add("XK"); // Kosovo
         COUNTRIES = Set.copyOf(ctry);

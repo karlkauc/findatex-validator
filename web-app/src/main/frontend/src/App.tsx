@@ -86,7 +86,7 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <header className="bg-gradient-to-b from-navy-700 to-navy-800 text-white">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-5">
+        <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-6 py-5 lg:px-8">
           <ShieldCheck className="h-7 w-7" aria-hidden="true" />
           <div className="flex-1">
             <h1 className="text-lg font-semibold tracking-tight">FinDatEx Validator</h1>
@@ -118,14 +118,14 @@ export default function App() {
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
       <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
 
-      <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
+      <main className="mx-auto max-w-[1600px] space-y-6 px-6 py-8 lg:px-8">
         {templatesQuery.isLoading && (
           <p className="text-sm text-slate-500">Loading templates…</p>
         )}
         {templatesQuery.isError && <ErrorBanner error={templatesQuery.error} />}
 
         {!templatesQuery.isLoading && !templatesQuery.isError && (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
             <section className="space-y-5">
               <div className="card">
                 <div className="card-header">Input</div>
@@ -223,7 +223,7 @@ export default function App() {
       </main>
 
       <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-4 text-xs text-slate-500">
+        <div className="mx-auto max-w-[1600px] px-6 py-4 text-xs text-slate-500 lg:px-8">
           FinDatEx Validator — Source &amp; Desktop-Build:&nbsp;
           <span className="font-mono">com.findatex/findatex-validator</span>
         </div>

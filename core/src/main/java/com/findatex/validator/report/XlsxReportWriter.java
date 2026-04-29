@@ -12,16 +12,12 @@ import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.FindingContext;
 import com.findatex.validator.validation.Severity;
 import org.apache.poi.ooxml.POIXMLProperties;
-import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -69,12 +65,12 @@ public final class XlsxReportWriter {
     public void write(QualityReport report, Path out) throws IOException {
         try (XSSFWorkbook wb = new XSSFWorkbook();
              OutputStream os = Files.newOutputStream(out)) {
-            CellStyle header = headerStyle(wb);
-            CellStyle pct = percentStyle(wb);
-            CellStyle err = colourStyle(wb, IndexedColors.ROSE.getIndex());
-            CellStyle warn = colourStyle(wb, IndexedColors.LIGHT_YELLOW.getIndex());
-            CellStyle ok = colourStyle(wb, IndexedColors.LIGHT_GREEN.getIndex());
-            CellStyle info = colourStyle(wb, IndexedColors.PALE_BLUE.getIndex());
+            CellStyle header = XlsxStyles.headerStyle(wb);
+            CellStyle pct = XlsxStyles.percentStyle(wb);
+            CellStyle err = XlsxStyles.colourStyle(wb, IndexedColors.ROSE.getIndex());
+            CellStyle warn = XlsxStyles.colourStyle(wb, IndexedColors.LIGHT_YELLOW.getIndex());
+            CellStyle ok = XlsxStyles.colourStyle(wb, IndexedColors.LIGHT_GREEN.getIndex());
+            CellStyle info = XlsxStyles.colourStyle(wb, IndexedColors.PALE_BLUE.getIndex());
 
             applyWorkbookProperties(wb, report);
             writeSummary(wb, report, header, pct);
@@ -166,39 +162,39 @@ public final class XlsxReportWriter {
     private void writeSummary(Workbook wb, QualityReport r, CellStyle header, CellStyle pct) {
         Sheet s = wb.createSheet("Summary");
         int row = 0;
-        addRow(s, row++, header, templateVersion.label() + " Quality Report");
-        addRow(s, row++, null,   "Produced by " + AppInfo.applicationWithVersion());
-        addRow(s, row++, null,   GITHUB_URL);
-        addRow(s, row++, null,   "");
-        addRow(s, row++, null,   "Source file",      r.file().source().toString());
-        addRow(s, row++, null,   "Format",           r.file().inputFormat());
-        addRow(s, row++, null,   "Generated",        r.generatedAt().toString());
-        addRow(s, row++, null,   "Rows",             Integer.toString(r.file().rows().size()));
-        addRow(s, row++, null,   "Mapped fields",    Integer.toString(r.file().headerToNumKey().size()));
-        addRow(s, row++, null,   "Unmapped headers", String.join(", ", r.file().unmappedHeaders()));
-        addRow(s, row++, null,   "Active profiles",
+        XlsxStyles.addRow(s, row++, header, templateVersion.label() + " Quality Report");
+        XlsxStyles.addRow(s, row++, null,   "Produced by " + AppInfo.applicationWithVersion());
+        XlsxStyles.addRow(s, row++, null,   GITHUB_URL);
+        XlsxStyles.addRow(s, row++, null,   "");
+        XlsxStyles.addRow(s, row++, null,   "Source file",      r.file().source().toString());
+        XlsxStyles.addRow(s, row++, null,   "Format",           r.file().inputFormat());
+        XlsxStyles.addRow(s, row++, null,   "Generated",        r.generatedAt().toString());
+        XlsxStyles.addRow(s, row++, null,   "Rows",             Integer.toString(r.file().rows().size()));
+        XlsxStyles.addRow(s, row++, null,   "Mapped fields",    Integer.toString(r.file().headerToNumKey().size()));
+        XlsxStyles.addRow(s, row++, null,   "Unmapped headers", String.join(", ", r.file().unmappedHeaders()));
+        XlsxStyles.addRow(s, row++, null,   "Active profiles",
                 r.activeProfiles().stream().map(ProfileKey::displayName).collect(Collectors.joining(", ")));
         row++;
-        addRow(s, row++, header, "Findings by severity");
+        XlsxStyles.addRow(s, row++, header, "Findings by severity");
         Map<Severity, Long> bySeverity = findingsBySeverity(r);
-        addRow(s, row++, null, "ERROR",   Long.toString(bySeverity.getOrDefault(Severity.ERROR,   0L)));
-        addRow(s, row++, null, "WARNING", Long.toString(bySeverity.getOrDefault(Severity.WARNING, 0L)));
-        addRow(s, row++, null, "INFO",    Long.toString(bySeverity.getOrDefault(Severity.INFO,    0L)));
+        XlsxStyles.addRow(s, row++, null, "ERROR",   Long.toString(bySeverity.getOrDefault(Severity.ERROR,   0L)));
+        XlsxStyles.addRow(s, row++, null, "WARNING", Long.toString(bySeverity.getOrDefault(Severity.WARNING, 0L)));
+        XlsxStyles.addRow(s, row++, null, "INFO",    Long.toString(bySeverity.getOrDefault(Severity.INFO,    0L)));
         row++;
-        addRow(s, row++, header, "Report metadata");
+        XlsxStyles.addRow(s, row++, header, "Report metadata");
         String releaseSuffix = templateVersion.releaseDate() == null
                 ? ""
                 : " (released " + templateVersion.releaseDate() + ")";
-        addRow(s, row++, null, "Template",          templateVersion.label() + releaseSuffix);
-        addRow(s, row++, null, "Validator version", AppInfo.version() + "  (build " + AppInfo.buildTimestamp() + ")");
-        addRow(s, row++, null, "Generation UI",     generationUi.label());
+        XlsxStyles.addRow(s, row++, null, "Template",          templateVersion.label() + releaseSuffix);
+        XlsxStyles.addRow(s, row++, null, "Validator version", AppInfo.version() + "  (build " + AppInfo.buildTimestamp() + ")");
+        XlsxStyles.addRow(s, row++, null, "Generation UI",     generationUi.label());
         for (int c = 0; c < 3; c++) s.autoSizeColumn(c);
     }
 
     private static void writeScores(Workbook wb, QualityReport r, CellStyle header, CellStyle pct) {
         Sheet s = wb.createSheet("Scores");
         int row = 0;
-        addRow(s, row++, header, "Category", "Score");
+        XlsxStyles.addRow(s, row++, header, "Category", "Score");
         for (Map.Entry<ScoreCategory, Double> e : r.scores().entrySet()) {
             Row rr = s.createRow(row++);
             rr.createCell(0).setCellValue(e.getKey().name());
@@ -207,8 +203,8 @@ public final class XlsxReportWriter {
             c.setCellStyle(pct);
         }
         row++;
-        addRow(s, row++, header, "Per-profile scores");
-        addRow(s, row++, header, "Profile", "Category", "Score");
+        XlsxStyles.addRow(s, row++, header, "Per-profile scores");
+        XlsxStyles.addRow(s, row++, header, "Profile", "Category", "Score");
         for (Map.Entry<ProfileKey, Map<ScoreCategory, Double>> pe : r.perProfileScores().entrySet()) {
             for (Map.Entry<ScoreCategory, Double> ce : pe.getValue().entrySet()) {
                 Row rr = s.createRow(row++);
@@ -226,7 +222,7 @@ public final class XlsxReportWriter {
                                       CellStyle header, CellStyle err, CellStyle warn) {
         Sheet s = wb.createSheet("Findings");
         int row = 0;
-        addRow(s, row++, header,
+        XlsxStyles.addRow(s, row++, header,
                 "Severity", "Profile", "Rule",
                 "Fund ID", "Fund name", "Valuation date",
                 "Field#", "Field name", "Row", "Instrument code", "Instrument name",
@@ -275,7 +271,7 @@ public final class XlsxReportWriter {
         headers.add("Present");
         headers.add("Missing");
         headers.add("Invalid");
-        addRow(s, row++, header, headers.toArray(new String[0]));
+        XlsxStyles.addRow(s, row++, header, headers.toArray(new String[0]));
 
         Map<String, long[]> byField = new HashMap<>(); // numKey -> [present, missing, invalid]
         for (FieldSpec spec : catalog.fields()) byField.put(spec.numKey(), new long[3]);
@@ -326,7 +322,7 @@ public final class XlsxReportWriter {
             else if (f.severity() == Severity.WARNING) arr[1]++;
         }
         int row = 0;
-        addRow(s, row++, header, "Row", "Errors", "Warnings", "Status");
+        XlsxStyles.addRow(s, row++, header, "Row", "Errors", "Warnings", "Status");
         for (TptRow tr : r.file().rows()) {
             long[] arr = byRow.getOrDefault(tr.rowIndex(), new long[2]);
             Row rr = s.createRow(row++);
@@ -347,40 +343,6 @@ public final class XlsxReportWriter {
         }
         s.createFreezePane(0, 1);
         for (int c = 0; c < 4; c++) s.autoSizeColumn(c);
-    }
-
-    private static void addRow(Sheet s, int rowIdx, CellStyle style, String... values) {
-        Row r = s.createRow(rowIdx);
-        for (int c = 0; c < values.length; c++) {
-            org.apache.poi.ss.usermodel.Cell cell = r.createCell(c);
-            cell.setCellValue(values[c]);
-            if (style != null) cell.setCellStyle(style);
-        }
-    }
-
-    private static CellStyle headerStyle(Workbook wb) {
-        CellStyle s = wb.createCellStyle();
-        Font f = wb.createFont();
-        f.setBold(true);
-        s.setFont(f);
-        s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        s.setBorderBottom(BorderStyle.THIN);
-        s.setAlignment(HorizontalAlignment.LEFT);
-        return s;
-    }
-
-    private static CellStyle percentStyle(Workbook wb) {
-        CellStyle s = wb.createCellStyle();
-        s.setDataFormat(wb.createDataFormat().getFormat("0.00%"));
-        return s;
-    }
-
-    private static CellStyle colourStyle(Workbook wb, short colour) {
-        CellStyle s = wb.createCellStyle();
-        s.setFillForegroundColor(colour);
-        s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        return s;
     }
 
     // --- Annotated Source tab -------------------------------------------------

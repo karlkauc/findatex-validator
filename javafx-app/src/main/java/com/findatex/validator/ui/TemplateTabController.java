@@ -143,6 +143,7 @@ public final class TemplateTabController {
     @FXML private MenuButton exportMenu;
     @FXML private MenuItem exportPerFileItem;
     @FXML private MenuItem exportCombinedItem;
+    @FXML private MenuItem exportCombinedWithSourceItem;
     @FXML private ProgressIndicator progress;
     @FXML private Label statusLabel;
 
@@ -320,6 +321,7 @@ public final class TemplateTabController {
 
         // Combined export only makes sense in batch mode; per-file works in both.
         exportCombinedItem.setDisable(true);
+        exportCombinedWithSourceItem.setDisable(true);
     }
 
     private void updateVersionDateLabel() {
@@ -398,6 +400,7 @@ public final class TemplateTabController {
         batchModeLabel.setManaged(false);
         batchModeLabel.setVisible(false);
         exportCombinedItem.setDisable(true);
+        exportCombinedWithSourceItem.setDisable(true);
     }
 
     @FXML
@@ -505,6 +508,7 @@ public final class TemplateTabController {
             validateButton.setDisable(false);
             exportMenu.setDisable(false);
             exportCombinedItem.setDisable(true);   // not meaningful for one file
+            exportCombinedWithSourceItem.setDisable(true);
             statusLabel.setText("Validation complete: " + report.findings().size()
                     + " finding(s), " + report.file().rows().size() + " row(s).");
         });
@@ -602,8 +606,10 @@ public final class TemplateTabController {
             currentReport = null;
             progress.setVisible(false);
             validateButton.setDisable(false);
-            exportMenu.setDisable(summary.results().stream().noneMatch(r -> r.status() == BatchFileStatus.OK));
+            boolean hasOk = summary.results().stream().anyMatch(r -> r.status() == BatchFileStatus.OK);
+            exportMenu.setDisable(!hasOk);
             exportCombinedItem.setDisable(false);
+            exportCombinedWithSourceItem.setDisable(!hasOk);
             renderBatchHeader(summary);
             // Auto-select first OK row to populate the detail panes; leaving the table
             // selection-less also leaves scorePane and findings empty, which is confusing.
@@ -706,13 +712,26 @@ public final class TemplateTabController {
 
     @FXML
     private void onExportCombined(ActionEvent e) {
+        doExportCombined(false);
+    }
+
+    @FXML
+    private void onExportCombinedWithSource(ActionEvent e) {
+        doExportCombined(true);
+    }
+
+    private void doExportCombined(boolean withAnnotatedSource) {
         SpecCatalog cat = catalog();
         if (cat == null || currentBatch == null) return;
         FileChooser fc = new FileChooser();
-        fc.setTitle("Export combined report");
+        fc.setTitle(withAnnotatedSource
+                ? "Export combined report (with annotated source)"
+                : "Export combined report");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel workbook", "*.xlsx"));
-        String defaultName = batchFolder == null ? "combined.report.xlsx"
-                : batchFolder.getFileName() + ".combined.report.xlsx";
+        String suffix = withAnnotatedSource ? ".annotated.combined.report.xlsx" : ".combined.report.xlsx";
+        String defaultName = batchFolder == null
+                ? (withAnnotatedSource ? "annotated.combined.report.xlsx" : "combined.report.xlsx")
+                : batchFolder.getFileName() + suffix;
         fc.setInitialFileName(defaultName);
         File out = fc.showSaveDialog(stage);
         if (out == null) return;
@@ -722,11 +741,14 @@ public final class TemplateTabController {
                 new CombinedXlsxReportWriter(cat,
                         template.profilesFor(selectedVersion),
                         selectedVersion, GenerationUi.DESKTOP)
-                        .write(currentBatch, target);
+                        .write(currentBatch, target, withAnnotatedSource);
                 return null;
             }
         };
-        task.setOnSucceeded(ev -> statusLabel.setText("Combined report exported: " + target.getFileName()));
+        String successMsg = withAnnotatedSource
+                ? "Combined report (with annotated source) exported: "
+                : "Combined report exported: ";
+        task.setOnSucceeded(ev -> statusLabel.setText(successMsg + target.getFileName()));
         task.setOnFailed(ev -> reportExportFailure(task.getException()));
         new Thread(task, template.id() + "-export-combined").start();
     }

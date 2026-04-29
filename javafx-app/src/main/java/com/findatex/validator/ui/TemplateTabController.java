@@ -63,6 +63,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -82,6 +83,35 @@ public final class TemplateTabController {
 
     private static final Logger log = LoggerFactory.getLogger(TemplateTabController.class);
     private static final int FLAT_FINDINGS_DISPLAY_CAP = 10_000;
+
+    /**
+     * Sorts string-typed numeric columns by parsed value. Tolerates the {@code "—"} placeholder,
+     * trailing {@code %}, and the {@code "123 ms"} / {@code "1.5s"} time formats. Unparseable
+     * values sort lowest, alongside blanks and placeholders.
+     */
+    private static final Comparator<String> NUMERIC_STRING =
+            Comparator.comparingDouble(TemplateTabController::parseNumeric);
+
+    private static double parseNumeric(String s) {
+        if (s == null) return Double.NEGATIVE_INFINITY;
+        String t = s.trim();
+        if (t.isEmpty() || "—".equals(t) || "-".equals(t)) return Double.NEGATIVE_INFINITY;
+        if (t.endsWith("ms")) return tryParse(t.substring(0, t.length() - 2));
+        if (t.endsWith("s")) {
+            double sec = tryParse(t.substring(0, t.length() - 1));
+            return sec == Double.NEGATIVE_INFINITY ? sec : sec * 1000.0;
+        }
+        if (t.endsWith("%")) return tryParse(t.substring(0, t.length() - 1));
+        return tryParse(t);
+    }
+
+    private static double tryParse(String s) {
+        try {
+            return Double.parseDouble(s.trim().replace(",", "."));
+        } catch (NumberFormatException ignored) {
+            return Double.NEGATIVE_INFINITY;
+        }
+    }
 
     private final TemplateDefinition template;
     private TemplateVersion selectedVersion;
@@ -236,6 +266,12 @@ public final class TemplateTabController {
         colFieldName.setCellValueFactory(new PropertyValueFactory<>("fieldName"));
         colMessage.setCellValueFactory(new PropertyValueFactory<>("message"));
 
+        // Cells render formatted strings ("100%", "1.5s", "—") but the underlying values are
+        // numeric — sort by parsed value, not lexicographically.
+        colRow.setComparator(NUMERIC_STRING);
+        colField.setComparator(NUMERIC_STRING);
+        colWeight.setComparator(NUMERIC_STRING);
+
         filteredFindings = new FilteredList<>(allFindings, fr -> true);
         findingsTable.setItems(filteredFindings);
 
@@ -255,6 +291,13 @@ public final class TemplateTabController {
         colFileInfos.setCellValueFactory(new PropertyValueFactory<>("infos"));
         colFileRows.setCellValueFactory(new PropertyValueFactory<>("rows"));
         colFileTime.setCellValueFactory(new PropertyValueFactory<>("time"));
+
+        colFileScore.setComparator(NUMERIC_STRING);
+        colFileErrors.setComparator(NUMERIC_STRING);
+        colFileWarnings.setComparator(NUMERIC_STRING);
+        colFileInfos.setComparator(NUMERIC_STRING);
+        colFileRows.setComparator(NUMERIC_STRING);
+        colFileTime.setComparator(NUMERIC_STRING);
         filesTable.setItems(fileRows);
         filesTable.setRowFactory(tv -> new TableRow<>() {
             @Override protected void updateItem(FileRow item, boolean empty) {

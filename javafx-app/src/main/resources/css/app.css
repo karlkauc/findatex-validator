@@ -78,3 +78,106 @@
 .severity-error { -fx-text-fill: #b00020; -fx-font-weight: bold; }
 .severity-warn  { -fx-text-fill: #b07a00; -fx-font-weight: bold; }
 .severity-info  { -fx-text-fill: #1f6feb; }
+
+/* ===== Progress dialog ================================================= */
+
+.progress-dialog {
+    -fx-background-color: #f3f5f8;
+}
+
+.progress-dialog-header {
+    -fx-background-color: linear-gradient(to bottom, #1f3550, #173049);
+    -fx-padding: 14 18 12 18;
+}
+
+.progress-dialog-title {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.progress-dialog-subtitle {
+    -fx-text-fill: #c8d6e6;
+    -fx-font-size: 11px;
+}
+
+.progress-dialog-body {
+    -fx-padding: 14 16 14 16;
+    -fx-spacing: 10;
+}
+
+.progress-card {
+    -fx-background-color: white;
+    -fx-background-radius: 6;
+    -fx-border-color: #d6dde6;
+    -fx-border-radius: 6;
+    -fx-padding: 10 12 10 12;
+    -fx-spacing: 6;
+}
+
+.progress-card .card-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f3550;
+}
+
+.progress-card .card-counter {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6a7785;
+    -fx-font-family: "Menlo", "Consolas", monospace;
+}
+
+.progress-card .card-detail {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6a7785;
+    -fx-font-style: italic;
+}
+
+.progress-card .progress-bar {
+    -fx-pref-height: 10px;
+}
+
+.progress-card .progress-bar > .track {
+    -fx-background-color: #e6ebf1;
+    -fx-background-radius: 5;
+    -fx-background-insets: 0;
+}
+
+.progress-card .progress-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #1f6feb, #5396ff);
+    -fx-background-radius: 5;
+    -fx-background-insets: 0;
+    -fx-padding: 5;
+}
+
+.progress-cache-line {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6a7785;
+    -fx-padding: 0 2 0 2;
+}
+
+.progress-dialog-footer {
+    -fx-padding: 10 16 14 16;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d6dde6 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.cancel-button {
+    -fx-background-color: white;
+    -fx-text-fill: #1f3550;
+    -fx-border-color: #b6c2d0;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 5 16 5 16;
+    -fx-font-weight: bold;
+}
+
+.cancel-button:hover {
+    -fx-background-color: #f0f3f7;
+}
+
+.cancel-button:disabled {
+    -fx-text-fill: #9aa6b3;
+    -fx-border-color: #dde2e8;
+}

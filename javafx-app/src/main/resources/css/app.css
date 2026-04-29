@@ -68,6 +68,13 @@
 .score-warn   { -fx-text-fill: #b07a00; }
 .score-poor   { -fx-text-fill: #b00020; }
 
+.table-row-cell.file-row-error {
+    -fx-background-color: #fdecea;
+}
+.table-row-cell.file-row-error:selected {
+    -fx-background-color: #f5b6ad;
+}
+
 .severity-error { -fx-text-fill: #b00020; -fx-font-weight: bold; }
 .severity-warn  { -fx-text-fill: #b07a00; -fx-font-weight: bold; }
 .severity-info  { -fx-text-fill: #1f6feb; }

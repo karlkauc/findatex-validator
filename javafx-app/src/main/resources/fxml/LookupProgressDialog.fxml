@@ -1,21 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.findatex.validator.ui.LookupProgressController"
-      spacing="10" prefWidth="480">
-  <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
-  <Label fx:id="phaseLabel" text="Local validation: complete"/>
-  <Label fx:id="batchLabel" text="" managed="false" visible="false"/>
-  <ProgressBar fx:id="batchBar" prefWidth="450" progress="0" managed="false" visible="false"/>
-  <Label fx:id="gleifLabel" text="GLEIF lookup: 0/0"/>
-  <ProgressBar fx:id="gleifBar" prefWidth="450" progress="0"/>
-  <Label fx:id="figiLabel"  text="OpenFIGI lookup: 0/0"/>
-  <ProgressBar fx:id="figiBar"  prefWidth="450" progress="0"/>
-  <Label fx:id="cacheLabel" text=""/>
-  <HBox alignment="CENTER_RIGHT">
-    <Button fx:id="cancelButton" text="Cancel" onAction="#onCancel"/>
+      styleClass="progress-dialog" prefWidth="520" stylesheets="@/css/app.css">
+
+  <!-- Header -->
+  <VBox styleClass="progress-dialog-header" spacing="2">
+    <Label fx:id="phaseLabel" text="Local validation" styleClass="progress-dialog-title"/>
+    <Label fx:id="subtitleLabel" text="Working…" styleClass="progress-dialog-subtitle"/>
+  </VBox>
+
+  <!-- Body -->
+  <VBox styleClass="progress-dialog-body">
+
+    <!-- Files (folder mode only) -->
+    <VBox fx:id="batchCard" styleClass="progress-card" managed="false" visible="false">
+      <HBox alignment="CENTER_LEFT">
+        <Label text="Files" styleClass="card-title"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="batchCounter" text="0/0" styleClass="card-counter"/>
+      </HBox>
+      <ProgressBar fx:id="batchBar" maxWidth="Infinity" progress="0"/>
+      <Label fx:id="batchLabel" text="" styleClass="card-detail"/>
+    </VBox>
+
+    <!-- GLEIF -->
+    <VBox fx:id="gleifCard" styleClass="progress-card">
+      <HBox alignment="CENTER_LEFT">
+        <Label text="GLEIF lookup" styleClass="card-title"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="gleifLabel" text="0/0" styleClass="card-counter"/>
+      </HBox>
+      <ProgressBar fx:id="gleifBar" maxWidth="Infinity" progress="0"/>
+    </VBox>
+
+    <!-- OpenFIGI -->
+    <VBox fx:id="figiCard" styleClass="progress-card">
+      <HBox alignment="CENTER_LEFT">
+        <Label text="OpenFIGI lookup" styleClass="card-title"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="figiLabel" text="0/0" styleClass="card-counter"/>
+      </HBox>
+      <ProgressBar fx:id="figiBar" maxWidth="Infinity" progress="0"/>
+    </VBox>
+
+    <Label fx:id="cacheLabel" text="" styleClass="progress-cache-line"/>
+  </VBox>
+
+  <!-- Footer -->
+  <HBox alignment="CENTER_RIGHT" styleClass="progress-dialog-footer">
+    <Button fx:id="cancelButton" text="Cancel" onAction="#onCancel" styleClass="cancel-button"/>
   </HBox>
 </VBox>

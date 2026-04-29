@@ -6,12 +6,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public final class LookupProgressController {
 
-    @FXML private Label phaseLabel, batchLabel, gleifLabel, figiLabel, cacheLabel;
+    @FXML private Label phaseLabel, subtitleLabel,
+                        batchCounter, batchLabel,
+                        gleifLabel, figiLabel, cacheLabel;
     @FXML private ProgressBar batchBar, gleifBar, figiBar;
+    @FXML private VBox batchCard, gleifCard, figiCard;
     @FXML private Button cancelButton;
 
     private volatile boolean cancelled;
@@ -24,13 +28,24 @@ public final class LookupProgressController {
     /** Show or hide the batch-level "Files: x/N" controls. Single-file callers leave this off. */
     public void setBatchMode(boolean enabled) {
         Platform.runLater(() -> {
-            batchLabel.setManaged(enabled);
-            batchLabel.setVisible(enabled);
-            batchBar.setManaged(enabled);
-            batchBar.setVisible(enabled);
+            batchCard.setManaged(enabled);
+            batchCard.setVisible(enabled);
             if (enabled) {
                 phaseLabel.setText("Folder validation");
+                subtitleLabel.setText("Validating files in selected folder");
             }
+        });
+    }
+
+    /** Show or hide the GLEIF/OpenFIGI/cache rows. Off when external validation is disabled. */
+    public void setExternalMode(boolean enabled) {
+        Platform.runLater(() -> {
+            gleifCard.setManaged(enabled);
+            gleifCard.setVisible(enabled);
+            figiCard.setManaged(enabled);
+            figiCard.setVisible(enabled);
+            cacheLabel.setManaged(enabled);
+            cacheLabel.setVisible(enabled);
         });
     }
 
@@ -42,12 +57,16 @@ public final class LookupProgressController {
             int total = p.filesTotal();
             String fileName = p.currentFileName() == null ? "" : p.currentFileName();
             String phase = phaseLabel(p.phase());
-            String prefix = total == 0 ? "" : "Files: " + done + "/" + total;
-            String label = fileName.isEmpty()
-                    ? prefix + (phase.isEmpty() ? "" : " — " + phase)
-                    : prefix + " — " + fileName + (phase.isEmpty() ? "" : " (" + phase + ")");
-            batchLabel.setText(label);
+            batchCounter.setText(total == 0 ? "—" : done + "/" + total);
+            String detail = fileName.isEmpty()
+                    ? phase
+                    : (phase.isEmpty() ? fileName : fileName + " — " + phase);
+            batchLabel.setText(detail);
             batchBar.setProgress(total == 0 ? 1 : (double) done / total);
+            subtitleLabel.setText(total == 0
+                    ? "Preparing…"
+                    : "Processed " + done + " of " + total + " file(s)"
+                      + (phase.isEmpty() ? "" : " — " + phase));
         });
     }
 
@@ -56,7 +75,7 @@ public final class LookupProgressController {
         return switch (phase) {
             case LOADING -> "loading";
             case VALIDATING -> "validating";
-            case EXTERNAL -> "external";
+            case EXTERNAL -> "external lookup";
             case SCORING -> "scoring";
             case DONE -> "done";
         };
@@ -66,9 +85,9 @@ public final class LookupProgressController {
                        int figiDone,  int figiTotal,
                        int cacheHits, int cacheTotal) {
         Platform.runLater(() -> {
-            gleifLabel.setText("GLEIF lookup: " + gleifDone + "/" + gleifTotal);
+            gleifLabel.setText(gleifDone + "/" + gleifTotal);
             gleifBar.setProgress(gleifTotal == 0 ? 1 : (double) gleifDone / gleifTotal);
-            figiLabel.setText("OpenFIGI lookup: " + figiDone + "/" + figiTotal);
+            figiLabel.setText(figiDone + "/" + figiTotal);
             figiBar.setProgress(figiTotal == 0 ? 1 : (double) figiDone / figiTotal);
             int pct = cacheTotal == 0 ? 0 : 100 * cacheHits / cacheTotal;
             cacheLabel.setText("Cache hits: " + cacheHits + " / " + cacheTotal + " (" + pct + "%)");
@@ -78,5 +97,10 @@ public final class LookupProgressController {
     public void close() { Platform.runLater(() -> { if (stage != null) stage.close(); }); }
 
     @FXML
-    private void onCancel() { cancelled = true; cancelButton.setDisable(true); }
+    private void onCancel() {
+        cancelled = true;
+        cancelButton.setDisable(true);
+        cancelButton.setText("Cancelling…");
+        subtitleLabel.setText("Cancelling — finishing current file…");
+    }
 }

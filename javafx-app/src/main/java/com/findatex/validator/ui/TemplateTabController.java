@@ -522,6 +522,7 @@ public final class TemplateTabController {
             progressStage.setTitle("Folder validation");
             progressStage.setScene(new Scene(pRoot));
             progressController.setBatchMode(true);
+            progressController.setExternalMode(externalActive);
         } catch (Exception ex) {
             log.warn("Could not load progress dialog: {}", ex.getMessage());
         }

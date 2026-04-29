@@ -13,12 +13,17 @@ import com.findatex.validator.template.api.TemplateVersion;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.FindingContext;
 import com.findatex.validator.validation.Severity;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Hyperlink;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
@@ -26,11 +31,14 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalDouble;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -45,8 +53,10 @@ import java.util.stream.Collectors;
  *   <li><b>Skipped / Failed Files</b> — only present when the run includes non-OK results</li>
  * </ol>
  *
- * <p>The Annotated Source tab is intentionally not produced in the combined report — keeping
- * every source workbook in memory across a large batch would be prohibitive.
+ * <p>An optional per-file <b>Annotated Source</b> tab can be appended for every OK file via
+ * {@link #write(BatchSummary, Path, boolean)} — opt-in, since the resulting workbook can grow
+ * substantially. The {@code File} cells in {@code Batch Summary} link directly to the
+ * corresponding sheet when this option is enabled.
  */
 public final class CombinedXlsxReportWriter {
 
@@ -66,16 +76,26 @@ public final class CombinedXlsxReportWriter {
     }
 
     public void write(BatchSummary summary, Path out) throws IOException {
+        write(summary, out, false);
+    }
+
+    public void write(BatchSummary summary, Path out, boolean includeAnnotatedSourcePerFile) throws IOException {
         try (XSSFWorkbook wb = new XSSFWorkbook();
              OutputStream os = Files.newOutputStream(out)) {
             CellStyle header = XlsxStyles.headerStyle(wb);
             CellStyle pct = XlsxStyles.percentStyle(wb);
             CellStyle err = XlsxStyles.colourStyle(wb, IndexedColors.ROSE.getIndex());
             CellStyle warn = XlsxStyles.colourStyle(wb, IndexedColors.LIGHT_YELLOW.getIndex());
+            CellStyle info = XlsxStyles.colourStyle(wb, IndexedColors.PALE_BLUE.getIndex());
+            CellStyle linkStyle = hyperlinkStyle(wb);
 
             wb.getProperties().getCustomProperties()
                     .addProperty("Generation-UI", generationUi.label());
-            writeBatchSummary(wb, summary, header, pct);
+
+            Map<BatchResult, String> annotatedSheetNames =
+                    includeAnnotatedSourcePerFile ? planAnnotatedSheetNames(summary) : Map.of();
+
+            writeBatchSummary(wb, summary, header, pct, linkStyle, annotatedSheetNames);
             writeAllFindings(wb, summary, header, err, warn);
             writeAggregateFieldCoverage(wb, summary, header);
             writePerFileScores(wb, summary, header, pct);
@@ -83,13 +103,67 @@ public final class CombinedXlsxReportWriter {
                     .anyMatch(r -> r.status() != BatchFileStatus.OK);
             if (hasFailures) writeSkippedOrFailed(wb, summary, header);
 
+            if (includeAnnotatedSourcePerFile) {
+                for (BatchResult r : summary.results()) {
+                    String sheetName = annotatedSheetNames.get(r);
+                    if (sheetName == null) continue;
+                    Sheet sheet = wb.createSheet(sheetName);
+                    AnnotatedSourceSheetWriter.write(sheet, r.report(), header, err, warn, info);
+                }
+            }
+
             wb.write(os);
         }
     }
 
+    private static Map<BatchResult, String> planAnnotatedSheetNames(BatchSummary summary) {
+        // Excel sheet names: max 31 chars, no `: \ / ? * [ ]`, case-insensitive unique.
+        Set<String> taken = new HashSet<>();
+        // Pre-seed with the names of the workbook's base sheets to avoid collisions.
+        for (String reserved : List.of(
+                "Batch Summary", "All Findings", "Aggregate Field Coverage",
+                "Per-File Scores", "Skipped or Failed Files")) {
+            taken.add(reserved.toLowerCase(Locale.ROOT));
+        }
+        Map<BatchResult, String> out = new LinkedHashMap<>();
+        for (BatchResult r : summary.results()) {
+            if (r.status() != BatchFileStatus.OK || r.file() == null || r.report() == null) continue;
+            out.put(r, safeSheetName(r.displayName(), taken));
+        }
+        return out;
+    }
+
+    private static String safeSheetName(String displayName, Set<String> taken) {
+        String base = displayName == null ? "file" : displayName;
+        base = base.replaceAll("[\\\\/?*\\[\\]:]", "_");
+        if (base.length() > 31) base = base.substring(0, 31);
+        if (base.isEmpty()) base = "file";
+        String name = base;
+        int n = 2;
+        while (taken.contains(name.toLowerCase(Locale.ROOT))) {
+            String suffix = " ~" + n++;
+            int cut = Math.min(base.length(), 31 - suffix.length());
+            name = base.substring(0, cut) + suffix;
+        }
+        taken.add(name.toLowerCase(Locale.ROOT));
+        return name;
+    }
+
+    private static CellStyle hyperlinkStyle(Workbook wb) {
+        CellStyle style = wb.createCellStyle();
+        Font font = wb.createFont();
+        font.setUnderline(Font.U_SINGLE);
+        font.setColor(IndexedColors.BLUE.getIndex());
+        style.setFont(font);
+        return style;
+    }
+
     private void writeBatchSummary(XSSFWorkbook wb, BatchSummary s,
-                                   CellStyle header, CellStyle pct) {
+                                   CellStyle header, CellStyle pct,
+                                   CellStyle linkStyle,
+                                   Map<BatchResult, String> annotatedSheetNames) {
         Sheet sheet = wb.createSheet("Batch Summary");
+        CreationHelper helper = wb.getCreationHelper();
         int row = 0;
         XlsxStyles.addRow(sheet, row++, header,
                 AppInfo.applicationName() + " — " + templateVersion.label() + " Batch Quality Report");
@@ -140,7 +214,15 @@ public final class CombinedXlsxReportWriter {
         for (BatchResult r : s.results()) {
             Row rr = sheet.createRow(row++);
             int col = 0;
-            rr.createCell(col++).setCellValue(r.displayName());
+            Cell fileCell = rr.createCell(col++);
+            fileCell.setCellValue(r.displayName());
+            String linkedSheet = annotatedSheetNames.get(r);
+            if (linkedSheet != null) {
+                Hyperlink h = helper.createHyperlink(HyperlinkType.DOCUMENT);
+                h.setAddress("'" + linkedSheet + "'!A1");
+                fileCell.setHyperlink(h);
+                fileCell.setCellStyle(linkStyle);
+            }
             rr.createCell(col++).setCellValue(r.status().name());
             if (r.status() == BatchFileStatus.OK && r.report() != null) {
                 rr.createCell(col++).setCellValue(r.file().rows().size());

@@ -53,6 +53,8 @@
                               onAction="#onExportPerFile"/>
                     <MenuItem text="Kombinierten Report exportieren..." fx:id="exportCombinedItem"
                               onAction="#onExportCombined"/>
+                    <MenuItem text="Kombinierten Report mit Annotated Source..." fx:id="exportCombinedWithSourceItem"
+                              onAction="#onExportCombinedWithSource"/>
                 </items>
             </MenuButton>
             <ProgressIndicator fx:id="progress" visible="false" prefHeight="22" prefWidth="22"/>

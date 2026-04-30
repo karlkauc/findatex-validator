@@ -7,6 +7,8 @@ REM   APP_VERSION    Installer version (default 1.0.0). Must be numeric.
 REM   APP_VENDOR     Vendor (default "Karl Kauc").
 REM   APP_NAME       Display name (default "FinDatEx Validator").
 REM   PACKAGE_TYPE   "msi" (default) or "app-image" for the no-admin .zip path.
+REM   JAVA_OPTIONS   JVM flags baked into the launcher (default:
+REM                  "-Xms512m -Xmx8g -XX:+UseG1GC -XX:MaxMetaspaceSize=512m").
 REM
 REM The shaded jar already contains JavaFX classes + native libraries, so we
 REM only enumerate JDK modules via jdeps for jlink. No --module-path javafx.*.
@@ -20,6 +22,11 @@ if "%APP_NAME%"==""    set "APP_NAME=FinDatEx Validator"
 if "%APP_VERSION%"=="" set "APP_VERSION=1.0.0"
 if "%APP_VENDOR%"==""  set "APP_VENDOR=Karl Kauc"
 if "%PACKAGE_TYPE%"=="" set "PACKAGE_TYPE=msi"
+if "%JAVA_OPTIONS%"=="" set "JAVA_OPTIONS=-Xms512m -Xmx8g -XX:+UseG1GC -XX:MaxMetaspaceSize=512m"
+
+REM Expand each space-separated flag into its own --java-options arg.
+set "JAVA_OPTION_ARGS="
+for %%O in (%JAVA_OPTIONS%) do set "JAVA_OPTION_ARGS=!JAVA_OPTION_ARGS! --java-options %%O"
 
 set "SHADED_JAR=%TARGET_DIR%\findatex-validator-javafx-1.0.0-shaded.jar"
 
@@ -59,7 +66,8 @@ for /f "usebackq delims=" %%M in (`jdeps --multi-release 21 --ignore-missing-dep
 if "!ADD_MODULES!"=="" set "ADD_MODULES=java.base,java.desktop,java.naming,java.net.http,java.scripting,java.security.jgss,java.sql,java.xml,java.xml.crypto,java.logging,java.management,jdk.crypto.ec,jdk.jfr,jdk.unsupported"
 
 echo Building %PACKAGE_TYPE% for Windows - version %APP_VERSION%, vendor "%APP_VENDOR%"
-echo   add-modules: !ADD_MODULES!
+echo   add-modules:  !ADD_MODULES!
+echo   java-options: %JAVA_OPTIONS%
 
 jpackage ^
   --type %PACKAGE_TYPE% ^
@@ -71,6 +79,7 @@ jpackage ^
   --main-jar "findatex-validator-javafx-1.0.0-shaded.jar" ^
   --main-class com.findatex.validator.AppLauncher ^
   --add-modules !ADD_MODULES! ^
+  !JAVA_OPTION_ARGS! ^
   %ICON_ARG% ^
   %INSTALLER_FLAGS% ^
   --dest "%OUT_DIR%"

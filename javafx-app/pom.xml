@@ -64,6 +64,15 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>${main.class}</mainClass>
+                    <options>
+                        <!-- Batch-Mode kann hunderte XLSX-Dateien gleichzeitig im Heap halten
+                             (TptFile + Findings + QualityReport pro Datei für den kombinierten
+                             Report). 8 GiB sind großzügig für 800 Dateien dimensioniert. -->
+                        <option>-Xms512m</option>
+                        <option>-Xmx8g</option>
+                        <option>-XX:+UseG1GC</option>
+                        <option>-XX:MaxMetaspaceSize=512m</option>
+                    </options>
                 </configuration>
             </plugin>
 

@@ -13,6 +13,8 @@ import com.findatex.validator.validation.rules.FormatRule;
 import com.findatex.validator.validation.rules.PresenceRule;
 import com.findatex.validator.validation.rules.crossfield.ConditionalAnyFieldPresenceRule;
 import com.findatex.validator.validation.rules.crossfield.ConditionalAnyOfRequirement;
+import com.findatex.validator.validation.rules.crossfield.ConditionalAnySourceFieldPresenceRule;
+import com.findatex.validator.validation.rules.crossfield.ConditionalAnySourceRequirement;
 import com.findatex.validator.validation.rules.crossfield.ConditionalFieldAbsenceRule;
 import com.findatex.validator.validation.rules.crossfield.ConditionalFieldPresenceRule;
 import com.findatex.validator.validation.rules.crossfield.ConditionalRequirement;
@@ -75,7 +77,40 @@ public final class EetRuleSet implements TemplateRuleSet {
             // social objective (field 48) is required.
             new ConditionalRequirement("EET-XF-ART9-MIN-SOC",
                     "27", FieldPredicate.EqualsAny.of("9"),
-                    "48", Severity.ERROR)
+                    "48", Severity.ERROR),
+
+            // SFDR Article 9 product → carbon-reduction objective flag (NUM=80,
+            // 20570_..._Reduction_In_Carbon_Emission) must be present. Severity =
+            // WARNING: the spec text "Conditional to product being art 9" is paired
+            // with "Could be fulfilled for art 8", so a hard ERROR would over-constrain
+            // Art-8 funds that legitimately leave this blank. PENDING SME SIGN-OFF
+            // for promotion to ERROR — see docs/EET_AUDIT_V113.md §3.
+            new ConditionalRequirement("EET-XF-ART9-PARIS-DECARB-80",
+                    "27", FieldPredicate.EqualsAny.of("9"),
+                    "80", Severity.WARNING),
+
+            // SFDR Article 9 product → Paris-Agreement-aligned flag (NUM=81,
+            // 20580_..._Aligned_With_Paris_Agreement) must be present. Same
+            // WARNING rationale as NUM=80. PENDING SME SIGN-OFF.
+            new ConditionalRequirement("EET-XF-ART9-PARIS-DECARB-81",
+                    "27", FieldPredicate.EqualsAny.of("9"),
+                    "81", Severity.WARNING),
+
+            // Country-list gating: NUM 615 (100000_List_Of_Countries_Subject_To_Social_Violations)
+            // is "Blank if none; conditional to 31210 > 0". Source NUM=225
+            // (31210_..._Number_Of_Countries_..._Value, Integer count) > 0 → target required.
+            // Severity = ERROR — the spec text is unambiguous (no softening clause).
+            new ConditionalRequirement("EET-XF-COUNTRYLIST-615",
+                    "225", FieldPredicate.GreaterThan.of(0.0),
+                    "615", Severity.ERROR),
+
+            // Country-list gating, eligible-assets variant: NUM 616
+            // (100010_List_Of_Invested_Countries) is "Blank if none; conditional to 31240 > 0".
+            // Source NUM=228 (31240_..._Eligible_Assets, floating decimal proportion) > 0 →
+            // target required. Severity = ERROR (no softening clause).
+            new ConditionalRequirement("EET-XF-COUNTRYLIST-616",
+                    "228", FieldPredicate.GreaterThan.of(0.0),
+                    "616", Severity.ERROR)
     );
 
     /**
@@ -122,6 +157,24 @@ public final class EetRuleSet implements TemplateRuleSet {
             List.of("46", "47"), Severity.WARNING);
 
     /**
+     * Pre-Contractual Disclosure for Multi-Option Products gating: when NUM=27
+     * (SFDR product type, {@code 20040_...}) OR NUM=28 (eligibility,
+     * {@code 20050_...}) is "8" or "9", the PCDFP link (NUM=35) and its
+     * production date (NUM=36) must be present. Comment text is identical in
+     * V1.1.2 and V1.1.3 (V1.1.3 only added a C-flag in {@code SFDR_PRECONTRACT});
+     * the cross-field rule fires on both. Severity = WARNING because the
+     * spec also says "Could be provided for art6 under insurers demand", so
+     * enforcement is conventional rather than absolute. PENDING SME SIGN-OFF.
+     */
+    private static final List<ConditionalAnySourceRequirement> PCDFP_REQUIREMENTS = List.of(
+            new ConditionalAnySourceRequirement("EET-XF-PCDFP-35",
+                    List.of("27", "28"), FieldPredicate.EqualsAny.of("8", "9"),
+                    "35", Severity.WARNING),
+            new ConditionalAnySourceRequirement("EET-XF-PCDFP-36",
+                    List.of("27", "28"), FieldPredicate.EqualsAny.of("8", "9"),
+                    "36", Severity.WARNING));
+
+    /**
      * Targets handled by an XF rule above must be removed from the generic Presence /
      * ConditionalPresence registration so the same missing value isn't reported twice.
      * The PAI block is added here because every PAI indicator carries M/C flags on
@@ -152,6 +205,7 @@ public final class EetRuleSet implements TemplateRuleSet {
                 .map(ConditionalRequirement::targetFieldNum)
                 .collect(Collectors.toCollection(HashSet::new));
         handledByXf.addAll(ADDITIONALLY_SUPPRESSED_FROM_GENERIC_RULES);
+        PCDFP_REQUIREMENTS.forEach(r -> handledByXf.add(r.targetFieldNum()));
 
         for (FieldSpec spec : catalog.fields()) {
             rules.add(new FormatRule(spec));
@@ -192,6 +246,11 @@ public final class EetRuleSet implements TemplateRuleSet {
         rules.add(new ConditionalAnyFieldPresenceRule(ART8_MIN_SI_SPLIT));
         rules.add(new ConditionalAnyFieldPresenceRule(ART9_MIN_ENV_SPLIT));
 
+        // PCDFP gating — NUM 27 OR 28 ∈ {8,9} → NUM 35/36 required (V1.1.2 + V1.1.3).
+        for (ConditionalAnySourceRequirement r : PCDFP_REQUIREMENTS) {
+            rules.add(new ConditionalAnySourceFieldPresenceRule(r));
+        }
+
         // Wired (was DEFERRED, now done — see docs/EET_AUDIT_V113.md):
         //  - Negative SFDR constraint (EET-XF-ART*-MUST-BE-ABSENT, severity=WARNING).
         //  - PAI gating on NUM=33 (= 20100_..._Does_This_Product_Consider_Principle_Adverse_Impact),
@@ -200,16 +259,26 @@ public final class EetRuleSet implements TemplateRuleSet {
         //  - Taxonomy at-least-one-of split (soft rule — the spec text does NOT
         //    impose a sum-check, only that the minimum from 41/45 must be attributable
         //    to one of the sub-categories).
+        //  - Art-9 Paris-aligned / decarbonisation gating on NUM=80 + NUM=81
+        //    (EET-XF-ART9-PARIS-DECARB-{80,81}, severity=WARNING).
+        //  - PCDFP gating on NUM=35 + NUM=36 ({27,28} ∈ {8,9} → required;
+        //    EET-XF-PCDFP-{35,36}, severity=WARNING). Identical fire in V1.1.2 + V1.1.3
+        //    because the spec's conditional comment text is identical — V1.1.3 only
+        //    formalised the C-flag in SFDR_PRECONTRACT.
+        //  - Country-list gating on NUM=615 + NUM=616 (numeric trigger via
+        //    NUM=225 > 0 / NUM=228 > 0; EET-XF-COUNTRYLIST-{615,616}, severity=ERROR).
         //
-        // Still DEFERRED (require regulatory SME):
-        //  - Quantitative taxonomy sum-check across 42/43/44 vs 41 — RTS does not
-        //    currently mandate that the components sum to the parent; encoding as a
-        //    hard rule would invent regulatory logic.
-        //  - PAI value fields (NUMs 105/109/113/.../237) gated by "Coverage > 0%" —
-        //    requires identifying the Coverage source field and adding a numeric
-        //    FieldPredicate variant.
-        //  - Promotion of EET-XF-ART*-MUST-BE-ABSENT severity from WARNING to ERROR
-        //    after SFDR SME sign-off.
+        // Still DEFERRED (require regulatory SME — see docs/SME_QUESTIONS/):
+        //  - Quantitative taxonomy sum-check across 42/43/44 vs 41
+        //    → docs/SME_QUESTIONS/eet-taxonomy-sum-check.md
+        //  - PAI value fields (NUMs 105/109/113/.../237) gated by "Coverage > 0%"
+        //    → docs/SME_QUESTIONS/eet-pai-coverage-mapping.md
+        //  - Structured-Product fields (NUMs 583-588)
+        //    → docs/SME_QUESTIONS/eet-structured-product.md
+        //  - Fossil-Gas / Nuclear EU-Taxonomy disclosures (NUMs 589-614)
+        //    → docs/SME_QUESTIONS/eet-fossil-gas-nuclear-chain.md
+        //  - Promotion of WARNING-severity SFDR rules to ERROR
+        //    → docs/SME_QUESTIONS/eet-severity-promotion.md
 
         return rules;
     }

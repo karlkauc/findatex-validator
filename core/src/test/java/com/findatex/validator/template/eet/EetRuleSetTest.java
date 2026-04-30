@@ -69,6 +69,61 @@ class EetRuleSetTest {
     }
 
     @Test
+    void article0WithArtFieldsPopulatedFiresMustBeAbsent() {
+        SpecCatalog catalog = eet.specLoaderFor(EetTemplate.V1_1_3).load();
+        TemplateRuleSet rs = eet.ruleSetFor(EetTemplate.V1_1_3);
+        TptFile file = new TestFileBuilder()
+                .row(TestFileBuilder.values("1", "V1.1.3", "27", "0",
+                        "30", "0.5", "41", "0.3", "45", "0.2"))
+                .build();
+
+        Set<ProfileKey> profiles = Set.of(EetProfiles.SFDR_PRECONTRACT);
+        List<Finding> findings = rs.build(catalog, profiles).stream()
+                .flatMap(r -> r.evaluate(new ValidationContext(file, catalog, profiles)).stream())
+                .toList();
+
+        assertThat(findings).extracting(Finding::ruleId)
+                .contains("EET-XF-ART30-MUST-BE-ABSENT",
+                          "EET-XF-ART41-MUST-BE-ABSENT",
+                          "EET-XF-ART45-MUST-BE-ABSENT");
+    }
+
+    @Test
+    void paiYesTriggersPaiBlockGating() {
+        SpecCatalog catalog = eet.specLoaderFor(EetTemplate.V1_1_3).load();
+        TemplateRuleSet rs = eet.ruleSetFor(EetTemplate.V1_1_3);
+        TptFile file = new TestFileBuilder()
+                .row(TestFileBuilder.values("1", "V1.1.3", "33", "Y"))
+                .build();
+
+        Set<ProfileKey> profiles = Set.of(EetProfiles.SFDR_ENTITY);
+        long paiErrors = rs.build(catalog, profiles).stream()
+                .flatMap(r -> r.evaluate(new ValidationContext(file, catalog, profiles)).stream())
+                .filter(f -> f.ruleId().startsWith("EET-XF-PAI-"))
+                .count();
+
+        assertThat(paiErrors).isEqualTo(27);
+    }
+
+    @Test
+    void art8MinUnattributedFiresSplitWarning() {
+        SpecCatalog catalog = eet.specLoaderFor(EetTemplate.V1_1_3).load();
+        TemplateRuleSet rs = eet.ruleSetFor(EetTemplate.V1_1_3);
+        TptFile file = new TestFileBuilder()
+                .row(TestFileBuilder.values("1", "V1.1.3", "27", "8",
+                        "41", "0.3"))
+                .build();
+
+        Set<ProfileKey> profiles = Set.of(EetProfiles.SFDR_PRECONTRACT);
+        List<Finding> findings = rs.build(catalog, profiles).stream()
+                .flatMap(r -> r.evaluate(new ValidationContext(file, catalog, profiles)).stream())
+                .toList();
+
+        assertThat(findings).extracting(Finding::ruleId)
+                .contains("EET-XF-ART8-MIN-SI-SPLIT");
+    }
+
+    @Test
     void article6DoesNotTriggerArticle9Conditionals() {
         SpecCatalog catalog = eet.specLoaderFor(EetTemplate.V1_1_3).load();
         TemplateRuleSet rs = eet.ruleSetFor(EetTemplate.V1_1_3);

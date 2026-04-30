@@ -35,8 +35,21 @@ class EetExampleSamplesTest {
         return Files.isDirectory(samplesDir());
     }
 
+    /**
+     * Resolve {@code samples/eet/} from the JVM's CWD. When Surefire launches
+     * the test JVM with {@code core/} as CWD (the multi-module default) we walk
+     * up to find the project root that actually owns {@code samples/}.
+     */
     private static Path samplesDir() {
-        return Paths.get("").toAbsolutePath().resolve("samples").resolve("eet");
+        Path cwd = Paths.get("").toAbsolutePath();
+        Path direct = cwd.resolve("samples").resolve("eet");
+        if (Files.isDirectory(direct)) return direct;
+        Path parent = cwd.getParent();
+        if (parent != null) {
+            Path up = parent.resolve("samples").resolve("eet");
+            if (Files.isDirectory(up)) return up;
+        }
+        return direct;
     }
 
     @Test
@@ -47,6 +60,18 @@ class EetExampleSamplesTest {
                 .filter(f -> f.ruleId().startsWith("FORMAT/"))
                 .count();
         assertThat(fmt).as("01_clean must have zero FORMAT/* errors").isZero();
+    }
+
+    @Test
+    void cleanFileFiresNoNewXfRules() throws Exception {
+        // Regression guard: the new EET-XF-ART*-MUST-BE-ABSENT, EET-XF-PAI-*,
+        // and EET-XF-ART*-MIN-*-SPLIT rules must NOT fire on the clean baseline.
+        List<Finding> findings = run("01_clean.xlsx");
+        boolean any = findings.stream().anyMatch(f ->
+                f.ruleId().startsWith("EET-XF-ART") && f.ruleId().endsWith("-MUST-BE-ABSENT")
+                || f.ruleId().startsWith("EET-XF-PAI-")
+                || f.ruleId().endsWith("-SPLIT"));
+        assertThat(any).as("01_clean must not fire any new XF rule").isFalse();
     }
 
     @Test
@@ -78,6 +103,36 @@ class EetExampleSamplesTest {
         List<Finding> findings = run("05_sfdr_art9_no_min.xlsx");
         boolean ltMissing = findings.stream().anyMatch(f -> f.ruleId().equals("EET-XF-ART9-MIN-LT"));
         assertThat(ltMissing).as("EET-XF-ART9-MIN-LT must fire").isTrue();
+    }
+
+    @Test
+    void sfdrOutOfScopeWithArtFieldsFiresMustBeAbsent() throws Exception {
+        List<Finding> findings = run("06_sfdr_out_of_scope_with_art_fields.xlsx");
+        boolean fired = findings.stream().anyMatch(f -> f.ruleId().equals("EET-XF-ART30-MUST-BE-ABSENT"));
+        assertThat(fired).as("EET-XF-ART30-MUST-BE-ABSENT must fire").isTrue();
+        long warnings = findings.stream()
+                .filter(f -> f.ruleId().startsWith("EET-XF-ART") && f.ruleId().endsWith("-MUST-BE-ABSENT"))
+                .filter(f -> f.severity() == Severity.WARNING)
+                .count();
+        assertThat(warnings).as("multiple MUST-BE-ABSENT warnings expected").isGreaterThanOrEqualTo(3);
+    }
+
+    @Test
+    void paiYesWithEmptyBlockFiresPaiErrors() throws Exception {
+        List<Finding> findings = run("07_pai_yes_block_missing.xlsx");
+        long paiErrors = findings.stream()
+                .filter(f -> f.ruleId().startsWith("EET-XF-PAI-"))
+                .filter(f -> f.severity() == Severity.ERROR)
+                .count();
+        // PAI block has 27 NUMs; expect one error per blank PAI field.
+        assertThat(paiErrors).as("expected 27 EET-XF-PAI-* errors").isEqualTo(27);
+    }
+
+    @Test
+    void taxonomyMinWithoutAttributionFiresSplitWarning() throws Exception {
+        List<Finding> findings = run("08_taxonomy_min_unattributed.xlsx");
+        boolean fired = findings.stream().anyMatch(f -> f.ruleId().equals("EET-XF-ART8-MIN-SI-SPLIT"));
+        assertThat(fired).as("EET-XF-ART8-MIN-SI-SPLIT must fire").isTrue();
     }
 
     private List<Finding> run(String filename) throws Exception {

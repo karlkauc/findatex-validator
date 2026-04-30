@@ -8,16 +8,19 @@ import java.util.Set;
 
 /**
  * Boolean test on a TPT cell value, used by {@link ConditionalRequirement} to
- * decide whether a cross-field conditional applies on a given row. Two simple
- * implementations cover every pattern the TPT V7 spec uses:
+ * decide whether a cross-field conditional applies on a given row.
  *
  * <ul>
  *   <li>{@link EqualsAny} — case-insensitive membership against a fixed set of
  *       values, e.g. {@code "1"}, {@code "Cal"}, {@code "Put"}.</li>
  *   <li>{@link NotBlank} — value is present and non-whitespace.</li>
+ *   <li>{@link GreaterThan} — value parses as a number strictly above a
+ *       threshold (used by EET PAI-Coverage gating and EET 615/616 country
+ *       lists, where the spec says e.g. "Conditional to 31210 &gt; 0").</li>
  * </ul>
  */
-public sealed interface FieldPredicate permits FieldPredicate.EqualsAny, FieldPredicate.NotBlank {
+public sealed interface FieldPredicate
+        permits FieldPredicate.EqualsAny, FieldPredicate.NotBlank, FieldPredicate.GreaterThan {
 
     boolean test(String value);
 
@@ -65,6 +68,34 @@ public sealed interface FieldPredicate permits FieldPredicate.EqualsAny, FieldPr
         @Override
         public String describe() {
             return "is not blank";
+        }
+    }
+
+    record GreaterThan(double threshold) implements FieldPredicate {
+
+        public static GreaterThan of(double threshold) {
+            return new GreaterThan(threshold);
+        }
+
+        @Override
+        public boolean test(String value) {
+            if (value == null) return false;
+            String norm = value.trim().replace(',', '.');
+            if (norm.isEmpty()) return false;
+            try {
+                return Double.parseDouble(norm) > threshold;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        @Override
+        public String describe() {
+            // Render integer-valued thresholds without a trailing ".0".
+            String t = (threshold == Math.floor(threshold) && !Double.isInfinite(threshold))
+                    ? Long.toString((long) threshold)
+                    : Double.toString(threshold);
+            return "> " + t;
         }
     }
 }

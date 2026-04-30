@@ -55,6 +55,7 @@ public final class EmtRuleSet implements TemplateRuleSet {
         rules.add(new EmtVersionRule(expectedVersionToken));
 
         // TODO(emt-xf): needs SME validation
+        // Open SME briefs: docs/SME_QUESTIONS/emt-cross-field-rules.md
         //  - Target Market block: when "Eligible Investor Type" indicates a restricted set,
         //    the corresponding negative-target-market and risk-tolerance fields become required.
         //  - Cost arithmetic: total ongoing costs should equal the sum of subcomponents

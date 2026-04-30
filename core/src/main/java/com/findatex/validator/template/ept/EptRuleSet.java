@@ -56,13 +56,13 @@ public final class EptRuleSet implements TemplateRuleSet {
         rules.add(new EptVersionRule(expectedVersionToken));
 
         // TODO(ept-xf): needs SME validation
-        //  - Performance scenarios: stress / unfavourable / moderate / favourable must all
-        //    be populated for PRIIPs Categories 1-4. Encoding requires identifying the four
-        //    field NUMs (RTS Annex IV) and the category-discriminator field.
-        //  - SRI consistency: synthetic risk indicator (1-7) must agree with the credit risk
-        //    measure and market risk measure when both present.
-        //  - Cost components: total ongoing costs = sum of one-off + recurring + incidental
-        //    over the recommended holding period.
+        // Open SME brief: docs/SME_QUESTIONS/ept-cross-field-rules.md
+        //  - Performance scenarios: NUMs 39/44/49/54 (1Y), 40/45/50/55 (Half-RHP),
+        //    41/46/51/56 (RHP) gated by NUM 35 (RHP > 1.0 / >= 10.0). Discriminator NUM 19.
+        //    Wiring needs FieldPredicate.GreaterThanOrEqual (currently YAGNI-deferred).
+        //  - SRI consistency: NUM 31 (SRI) vs NUM 33 (MRM) + NUM 34 (CRM) per Annex II grid.
+        //  - Cost components: NUM 115 (Total Cost RHP) ≈ amortised sum of NUMs 117/118/119
+        //    (and others — full list pending SME).
 
         return rules;
     }

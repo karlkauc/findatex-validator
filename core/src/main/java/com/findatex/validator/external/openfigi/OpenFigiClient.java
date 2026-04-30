@@ -17,13 +17,16 @@ import java.util.function.IntConsumer;
 public final class OpenFigiClient {
 
     public static final String DEFAULT_BASE = "https://api.openfigi.com";
-    private static final int BATCH = 100;
+    /** OpenFIGI /v3/mapping limits: 10 items/request without API key, 100 with. */
+    static final int BATCH_NO_KEY = 10;
+    static final int BATCH_WITH_KEY = 100;
     private static final ObjectMapper M = new ObjectMapper();
     private static final Logger log = LoggerFactory.getLogger(OpenFigiClient.class);
 
     private final HttpExecutor http;
     private final String base;
     private final String apiKey;
+    private final int batchSize;
 
     public OpenFigiClient(HttpExecutor http, String apiKey) { this(http, DEFAULT_BASE, apiKey); }
 
@@ -31,15 +34,16 @@ public final class OpenFigiClient {
         this.http = http;
         this.base = base;
         this.apiKey = apiKey == null ? "" : apiKey;
+        this.batchSize = this.apiKey.isEmpty() ? BATCH_NO_KEY : BATCH_WITH_KEY;
     }
 
     public Map<String, IsinRecord> lookup(List<String> isins,
                                           BooleanSupplier cancelled,
                                           IntConsumer onBatchDone) {
         Map<String, IsinRecord> out = new HashMap<>();
-        for (int i = 0; i < isins.size(); i += BATCH) {
+        for (int i = 0; i < isins.size(); i += batchSize) {
             if (cancelled.getAsBoolean()) break;
-            List<String> chunk = isins.subList(i, Math.min(i + BATCH, isins.size()));
+            List<String> chunk = isins.subList(i, Math.min(i + batchSize, isins.size()));
             try {
                 String body = buildBody(chunk);
                 java.util.Map<String, String> headers = new java.util.LinkedHashMap<>();
@@ -68,7 +72,7 @@ public final class OpenFigiClient {
                         log.warn("OpenFIGI parse error: {}", e.getMessage());
                     }
                 });
-                onBatchDone.accept(Math.min(i + BATCH, isins.size()));
+                onBatchDone.accept(Math.min(i + batchSize, isins.size()));
             } catch (Exception e) {
                 log.warn("OpenFIGI request build error: {}", e.getMessage());
             }

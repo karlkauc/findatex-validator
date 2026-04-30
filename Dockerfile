@@ -58,6 +58,11 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 COPY --from=jre-build /custom-jre $JAVA_HOME
 
+# Pre-create the persistent cache dir owned by the runtime user. When a named
+# volume is bound to /data/cache, Docker copies these perms into the fresh
+# volume on first start so the container can write GLEIF/OpenFIGI lookup data.
+RUN mkdir -p /data/cache && chown -R app:app /data
+
 WORKDIR /app
 COPY --from=build --chown=app:app /src/web-app/target/quarkus-app/ ./
 

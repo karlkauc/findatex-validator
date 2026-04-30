@@ -69,4 +69,55 @@ class FieldPredicateTest {
                 .startsWith("∈ ")
                 .contains("CAL", "PUT");
     }
+
+    // ------------------------------------------------------------- GreaterThan
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "abc", "1,2,3"})
+    void greaterThanRejectsBlankOrUnparseable(String v) {
+        assertThat(FieldPredicate.GreaterThan.of(0.0).test(v)).isFalse();
+    }
+
+    @Test
+    void greaterThanZeroAcceptsStrictlyPositive() {
+        FieldPredicate p = FieldPredicate.GreaterThan.of(0.0);
+        assertThat(p.test("1")).isTrue();
+        assertThat(p.test("0.5")).isTrue();
+        assertThat(p.test("0.0001")).isTrue();
+        assertThat(p.test(" 0.5 ")).isTrue();         // trims whitespace
+    }
+
+    @Test
+    void greaterThanZeroRejectsZeroAndNegative() {
+        FieldPredicate p = FieldPredicate.GreaterThan.of(0.0);
+        assertThat(p.test("0")).isFalse();
+        assertThat(p.test("0.0")).isFalse();          // boundary
+        assertThat(p.test("-0.5")).isFalse();
+        assertThat(p.test("-1")).isFalse();
+    }
+
+    @Test
+    void greaterThanAcceptsCommaDecimalSeparator() {
+        // EU spec data often surfaces "0,5" rather than "0.5".
+        FieldPredicate p = FieldPredicate.GreaterThan.of(0.0);
+        assertThat(p.test("0,5")).isTrue();
+        assertThat(p.test("0,0")).isFalse();
+    }
+
+    @Test
+    void greaterThanNonZeroThreshold() {
+        FieldPredicate p = FieldPredicate.GreaterThan.of(5.0);
+        assertThat(p.test("4.9")).isFalse();
+        assertThat(p.test("5.0")).isFalse();          // boundary, strict >
+        assertThat(p.test("5.01")).isTrue();
+        assertThat(p.test("100")).isTrue();
+    }
+
+    @Test
+    void greaterThanDescribesItself() {
+        assertThat(FieldPredicate.GreaterThan.of(0.0).describe()).isEqualTo("> 0");
+        assertThat(FieldPredicate.GreaterThan.of(5.0).describe()).isEqualTo("> 5");
+        assertThat(FieldPredicate.GreaterThan.of(0.5).describe()).isEqualTo("> 0.5");
+    }
 }

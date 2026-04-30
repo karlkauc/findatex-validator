@@ -17,7 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -88,12 +91,14 @@ final class AnnotatedSourceSheetWriter {
         }
 
         int dataWidth = 0;
-        for (List<String> row : src.rows()) dataWidth = Math.max(dataWidth, row.size());
+        for (List<SourceMirror.SourceCell> row : src.rows()) dataWidth = Math.max(dataWidth, row.size());
         int totalCols = dataWidth + 1;
+
+        StyleResolver styles = new StyleResolver(wb, err, warn, info);
 
         for (int rIdx = 0; rIdx < src.rows().size(); rIdx++) {
             Row rr = sheet.createRow(rIdx);
-            List<String> srcRow = src.rows().get(rIdx);
+            List<SourceMirror.SourceCell> srcRow = src.rows().get(rIdx);
             boolean isHeaderRow = rIdx == src.headerRowIndex();
 
             Cell zeile = rr.createCell(0);
@@ -119,11 +124,14 @@ final class AnnotatedSourceSheetWriter {
             for (int c = 0; c < srcRow.size(); c++) {
                 int mirrorCol = c + 1;
                 Cell cell = rr.createCell(mirrorCol);
-                String v = srcRow.get(c);
-                cell.setCellValue(v == null ? "" : v);
-                if (isHeaderRow) cell.setCellStyle(headerStyle);
-                applyFindings(drawing, helper, cell, byCell.get(new CellKey(rIdx, mirrorCol)),
-                        err, warn, info);
+                SourceMirror.SourceCell sc = srcRow.get(c);
+                writeTypedValue(cell, sc, isHeaderRow);
+                List<Finding> findings = byCell.get(new CellKey(rIdx, mirrorCol));
+                CellStyle target = resolveStyle(styles, headerStyle, sc, findings, isHeaderRow);
+                if (target != null) cell.setCellStyle(target);
+                if (findings != null && !findings.isEmpty()) {
+                    attachComment(drawing, helper, cell, findings);
+                }
             }
         }
 
@@ -132,12 +140,90 @@ final class AnnotatedSourceSheetWriter {
         for (int c = 1; c < totalCols; c++) sheet.setColumnWidth(c, 4500);
     }
 
-    private static void applyFindings(Drawing<?> drawing, CreationHelper helper,
-                                      Cell cell, List<Finding> findings,
-                                      CellStyle err, CellStyle warn, CellStyle info) {
-        if (findings == null || findings.isEmpty()) return;
-        cell.setCellStyle(styleFor(worstSeverity(findings), err, warn, info));
-        attachComment(drawing, helper, cell, findings);
+    private static void writeTypedValue(Cell cell, SourceMirror.SourceCell sc, boolean isHeaderRow) {
+        if (isHeaderRow) {
+            cell.setCellValue(sc.asText());
+            return;
+        }
+        switch (sc.kind()) {
+            case STRING -> cell.setCellValue(sc.asText());
+            case NUMERIC -> cell.setCellValue(((Double) sc.value()).doubleValue());
+            case DATE -> {
+                LocalDateTime dt = (LocalDateTime) sc.value();
+                cell.setCellValue(Date.from(dt.atZone(ZoneId.systemDefault()).toInstant()));
+            }
+            case BOOLEAN -> cell.setCellValue(((Boolean) sc.value()).booleanValue());
+            case BLANK -> cell.setBlank();
+        }
+    }
+
+    private static CellStyle resolveStyle(StyleResolver styles, CellStyle headerStyle,
+                                          SourceMirror.SourceCell sc, List<Finding> findings,
+                                          boolean isHeaderRow) {
+        if (isHeaderRow) return headerStyle;
+        boolean hasFinding = findings != null && !findings.isEmpty();
+        if (hasFinding) {
+            return styles.findingStyle(worstSeverity(findings), sc.dataFormat());
+        }
+        if (needsFormat(sc)) {
+            return styles.plainFormatStyle(sc.dataFormat());
+        }
+        return null;
+    }
+
+    private static boolean needsFormat(SourceMirror.SourceCell sc) {
+        if (sc.kind() == SourceMirror.CellKind.DATE) return sc.dataFormat() != null && !sc.dataFormat().isEmpty();
+        if (sc.kind() == SourceMirror.CellKind.NUMERIC) {
+            String fmt = sc.dataFormat();
+            return fmt != null && !fmt.isEmpty() && !"General".equalsIgnoreCase(fmt);
+        }
+        return false;
+    }
+
+    private static final class StyleResolver {
+        private final Workbook wb;
+        private final CellStyle err;
+        private final CellStyle warn;
+        private final CellStyle info;
+        private final Map<String, CellStyle> plain = new HashMap<>();
+        private final Map<String, CellStyle> findingStyles = new HashMap<>();
+
+        StyleResolver(Workbook wb, CellStyle err, CellStyle warn, CellStyle info) {
+            this.wb = wb;
+            this.err = err;
+            this.warn = warn;
+            this.info = info;
+        }
+
+        CellStyle plainFormatStyle(String fmt) {
+            return plain.computeIfAbsent(fmt, this::buildPlain);
+        }
+
+        CellStyle findingStyle(Severity severity, String fmt) {
+            String key = severity.name() + ':' + (fmt == null ? "" : fmt);
+            return findingStyles.computeIfAbsent(key, k -> buildFinding(severity, fmt));
+        }
+
+        private CellStyle buildPlain(String fmt) {
+            CellStyle s = wb.createCellStyle();
+            s.setDataFormat(wb.createDataFormat().getFormat(fmt));
+            return s;
+        }
+
+        private CellStyle buildFinding(Severity severity, String fmt) {
+            CellStyle base = switch (severity) {
+                case ERROR -> err;
+                case WARNING -> warn;
+                case INFO -> info;
+            };
+            if (fmt == null || fmt.isEmpty() || "General".equalsIgnoreCase(fmt)) {
+                return base;
+            }
+            CellStyle s = wb.createCellStyle();
+            s.cloneStyleFrom(base);
+            s.setDataFormat(wb.createDataFormat().getFormat(fmt));
+            return s;
+        }
     }
 
     private static Severity worstSeverity(List<Finding> findings) {

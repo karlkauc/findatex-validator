@@ -1,6 +1,7 @@
 package com.findatex.validator.external.cache;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
@@ -19,7 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class JsonCache<V> {
 
     private static final Logger log = LoggerFactory.getLogger(JsonCache.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper().configure(SerializationFeature.INDENT_OUTPUT, true);
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .configure(SerializationFeature.INDENT_OUTPUT, true)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public record Entry<V>(V value, long epochMilli) {}
 

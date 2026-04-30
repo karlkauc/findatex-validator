@@ -20,6 +20,8 @@ services:
       # a key it goes up to 100 req/s. Users may also bring their own OpenFIGI
       # key per request — that one is never persisted.
       FINDATEX_WEB_EXTERNAL_ENABLED: "true"
+      # Persistent cache dir (mounted as a named volume below — survives restarts).
+      FINDATEX_WEB_EXTERNAL_CACHE_DIR: "/data/cache"
       # FINDATEX_WEB_EXTERNAL_OPENFIGI_KEY: "your-key"
       # FINDATEX_WEB_EXTERNAL_PROXY_MODE: "MANUAL"
       # FINDATEX_WEB_EXTERNAL_PROXY_HOST: "proxy.example.com"
@@ -27,6 +29,11 @@ services:
       # FINDATEX_WEB_EXTERNAL_PROXY_USERNAME: "svc-findatex"
       # FINDATEX_WEB_EXTERNAL_PROXY_PASSWORD: "your-password"
       # FINDATEX_WEB_EXTERNAL_PROXY_NON_PROXY_HOSTS: "localhost,*.internal"
+
+    volumes:
+      # GLEIF/OpenFIGI lookup cache. Persisting it across restarts avoids
+      # re-fetching every LEI/ISIN every time the container is recreated.
+      - findatex-cache:/data/cache
 
     deploy:
       resources:
@@ -44,3 +51,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+
+volumes:
+  findatex-cache:

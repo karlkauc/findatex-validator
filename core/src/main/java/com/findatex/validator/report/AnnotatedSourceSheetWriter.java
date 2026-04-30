@@ -68,6 +68,7 @@ final class AnnotatedSourceSheetWriter {
         }
 
         Map<CellKey, List<Finding>> byCell = new HashMap<>();
+        Map<Integer, Severity> worstByRow = new HashMap<>();
         for (Finding f : report.findings()) {
             if (f.rowIndex() == null) continue;
             TptRow tr = rowsByLogical.get(f.rowIndex());
@@ -83,6 +84,7 @@ final class AnnotatedSourceSheetWriter {
                 mirrorCol = 0;
             }
             byCell.computeIfAbsent(new CellKey(mirrorRow, mirrorCol), k -> new ArrayList<>()).add(f);
+            worstByRow.merge(mirrorRow, f.severity(), AnnotatedSourceSheetWriter::worse);
         }
 
         int dataWidth = 0;
@@ -103,8 +105,16 @@ final class AnnotatedSourceSheetWriter {
             } else {
                 zeile.setCellValue("");
             }
-            applyFindings(drawing, helper, zeile, byCell.get(new CellKey(rIdx, 0)),
-                    err, warn, info);
+            if (!isHeaderRow) {
+                Severity rowSeverity = worstByRow.get(rIdx);
+                if (rowSeverity != null) {
+                    zeile.setCellStyle(styleFor(rowSeverity, err, warn, info));
+                }
+            }
+            List<Finding> rowLevelFindings = byCell.get(new CellKey(rIdx, 0));
+            if (rowLevelFindings != null && !rowLevelFindings.isEmpty()) {
+                attachComment(drawing, helper, zeile, rowLevelFindings);
+            }
 
             for (int c = 0; c < srcRow.size(); c++) {
                 int mirrorCol = c + 1;
@@ -137,6 +147,12 @@ final class AnnotatedSourceSheetWriter {
             if (f.severity() == Severity.WARNING) worst = Severity.WARNING;
         }
         return worst;
+    }
+
+    private static Severity worse(Severity a, Severity b) {
+        if (a == Severity.ERROR || b == Severity.ERROR) return Severity.ERROR;
+        if (a == Severity.WARNING || b == Severity.WARNING) return Severity.WARNING;
+        return Severity.INFO;
     }
 
     private static CellStyle styleFor(Severity sev, CellStyle err, CellStyle warn, CellStyle info) {

@@ -49,25 +49,31 @@ Notable groups:
 
 - **PAI value fields** (NUMs 105, 109, 113, ..., 237): paired with the
   PAI Y/N indicators wired in this branch. Each "Value" field carries
-  "Conditional to Coverage > 0%". Wiring these requires a SFDR/RTS SME to
-  define the "Coverage" field reference and the > 0 predicate semantics.
-  **DEFERRED**.
-- **Article-9 Paris/decarbonisation fields** (NUMs 80, 81): "Conditional
-  to product being art 9". Mechanically wireable as `field 27 = "9" → 80,
-  81 must be present`. SME should confirm severity (probably WARNING; the
-  spec also says "Could be fulfilled for art 8").
+  "Conditional to Coverage > 0%". Engine ready (`FieldPredicate.GreaterThan`
+  shipped); awaiting SFDR-SME confirmation of the per-indicator
+  Coverage-source NUM mapping. **DEFERRED** — see
+  [`docs/SME_QUESTIONS/eet-pai-coverage-mapping.md`](SME_QUESTIONS/eet-pai-coverage-mapping.md).
+- **Article-9 Paris/decarbonisation fields** (NUMs 80, 81): **WIRED** as
+  `EET-XF-ART9-PARIS-DECARB-{80,81}`, `field 27 = "9" → 80, 81 must be
+  present`, severity = WARNING. Severity is conservative because the spec
+  also says "Could be fulfilled for art 8" — promotion to ERROR pending
+  SFDR SME sign-off.
 - **Structured Product fields** (NUMs 583-588): "Conditional to being a
   Structured Product". Requires identifying the source field that flags
-  Structured Product status — not obvious from the spec alone. **DEFERRED**.
+  Structured Product status — not obvious from the spec alone. **DEFERRED**
+  — see [`docs/SME_QUESTIONS/eet-structured-product.md`](SME_QUESTIONS/eet-structured-product.md).
 - **EU Taxonomy Fossil-Gas / Nuclear fields** (NUMs 589-614): chains of
   dependencies (90000 → 90010, 90020; 90030 → 90040, 90050; …). Mechanically
   wireable but would add ~25 ConditionalRequirements. SME triage needed
   before wiring (the spec also says "Conditional to product type in field
-  20040 or 20050" without specifying which value).
-- **List-of-countries fields** (NUMs 615, 616): conditional to
-  numeric-comparison triggers (`31210 > 0`, `31240 > 0`). Current
-  `FieldPredicate` does not support numeric comparisons; would require a
-  new predicate variant. **DEFERRED** until use-case demand exists.
+  20040 or 20050" without specifying which value). **DEFERRED** —
+  see [`docs/SME_QUESTIONS/eet-fossil-gas-nuclear-chain.md`](SME_QUESTIONS/eet-fossil-gas-nuclear-chain.md).
+- **List-of-countries fields** (NUMs 615, 616): **WIRED** as
+  `EET-XF-COUNTRYLIST-{615,616}`. Source NUM=225 (`31210_..._Value`,
+  Integer) > 0 → NUM=615 required; source NUM=228 (`31240_..._Eligible_Assets`,
+  floating decimal) > 0 → NUM=616 required. Severity = ERROR (spec text has
+  no softening clause). Backed by the `FieldPredicate.GreaterThan` variant
+  added in this branch.
 
 For the full candidate list run `python3 tools/audit_eet_conditionals.py`.
 
@@ -79,8 +85,13 @@ Minimal: the only profile that changed M/C flags between versions is
 - NUM 36 (`20130_Financial_Instrument_Production_Date_PCDFP`)
 
 Both are conditional in V1.1.3 with a comment that begins
-"Conditional to 20040 or 20050 set to 8 or 9". They appear in the
-Conditional-Candidates list above and are also DEFERRED until SME triage.
+"Conditional to 20040 or 20050 set to 8 or 9". The conditional comment
+text is **identical** in V1.1.2 — only the per-profile flag differs —
+so the cross-field rule fires for both versions. **WIRED** as
+`EET-XF-PCDFP-{35,36}` via `ConditionalAnySourceFieldPresenceRule`,
+severity = WARNING (the spec also says "Could be provided for art6 under
+insurers demand", so enforcement is conventional). Promotion to ERROR
+pending SFDR SME sign-off.
 
 For the full diff run `python3 tools/audit_eet_m_flag_drift.py`.
 

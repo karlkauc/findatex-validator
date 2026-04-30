@@ -29,12 +29,14 @@ PAI_BLOCK = [
 ]
 
 # Header row = all M-flagged fields, plus the SFDR-conditional fields
-# (NUM 28, 30, 31, 40, 41, 42, 43, 44, 45, 46, 47, 48), the PAI gating
-# field (33) and the PAI block, so every XF scenario has the columns it
-# needs.
+# (NUM 28, 30, 31, 35, 36, 40, 41, 42, 43, 44, 45, 46, 47, 48), the PAI
+# gating field (33) and the PAI block, so every XF scenario has the
+# columns it needs. NUMs 35/36 are the PCDFP link + production date,
+# required when NUM 27 OR 28 ∈ {8,9} (rule EET-XF-PCDFP-{35,36}).
 M_NUMS = [r.num for r in FIELDS if r.flag == "M"]
 EXTRA_NUMS = (
-    ["28", "30", "31", "33", "40", "41", "42", "43", "44", "45", "46", "47", "48"]
+    ["28", "30", "31", "33", "35", "36",
+     "40", "41", "42", "43", "44", "45", "46", "47", "48"]
     + PAI_BLOCK
 )
 HEADER_NUMS = M_NUMS + [n for n in EXTRA_NUMS if n not in M_NUMS]
@@ -62,6 +64,11 @@ def clean_row() -> dict[str, str]:
     # poisoning the "clean" baseline. Pin it to "N" so the clean file does
     # not need to populate 27 PAI indicators.
     row["33"] = "N"
+    # NUM 27 = "8" triggers EET-XF-PCDFP-{35,36}: Pre-Contractual Disclosure
+    # link + production date are required for any Art-8/Art-9 product. Populate
+    # both so the clean baseline stays silent.
+    row["35"] = "https://findatex.example/pre-contractual/LU0001234567/EN.pdf"
+    row["36"] = "2026-03-31"
     return row
 
 

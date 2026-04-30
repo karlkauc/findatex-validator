@@ -65,12 +65,16 @@ class EetExampleSamplesTest {
     @Test
     void cleanFileFiresNoNewXfRules() throws Exception {
         // Regression guard: the new EET-XF-ART*-MUST-BE-ABSENT, EET-XF-PAI-*,
-        // and EET-XF-ART*-MIN-*-SPLIT rules must NOT fire on the clean baseline.
+        // EET-XF-ART*-MIN-*-SPLIT, EET-XF-ART9-PARIS-DECARB-*, EET-XF-PCDFP-*,
+        // and EET-XF-COUNTRYLIST-* rules must NOT fire on the clean baseline.
         List<Finding> findings = run("01_clean.xlsx");
         boolean any = findings.stream().anyMatch(f ->
                 f.ruleId().startsWith("EET-XF-ART") && f.ruleId().endsWith("-MUST-BE-ABSENT")
                 || f.ruleId().startsWith("EET-XF-PAI-")
-                || f.ruleId().endsWith("-SPLIT"));
+                || f.ruleId().endsWith("-SPLIT")
+                || f.ruleId().startsWith("EET-XF-ART9-PARIS-DECARB-")
+                || f.ruleId().startsWith("EET-XF-PCDFP-")
+                || f.ruleId().startsWith("EET-XF-COUNTRYLIST-"));
         assertThat(any).as("01_clean must not fire any new XF rule").isFalse();
     }
 

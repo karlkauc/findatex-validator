@@ -15,6 +15,8 @@
 #   PACKAGE_TYPE   Override jpackage --type. Set to "app-image" to skip the
 #                  OS installer and produce a portable directory in
 #                  $TARGET_DIR/portable instead of $TARGET_DIR/installer.
+#   JAVA_OPTIONS   JVM flags baked into the launcher (default:
+#                  "-Xms512m -Xmx8g -XX:+UseG1GC -XX:MaxMetaspaceSize=512m").
 #
 # The shaded jar already contains JavaFX classes + native libraries, so we
 # do NOT pass --module-path / --add-modules javafx.* — that would split-package
@@ -115,8 +117,18 @@ if [[ -z "$ADD_MODULES" ]]; then
   ADD_MODULES="java.base,java.desktop,java.naming,java.net.http,java.scripting,java.security.jgss,java.sql,java.xml,java.xml.crypto,java.logging,java.management,jdk.crypto.ec,jdk.jfr,jdk.unsupported"
 fi
 
+# Heap settings baked into the launcher binary. Batch-Mode mit hunderten XLSX-
+# Dateien hält pro Datei TptFile + Findings + QualityReport im Speicher; 8 GiB
+# sind großzügig für ~800 Dateien dimensioniert. Override via env JAVA_OPTIONS.
+JAVA_OPTIONS="${JAVA_OPTIONS:--Xms512m -Xmx8g -XX:+UseG1GC -XX:MaxMetaspaceSize=512m}"
+JAVA_OPTION_ARGS=()
+for opt in $JAVA_OPTIONS; do
+  JAVA_OPTION_ARGS+=(--java-options "$opt")
+done
+
 echo "Building $PACKAGE_TYPE for $UNAME_S — version $APP_VERSION, vendor '$APP_VENDOR'"
-echo "  add-modules: $ADD_MODULES"
+echo "  add-modules:  $ADD_MODULES"
+echo "  java-options: $JAVA_OPTIONS"
 
 jpackage \
   --type "$PACKAGE_TYPE" \
@@ -128,6 +140,7 @@ jpackage \
   --main-jar "$(basename "$SHADED_JAR")" \
   --main-class com.findatex.validator.AppLauncher \
   --add-modules "$ADD_MODULES" \
+  "${JAVA_OPTION_ARGS[@]}" \
   "${ICON_ARG[@]}" \
   "${EXTRA_ARGS[@]}" \
   --dest "$OUT_DIR"

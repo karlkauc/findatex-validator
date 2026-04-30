@@ -25,6 +25,10 @@ _SPEC_LOCATIONS: dict[tuple[str, str], tuple[str, str]] = {
         "core/src/main/resources/spec/eet/eet-v113-info.json",
         "core/src/main/resources/spec/eet/EET_V1_1_3_20260410.xlsx",
     ),
+    ("EET", "V1.1.2"): (
+        "core/src/main/resources/spec/eet/eet-v112-info.json",
+        "core/src/main/resources/spec/eet/EET_V1_1_2_20231205.xlsx",
+    ),
     ("EMT", "V4.3"): (
         "core/src/main/resources/spec/emt/emt-v43-info.json",
         "core/src/main/resources/spec/emt/EMT_V4_3_20251217.xlsx",

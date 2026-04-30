@@ -10,6 +10,7 @@ import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.ValidationEngine;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -214,6 +215,82 @@ class XlsxReportWriterTest {
             assertThat(rowCell.getCellStyle().getFillForegroundColor())
                     .as("Row helper cell on a row with an ERROR must be coloured rose")
                     .isEqualTo(org.apache.poi.ss.usermodel.IndexedColors.ROSE.getIndex());
+        }
+    }
+
+    @Test
+    void annotatedSourcePreservesNumericAndDateCellTypes(@TempDir Path tmp) throws Exception {
+        Path src = tmp.resolve("typed.xlsx");
+        try (XSSFWorkbook wb = new XSSFWorkbook();
+             java.io.OutputStream os = Files.newOutputStream(src)) {
+            Sheet s = wb.createSheet();
+            org.apache.poi.ss.usermodel.Row hdr = s.createRow(0);
+            String[] headers = {
+                    "1_Portfolio_identifying_data",
+                    "2_Type_of_identification_code_for_the_fund_share_or_portfolio",
+                    "3_Portfolio_name",
+                    "4_Portfolio_currency_(B)",
+                    "5_Net_asset_valuation_of_the_portfolio_or_the_share_class_in_portfolio_currency",
+                    "6_Valuation_date"
+            };
+            for (int c = 0; c < headers.length; c++) hdr.createCell(c).setCellValue(headers[c]);
+            CellStyle pctStyle = wb.createCellStyle();
+            pctStyle.setDataFormat(wb.createDataFormat().getFormat("0.00%"));
+            CellStyle dateStyle = wb.createCellStyle();
+            dateStyle.setDataFormat(wb.createDataFormat().getFormat("yyyy-mm-dd"));
+
+            org.apache.poi.ss.usermodel.Row data = s.createRow(1);
+            data.createCell(0).setCellValue("FR0010000001");
+            data.createCell(1).setCellValue("1");
+            data.createCell(2).setCellValue("Demo Bond Fund");
+            data.createCell(3).setCellValue("EUR");
+            org.apache.poi.ss.usermodel.Cell numeric = data.createCell(4);
+            numeric.setCellValue(0.0525);
+            numeric.setCellStyle(pctStyle);
+            org.apache.poi.ss.usermodel.Cell dateCell = data.createCell(5);
+            dateCell.setCellValue(java.time.LocalDate.of(2025, 12, 31));
+            dateCell.setCellStyle(dateStyle);
+            wb.write(os);
+        }
+
+        com.findatex.validator.domain.TptFile file = new com.findatex.validator.ingest.TptFileLoader(CATALOG).load(src);
+        Set<ProfileKey> profiles = new HashSet<>(java.util.Arrays.asList(
+                TptProfiles.SOLVENCY_II, TptProfiles.IORP_EIOPA_ECB,
+                TptProfiles.NW_675, TptProfiles.SST));
+        List<Finding> findings = new ValidationEngine(CATALOG, new com.findatex.validator.template.tpt.TptRuleSet()).validate(file, profiles);
+        QualityReport report = new QualityScorer(CATALOG).score(file, profiles, findings);
+
+        Path out = tmp.resolve("annotated_typed.xlsx");
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.DESKTOP).write(report, out);
+
+        try (InputStream in = Files.newInputStream(out);
+             Workbook wb = new XSSFWorkbook(in)) {
+            Sheet annotated = wb.getSheet("Annotated Source");
+            assertThat(annotated).isNotNull();
+
+            int firstDataMirrorRow = report.file().rows().get(0).all().values().iterator().next().sourceRow() - 1;
+            org.apache.poi.ss.usermodel.Row poiRow = annotated.getRow(firstDataMirrorRow);
+            assertThat(poiRow).isNotNull();
+
+            org.apache.poi.ss.usermodel.Cell numericMirror = poiRow.getCell(5); // +1 for Row helper col
+            assertThat(numericMirror.getCellType())
+                    .as("numeric source cell must be mirrored as NUMERIC, not STRING")
+                    .isEqualTo(org.apache.poi.ss.usermodel.CellType.NUMERIC);
+            assertThat(numericMirror.getNumericCellValue()).isEqualTo(0.0525);
+            assertThat(numericMirror.getCellStyle().getDataFormatString())
+                    .as("numeric format must be preserved")
+                    .isEqualTo("0.00%");
+
+            org.apache.poi.ss.usermodel.Cell dateMirror = poiRow.getCell(6); // +1 for Row helper col
+            assertThat(dateMirror.getCellType())
+                    .as("date source cell must be mirrored as NUMERIC (Excel dates)")
+                    .isEqualTo(org.apache.poi.ss.usermodel.CellType.NUMERIC);
+            assertThat(org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(dateMirror))
+                    .as("date cell must keep date formatting")
+                    .isTrue();
+            assertThat(dateMirror.getCellStyle().getDataFormatString())
+                    .as("date format must be preserved")
+                    .isEqualTo("yyyy-mm-dd");
         }
     }
 

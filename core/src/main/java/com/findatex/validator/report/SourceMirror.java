@@ -24,7 +24,39 @@ import java.util.List;
 
 final class SourceMirror {
 
-    record SourceData(List<List<String>> rows, int headerRowIndex) {}
+    enum CellKind { STRING, NUMERIC, DATE, BOOLEAN, BLANK }
+
+    record SourceCell(CellKind kind, Object value, String dataFormat) {
+        static final SourceCell BLANK = new SourceCell(CellKind.BLANK, null, null);
+
+        static SourceCell text(String s) {
+            return new SourceCell(CellKind.STRING, s == null ? "" : s, null);
+        }
+
+        String asText() {
+            return switch (kind) {
+                case STRING -> value == null ? "" : (String) value;
+                case NUMERIC -> {
+                    double d = (Double) value;
+                    if (d == Math.floor(d) && !Double.isInfinite(d) && Math.abs(d) < 1e15) {
+                        yield Long.toString((long) d);
+                    }
+                    yield Double.toString(d);
+                }
+                case DATE -> {
+                    LocalDateTime dt = (LocalDateTime) value;
+                    if (dt.toLocalTime().toSecondOfDay() == 0) {
+                        yield dt.toLocalDate().toString();
+                    }
+                    yield dt.toString();
+                }
+                case BOOLEAN -> Boolean.toString((Boolean) value);
+                case BLANK -> "";
+            };
+        }
+    }
+
+    record SourceData(List<List<SourceCell>> rows, int headerRowIndex) {}
 
     static SourceData read(TptFile file) throws IOException {
         String fmt = file.inputFormat();
@@ -47,16 +79,16 @@ final class SourceMirror {
                 if (row != null) width = Math.max(width, row.getLastCellNum());
             }
             int headerRowIndex = locateHeader(sheet, file.rawHeaders(), last);
-            List<List<String>> rows = new ArrayList<>(last + 1);
+            List<List<SourceCell>> rows = new ArrayList<>(last + 1);
             for (int r = 0; r <= last; r++) {
                 Row row = sheet.getRow(r);
-                List<String> cells = new ArrayList<>(width);
+                List<SourceCell> cells = new ArrayList<>(width);
                 if (row == null) {
-                    for (int c = 0; c < width; c++) cells.add("");
+                    for (int c = 0; c < width; c++) cells.add(SourceCell.BLANK);
                 } else {
                     int rowWidth = Math.max(width, row.getLastCellNum());
                     for (int c = 0; c < rowWidth; c++) {
-                        cells.add(stringValue(row.getCell(c)));
+                        cells.add(readCell(row.getCell(c)));
                     }
                 }
                 rows.add(cells);
@@ -74,7 +106,7 @@ final class SourceMirror {
             boolean match = true;
             for (int c = 0; c < rawHeaders.size(); c++) {
                 String expected = rawHeaders.get(c) == null ? "" : rawHeaders.get(c).trim();
-                String actual = stringValue(row.getCell(c)).trim();
+                String actual = readCell(row.getCell(c)).asText().trim();
                 if (!actual.equals(expected)) { match = false; break; }
             }
             if (match) return r;
@@ -95,11 +127,11 @@ final class SourceMirror {
             List<CSVRecord> records = parser.getRecords();
             int width = 0;
             for (CSVRecord rec : records) width = Math.max(width, rec.size());
-            List<List<String>> rows = new ArrayList<>(records.size());
+            List<List<SourceCell>> rows = new ArrayList<>(records.size());
             for (CSVRecord rec : records) {
-                List<String> row = new ArrayList<>(width);
+                List<SourceCell> row = new ArrayList<>(width);
                 for (int c = 0; c < width; c++) {
-                    row.add(c < rec.size() ? rec.get(c) : "");
+                    row.add(c < rec.size() ? SourceCell.text(rec.get(c)) : SourceCell.BLANK);
                 }
                 rows.add(row);
             }
@@ -131,48 +163,45 @@ final class SourceMirror {
         return count;
     }
 
-    private static String stringValue(Cell cell) {
-        if (cell == null) return "";
+    private static SourceCell readCell(Cell cell) {
+        if (cell == null) return SourceCell.BLANK;
         try {
             return switch (cell.getCellType()) {
-                case STRING -> cell.getStringCellValue();
+                case STRING -> new SourceCell(CellKind.STRING, cell.getStringCellValue(), null);
                 case NUMERIC -> {
+                    String fmt = cell.getCellStyle() == null ? null
+                            : cell.getCellStyle().getDataFormatString();
                     if (DateUtil.isCellDateFormatted(cell)) {
-                        LocalDateTime dt = cell.getLocalDateTimeCellValue();
-                        if (dt.toLocalTime().toSecondOfDay() == 0) {
-                            yield dt.toLocalDate().toString();
-                        }
-                        yield dt.toString();
+                        yield new SourceCell(CellKind.DATE, cell.getLocalDateTimeCellValue(), fmt);
                     }
-                    double d = cell.getNumericCellValue();
-                    if (d == Math.floor(d) && !Double.isInfinite(d) && Math.abs(d) < 1e15) {
-                        yield Long.toString((long) d);
-                    }
-                    yield Double.toString(d);
+                    yield new SourceCell(CellKind.NUMERIC, cell.getNumericCellValue(), fmt);
                 }
-                case BOOLEAN -> Boolean.toString(cell.getBooleanCellValue());
-                case FORMULA -> formulaValue(cell);
-                case BLANK, ERROR, _NONE -> "";
+                case BOOLEAN -> new SourceCell(CellKind.BOOLEAN, cell.getBooleanCellValue(), null);
+                case FORMULA -> readFormulaCell(cell);
+                case BLANK, ERROR, _NONE -> SourceCell.BLANK;
             };
         } catch (Exception e) {
-            return "";
+            return SourceCell.BLANK;
         }
     }
 
-    private static String formulaValue(Cell cell) {
+    private static SourceCell readFormulaCell(Cell cell) {
         try {
             return switch (cell.getCachedFormulaResultType()) {
-                case STRING -> cell.getStringCellValue();
+                case STRING -> new SourceCell(CellKind.STRING, cell.getStringCellValue(), null);
                 case NUMERIC -> {
-                    double d = cell.getNumericCellValue();
-                    if (d == Math.floor(d) && !Double.isInfinite(d)) yield Long.toString((long) d);
-                    yield Double.toString(d);
+                    String fmt = cell.getCellStyle() == null ? null
+                            : cell.getCellStyle().getDataFormatString();
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        yield new SourceCell(CellKind.DATE, cell.getLocalDateTimeCellValue(), fmt);
+                    }
+                    yield new SourceCell(CellKind.NUMERIC, cell.getNumericCellValue(), fmt);
                 }
-                case BOOLEAN -> Boolean.toString(cell.getBooleanCellValue());
-                default -> "";
+                case BOOLEAN -> new SourceCell(CellKind.BOOLEAN, cell.getBooleanCellValue(), null);
+                default -> SourceCell.BLANK;
             };
         } catch (Exception e) {
-            return "";
+            return SourceCell.BLANK;
         }
     }
 

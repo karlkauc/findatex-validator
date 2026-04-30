@@ -44,6 +44,18 @@
     -fx-background-color: white;
 }
 
+.template-tab.drop-active {
+    -fx-border-color: #2c6ed5;
+    -fx-border-width: 2;
+    -fx-border-style: dashed;
+    -fx-border-insets: 4;
+    -fx-border-radius: 6;
+}
+
+.template-tab.drop-active > .viewport > .form-area {
+    -fx-background-color: #eef4fc;
+}
+
 .score-card {
     -fx-background-color: white;
     -fx-border-color: #d0d8e0;

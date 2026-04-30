@@ -47,9 +47,13 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -131,6 +135,7 @@ public final class TemplateTabController {
     private final Map<ProfileKey, CheckBox> profileCheckBoxes = new LinkedHashMap<>();
 
     // --- FXML wiring --------------------------------------------------------
+    @FXML private ScrollPane rootPane;
     @FXML private ComboBox<TemplateVersion> versionCombo;
     @FXML private Label versionDateLabel;
     @FXML private Label emptySpecNotice;
@@ -208,6 +213,18 @@ public final class TemplateTabController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    private void applyAppIcons(Stage target) {
+        if (target == null) return;
+        Stage owner = stage;
+        if (owner == null && validateButton != null && validateButton.getScene() != null
+                && validateButton.getScene().getWindow() instanceof Stage s) {
+            owner = s;
+        }
+        if (owner != null && !owner.getIcons().isEmpty()) {
+            target.getIcons().addAll(owner.getIcons());
+        }
     }
 
     /**
@@ -374,6 +391,68 @@ public final class TemplateTabController {
         enterBatchMode(chosen.toPath());
     }
 
+    @FXML
+    private void onDragOver(DragEvent e) {
+        Dragboard db = e.getDragboard();
+        if (db.hasFiles()) {
+            e.acceptTransferModes(TransferMode.COPY);
+        }
+        e.consume();
+    }
+
+    @FXML
+    private void onDragEntered(DragEvent e) {
+        if (e.getDragboard().hasFiles() && rootPane != null
+                && !rootPane.getStyleClass().contains("drop-active")) {
+            rootPane.getStyleClass().add("drop-active");
+        }
+        e.consume();
+    }
+
+    @FXML
+    private void onDragExited(DragEvent e) {
+        if (rootPane != null) rootPane.getStyleClass().remove("drop-active");
+        e.consume();
+    }
+
+    @FXML
+    private void onDragDropped(DragEvent e) {
+        Dragboard db = e.getDragboard();
+        boolean accepted = false;
+        if (db.hasFiles()) {
+            accepted = handleDroppedFiles(db.getFiles());
+        }
+        e.setDropCompleted(accepted);
+        if (rootPane != null) rootPane.getStyleClass().remove("drop-active");
+        e.consume();
+    }
+
+    /**
+     * Mirrors the two file-picker buttons: a single regular file enters single-file mode, a
+     * single directory enters batch mode. Anything else (multiple items, mixed selections) is
+     * rejected with a status hint so users learn the expected gesture.
+     */
+    private boolean handleDroppedFiles(List<File> files) {
+        if (files == null || files.isEmpty()) return false;
+        if (files.size() == 1) {
+            File f = files.get(0);
+            if (f.isDirectory()) {
+                enterBatchMode(f.toPath());
+                return true;
+            }
+            if (f.isFile()) {
+                leaveBatchMode();
+                filePathField.setText(f.getAbsolutePath());
+                statusLabel.setText("");
+                return true;
+            }
+            statusLabel.setText("Drop ignoriert: '" + f.getName() + "' ist weder Datei noch Verzeichnis.");
+            return false;
+        }
+        statusLabel.setText("Bitte eine einzelne Datei oder ein einzelnes Verzeichnis droppen.");
+        return false;
+    }
+
     private void enterBatchMode(Path folder) {
         batchMode = true;
         batchFolder = folder;
@@ -460,6 +539,7 @@ public final class TemplateTabController {
                 progressStage.initModality(Modality.APPLICATION_MODAL);
                 progressStage.setTitle("External validation");
                 progressStage.setScene(new Scene(pRoot));
+                applyAppIcons(progressStage);
             } catch (Exception ex) {
                 log.warn("Could not load progress dialog: {}", ex.getMessage());
             }
@@ -568,6 +648,7 @@ public final class TemplateTabController {
             progressStage.initModality(Modality.APPLICATION_MODAL);
             progressStage.setTitle("Folder validation");
             progressStage.setScene(new Scene(pRoot));
+            applyAppIcons(progressStage);
             progressController.setBatchMode(true);
             progressController.setExternalMode(externalActive);
         } catch (Exception ex) {

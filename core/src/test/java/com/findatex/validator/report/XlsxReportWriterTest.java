@@ -184,6 +184,40 @@ class XlsxReportWriterTest {
     }
 
     @Test
+    void rowColumnIsHighlightedWhenAnyCellInRowHasError(@TempDir Path tmp) throws Exception {
+        QualityReport report = buildReportFor("/sample/bad_formats.xlsx");
+        Path out = tmp.resolve("annotated_row_color.xlsx");
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.DESKTOP).write(report, out);
+
+        try (InputStream in = Files.newInputStream(out);
+             Workbook wb = new XSSFWorkbook(in)) {
+            Sheet annotated = wb.getSheet("Annotated Source");
+            assertThat(annotated).isNotNull();
+
+            Finding fieldErr = report.findings().stream()
+                    .filter(f -> f.severity() == com.findatex.validator.validation.Severity.ERROR)
+                    .filter(f -> f.fieldNum() != null && f.rowIndex() != null)
+                    .findFirst()
+                    .orElseThrow();
+
+            com.findatex.validator.domain.TptRow tptRow = report.file().rows().stream()
+                    .filter(rr -> rr.rowIndex() == fieldErr.rowIndex())
+                    .findFirst()
+                    .orElseThrow();
+            int mirrorRow = tptRow.all().values().iterator().next().sourceRow() - 1;
+
+            org.apache.poi.ss.usermodel.Row poiRow = annotated.getRow(mirrorRow);
+            org.apache.poi.ss.usermodel.Cell rowCell = poiRow.getCell(0);
+            assertThat(rowCell)
+                    .as("Row helper cell at row %d must exist", mirrorRow)
+                    .isNotNull();
+            assertThat(rowCell.getCellStyle().getFillForegroundColor())
+                    .as("Row helper cell on a row with an ERROR must be coloured rose")
+                    .isEqualTo(org.apache.poi.ss.usermodel.IndexedColors.ROSE.getIndex());
+        }
+    }
+
+    @Test
     void scoresAreWrittenAsPercentages(@TempDir Path tmp) throws Exception {
         QualityReport report = buildReportFor("/sample/clean_v7.xlsx");
         Path out = tmp.resolve("scores.xlsx");

@@ -11,7 +11,10 @@
     identical across all templates so layout drift is impossible.
 -->
 <ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fitToWidth="true" styleClass="template-tab">
+            fx:id="rootPane"
+            fitToWidth="true" styleClass="template-tab"
+            onDragOver="#onDragOver" onDragEntered="#onDragEntered"
+            onDragExited="#onDragExited" onDragDropped="#onDragDropped">
     <VBox spacing="14" styleClass="form-area">
         <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
 
@@ -27,7 +30,7 @@
 
         <Label text="2. Choose a file or folder" styleClass="section-title"/>
         <HBox spacing="10" alignment="CENTER_LEFT">
-            <TextField fx:id="filePathField" prefWidth="600" promptText="Pick a file or a folder..."/>
+            <TextField fx:id="filePathField" prefWidth="600" promptText="Pick a file or a folder, or drag &amp; drop here..."/>
             <Button text="Datei wählen..." fx:id="browseButton" onAction="#onBrowse" styleClass="primary-button"/>
             <Button text="Verzeichnis wählen..." fx:id="browseFolderButton" onAction="#onBrowseFolder" styleClass="primary-button"/>
         </HBox>

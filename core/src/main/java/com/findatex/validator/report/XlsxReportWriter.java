@@ -3,6 +3,7 @@ package com.findatex.validator.report;
 import com.findatex.validator.AppInfo;
 import com.findatex.validator.domain.FundGroup;
 import com.findatex.validator.domain.FundGrouper;
+import com.findatex.validator.domain.FundKey;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.spec.FieldSpec;
 import com.findatex.validator.spec.SpecCatalog;
@@ -216,7 +217,7 @@ public final class XlsxReportWriter {
                 "Mandatory", "Format", "Closed-List", "Cross-Field", "Overall");
 
         java.util.List<FundGroup> groups = FundGrouper.group(r.file());
-        Map<com.findatex.validator.domain.FundKey, Map<ScoreCategory, Double>> sm = r.perFundScores();
+        Map<FundKey, Map<ScoreCategory, Double>> sm = r.perFundScores();
 
         int row = 1;
         int idx = 1;

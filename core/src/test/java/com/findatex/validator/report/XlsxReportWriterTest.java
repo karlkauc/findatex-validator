@@ -340,14 +340,13 @@ class XlsxReportWriterTest {
         Path src = samples.resolve("13_multi_fund_with_errors.xlsx");
         Assumptions.assumeTrue(Files.isRegularFile(src), "multi-fund fixture missing");
 
-        SpecCatalog catalog = SpecLoader.loadBundled();
-        TptFile file = new TptFileLoader(catalog).load(src);
+        TptFile file = new TptFileLoader(CATALOG).load(src);
         Set<ProfileKey> profiles = Set.of(TptProfiles.SOLVENCY_II);
-        List<Finding> findings = new ValidationEngine(catalog, new TptRuleSet()).validate(file, profiles);
-        QualityReport report = new QualityScorer(catalog).score(file, profiles, findings);
+        List<Finding> findings = new ValidationEngine(CATALOG, new TptRuleSet()).validate(file, profiles);
+        QualityReport report = new QualityScorer(CATALOG).score(file, profiles, findings);
 
         Path out = tmp.resolve("multi-fund.xlsx");
-        new XlsxReportWriter(catalog, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.DESKTOP).write(report, out);
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.DESKTOP).write(report, out);
 
         try (Workbook wb = new XSSFWorkbook(Files.newInputStream(out))) {
             Sheet perFund = wb.getSheet("Per Fund");

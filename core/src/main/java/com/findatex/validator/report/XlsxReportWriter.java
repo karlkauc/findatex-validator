@@ -64,6 +64,7 @@ public final class XlsxReportWriter {
             applyWorkbookProperties(wb, report);
             writeSummary(wb, report, header, pct);
             writeScores(wb, report, header, pct);
+            writePerFund(wb, report, header, pct);
             writeFindings(wb, report, header, err, warn);
             writeFieldCoverage(wb, report, header);
             writePerPosition(wb, report, header, ok, warn, err);
@@ -205,6 +206,43 @@ public final class XlsxReportWriter {
             }
         }
         for (int c = 0; c < 4; c++) s.autoSizeColumn(c);
+    }
+
+    private static void writePerFund(Workbook wb, QualityReport r, CellStyle header, CellStyle pct) {
+        if (r.perFundScores().size() <= 1) return;     // single-fund => no extra sheet
+        Sheet s = wb.createSheet("Per Fund");
+        XlsxStyles.addRow(s, 0, header,
+                "Fund #", "Portfolio ID", "Portfolio Name", "Valuation Date",
+                "Mandatory", "Format", "Closed-List", "Cross-Field", "Overall");
+
+        java.util.List<FundGroup> groups = FundGrouper.group(r.file());
+        Map<com.findatex.validator.domain.FundKey, Map<ScoreCategory, Double>> sm = r.perFundScores();
+
+        int row = 1;
+        int idx = 1;
+        for (FundGroup g : groups) {
+            Map<ScoreCategory, Double> sc = sm.get(g.key());
+            if (sc == null) continue;
+            Row rr = s.createRow(row++);
+            rr.createCell(0).setCellValue(idx++);
+            rr.createCell(1).setCellValue(nz(g.key().portfolioId()));
+            rr.createCell(2).setCellValue(nz(firstNonEmpty(g, "3")));
+            rr.createCell(3).setCellValue(nz(g.key().valuationDate()));
+            putPct(rr, 4, sc.get(ScoreCategory.MANDATORY_COMPLETENESS), pct);
+            putPct(rr, 5, sc.get(ScoreCategory.FORMAT_CONFORMANCE),     pct);
+            putPct(rr, 6, sc.get(ScoreCategory.CLOSED_LIST_CONFORMANCE), pct);
+            putPct(rr, 7, sc.get(ScoreCategory.CROSS_FIELD_CONSISTENCY), pct);
+            putPct(rr, 8, sc.get(ScoreCategory.OVERALL),                 pct);
+        }
+        s.createFreezePane(0, 1);
+        for (int c = 0; c < 9; c++) s.autoSizeColumn(c);
+    }
+
+    private static void putPct(Row rr, int col, Double v, CellStyle pct) {
+        org.apache.poi.ss.usermodel.Cell c = rr.createCell(col);
+        if (v == null) { c.setCellValue(""); return; }
+        c.setCellValue(v);
+        c.setCellStyle(pct);
     }
 
     private static void writeFindings(Workbook wb, QualityReport r,

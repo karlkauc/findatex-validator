@@ -11,9 +11,11 @@ import com.findatex.validator.spec.SpecLoader;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.ValidationEngine;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -21,6 +23,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -320,6 +324,44 @@ class XlsxReportWriterTest {
             assertThat(seen)
                     .as("Scores sheet should contain at least 4 overall categories")
                     .isGreaterThanOrEqualTo(4);
+        }
+    }
+
+    @Test
+    void multiFundReportContainsPerFundSheet(@TempDir Path tmp) throws Exception {
+        // Resolve the multi-fund fixture using the same walk-up samplesDir() pattern
+        // ExampleSamplesTest uses (assumes the project root has samples/tpt/).
+        Path cwd = Paths.get("").toAbsolutePath();
+        Path samples = cwd.resolve("samples").resolve("tpt");
+        if (!Files.isDirectory(samples)) {
+            Path parent = cwd.getParent();
+            if (parent != null) samples = parent.resolve("samples").resolve("tpt");
+        }
+        Path src = samples.resolve("13_multi_fund_with_errors.xlsx");
+        Assumptions.assumeTrue(Files.isRegularFile(src), "multi-fund fixture missing");
+
+        SpecCatalog catalog = SpecLoader.loadBundled();
+        TptFile file = new TptFileLoader(catalog).load(src);
+        Set<ProfileKey> profiles = Set.of(TptProfiles.SOLVENCY_II);
+        List<Finding> findings = new ValidationEngine(catalog, new TptRuleSet()).validate(file, profiles);
+        QualityReport report = new QualityScorer(catalog).score(file, profiles, findings);
+
+        Path out = tmp.resolve("multi-fund.xlsx");
+        new XlsxReportWriter(catalog, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.DESKTOP).write(report, out);
+
+        try (Workbook wb = new XSSFWorkbook(Files.newInputStream(out))) {
+            Sheet perFund = wb.getSheet("Per Fund");
+            assertThat(perFund).as("Per Fund sheet exists for multi-fund report").isNotNull();
+            // Header + 3 funds (FR / DE / LU)
+            assertThat(perFund.getLastRowNum()).isEqualTo(3);
+            Row header = perFund.getRow(0);
+            assertThat(header.getCell(0).getStringCellValue()).isEqualTo("Fund #");
+            assertThat(header.getCell(1).getStringCellValue()).isEqualTo("Portfolio ID");
+            assertThat(header.getCell(4).getStringCellValue()).isEqualTo("Mandatory");
+            // Body — order is encounter order (FR, DE, LU)
+            List<String> ids = new ArrayList<>();
+            for (int r = 1; r <= 3; r++) ids.add(perFund.getRow(r).getCell(1).getStringCellValue());
+            assertThat(ids).containsExactly("FR0010000001", "DE0010000002", "LU0010000003");
         }
     }
 

@@ -917,6 +917,14 @@ public final class TemplateTabController {
             if (v == null) continue;
             scorePane.getChildren().add(buildScoreCard(pe.getKey().displayName(), v));
         }
+        for (Map.Entry<com.findatex.validator.domain.FundKey, Map<ScoreCategory, Double>> fe
+                : report.perFundScores().entrySet()) {
+            Double v = fe.getValue().get(ScoreCategory.OVERALL);
+            if (v == null) continue;
+            String pid = fe.getKey().portfolioId();
+            String label = "Fund " + (pid == null ? "(no id)" : pid);
+            scorePane.getChildren().add(buildScoreCard(label, v));
+        }
 
         List<FindingRow> rows = report.findings().stream().map(FindingRow::of).toList();
         if (rows.size() > FLAT_FINDINGS_DISPLAY_CAP) {

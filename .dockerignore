@@ -8,6 +8,10 @@ specs/
 # Tooling/scripts not needed at build time
 samples/
 docs/
+# Exception: the per-template rules reference is bundled into the core JAR
+# (see core/pom.xml's <resource> for ../docs/rules) and surfaced in the in-app
+# Help dialog, so it must reach the build context.
+!docs/rules/
 package/
 tools/
 

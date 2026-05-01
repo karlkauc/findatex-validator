@@ -77,6 +77,54 @@ class FormatRuleCornerCasesTest {
         assertHasError(dateRule(), v, "ISO 8601");
     }
 
+    // -------------------------------------------------------- DATETIME
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "2026-04-10 11:22:09",     // EET file-generation field — space-separated
+            "2026-04-10T11:22:09",     // ISO 'T' separator
+            "2026-04-10 11:22",        // minutes precision
+            "2026-04-10",              // graceful: date-only on a datetime field
+    })
+    void datetimeValidValues(String v) {
+        assertNoErrors(datetimeRule(), v);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "10/04/2026 11:22:09",     // wrong date order
+            "2026-04-10 25:00:00",     // impossible hour
+            "2026-04-10 11-22-09",     // wrong time separator
+            "Jan 1 2025 11:22:09",
+    })
+    void datetimeInvalidValues(String v) {
+        assertHasError(datetimeRule(), v, "date-time");
+    }
+
+    // -------------------------------------------------------- DATE_LIST
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "2024-12-23;2024-08-29",      // EET field 36 — two-date list
+            "2024-12-23 ; 2024-08-29",    // with whitespace
+            "2024-12-23/2024-08-29",      // slash separator
+            "2024-12-23; 2024-08-29; 2025-01-15; 2025-02-01", // four dates
+            "2024-12-23",                  // single date is also a valid 1-element list
+    })
+    void dateListValidValues(String v) {
+        assertNoErrors(dateListRule(), v);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "2024-12-23;not-a-date",
+            "2024-13-01;2024-08-29",       // 13th month invalid
+            "23/12/2024;2024-08-29",        // wrong order in first piece
+    })
+    void dateListInvalidValues(String v) {
+        assertHasError(dateListRule(), v, "date list");
+    }
+
     // ------------------------------------------------------------- ISO_4217
 
     @ParameterizedTest
@@ -261,6 +309,10 @@ class FormatRuleCornerCasesTest {
             new CodificationDescriptor(CodificationKind.NUMERIC, Optional.empty(), List.of(), "n"))); }
     private static FormatRule dateRule()     { return new FormatRule(makeField("02",
             new CodificationDescriptor(CodificationKind.DATE, Optional.empty(), List.of(), "d"))); }
+    private static FormatRule datetimeRule() { return new FormatRule(makeField("02dt",
+            new CodificationDescriptor(CodificationKind.DATETIME, Optional.empty(), List.of(), "dt"))); }
+    private static FormatRule dateListRule() { return new FormatRule(makeField("02dl",
+            new CodificationDescriptor(CodificationKind.DATE_LIST, Optional.empty(), List.of(), "dl"))); }
     private static FormatRule currencyRule() { return new FormatRule(makeField("03",
             new CodificationDescriptor(CodificationKind.ISO_4217, Optional.empty(), List.of(), "c"))); }
     private static FormatRule countryRule()  { return new FormatRule(makeField("04",

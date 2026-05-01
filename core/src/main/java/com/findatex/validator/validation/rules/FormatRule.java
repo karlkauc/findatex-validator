@@ -9,8 +9,10 @@ import com.findatex.validator.validation.ValidationContext;
 import com.findatex.validator.validation.refdata.IsoData;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +26,19 @@ public final class FormatRule implements Rule {
      *  ({@code uuuu}) so impossible dates like 2025-02-30 are rejected instead of being
      *  clamped to the last valid day of the month. */
     private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ofPattern("uuuu-MM-dd")
-            .withResolverStyle(java.time.format.ResolverStyle.STRICT);
+            .withResolverStyle(ResolverStyle.STRICT);
+    /** Strict ISO 8601 date-time variants accepted for {@link CodificationKind#DATETIME}.
+     *  Both space-separated ({@code "2026-04-10 11:22:09"}) and {@code 'T'}-separated
+     *  ({@code "2026-04-10T11:22:09"}) are common in producer outputs; minutes-precision
+     *  is also accepted. */
+    private static final List<DateTimeFormatter> ISO_DATETIME_VARIANTS = List.of(
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withResolverStyle(ResolverStyle.STRICT),
+            DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss").withResolverStyle(ResolverStyle.STRICT),
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm").withResolverStyle(ResolverStyle.STRICT),
+            DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm").withResolverStyle(ResolverStyle.STRICT));
+    /** Splitter for {@link CodificationKind#DATE_LIST} values. The spec writes the separator
+     *  as either {@code ;} or {@code /} (sometimes mixed with whitespace). */
+    private static final Pattern DATE_LIST_SPLIT = Pattern.compile("\\s*[;/]\\s*");
     /** NACE V2.1: a single sector letter A..U optionally followed by 1..4 digits (no dots, per spec). */
     private static final Pattern NACE_PATTERN = Pattern.compile("^[A-U]\\d{0,4}$");
     private static final Pattern CIC_PATTERN = Pattern.compile("^[A-Z]{2}[0-9A-F][0-9A-Z]$");
@@ -85,6 +99,27 @@ public final class FormatRule implements Rule {
                 } catch (DateTimeParseException e) {
                     return "Expected ISO 8601 date YYYY-MM-DD";
                 }
+            }
+            case DATETIME: {
+                for (DateTimeFormatter f : ISO_DATETIME_VARIANTS) {
+                    try { LocalDateTime.parse(v, f); return null; }
+                    catch (DateTimeParseException ignored) { }
+                }
+                // Producers occasionally emit a date-only timestamp on a datetime field;
+                // accept that as a graceful fallback rather than flagging the file.
+                try { LocalDate.parse(v, ISO_DATE); return null; }
+                catch (DateTimeParseException ignored) { }
+                return "Expected ISO 8601 date-time YYYY-MM-DD hh:mm:ss";
+            }
+            case DATE_LIST: {
+                for (String part : DATE_LIST_SPLIT.split(v)) {
+                    if (part.isEmpty()) continue;
+                    try { LocalDate.parse(part, ISO_DATE); }
+                    catch (DateTimeParseException e) {
+                        return "Expected ISO 8601 date list (YYYY-MM-DD separated by ';' or '/')";
+                    }
+                }
+                return null;
             }
             case ISO_4217: {
                 String u = v.toUpperCase(Locale.ROOT);

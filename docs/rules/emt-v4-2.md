@@ -182,7 +182,7 @@ Definition: Contact entry point for distributors regarding EMT
 ### Field 5 — 5
 
 Path: `00005_File_Generation_Date_And_Time`
-Codification: DATE
+Codification: DATETIME
 Applicability: all rows
 Definition: Date and Time of the creation of the EMT file
 
@@ -197,7 +197,7 @@ Definition: Date and Time of the creation of the EMT file
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `PRESENCE/5/EMT_BASE` | EMT (Mandatory) | ERROR | Cell is empty for an active row of profile EMT (Mandatory) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/5` | (all) | ERROR | Populated cell does not match the codification (DATE) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/5` | (all) | ERROR | Populated cell does not match the codification (DATETIME) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---

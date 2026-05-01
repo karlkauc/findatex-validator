@@ -40,6 +40,10 @@ public final class CodificationParser {
      *  Used for mixed numeric+letter codifications like {@code "floating decimal or V or S or M or L or H"}. */
     private static final Pattern OR_SINGLE_LETTER =
             Pattern.compile("\\b[oO][rR]\\s+([A-Z])(?![a-zA-Z])");
+    /** Two {@code yyyy-mm-dd} placeholders separated by {@code ;} or {@code /} (with whitespace).
+     *  Marks the codification as a list-of-dates rather than a single date. */
+    private static final Pattern DATE_LIST_PATTERN =
+            Pattern.compile("yyyy-mm-dd\\s*[;/]\\s*yyyy-mm-dd");
 
     private CodificationParser() {}
 
@@ -77,6 +81,15 @@ public final class CodificationParser {
             return new CodificationDescriptor(CodificationKind.ISO_3166_A2, Optional.empty(), closedList, text);
         }
         if (lower.contains("yyyy-mm-dd") || lower.contains("iso 8601")) {
+            // Multi-date list: "YYYY-MM-DD ; YYYY-MM-DD" or "YYYY-MM-DD / YYYY-MM-DD"
+            // (e.g. EET v1.1.2 field 36: "YYYY-MM-DD / YYYY-MM-DD ; YYYY-MM-DD; YYYY-MM-DD ISO 8601").
+            if (DATE_LIST_PATTERN.matcher(lower).find()) {
+                return new CodificationDescriptor(CodificationKind.DATE_LIST, Optional.empty(), closedList, text);
+            }
+            // Date + time: "YYYY-MM-DD hh:mm:ss" (e.g. EET/EMT/EPT file-generation field).
+            if (lower.contains("hh:mm")) {
+                return new CodificationDescriptor(CodificationKind.DATETIME, Optional.empty(), closedList, text);
+            }
             return new CodificationDescriptor(CodificationKind.DATE, Optional.empty(), closedList, text);
         }
         if (lower.contains("nace")) {

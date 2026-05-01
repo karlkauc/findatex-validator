@@ -692,7 +692,7 @@ Definition: Contact entry point for distributors regarding EET
 ### Field 5 — 5
 
 Path: `00050_EET_File_Generation_Date_And_Time`
-Codification: DATE
+Codification: DATETIME
 Applicability: all rows
 Definition: Date and Time of the creation of the EET file
 
@@ -721,7 +721,7 @@ Definition: Date and Time of the creation of the EET file
 | `PRESENCE/5/MIFID_DISTRIBUTORS` | MiFID Distributors | ERROR | Cell is empty for an active row of profile MiFID Distributors | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `PRESENCE/5/IDD_INSURERS` | IDD Insurers | ERROR | Cell is empty for an active row of profile IDD Insurers | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `PRESENCE/5/LOOK_THROUGH` | Look-through (FoF) | ERROR | Cell is empty for an active row of profile Look-through (FoF) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/5` | (all) | ERROR | Populated cell does not match the codification (DATE) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/5` | (all) | ERROR | Populated cell does not match the codification (DATETIME) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1702,7 +1702,7 @@ Definition: Pre Contractual Disclosure for Financial Products referred to in Art
 ### Field 36 — 36
 
 Path: `20130_Financial_Instrument_Production_Date_PCDFP`
-Codification: DATE
+Codification: DATE_LIST
 Applicability: all rows
 Definition: Dates of production of PCDFP for the different languages
 
@@ -1723,7 +1723,7 @@ Definition: Dates of production of PCDFP for the different languages
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/36` | (all) | ERROR | Populated cell does not match the codification (DATE) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/36` | (all) | ERROR | Populated cell does not match the codification (DATE_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 | `EET-XF-PCDFP-36` | (all) | WARNING | Any of fields `27`, `28` ∈ [8, 9] | Field `36` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 

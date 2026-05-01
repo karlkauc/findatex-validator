@@ -11,8 +11,8 @@ services:
     restart: unless-stopped
     environment:
       # --- Throttling --------------------------------------------------------
-      FINDATEX_WEB_RATE_LIMIT_PER_IP_PER_HOUR: "10"
-      FINDATEX_WEB_MAX_CONCURRENCY: "4"
+      FINDATEX_WEB_RATE_LIMIT_PER_IP_PER_HOUR: "10000"
+      FINDATEX_WEB_MAX_CONCURRENCY: "8"
       FINDATEX_WEB_REPORT_TTL_MINUTES: "5"
 
       # --- External validation -----------------------------------------------
@@ -38,10 +38,10 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
-          cpus: "1.0"
+          memory: 2048M
+          cpus: "2.0"
         reservations:
-          memory: 256M
+          memory: 512M
 
     healthcheck:
       # BusyBox wget is bundled in alpine:3.20 — exits 0 on 2xx, non-zero on >=400.

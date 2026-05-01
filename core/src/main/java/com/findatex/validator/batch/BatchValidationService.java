@@ -74,7 +74,9 @@ public final class BatchValidationService {
         Instant startedAt = Instant.now();
         TptFileLoader loader = new TptFileLoader(catalog);
         TemplateRuleSet ruleSet = options.template().ruleSetFor(options.version());
-        ValidationEngine engine = new ValidationEngine(catalog, ruleSet);
+        com.findatex.validator.template.api.FindingContextSpec contextSpec =
+                options.template().findingContextSpec();
+        ValidationEngine engine = new ValidationEngine(catalog, ruleSet, contextSpec);
         QualityScorer scorer = new QualityScorer(catalog);
 
         ExternalValidationConfig externalConfig = options.template()
@@ -122,7 +124,8 @@ public final class BatchValidationService {
                     l.onProgress(new BatchProgress(i, total, displayName, BatchProgress.Phase.EXTERNAL));
                     List<Finding> online = FindingEnricher.enrich(tptFile,
                             externalService.run(tptFile, externalConfig,
-                                    options.appSettings(), cancel, sink));
+                                    options.appSettings(), cancel, sink),
+                            contextSpec);
                     List<Finding> all = new ArrayList<>(findings.size() + online.size());
                     all.addAll(findings);
                     all.addAll(online);

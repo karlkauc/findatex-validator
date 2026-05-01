@@ -36,15 +36,17 @@ public final class CsvLoader {
 
     public TptFile load(Path file) throws IOException {
         byte[] bytes = Files.readAllBytes(file);
-        return load(bytes, file);
+        return load(bytes, file, null);
     }
 
     public TptFile load(InputStream in, String filename) throws IOException {
         byte[] bytes = in.readAllBytes();
-        return load(bytes, Path.of(filename == null || filename.isBlank() ? "uploaded.csv" : filename));
+        // Web upload path: keep the bytes on the TptFile so the report writer can rebuild
+        // the Annotated-Source tab without going back to the (now-deleted) tempfile.
+        return load(bytes, Path.of(filename == null || filename.isBlank() ? "uploaded.csv" : filename), bytes);
     }
 
-    private TptFile load(byte[] bytes, Path source) throws IOException {
+    private TptFile load(byte[] bytes, Path source, byte[] sourceBytes) throws IOException {
         char delimiter = detectDelimiter(bytes);
         log.debug("CSV delimiter for {}: {}", source.getFileName(), (int) delimiter);
         CSVFormat format = CSVFormat.DEFAULT.builder()
@@ -58,7 +60,7 @@ public final class CsvLoader {
              CSVParser parser = format.parse(r)) {
             List<CSVRecord> records = parser.getRecords();
             if (records.isEmpty()) {
-                return new TptFile(source, "csv", List.of(), Map.of(), List.of(), List.of());
+                return new TptFile(source, "csv", List.of(), Map.of(), List.of(), List.of(), sourceBytes);
             }
             List<String> headers = new ArrayList<>();
             for (String h : records.get(0)) headers.add(h);
@@ -79,7 +81,7 @@ public final class CsvLoader {
             }
             log.info("Loaded CSV {} ({} rows, {} mapped fields, {} unmapped headers)",
                     source.getFileName(), rows.size(), map.size(), unmapped.size());
-            return new TptFile(source, "csv", headers, map, unmapped, rows);
+            return new TptFile(source, "csv", headers, map, unmapped, rows, sourceBytes);
         }
     }
 

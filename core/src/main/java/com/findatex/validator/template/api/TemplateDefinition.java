@@ -49,4 +49,14 @@ public interface TemplateDefinition {
     default ExternalValidationConfig externalValidationConfigFor(TemplateVersion version) {
         return ExternalValidationConfig.empty();
     }
+
+    /**
+     * Maps {@link com.findatex.validator.validation.Finding} context slots to the data-file
+     * field {@code numKey}s holding those values. Default is {@link FindingContextSpec#EMPTY},
+     * which leaves findings unannotated; templates that have a portfolio/position notion
+     * (currently TPT, plus EMT's issuer/instrument shape) should override.
+     */
+    default FindingContextSpec findingContextSpec() {
+        return FindingContextSpec.EMPTY;
+    }
 }

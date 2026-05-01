@@ -129,6 +129,48 @@ class CodificationParserCornerCasesTest {
     }
 
     @Test
+    void numericRangeIsExpandedIntoClosedList() {
+        // EMT V4.2 NUM 44 codification: "1-7 or Empty " (Risk_Tolerance_PRIIPS_Methodology).
+        // Without range support the bullet regex misreads this as a single-entry closed list
+        // ("1" with label "7 or Empty"), then any value ∈ {2..7} fails the FORMAT rule.
+        CodificationDescriptor d = CodificationParser.parse("1-7 or Empty ");
+        assertThat(d.kind()).isEqualTo(CodificationKind.CLOSED_LIST);
+        assertThat(d.closedList()).extracting(CodificationDescriptor.ClosedListEntry::code)
+                .containsExactly("1", "2", "3", "4", "5", "6", "7");
+    }
+
+    @Test
+    void numericRangeWithEnDashIsExpanded() {
+        CodificationDescriptor d = CodificationParser.parse("1 – 6");
+        assertThat(d.kind()).isEqualTo(CodificationKind.CLOSED_LIST);
+        assertThat(d.closedList()).extracting(CodificationDescriptor.ClosedListEntry::code)
+                .containsExactly("1", "2", "3", "4", "5", "6");
+    }
+
+    @Test
+    void floatingDecimalExampleIsNotClosedList() {
+        // EMT V4.2 cost fields (NUM 62, 66, 69-76, 84-90) carry a "Floating decimal." rubric
+        // followed by inline examples like "1.15% = 0.0115". Without the post-separator
+        // whitespace requirement, the bullet regex misreads "1" + "." + "15% = 0.0115" as a
+        // single-entry closed list, then real cost values (e.g. 0.004) fail the FORMAT rule.
+        String raw = "Floating decimal. \n1.15% = 0.0115\n5% =  0.05\nNumber must be >=0";
+        CodificationDescriptor d = CodificationParser.parse(raw);
+        assertThat(d.kind()).isEqualTo(CodificationKind.NUMERIC);
+        assertThat(d.closedList()).isEmpty();
+    }
+
+    @Test
+    void floatingDecimalWithLetterAlternativesKeepsLettersAsClosedList() {
+        // EMT V4.2 NUM 55 (Minimum_Recommended_Holding_Period) accepts a numeric value or one
+        // of V/S/M/L/H. The kind stays NUMERIC, but the letters live in closedList so FormatRule
+        // can accept them as alternatives.
+        CodificationDescriptor d = CodificationParser.parse("floating decimal  or V or S or M or L or H");
+        assertThat(d.kind()).isEqualTo(CodificationKind.NUMERIC);
+        assertThat(d.closedList()).extracting(CodificationDescriptor.ClosedListEntry::code)
+                .containsExactly("V", "S", "M", "L", "H");
+    }
+
+    @Test
     void hasClosedListReflectsContent() {
         CodificationDescriptor empty = CodificationParser.parse("number with floating decimal");
         assertThat(empty.hasClosedList()).isFalse();

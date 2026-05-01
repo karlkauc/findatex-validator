@@ -68,6 +68,13 @@ public final class FormatRule implements Rule {
                     Double.parseDouble(n);
                     return null;
                 } catch (NumberFormatException e) {
+                    // Some specs allow EITHER a number OR specific letter codes (e.g. EMT
+                    // V4.2 NUM 55 holding-period: "floating decimal or V or S or M or L or H").
+                    // Codifications of that shape parse the letters into closedList; accept them.
+                    if (codif.hasClosedList()
+                            && codif.closedList().stream().anyMatch(en -> en.code().equalsIgnoreCase(v))) {
+                        return null;
+                    }
                     return "Expected numeric value (floating decimal)";
                 }
             }

@@ -552,7 +552,10 @@ public final class TemplateTabController {
             protected QualityReport call() throws Exception {
                 TptFile file = new TptFileLoader(cat).load(path);
                 TemplateRuleSet ruleSet = template.ruleSetFor(selectedVersion);
-                List<Finding> findings = new ValidationEngine(cat, ruleSet).validate(file, profiles);
+                com.findatex.validator.template.api.FindingContextSpec contextSpec =
+                        template.findingContextSpec();
+                List<Finding> findings = new ValidationEngine(cat, ruleSet, contextSpec)
+                        .validate(file, profiles);
 
                 if (externalSupported && settings.external().enabled()) {
                     Path cacheDir = resolveExternalCacheDir(settings);
@@ -561,7 +564,8 @@ public final class TemplateTabController {
                     BooleanSupplier cancelled = pCtrl != null ? pCtrl::isCancelled : () -> false;
                     ExternalValidationService.ProgressSink sink = buildSink(pCtrl);
                     List<Finding> online = FindingEnricher.enrich(
-                            file, svc.run(file, externalConfig, settings, cancelled, sink));
+                            file, svc.run(file, externalConfig, settings, cancelled, sink),
+                            contextSpec);
                     List<Finding> all = new ArrayList<>(findings);
                     all.addAll(online);
                     findings = all;

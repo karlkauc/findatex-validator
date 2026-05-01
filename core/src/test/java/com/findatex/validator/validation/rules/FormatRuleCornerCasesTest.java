@@ -77,6 +77,27 @@ class FormatRuleCornerCasesTest {
         assertHasError(dateRule(), v, "ISO 8601");
     }
 
+    @Test
+    void dateAcceptsClosedListAlternative() {
+        // EPT V2.1 NUM 107 (06060_Time_Interval_Maximum_Loss): codification is
+        // "Frequency (1=annual / 2=biannual / 4=quarterly / 12=monthly / ... /
+        // 252=daily / YYYY-MM-DD=fixed date)" — the value is either one of the
+        // listed integer codes or a date.
+        FormatRule rule = new FormatRule(makeField("107", new CodificationDescriptor(
+                CodificationKind.DATE,
+                Optional.empty(),
+                List.of(
+                        new CodificationDescriptor.ClosedListEntry("1", "annual"),
+                        new CodificationDescriptor.ClosedListEntry("12", "monthly"),
+                        new CodificationDescriptor.ClosedListEntry("252", "daily")),
+                "1=annual / 12=monthly / 252=daily / YYYY-MM-DD=fixed date")));
+        assertNoErrors(rule, "1");
+        assertNoErrors(rule, "12");
+        assertNoErrors(rule, "252");
+        assertNoErrors(rule, "2026-04-10");
+        assertHasError(rule, "weekly", "ISO 8601");
+    }
+
     // -------------------------------------------------------- DATETIME
 
     @ParameterizedTest

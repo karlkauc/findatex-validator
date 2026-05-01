@@ -47,6 +47,7 @@ public final class CsvLoader {
     }
 
     private TptFile load(byte[] bytes, Path source, byte[] sourceBytes) throws IOException {
+        bytes = stripUtf8Bom(bytes);
         char delimiter = detectDelimiter(bytes);
         log.debug("CSV delimiter for {}: {}", source.getFileName(), (int) delimiter);
         // FinDatEx pipe-delimited files don't quote their values (the whole point
@@ -89,6 +90,22 @@ public final class CsvLoader {
                     source.getFileName(), rows.size(), map.size(), unmapped.size());
             return new TptFile(source, "csv", headers, map, unmapped, rows, sourceBytes);
         }
+    }
+
+    /** Drop a leading UTF-8 BOM ({@code EF BB BF}) so the first header parses cleanly.
+     *  Several producers (DWS, Amundi) emit BOM-prefixed CSVs; without this strip the first
+     *  header would carry a {@code ﻿} prefix and never match the spec, leading to
+     *  spurious "field N missing" findings on every row. */
+    private static byte[] stripUtf8Bom(byte[] bytes) {
+        if (bytes.length >= 3
+                && (bytes[0] & 0xFF) == 0xEF
+                && (bytes[1] & 0xFF) == 0xBB
+                && (bytes[2] & 0xFF) == 0xBF) {
+            byte[] out = new byte[bytes.length - 3];
+            System.arraycopy(bytes, 3, out, 0, out.length);
+            return out;
+        }
+        return bytes;
     }
 
     static char detectDelimiter(Path file) throws IOException {

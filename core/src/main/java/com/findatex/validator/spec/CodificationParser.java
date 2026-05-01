@@ -162,7 +162,10 @@ public final class CodificationParser {
         java.util.LinkedHashSet<String> tokens = new java.util.LinkedHashSet<>();
         while (qm.find()) {
             String t = qm.group(1).trim();
-            if (!t.isEmpty()) tokens.add(t);
+            // Skip the "YYYY-MM-DD" placeholder — it's a format hint inside hybrid
+            // codifications like "1=annual / 252=daily / YYYY-MM-DD=fixed date", not a
+            // literal value the producer would emit.
+            if (!t.isEmpty() && !t.equalsIgnoreCase("YYYY-MM-DD")) tokens.add(t);
         }
         if (tokens.size() >= 2) {
             for (String t : tokens) entries.add(new CodificationDescriptor.ClosedListEntry(t, t));

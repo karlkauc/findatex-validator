@@ -2781,7 +2781,7 @@ Definition: 100% minus the maximum possible loss in percentage of its market val
 ### Field 107 — 107
 
 Path: `06060_Time_Interval_Maximum_Loss`
-Codification: DATE, closed list of 9 entries
+Codification: DATE, closed list of 8 entries
 Applicability: all rows
 Definition: The time period in which a possible loss of a capital preservation funds is measured.
 

@@ -73,6 +73,11 @@ public final class FormatRule implements Rule {
         return out;
     }
 
+    private static boolean matchesClosedList(CodificationDescriptor codif, String value) {
+        return codif.hasClosedList()
+                && codif.closedList().stream().anyMatch(en -> en.code().equalsIgnoreCase(value));
+    }
+
     private String checkFormat(CodificationDescriptor codif, String raw) {
         String v = raw.trim();
         switch (codif.kind()) {
@@ -97,6 +102,7 @@ public final class FormatRule implements Rule {
                     LocalDate.parse(v, ISO_DATE);
                     return null;
                 } catch (DateTimeParseException e) {
+                    if (matchesClosedList(codif, v)) return null;
                     return "Expected ISO 8601 date YYYY-MM-DD";
                 }
             }
@@ -109,6 +115,7 @@ public final class FormatRule implements Rule {
                 // accept that as a graceful fallback rather than flagging the file.
                 try { LocalDate.parse(v, ISO_DATE); return null; }
                 catch (DateTimeParseException ignored) { }
+                if (matchesClosedList(codif, v)) return null;
                 return "Expected ISO 8601 date-time YYYY-MM-DD hh:mm:ss";
             }
             case DATE_LIST: {

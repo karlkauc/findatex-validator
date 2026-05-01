@@ -130,6 +130,9 @@ echo "Building $PACKAGE_TYPE for $UNAME_S — version $APP_VERSION, vendor '$APP
 echo "  add-modules:  $ADD_MODULES"
 echo "  java-options: $JAVA_OPTIONS"
 
+# macOS ships /bin/bash 3.2, which under `set -u` aborts on empty-array
+# expansion ("${arr[@]}"). The "${arr[@]+...}" guard is the bash 3.2-safe way
+# to expand to nothing when the array is unset/empty.
 jpackage \
   --type "$PACKAGE_TYPE" \
   --name "$APP_NAME" \
@@ -140,9 +143,9 @@ jpackage \
   --main-jar "$(basename "$SHADED_JAR")" \
   --main-class com.findatex.validator.AppLauncher \
   --add-modules "$ADD_MODULES" \
-  "${JAVA_OPTION_ARGS[@]}" \
-  "${ICON_ARG[@]}" \
-  "${EXTRA_ARGS[@]}" \
+  ${JAVA_OPTION_ARGS[@]+"${JAVA_OPTION_ARGS[@]}"} \
+  ${ICON_ARG[@]+"${ICON_ARG[@]}"} \
+  ${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"} \
   --dest "$OUT_DIR"
 
 echo "Output at $OUT_DIR:"

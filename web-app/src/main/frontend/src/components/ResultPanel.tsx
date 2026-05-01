@@ -4,6 +4,7 @@ import { ValidationResponse } from '../types/api';
 import { reportDownloadUrl } from '../api/client';
 import { ScoreBadge } from './ScoreBadge';
 import { FindingsTable } from './FindingsTable';
+import { PerFundScores } from './PerFundScores';
 
 interface Props {
   result: ValidationResponse;
@@ -60,6 +61,8 @@ export function ResultPanel({ result }: Props) {
           </div>
         )}
       </div>
+
+      <PerFundScores perFundScores={result.perFundScores ?? []} />
 
       <FindingsTable findings={result.findings} />
     </div>

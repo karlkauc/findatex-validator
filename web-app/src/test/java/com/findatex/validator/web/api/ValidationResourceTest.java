@@ -103,4 +103,28 @@ class ValidationResourceTest {
         r.then().statusCode(200);
         assertThat(r.asString()).doesNotContain(secretKey);
     }
+
+    @Test
+    void multiFundUploadIncludesPerFundScores() throws Exception {
+        // Walk up to the project root samples/tpt/.
+        java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
+        java.nio.file.Path samples = cwd.resolve("samples").resolve("tpt");
+        if (!java.nio.file.Files.isDirectory(samples) && cwd.getParent() != null) {
+            samples = cwd.getParent().resolve("samples").resolve("tpt");
+        }
+        java.nio.file.Path src = samples.resolve("13_multi_fund_with_errors.xlsx");
+        org.junit.jupiter.api.Assumptions.assumeTrue(java.nio.file.Files.isRegularFile(src), "multi-fund fixture missing");
+
+        given()
+                .multiPart("templateId", "TPT")
+                .multiPart("templateVersion", "V7.0")
+                .multiPart("profiles", "SOLVENCY_II")
+                .multiPart("file", src.toFile())
+                .when().post("/api/validate")
+                .then()
+                .statusCode(200)
+                .body("perFundScores.size()", org.hamcrest.Matchers.is(3))
+                .body("perFundScores.portfolioId", org.hamcrest.Matchers.hasItems("FR0010000001", "DE0010000002", "LU0010000003"))
+                .body("perFundScores[0].scores.size()", org.hamcrest.Matchers.greaterThan(0));
+    }
 }

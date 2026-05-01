@@ -58,7 +58,7 @@ describe('api/client', () => {
     });
 
     it('POSTs multipart/form-data to /api/validate with all fields', async () => {
-      fetchSpy.mockResolvedValue(ok({ summary: { filename: 'sample.xlsx' }, scores: [], findings: [], reportId: 'r' }));
+      fetchSpy.mockResolvedValue(ok({ summary: { filename: 'sample.xlsx' }, scores: [], perFundScores: [], findings: [], reportId: 'r' }));
       await validateUpload({
         templateId: 'TPT',
         templateVersion: 'V7.0',
@@ -81,7 +81,7 @@ describe('api/client', () => {
     });
 
     it('omits external-validation fields when externalEnabled is false/undefined', async () => {
-      fetchSpy.mockResolvedValue(ok({ summary: {}, scores: [], findings: [], reportId: 'r' }));
+      fetchSpy.mockResolvedValue(ok({ summary: {}, scores: [], perFundScores: [], findings: [], reportId: 'r' }));
       await validateUpload({
         templateId: 'TPT',
         templateVersion: 'V7.0',
@@ -96,7 +96,7 @@ describe('api/client', () => {
     });
 
     it('appends external-validation flags + api key when externalEnabled is true', async () => {
-      fetchSpy.mockResolvedValue(ok({ summary: {}, scores: [], findings: [], reportId: 'r' }));
+      fetchSpy.mockResolvedValue(ok({ summary: {}, scores: [], perFundScores: [], findings: [], reportId: 'r' }));
       await validateUpload({
         templateId: 'TPT',
         templateVersion: 'V7.0',
@@ -125,7 +125,7 @@ describe('api/client', () => {
     });
 
     it('omits openfigiApiKey when externalEnabled is true but no key was provided', async () => {
-      fetchSpy.mockResolvedValue(ok({ summary: {}, scores: [], findings: [], reportId: 'r' }));
+      fetchSpy.mockResolvedValue(ok({ summary: {}, scores: [], perFundScores: [], findings: [], reportId: 'r' }));
       await validateUpload({
         templateId: 'TPT',
         templateVersion: 'V7.0',

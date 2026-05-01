@@ -57,10 +57,18 @@ export interface ValidationSummary {
   generatedAt: string;
 }
 
+export interface PerFundScoreDto {
+  portfolioId: string | null;
+  portfolioName: string | null;
+  valuationDate: string | null;
+  scores: ScoreDto[];
+}
+
 export interface ValidationResponse {
   summary: ValidationSummary;
   scores: ScoreDto[];
   perProfileScores: Record<string, ScoreDto[]>;
+  perFundScores: PerFundScoreDto[];
   findings: FindingDto[];
   reportId: string;
 }

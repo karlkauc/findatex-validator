@@ -137,6 +137,20 @@ public class ValidationOrchestrator {
                             .build());
         }
 
+        // Pre-flight: zero mapped fields with non-empty headers means the file
+        // doesn't match the chosen template/version. Without this, every row ×
+        // every mandatory field becomes a "missing" finding — easily 100k+ findings
+        // on a multi-thousand-row file, which exhausts the JVM heap.
+        if (file.headerToNumKey().isEmpty() && !file.rawHeaders().isEmpty()) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("File does not match template " + def.id() + " " + version.version()
+                                    + ": none of the " + file.rawHeaders().size()
+                                    + " column header(s) are recognized. "
+                                    + "Check that you picked the right template and version.")
+                            .build());
+        }
+
         List<Finding> findings = new ValidationEngine(bundle.catalog, bundle.ruleSet, def.findingContextSpec())
                 .validate(file, activeProfiles);
 

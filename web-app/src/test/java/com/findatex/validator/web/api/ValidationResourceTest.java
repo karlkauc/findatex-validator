@@ -73,6 +73,25 @@ class ValidationResourceTest {
     }
 
     @Test
+    void templateMismatchReturns400InsteadOfOom() {
+        // Reproduces the cept-ubs-am-v2.0.csv scenario: pipe-delimited CSV with
+        // headers that look valid in shape (column codes) but belong to a different
+        // template/version. Without the pre-flight check, every row × every mandatory
+        // field becomes a "missing" finding — 100k+ findings → OOM.
+        StringBuilder csv = new StringBuilder("99001_Bogus_Field|99002_Other_Bogus|99003_Third\n");
+        for (int i = 0; i < 50; i++) csv.append("a|b|c\n");
+
+        Response r = given()
+                .multiPart("templateId", "EPT")
+                .multiPart("templateVersion", "V2.0")
+                .multiPart("file", "wrong-template.csv", csv.toString().getBytes())
+                .when().post("/api/validate");
+
+        r.then().statusCode(400);
+        assertThat(r.asString()).containsIgnoringCase("template");
+    }
+
+    @Test
     void externalEnabledFormParamsAreAccepted() {
         // Default profile has external.enabled=false, so the orchestrator silently ignores
         // externalEnabled=true. The point of this test is that supplying the new form

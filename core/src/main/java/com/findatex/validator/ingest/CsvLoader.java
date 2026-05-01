@@ -49,12 +49,18 @@ public final class CsvLoader {
     private TptFile load(byte[] bytes, Path source, byte[] sourceBytes) throws IOException {
         char delimiter = detectDelimiter(bytes);
         log.debug("CSV delimiter for {}: {}", source.getFileName(), (int) delimiter);
-        CSVFormat format = CSVFormat.DEFAULT.builder()
+        // FinDatEx pipe-delimited files don't quote their values (the whole point
+        // of '|' is that it never appears inside data). Some producers still wrap
+        // descriptive prose in "..." but fail to escape inner '"' characters, which
+        // makes Apache Commons CSV abort with "Invalid character between encapsulated
+        // token and delimiter". Treating '"' as a literal there matches the convention.
+        CSVFormat.Builder b = CSVFormat.DEFAULT.builder()
                 .setDelimiter(delimiter)
-                .setQuote('"')
                 .setIgnoreEmptyLines(true)
-                .setTrim(true)
-                .build();
+                .setTrim(true);
+        if (delimiter != '|') b.setQuote('"');
+        else b.setQuote(null);
+        CSVFormat format = b.build();
 
         try (Reader r = new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8);
              CSVParser parser = format.parse(r)) {
@@ -93,9 +99,11 @@ public final class CsvLoader {
         try (BufferedReader br = new BufferedReader(new StringReader(new String(bytes, StandardCharsets.UTF_8)))) {
             String line = br.readLine();
             if (line == null) return ',';
+            int pipe = countOutsideQuotes(line, '|');
             int semi = countOutsideQuotes(line, ';');
             int comma = countOutsideQuotes(line, ',');
             int tab = countOutsideQuotes(line, '\t');
+            if (pipe >= semi && pipe >= comma && pipe >= tab && pipe > 0) return '|';
             if (semi >= comma && semi >= tab) return ';';
             if (tab >= comma) return '\t';
             return ',';

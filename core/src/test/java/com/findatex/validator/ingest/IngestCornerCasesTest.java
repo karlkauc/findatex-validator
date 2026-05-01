@@ -97,6 +97,43 @@ class IngestCornerCasesTest {
     }
 
     @Test
+    void csvAutoDetectsPipeDelimiter(@TempDir Path tmp) throws Exception {
+        // Real-world FinDatEx CSVs (e.g. UBS EPT V2.1) ship pipe-delimited
+        // because field values contain commas and semicolons themselves.
+        Path csv = tmp.resolve("pipe.csv");
+        Files.writeString(csv, """
+                12_CIC_code_of_the_instrument|17_Instrument_name
+                FR12|Treasury bond
+                """, StandardCharsets.UTF_8);
+        TptFile file = new CsvLoader(CATALOG).load(csv);
+        assertThat(file.rows()).hasSize(1);
+        assertThat(file.rows().get(0).stringValue("12")).contains("FR12");
+        assertThat(file.rows().get(0).stringValue("17")).contains("Treasury bond");
+    }
+
+    @Test
+    void csvPipeAcceptsStrayQuotesAsLiterals(@TempDir Path tmp) throws Exception {
+        // Reproduces the UBS_Asset_Management_EPT_UBSGAMFundsLtd_V2.1_en.csv failure:
+        // pipe-delimited file whose producer wrapped a description in "..." but didn't
+        // escape inner '"' characters. The FinDatEx pipe convention does not need
+        // quoting (pipe never appears in values), so the loader treats '"' as a literal
+        // character rather than failing with CSVException.
+        Path csv = tmp.resolve("pipe-stray-quote.csv");
+        Files.writeString(csv,
+                "12_CIC_code_of_the_instrument|17_Instrument_name\n"
+              + "FR12|\"The fund (the \"Fund\") aims to grow.\"The return depends on...\n",
+                StandardCharsets.UTF_8);
+        TptFile file = new CsvLoader(CATALOG).load(csv);
+        assertThat(file.rows()).hasSize(1);
+        assertThat(file.rows().get(0).stringValue("12")).contains("FR12");
+        String name17 = file.rows().get(0).stringValue("17").orElseThrow();
+        assertThat(name17)
+                .as("stray quotes should appear verbatim in the value")
+                .contains("\"Fund\"")
+                .contains("aims to grow.\"The return");
+    }
+
+    @Test
     void csvHandlesQuotedDelimiterInsideValue(@TempDir Path tmp) throws Exception {
         Path csv = tmp.resolve("quoted.csv");
         Files.writeString(csv,

@@ -62,8 +62,9 @@ jobs:
         include:
           - { os: ubuntu-latest,  target: linux-x64,   installer_ext: deb, portable_ext: tar.gz }
           - { os: windows-latest, target: windows-x64, installer_ext: msi, portable_ext: zip    }
-          - { os: macos-13,       target: macos-x64,   installer_ext: dmg, portable_ext: tar.gz }
           - { os: macos-14,       target: macos-arm64, installer_ext: dmg, portable_ext: tar.gz }
+          # macos-x64 dropped: GitHub's macos-13 runner pool is contested and
+          # being phased out. Intel Mac users can run the shaded JAR directly.
     steps:
       - name: Checkout
         uses: actions/checkout@v6

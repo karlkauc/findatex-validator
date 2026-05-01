@@ -1,6 +1,8 @@
 package com.findatex.validator.report;
 
 import com.findatex.validator.AppInfo;
+import com.findatex.validator.domain.FundGroup;
+import com.findatex.validator.domain.FundGrouper;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.spec.FieldSpec;
 import com.findatex.validator.spec.SpecCatalog;
@@ -310,26 +312,46 @@ public final class XlsxReportWriter {
         }
         int row = 0;
         XlsxStyles.addRow(s, row++, header, "Row", "Errors", "Warnings", "Status");
-        for (TptRow tr : r.file().rows()) {
-            long[] arr = byRow.getOrDefault(tr.rowIndex(), new long[2]);
-            Row rr = s.createRow(row++);
-            rr.createCell(0).setCellValue(tr.rowIndex());
-            rr.createCell(1).setCellValue(arr[0]);
-            rr.createCell(2).setCellValue(arr[1]);
-            org.apache.poi.ss.usermodel.Cell status = rr.createCell(3);
-            if (arr[0] > 0) {
-                status.setCellValue("ERROR");
-                status.setCellStyle(err);
-            } else if (arr[1] > 0) {
-                status.setCellValue("WARNING");
-                status.setCellStyle(warn);
-            } else {
-                status.setCellValue("OK");
-                status.setCellStyle(ok);
+        java.util.List<FundGroup> groups = FundGrouper.group(r.file());
+        boolean multi = groups.size() > 1;
+        for (FundGroup g : groups) {
+            if (multi) {
+                String pid = g.key().portfolioId() == null ? "(unknown)" : g.key().portfolioId();
+                String pname = firstNonEmpty(g, "3");
+                Row hr = s.createRow(row++);
+                org.apache.poi.ss.usermodel.Cell hc = hr.createCell(0);
+                hc.setCellValue("Fund: " + pid + (pname == null ? "" : " — " + pname));
+                hc.setCellStyle(header);
+            }
+            for (TptRow tr : g.rows()) {
+                long[] arr = byRow.getOrDefault(tr.rowIndex(), new long[2]);
+                Row rr = s.createRow(row++);
+                rr.createCell(0).setCellValue(tr.rowIndex());
+                rr.createCell(1).setCellValue(arr[0]);
+                rr.createCell(2).setCellValue(arr[1]);
+                org.apache.poi.ss.usermodel.Cell status = rr.createCell(3);
+                if (arr[0] > 0) {
+                    status.setCellValue("ERROR");
+                    status.setCellStyle(err);
+                } else if (arr[1] > 0) {
+                    status.setCellValue("WARNING");
+                    status.setCellStyle(warn);
+                } else {
+                    status.setCellValue("OK");
+                    status.setCellStyle(ok);
+                }
             }
         }
         s.createFreezePane(0, 1);
         for (int c = 0; c < 4; c++) s.autoSizeColumn(c);
+    }
+
+    private static String firstNonEmpty(FundGroup g, String numKey) {
+        for (TptRow r : g.rows()) {
+            String v = r.stringValue(numKey).orElse(null);
+            if (v != null && !v.isEmpty()) return v;
+        }
+        return null;
     }
 
     private static void writeAnnotatedSource(Workbook wb, QualityReport r,

@@ -16,6 +16,8 @@ ten deliberately broken files, each focused on a different rule family.
 | `09_interest_rate_inconsistent.xlsx` | Floating bond missing index/margin; Fixed bond missing coupon rate → XF-10. |
 | `10_dates_and_derivatives.xlsx` | Reporting < Valuation; maturity in past; futures without underlying CIC; PIK on equity → XF-11, XF-12, XF-13, XF-14. |
 | `11_unknown_isin_lei.xlsx` | Synthetic ISINs/LEIs that pass the local Luhn/mod-97 check but aren't registered in OpenFIGI/GLEIF. Local validation runs clean; **enable Online validation in Settings** to see `LEI-LIVE/...` and `ISIN-LIVE/...` ERRORs. |
+| `12_multi_fund_clean.xlsx` | Three distinct funds (FR / DE / LU) in one file, each with a clean 3-position book → no errors expected. |
+| `13_multi_fund_with_errors.xlsx` | Three funds with errors distributed: Fund B has a weight-sum mismatch (XF-04) and an ISIN checksum bug (ISIN/14); Fund C is missing the mandatory NAV (PRESENCE/5). Each finding must carry the correct portfolio context. |
 
 Open them via the JavaFX UI (`mvn javafx:run` → *Browse…*) to see the
 rule engine catch each issue, or feed them through the JUnit suite.

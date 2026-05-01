@@ -158,6 +158,24 @@ CASH = base_row({
 CLEAN_ROWS = [GOV_BOND, EQUITY, CASH]
 
 
+PORT_B = {
+    **PORT,
+    "1_Portfolio_identifying_data": "DE0010000002",
+    "3_Portfolio_name": "Demo Equity Fund DE",
+}
+
+PORT_C = {
+    **PORT,
+    "1_Portfolio_identifying_data": "LU0010000003",
+    "3_Portfolio_name": "Demo Mixed Fund LU",
+}
+
+
+def _swap_port(rows: list[dict], port: dict) -> list[dict]:
+    """Return a deep-copied row list with all PORT-level fields swapped to `port`."""
+    return [{**r, **port} for r in rows]
+
+
 # --------- helpers to build identifiers that pass the local checksum ------
 
 def _alpha_to_digits(s: str) -> str:
@@ -413,6 +431,30 @@ def s10_dates_and_derivatives() -> list[dict]:
     return rows
 
 
+def s12_multi_fund_clean() -> list[dict]:
+    """Three distinct funds (FR, DE, LU), each with a clean 3-position book."""
+    return (deepcopy(CLEAN_ROWS)
+            + _swap_port(deepcopy(CLEAN_ROWS), PORT_B)
+            + _swap_port(deepcopy(CLEAN_ROWS), PORT_C))
+
+
+def s13_multi_fund_with_errors() -> list[dict]:
+    """Three funds with errors distributed across them — Fund A clean, Fund B
+    has weight-sum and ISIN-checksum bugs, Fund C is missing NAV."""
+    a = deepcopy(CLEAN_ROWS)
+    b = _swap_port(deepcopy(CLEAN_ROWS), PORT_B)
+    # Fund B: weights 0.3 + 0.2 + 0.2 = 0.7 (XF-04 fires for B only)
+    b[0]["26_Valuation_weight"] = "0.3"
+    b[1]["26_Valuation_weight"] = "0.2"
+    b[2]["26_Valuation_weight"] = "0.2"
+    # Fund B: corrupt ISIN checksum on first position (ISIN/14 fires for B only)
+    b[0]["14_Identification_code_of_the_instrument"] = "FR0000571086"
+    c = _swap_port(deepcopy(CLEAN_ROWS), PORT_C)
+    # Fund C: drop the mandatory NAV (field 5) on the first row
+    c[0]["5_Net_asset_valuation_of_the_portfolio_or_the_share_class_in_portfolio_currency"] = ""
+    return a + b + c
+
+
 # ----------------------------------------------------------------- driver --
 
 EXAMPLES = [
@@ -427,6 +469,8 @@ EXAMPLES = [
     ("09_interest_rate_inconsistent.xlsx",  s09_interest_rate_inconsistent, "xlsx"),
     ("10_dates_and_derivatives.xlsx",       s10_dates_and_derivatives,  "xlsx"),
     ("11_unknown_isin_lei.xlsx",            s11_unknown_isin_lei,       "xlsx"),
+    ("12_multi_fund_clean.xlsx",            s12_multi_fund_clean,       "xlsx"),
+    ("13_multi_fund_with_errors.xlsx",      s13_multi_fund_with_errors, "xlsx"),
 ]
 
 
@@ -460,6 +504,8 @@ def main() -> int:
         "| `09_interest_rate_inconsistent.xlsx` | Floating bond missing index/margin; Fixed bond missing coupon rate → XF-10. |",
         "| `10_dates_and_derivatives.xlsx` | Reporting < Valuation; maturity in past; futures without underlying CIC; PIK on equity → XF-11, XF-12, XF-13, XF-14. |",
         "| `11_unknown_isin_lei.xlsx` | Synthetic ISINs/LEIs that pass the local Luhn/mod-97 check but aren't registered in OpenFIGI/GLEIF. Local validation runs clean; **enable Online validation in Settings** to see `LEI-LIVE/...` and `ISIN-LIVE/...` ERRORs. |",
+        "| `12_multi_fund_clean.xlsx` | Three distinct funds (FR / DE / LU) in one file, each with a clean 3-position book → no errors expected. |",
+        "| `13_multi_fund_with_errors.xlsx` | Three funds with errors distributed: Fund B has a weight-sum mismatch (XF-04) and an ISIN checksum bug (ISIN/14); Fund C is missing the mandatory NAV (PRESENCE/5). Each finding must carry the correct portfolio context. |",
         "",
         "Open them via the JavaFX UI (`mvn javafx:run` → *Browse…*) to see the",
         "rule engine catch each issue, or feed them through the JUnit suite.",

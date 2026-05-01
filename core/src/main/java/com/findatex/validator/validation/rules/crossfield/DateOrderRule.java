@@ -1,5 +1,6 @@
 package com.findatex.validator.validation.rules.crossfield;
 
+import com.findatex.validator.domain.FundGroup;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
@@ -31,18 +32,20 @@ public final class DateOrderRule implements Rule {
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {
         List<Finding> out = new ArrayList<>();
-        for (TptRow row : ctx.file().rows()) {
-            LocalDate val = parse(row, "6");
-            LocalDate rpt = parse(row, "7");
-            if (val == null || rpt == null) continue;
-            if (rpt.isBefore(val)) {
-                out.add(Finding.error(
-                        id(), null, "7", "Field 7 (Reporting date)",
-                        row.rowIndex(), rpt.toString(),
-                        "Reporting date " + rpt + " is before valuation date " + val));
+        for (FundGroup g : ctx.fundGroups()) {
+            for (TptRow row : g.rows()) {
+                LocalDate val = parse(row, "6");
+                LocalDate rpt = parse(row, "7");
+                if (val == null || rpt == null) continue;
+                if (rpt.isBefore(val)) {
+                    out.add(Finding.error(
+                            id(), null, "7", "Field 7 (Reporting date)",
+                            row.rowIndex(), rpt.toString(),
+                            "Reporting date " + rpt + " is before valuation date " + val));
+                }
+                // first non-empty (6,7) row of each fund is enough.
+                break;
             }
-            // first-row check is enough; portfolio-level dates are typically constant per file.
-            return out;
         }
         return out;
     }

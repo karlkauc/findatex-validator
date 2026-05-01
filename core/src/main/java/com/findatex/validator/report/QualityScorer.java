@@ -1,5 +1,8 @@
 package com.findatex.validator.report;
 
+import com.findatex.validator.domain.FundGroup;
+import com.findatex.validator.domain.FundGrouper;
+import com.findatex.validator.domain.FundKey;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.spec.FieldSpec;
@@ -11,6 +14,7 @@ import com.findatex.validator.validation.Severity;
 
 import java.time.Instant;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +114,100 @@ public final class QualityScorer {
               + W_PROFILE   * avgProfileCompleteness;
         overall.put(ScoreCategory.OVERALL, clamp(overallScore));
 
-        return new QualityReport(file, active, findings, overall, perProfile, Instant.now());
+        Map<FundKey, Map<ScoreCategory, Double>> perFund = scorePerFund(file, active, findings);
+
+        return new QualityReport(file, active, findings, overall, perProfile, perFund, Instant.now());
+    }
+
+    private Map<FundKey, Map<ScoreCategory, Double>> scorePerFund(TptFile file,
+                                                                  Set<ProfileKey> active,
+                                                                  List<Finding> findings) {
+        List<FundGroup> groups = FundGrouper.group(file);
+        if (groups.size() <= 1) return Map.of();
+
+        Map<FundKey, Map<ScoreCategory, Double>> result = new LinkedHashMap<>();
+        for (FundGroup g : groups) {
+            Set<Integer> rowIdx = new HashSet<>();
+            for (TptRow r : g.rows()) rowIdx.add(r.rowIndex());
+
+            long mandatoryAll = 0, mandatoryMissing = 0;
+            for (ProfileKey p : active) {
+                mandatoryAll += countMandatorySlotsInRows(g.rows(), p);
+                mandatoryMissing += findings.stream()
+                        .filter(f -> p.equals(f.profile()) && f.severity() == Severity.ERROR)
+                        .filter(f -> f.ruleId().startsWith("PRESENCE/"))
+                        .filter(f -> f.rowIndex() != null && rowIdx.contains(f.rowIndex()))
+                        .count();
+            }
+            double mandatoryScore = mandatoryAll == 0 ? 1.0
+                    : 1.0 - (double) mandatoryMissing / mandatoryAll;
+
+            long nonEmptyCells = countNonEmptyCellsInRows(g.rows());
+            long formatErrors = findings.stream()
+                    .filter(f -> f.severity() == Severity.ERROR)
+                    .filter(f -> f.ruleId().startsWith("FORMAT/") && !isClosedListFinding(f))
+                    .filter(f -> f.rowIndex() != null && rowIdx.contains(f.rowIndex()))
+                    .count();
+            double formatScore = nonEmptyCells == 0 ? 1.0
+                    : 1.0 - (double) formatErrors / nonEmptyCells;
+
+            long closedListCells = countNonEmptyClosedListCellsInRows(g.rows());
+            long closedListErrors = findings.stream()
+                    .filter(f -> f.severity() == Severity.ERROR)
+                    .filter(this::isClosedListFinding)
+                    .filter(f -> f.rowIndex() != null && rowIdx.contains(f.rowIndex()))
+                    .count();
+            double closedScore = closedListCells == 0 ? 1.0
+                    : 1.0 - (double) closedListErrors / closedListCells;
+
+            long crossFieldErrors = findings.stream()
+                    .filter(f -> f.ruleId().startsWith("XF-") && f.severity() != Severity.INFO)
+                    .filter(f -> f.rowIndex() != null && rowIdx.contains(f.rowIndex()))
+                    .count();
+            long crossRulesApprox = Math.max(12L, findings.stream()
+                    .map(Finding::ruleId).filter(s -> s.startsWith("XF-")).distinct().count());
+            double crossScore = 1.0 - (double) crossFieldErrors
+                    / Math.max(crossRulesApprox * Math.max(g.rows().size(), 1), 1);
+
+            Map<ScoreCategory, Double> cat = new EnumMap<>(ScoreCategory.class);
+            cat.put(ScoreCategory.MANDATORY_COMPLETENESS, clamp(mandatoryScore));
+            cat.put(ScoreCategory.FORMAT_CONFORMANCE,     clamp(formatScore));
+            cat.put(ScoreCategory.CLOSED_LIST_CONFORMANCE, clamp(closedScore));
+            cat.put(ScoreCategory.CROSS_FIELD_CONSISTENCY, clamp(crossScore));
+            double overallFund =
+                    W_MANDATORY * cat.get(ScoreCategory.MANDATORY_COMPLETENESS)
+                  + W_FORMAT    * cat.get(ScoreCategory.FORMAT_CONFORMANCE)
+                  + W_CLOSED    * cat.get(ScoreCategory.CLOSED_LIST_CONFORMANCE)
+                  + W_CROSS     * cat.get(ScoreCategory.CROSS_FIELD_CONSISTENCY)
+                  + W_PROFILE   * cat.get(ScoreCategory.MANDATORY_COMPLETENESS);
+            cat.put(ScoreCategory.OVERALL, clamp(overallFund));
+            result.put(g.key(), cat);
+        }
+        return result;
+    }
+
+    private long countMandatorySlotsInRows(List<TptRow> rows, ProfileKey p) {
+        long total = 0;
+        for (FieldSpec spec : catalog.fields()) {
+            if (spec.flag(p) != Flag.M) continue;
+            for (TptRow row : rows) if (applies(spec, row)) total++;
+        }
+        return total;
+    }
+
+    private long countNonEmptyCellsInRows(List<TptRow> rows) {
+        long n = 0;
+        for (TptRow row : rows) n += row.all().values().stream().filter(c -> !c.isEmpty()).count();
+        return n;
+    }
+
+    private long countNonEmptyClosedListCellsInRows(List<TptRow> rows) {
+        long n = 0;
+        for (FieldSpec spec : catalog.fields()) {
+            if (!spec.codification().hasClosedList()) continue;
+            for (TptRow row : rows) if (row.stringValue(spec).isPresent()) n++;
+        }
+        return n;
     }
 
     private boolean isClosedListFinding(Finding f) {

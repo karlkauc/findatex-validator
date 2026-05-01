@@ -1,5 +1,6 @@
 package com.findatex.validator.validation.rules.crossfield;
 
+import com.findatex.validator.domain.FundGroup;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
@@ -7,6 +8,7 @@ import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
 import com.findatex.validator.validation.rules.RuleDoc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** XF-06: field 5 ≈ field 8 × field 8b within precision tolerance. */
@@ -27,26 +29,29 @@ public final class NavConsistencyRule implements Rule {
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {
-        Double tna  = pick(ctx, "5");
-        Double price = pick(ctx, "8");
-        Double shares = pick(ctx, "8b");
-        if (tna == null || price == null || shares == null || tna == 0) return List.of();
-        double computed = price * shares;
-        double rel = Math.abs(computed - tna) / Math.abs(tna);
-        if (rel > REL_TOLERANCE) {
-            return List.of(Finding.warn(
-                    id(), null, "5", "Field 5 (TotalNetAssets)",
-                    null, String.format("%.4f", tna),
-                    "TotalNetAssets " + String.format("%.4f", tna)
-                            + " differs from SharePrice × Shares = "
-                            + String.format("%.4f", computed)
-                            + " (relative tolerance " + REL_TOLERANCE + ")"));
+        List<Finding> out = new ArrayList<>();
+        for (FundGroup g : ctx.fundGroups()) {
+            Double tna    = pick(g, "5");
+            Double price  = pick(g, "8");
+            Double shares = pick(g, "8b");
+            if (tna == null || price == null || shares == null || tna == 0) continue;
+            double computed = price * shares;
+            double rel = Math.abs(computed - tna) / Math.abs(tna);
+            if (rel > REL_TOLERANCE) {
+                out.add(Finding.warn(
+                        id(), null, "5", "Field 5 (TotalNetAssets)",
+                        g.firstRowIndex(), String.format("%.4f", tna),
+                        "TotalNetAssets " + String.format("%.4f", tna)
+                                + " differs from SharePrice × Shares = "
+                                + String.format("%.4f", computed)
+                                + " (relative tolerance " + REL_TOLERANCE + ")"));
+            }
         }
-        return List.of();
+        return out;
     }
 
-    private static Double pick(ValidationContext ctx, String numKey) {
-        for (TptRow row : ctx.file().rows()) {
+    private static Double pick(FundGroup g, String numKey) {
+        for (TptRow row : g.rows()) {
             String v = row.stringValue(numKey).orElse(null);
             if (v != null) {
                 try { return Double.parseDouble(v.replace(",", ".")); } catch (NumberFormatException ignore) {}

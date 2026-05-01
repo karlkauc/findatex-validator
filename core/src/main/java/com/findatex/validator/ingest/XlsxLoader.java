@@ -34,19 +34,23 @@ public final class XlsxLoader {
 
     public TptFile load(Path file) throws IOException {
         try (InputStream in = Files.newInputStream(file)) {
-            return load(in, file);
+            return load(in, file, null);
         }
     }
 
     public TptFile load(InputStream in, String filename) throws IOException {
-        return load(in, Path.of(filename == null || filename.isBlank() ? "uploaded.xlsx" : filename));
+        // Web upload path: buffer the bytes once so the report writer can re-read the source
+        // for the Annotated-Source tab without going back to the (now-deleted) tempfile.
+        byte[] bytes = in.readAllBytes();
+        Path source = Path.of(filename == null || filename.isBlank() ? "uploaded.xlsx" : filename);
+        return load(new java.io.ByteArrayInputStream(bytes), source, bytes);
     }
 
-    private TptFile load(InputStream in, Path source) throws IOException {
+    private TptFile load(InputStream in, Path source, byte[] sourceBytes) throws IOException {
         try (Workbook wb = new XSSFWorkbook(in)) {
             Sheet sheet = pickSheet(wb);
             if (sheet == null || sheet.getLastRowNum() < 0) {
-                return new TptFile(source, "xlsx", List.of(), Map.of(), List.of(), List.of());
+                return new TptFile(source, "xlsx", List.of(), Map.of(), List.of(), List.of(), sourceBytes);
             }
 
             int headerRowIdx = findHeaderRow(sheet);
@@ -73,7 +77,7 @@ public final class XlsxLoader {
             }
             log.info("Loaded XLSX {} ({} rows, {} mapped fields, {} unmapped headers)",
                     source.getFileName(), rows.size(), map.size(), unmapped.size());
-            return new TptFile(source, "xlsx", headers, map, unmapped, rows);
+            return new TptFile(source, "xlsx", headers, map, unmapped, rows, sourceBytes);
         }
     }
 

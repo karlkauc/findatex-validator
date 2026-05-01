@@ -3,6 +3,7 @@ package com.findatex.validator.template.ept;
 import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.external.ExternalValidationConfig.IdentifierRef;
 import com.findatex.validator.spec.ManifestDrivenSpecLoader;
+import com.findatex.validator.template.api.FindingContextSpec;
 import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.template.api.TemplateDefinition;
 import com.findatex.validator.template.api.TemplateId;
@@ -105,5 +106,19 @@ public final class EptTemplate implements TemplateDefinition {
             throw new NoSuchElementException("EPT does not support version " + version.version());
         }
         return EXTERNAL_VALIDATION;
+    }
+
+    /**
+     * EPT is per-portfolio (one row = one PRIIP product) so there is no separate position
+     * dimension. NUM 14 ({@code 00030_Portfolio_Identifying_Data}) is the portfolio id,
+     * NUM 16 ({@code 00050_Portfolio_Name}) the name, and NUM 18 ({@code 00070_PRIIPs_KID_Publication_Date})
+     * the closest analogue to a valuation date. Instrument/weight slots stay {@code null}.
+     */
+    public static final FindingContextSpec FINDING_CONTEXT =
+            new FindingContextSpec("14", "16", "18", null, null, null);
+
+    @Override
+    public FindingContextSpec findingContextSpec() {
+        return FINDING_CONTEXT;
     }
 }

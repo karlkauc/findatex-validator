@@ -42,6 +42,25 @@ class FormatRuleCornerCasesTest {
         assertHasError(numericRule(), v, "numeric");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"0.5", "1", "V", "S", "M", "L", "H", "v", "l"})
+    void numericWithLetterAlternativesAcceptsBothNumberAndCodes(String v) {
+        // EMT V4.2 NUM 55: "floating decimal or V or S or M or L or H".
+        // Numbers pass the numeric parse; the listed letters fall back to closedList check
+        // (case-insensitive) without producing a FORMAT finding.
+        FormatRule rule = new FormatRule(makeField("55", new CodificationDescriptor(
+                CodificationKind.NUMERIC,
+                Optional.empty(),
+                List.of(
+                        new CodificationDescriptor.ClosedListEntry("V", "V"),
+                        new CodificationDescriptor.ClosedListEntry("S", "S"),
+                        new CodificationDescriptor.ClosedListEntry("M", "M"),
+                        new CodificationDescriptor.ClosedListEntry("L", "L"),
+                        new CodificationDescriptor.ClosedListEntry("H", "H")),
+                "floating decimal  or V or S or M or L or H")));
+        assertNoErrors(rule, v);
+    }
+
     // ------------------------------------------------------------------- DATE
 
     @ParameterizedTest

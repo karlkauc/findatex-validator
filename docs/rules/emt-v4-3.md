@@ -1073,7 +1073,7 @@ Definition: Loss Beyond the Capital. Yes or No or Neutral
 ### Field 44 — 44
 
 Path: `04010_Risk_Tolerance_PRIIPS_Methodology`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: CLOSED_LIST, closed list of 7 entries
 Applicability: all rows
 Definition: SRI
 
@@ -1096,7 +1096,7 @@ Definition: SRI
 ### Field 45 — 45
 
 Path: `04020_Risk_Tolerance_UCITS_Methodology`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: CLOSED_LIST, closed list of 7 entries
 Applicability: all rows
 Definition: SRRI
 
@@ -1142,7 +1142,7 @@ Definition: Low/medium/high
 ### Field 47 — 47
 
 Path: `04040_Risk_Tolerance_For_Non_PRIIPS_And_Non_UCITS_Spain`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: all rows
 Definition: Spanish SRI
 
@@ -1322,7 +1322,7 @@ Definition: Yes or No or Neutral
 ### Field 55 — 55
 
 Path: `05080_Minimum_Recommended_Holding_Period`
-Codification: NUMERIC
+Codification: NUMERIC, closed list of 5 entries
 Applicability: all rows
 Definition: Minimum recommending holding period: RHP in years or Very Short Term (<1Y)or Short term (>=1Y) or Medium term (>=3Y) or Long term (>5Y) or Hold To Maturity
 
@@ -1478,7 +1478,7 @@ Definition: Retail or Professional or Both or Neither
 ### Field 62 — 62
 
 Path: `07020_Gross_One-off_Cost_Financial_Instrument_Maximum_Entry_Cost_Non_Acquired`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum not acquired to the fund. Expressed as a % of the amount to be invested.
 
@@ -1493,7 +1493,7 @@ Definition: Maximum not acquired to the fund. Expressed as a % of the amount to 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `COND_PRESENCE/62/EMT_BASE` | EMT (Mandatory) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/62` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/62` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1546,7 +1546,7 @@ Definition: Maximum fixed amount per subscription, not incorporated. Flat fixed 
 ### Field 65 — 65
 
 Path: `07040_One-off_Cost_Financial_Instrument_Maximum_Entry_Cost_Acquired`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: Subscription fees acquired to the fund Expressed as a % of the amount to be invested
 
@@ -1561,7 +1561,7 @@ Definition: Subscription fees acquired to the fund Expressed as a % of the amoun
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `COND_PRESENCE/65/EMT_BASE` | EMT (Mandatory) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/65` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/65` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1569,7 +1569,7 @@ Definition: Subscription fees acquired to the fund Expressed as a % of the amoun
 ### Field 66 — 66
 
 Path: `07050_One-off_Costs_Financial_Instrument_Maximum_Exit_Cost_Non_Acquired`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum not acquired to the fund Expressed as a % of the NAV.
 
@@ -1584,7 +1584,7 @@ Definition: Maximum not acquired to the fund Expressed as a % of the NAV.
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `COND_PRESENCE/66/EMT_BASE` | EMT (Mandatory) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/66` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/66` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1615,7 +1615,7 @@ Definition: Maximum fixed amount per redemption, not incorporated. Flat fee defi
 ### Field 68 — 68
 
 Path: `07070_One-off_Costs_Financial_Instrument_Maximum_Exit_Cost_Acquired`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum Exit fees acquired to the fund Expressed as a % of the NAV
 
@@ -1630,7 +1630,7 @@ Definition: Maximum Exit fees acquired to the fund Expressed as a % of the NAV
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `COND_PRESENCE/68/EMT_BASE` | EMT (Mandatory) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/68` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/68` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1638,7 +1638,7 @@ Definition: Maximum Exit fees acquired to the fund Expressed as a % of the NAV
 ### Field 69 — 69
 
 Path: `07080_One-off_Costs_Financial_Instrument_Typical_Exit_Cost`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: Current exit cost linked to the RHP or Time to Maturity or 1Y (V) or 3Y(S) or 5Y (M L) (the value of 05080_Minimum_Recommended_Holding_Period)
 
@@ -1652,7 +1652,7 @@ Definition: Current exit cost linked to the RHP or Time to Maturity or 1Y (V) or
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/69` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/69` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1660,7 +1660,7 @@ Definition: Current exit cost linked to the RHP or Time to Maturity or 1Y (V) or
 ### Field 70 — 70
 
 Path: `07090_One-off_Cost_Financial_Instrument_Exit_Cost_Structured_Products_Prior_RHP`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: Expressed as a % of the amount to be divested. Fair Value - Exit Value (eg Bid Price)
 
@@ -1675,7 +1675,7 @@ Definition: Expressed as a % of the amount to be divested. Fair Value - Exit Val
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `COND_PRESENCE/70/EMT_BASE` | EMT (Mandatory) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/70` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/70` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1683,7 +1683,7 @@ Definition: Expressed as a % of the amount to be divested. Fair Value - Exit Val
 ### Field 71 — 71
 
 Path: `07100_Financial_Instrument_Gross_Ongoing_Costs`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -1698,7 +1698,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `PRESENCE/71/EMT_BASE` | EMT (Mandatory) | ERROR | Cell is empty for an active row of profile EMT (Mandatory) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/71` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/71` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1706,7 +1706,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 72 — 72
 
 Path: `07105_Financial_Instrument_Borrowing_Costs_Ex_Ante_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: Financing costs related to borrowing for the purposes of gearing expressed as a % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -1720,7 +1720,7 @@ Definition: Financing costs related to borrowing for the purposes of gearing exp
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/72` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/72` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1728,7 +1728,7 @@ Definition: Financing costs related to borrowing for the purposes of gearing exp
 ### Field 73 — 73
 
 Path: `07110_Financial_Instrument_Management_Fee`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -1743,7 +1743,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `PRESENCE/73/EMT_BASE` | EMT (Mandatory) | ERROR | Cell is empty for an active row of profile EMT (Mandatory) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/73` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/73` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1751,7 +1751,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 74 — 74
 
 Path: `07120_Financial_Instrument_Distribution_Fee`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -1766,7 +1766,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `COND_PRESENCE/74/EMT_BASE` | EMT (Mandatory) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/74` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/74` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1774,7 +1774,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 75 — 75
 
 Path: `07130_Financial_Instrument_Transaction_Costs_Ex_Ante`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -1789,7 +1789,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `PRESENCE/75/EMT_BASE` | EMT (Mandatory) | ERROR | Cell is empty for an active row of profile EMT (Mandatory) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/75` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/75` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1797,7 +1797,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 76 — 76
 
 Path: `07140_Financial_Instrument_Incidental_Costs_Ex_Ante`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied). Includes Performance Fees and other costs.
 
@@ -1812,7 +1812,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `PRESENCE/76/EMT_BASE` | EMT (Mandatory) | ERROR | Cell is empty for an active row of profile EMT (Mandatory) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/76` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/76` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1957,7 +1957,7 @@ Definition: Fixed amount
 ### Field 83 — 83
 
 Path: `08025_One-off_Cost_Financial_Instrument_Entry_Cost_Acquired`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV
 
@@ -1972,7 +1972,7 @@ Definition: % of NAV
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `COND_PRESENCE/83/EMT_BASE` | EMT (Mandatory) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/83` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/83` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -1980,7 +1980,7 @@ Definition: % of NAV
 ### Field 84 — 84
 
 Path: `08030_Financial_Instrument_Ongoing_Costs_Ex_Post`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -1995,7 +1995,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `PRESENCE/84/EMT_BASE` | EMT (Mandatory) | ERROR | Cell is empty for an active row of profile EMT (Mandatory) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/84` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/84` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2025,7 +2025,7 @@ Definition: Sum of each daily Recurring Product Costs
 ### Field 86 — 86
 
 Path: `08045_Financial_Instrument_Borrowing_Costs_Ex_Post_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: Financing costs related to borrowing for the purposes of gearing expressed as a % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2039,7 +2039,7 @@ Definition: Financing costs related to borrowing for the purposes of gearing exp
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/86` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/86` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2047,7 +2047,7 @@ Definition: Financing costs related to borrowing for the purposes of gearing exp
 ### Field 87 — 87
 
 Path: `08050_Financial_Instrument_Management_Fee_Ex_Post`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2062,7 +2062,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `PRESENCE/87/EMT_BASE` | EMT (Mandatory) | ERROR | Cell is empty for an active row of profile EMT (Mandatory) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/87` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/87` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2070,7 +2070,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 88 — 88
 
 Path: `08060_Financial_Instrument_Distribution_Fee_Ex_Post`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2085,7 +2085,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `COND_PRESENCE/88/EMT_BASE` | EMT (Mandatory) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/88` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/88` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2093,7 +2093,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 89 — 89
 
 Path: `08070_Financial_Instrument_Transaction_Costs_Ex_Post`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2108,7 +2108,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `PRESENCE/89/EMT_BASE` | EMT (Mandatory) | ERROR | Cell is empty for an active row of profile EMT (Mandatory) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/89` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/89` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2116,7 +2116,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 90 — 90
 
 Path: `08080_Financial_Instrument_Incidental_Costs_Ex_Post`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2131,7 +2131,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `PRESENCE/90/EMT_BASE` | EMT (Mandatory) | ERROR | Cell is empty for an active row of profile EMT (Mandatory) | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/90` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/90` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2231,7 +2231,7 @@ Definition: The Notional Reference Amount is the amount expressed in number of c
 ### Field 95 — 95
 
 Path: `09010_Financial_Instrument_Transaction_Costs_Ex_Ante_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2245,7 +2245,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/95` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/95` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2253,7 +2253,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 96 — 96
 
 Path: `09020_Financial_Instrument_Transaction_Costs_Ex_Post_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2267,7 +2267,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/96` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/96` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2455,7 +2455,7 @@ Applicability: all rows
 ### Field 105 — 105
 
 Path: `10000_Financial_Instrument_Indirect_Costs_Open_Ended_Ex_Ante_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2469,7 +2469,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/105` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/105` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2477,7 +2477,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 106 — 106
 
 Path: `10010_Financial_Instrument_Indirect_Costs_Closed_Ended_Ex_Ante_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2491,7 +2491,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/106` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/106` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2499,7 +2499,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 107 — 107
 
 Path: `10020_Financial_Instrument_Real_Assets_Costs_Ex_Ante_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2513,7 +2513,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/107` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/107` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2521,7 +2521,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 108 — 108
 
 Path: `10030_Financial_Instrument_Indirect_Costs_Open_Ended_Ex_Post_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2535,7 +2535,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/108` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/108` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2543,7 +2543,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 109 — 109
 
 Path: `10040_Financial_Instrument_Indirect_Costs_Closed_Ended_Ex_Post_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2557,7 +2557,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/109` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/109` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
@@ -2565,7 +2565,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 ### Field 110 — 110
 
 Path: `10050_Financial_Instrument_Real_Assets_Costs_Ex_Post_UK`
-Codification: CLOSED_LIST, closed list of 1 entries
+Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
 
@@ -2579,7 +2579,7 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/110` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/110` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---

@@ -105,6 +105,101 @@ class FindingEnricherTest {
     }
 
     @Test
+    void emtSpecPullsContextFromIssuerAndInstrumentColumns() {
+        // EMT carries the issuer LEI in NUM 3 (not portfolio id), the issuer name in NUM 2,
+        // a per-instrument reference date in NUM 8, and instrument code/name in NUM 9/11.
+        TptFile file = new TestFileBuilder()
+                .row(values(
+                        "1", "V4.2",
+                        "2", "WisdomTree Commodity Securities Limited",
+                        "3", "21380068Q1JSIAN4FO63",
+                        "8", "2026-04-09",
+                        "9", "JE00B2NFT427",
+                        "11", "WisdomTree Agriculture 2x Daily Leveraged"))
+                .build();
+
+        Finding f = Finding.error("FORMAT/55", null, "55", "55", 1, "L", "Expected numeric");
+        List<Finding> enriched = FindingEnricher.enrich(file, List.of(f),
+                com.findatex.validator.template.emt.EmtTemplate.FINDING_CONTEXT);
+
+        FindingContext ctx = enriched.get(0).context();
+        assertThat(ctx.portfolioId()).isEqualTo("21380068Q1JSIAN4FO63");
+        assertThat(ctx.portfolioName()).isEqualTo("WisdomTree Commodity Securities Limited");
+        assertThat(ctx.valuationDate()).isEqualTo("2026-04-09");
+        assertThat(ctx.instrumentCode()).isEqualTo("JE00B2NFT427");
+        assertThat(ctx.instrumentName()).isEqualTo("WisdomTree Agriculture 2x Daily Leveraged");
+        assertThat(ctx.valuationWeight()).isNull();   // EMT has no weight equivalent
+    }
+
+    @Test
+    void eetSpecPullsContextFromManufacturerAndInstrumentColumns() {
+        // EET context: NUM 13 = Manufacturer_Code (portfolio id), NUM 11 = Manufacturer_Name,
+        // NUM 15 = General_Reference_Date, NUM 23/25 = instrument id/name. No weight.
+        TptFile file = new TestFileBuilder()
+                .row(values(
+                        "1", "V1.1.3",
+                        "11", "Some Manufacturer",
+                        "13", "529900T8BM49AURSDO55",
+                        "15", "2025-12-31",
+                        "23", "FR0010315770",
+                        "25", "Demo PRIIP"))
+                .build();
+
+        Finding f = Finding.error("FORMAT/X", null, "23", "23", 1, "FR0010315770", "msg");
+        List<Finding> enriched = FindingEnricher.enrich(file, List.of(f),
+                com.findatex.validator.template.eet.EetTemplate.FINDING_CONTEXT);
+
+        FindingContext ctx = enriched.get(0).context();
+        assertThat(ctx.portfolioId()).isEqualTo("529900T8BM49AURSDO55");
+        assertThat(ctx.portfolioName()).isEqualTo("Some Manufacturer");
+        assertThat(ctx.valuationDate()).isEqualTo("2025-12-31");
+        assertThat(ctx.instrumentCode()).isEqualTo("FR0010315770");
+        assertThat(ctx.instrumentName()).isEqualTo("Demo PRIIP");
+        assertThat(ctx.valuationWeight()).isNull();
+    }
+
+    @Test
+    void eptSpecOmitsInstrumentSlots() {
+        // EPT is per-portfolio: NUM 14 = Portfolio_Identifying_Data, NUM 16 = Portfolio_Name,
+        // NUM 18 = PRIIPs_KID_Publication_Date. No instrument/weight (the row IS the product).
+        TptFile file = new TestFileBuilder()
+                .row(values(
+                        "1", "V2.1",
+                        "14", "FR0010315770",
+                        "16", "Demo PRIIP",
+                        "18", "2025-12-31"))
+                .build();
+
+        Finding f = Finding.error("FORMAT/X", null, "16", "16", 1, "Demo PRIIP", "msg");
+        List<Finding> enriched = FindingEnricher.enrich(file, List.of(f),
+                com.findatex.validator.template.ept.EptTemplate.FINDING_CONTEXT);
+
+        FindingContext ctx = enriched.get(0).context();
+        assertThat(ctx.portfolioId()).isEqualTo("FR0010315770");
+        assertThat(ctx.portfolioName()).isEqualTo("Demo PRIIP");
+        assertThat(ctx.valuationDate()).isEqualTo("2025-12-31");
+        assertThat(ctx.instrumentCode()).isNull();
+        assertThat(ctx.instrumentName()).isNull();
+        assertThat(ctx.valuationWeight()).isNull();
+    }
+
+    @Test
+    void emptyContextSpecLeavesFindingsUnannotated() {
+        TptFile file = new TestFileBuilder()
+                .row(values("1", "V4.2", "3", "21380068Q1JSIAN4FO63"))
+                .build();
+        Finding f = Finding.error("FORMAT/55", null, "55", "55", 1, "L", "msg");
+        List<Finding> enriched = FindingEnricher.enrich(file, List.of(f),
+                com.findatex.validator.template.api.FindingContextSpec.EMPTY);
+        FindingContext ctx = enriched.get(0).context();
+        assertThat(ctx).isNotNull();
+        assertThat(ctx.portfolioId()).isNull();
+        assertThat(ctx.portfolioName()).isNull();
+        assertThat(ctx.valuationDate()).isNull();
+        assertThat(ctx.instrumentCode()).isNull();
+    }
+
+    @Test
     void engineCallsEnricherAutomatically() {
         TptFile file = new TestFileBuilder()
                 .row(values(

@@ -11,13 +11,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +64,10 @@ final class SourceMirror {
     }
 
     private static SourceData readXlsx(TptFile file) throws IOException {
-        try (InputStream in = Files.newInputStream(file.source());
+        // Web uploads have no on-disk source — they carry the original bytes on TptFile.
+        try (InputStream in = file.sourceBytes() != null
+                ? new java.io.ByteArrayInputStream(file.sourceBytes())
+                : Files.newInputStream(file.source());
              Workbook wb = new XSSFWorkbook(in)) {
             Sheet sheet = wb.getNumberOfSheets() > 0 ? wb.getSheetAt(0) : null;
             if (sheet == null || sheet.getLastRowNum() < 0) {
@@ -115,14 +116,19 @@ final class SourceMirror {
     }
 
     private static SourceData readCsv(TptFile file) throws IOException {
-        char delimiter = detectDelimiter(file.source());
+        // Web uploads carry the original bytes; on-disk sources read from the path.
+        byte[] bytes = file.sourceBytes() != null
+                ? file.sourceBytes()
+                : Files.readAllBytes(file.source());
+        char delimiter = detectDelimiter(bytes);
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setDelimiter(delimiter)
                 .setQuote('"')
                 .setIgnoreEmptyLines(true)
                 .setTrim(true)
                 .build();
-        try (Reader r = Files.newBufferedReader(file.source(), StandardCharsets.UTF_8);
+        try (Reader r = new java.io.InputStreamReader(
+                        new java.io.ByteArrayInputStream(bytes), StandardCharsets.UTF_8);
              CSVParser parser = format.parse(r)) {
             List<CSVRecord> records = parser.getRecords();
             int width = 0;
@@ -139,17 +145,19 @@ final class SourceMirror {
         }
     }
 
-    private static char detectDelimiter(Path file) throws IOException {
-        try (BufferedReader br = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-            String line = br.readLine();
-            if (line == null) return ',';
-            int semi = countOutsideQuotes(line, ';');
-            int comma = countOutsideQuotes(line, ',');
-            int tab = countOutsideQuotes(line, '\t');
-            if (semi >= comma && semi >= tab) return ';';
-            if (tab >= comma) return '\t';
-            return ',';
+    private static char detectDelimiter(byte[] bytes) {
+        // Read the first line out of the buffered bytes and pick the dominant separator.
+        int end = bytes.length;
+        for (int i = 0; i < bytes.length; i++) {
+            if (bytes[i] == '\n' || bytes[i] == '\r') { end = i; break; }
         }
+        String line = new String(bytes, 0, end, StandardCharsets.UTF_8);
+        int semi = countOutsideQuotes(line, ';');
+        int comma = countOutsideQuotes(line, ',');
+        int tab = countOutsideQuotes(line, '\t');
+        if (semi >= comma && semi >= tab) return ';';
+        if (tab >= comma) return '\t';
+        return ',';
     }
 
     private static int countOutsideQuotes(String s, char target) {

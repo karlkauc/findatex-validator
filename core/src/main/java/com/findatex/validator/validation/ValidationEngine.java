@@ -2,8 +2,10 @@ package com.findatex.validator.validation;
 
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.spec.SpecCatalog;
+import com.findatex.validator.template.api.FindingContextSpec;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.TemplateRuleSet;
+import com.findatex.validator.template.tpt.TptTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +20,17 @@ public final class ValidationEngine {
 
     private final SpecCatalog catalog;
     private final TemplateRuleSet ruleSet;
+    private final FindingContextSpec contextSpec;
 
+    /** TPT-defaulted constructor — kept for tests and historic callers. */
     public ValidationEngine(SpecCatalog catalog, TemplateRuleSet ruleSet) {
+        this(catalog, ruleSet, TptTemplate.FINDING_CONTEXT);
+    }
+
+    public ValidationEngine(SpecCatalog catalog, TemplateRuleSet ruleSet, FindingContextSpec contextSpec) {
         this.catalog = Objects.requireNonNull(catalog, "catalog");
         this.ruleSet = Objects.requireNonNull(ruleSet, "ruleSet");
+        this.contextSpec = contextSpec == null ? FindingContextSpec.EMPTY : contextSpec;
     }
 
     public List<Finding> validate(TptFile file, Set<ProfileKey> activeProfiles) {
@@ -37,7 +46,7 @@ public final class ValidationEngine {
         }
         // Enrich with portfolio + position context so reports / UI can show fund name,
         // ISIN, valuation date and (per-row) the affected instrument and its weight.
-        findings = FindingEnricher.enrich(file, findings);
+        findings = FindingEnricher.enrich(file, findings, contextSpec);
         log.info("Validation produced {} findings ({} rules, {} rows)",
                 findings.size(), rules.size(), file.rows().size());
         return findings;

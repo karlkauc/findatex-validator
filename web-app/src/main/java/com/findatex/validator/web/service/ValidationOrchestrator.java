@@ -137,7 +137,7 @@ public class ValidationOrchestrator {
                             .build());
         }
 
-        List<Finding> findings = new ValidationEngine(bundle.catalog, bundle.ruleSet)
+        List<Finding> findings = new ValidationEngine(bundle.catalog, bundle.ruleSet, def.findingContextSpec())
                 .validate(file, activeProfiles);
 
         ExternalValidationConfig externalCfg = def.externalValidationConfigFor(version);
@@ -153,7 +153,8 @@ public class ValidationOrchestrator {
                     AppSettings settings = externalFactory.buildSettings(externalOptions);
                     List<Finding> online = FindingEnricher.enrich(file,
                             svc.run(file, externalCfg, settings, () -> false,
-                                    ExternalValidationService.ProgressSink.NOOP));
+                                    ExternalValidationService.ProgressSink.NOOP),
+                            def.findingContextSpec());
                     List<Finding> merged = new ArrayList<>(findings);
                     merged.addAll(online);
                     findings = merged;

@@ -17,10 +17,13 @@ public final class CodificationParser {
      *       like {@code e.g. "BLOOMBERG"...} would be misparsed as a closed-list entry with
      *       code {@code e}.</li>
      * </ul>
+     * The label after the separator must start with whitespace — that's what distinguishes
+     * a real bullet ({@code "1- option A"}) from inline example text such as a decimal number
+     * inside a sentence ({@code "Floating decimal. 1.15% = 0.0115"}).
      * Group 1 captures a digit-led code, group 2 captures a pure-letter code, group 3 is the label.
      */
     private static final Pattern CLOSED_LIST_LINE =
-            Pattern.compile("^\\s*(?:(\\d+[a-zA-Z]?)\\s*[-–.]|([A-Za-z])\\s*[-–])\\s*(.+)$", Pattern.MULTILINE);
+            Pattern.compile("^\\s*(?:(\\d+[a-zA-Z]?)\\s*[-–.]|([A-Za-z])\\s*[-–])\\s+(.+)$", Pattern.MULTILINE);
     /** Quoted token list, e.g. {@code "Bullet", "Sinkable"} or {@code "Y" ; "N"; "EPM"}. */
     private static final Pattern QUOTED_TOKEN =
             Pattern.compile("\"([A-Za-z0-9 _-]{1,40})\"");
@@ -28,6 +31,15 @@ public final class CodificationParser {
             Pattern.compile("alphanum(?:eric)?\\s*\\(?\\s*(?:max\\s*)?(\\d+)\\s*\\)?", Pattern.CASE_INSENSITIVE);
     private static final Pattern ALPHA_PATTERN =
             Pattern.compile("alpha\\s*\\(?\\s*(\\d+)\\s*\\)?", Pattern.CASE_INSENSITIVE);
+    /** Whole-string numeric range, e.g. {@code "1-7"}, {@code "1-7 or Empty"}, {@code "1 – 6"}. */
+    private static final Pattern NUMERIC_RANGE_PATTERN =
+            Pattern.compile("^\\s*(\\d+)\\s*[-–]\\s*(\\d+)\\s*(?:or\\s+empty)?\\s*$",
+                    Pattern.CASE_INSENSITIVE);
+    /** Single-uppercase-letter code introduced by an {@code "or"} keyword (case-insensitive
+     *  {@code or}, but the captured letter must be uppercase and not part of a longer word).
+     *  Used for mixed numeric+letter codifications like {@code "floating decimal or V or S or M or L or H"}. */
+    private static final Pattern OR_SINGLE_LETTER =
+            Pattern.compile("\\b[oO][rR]\\s+([A-Z])(?![a-zA-Z])");
 
     private CodificationParser() {}
 
@@ -37,6 +49,23 @@ public final class CodificationParser {
         }
         String text = raw.trim();
         String lower = text.toLowerCase();
+
+        // EMT-style numeric ranges like "1-7 or Empty" describe a discrete set of integer codes.
+        // Match them before the bullet-style closed-list regex so we don't misread the upper
+        // bound as the label of a single-entry closed list ("1" / "7 or Empty").
+        Matcher rangeMatcher = NUMERIC_RANGE_PATTERN.matcher(text);
+        if (rangeMatcher.matches()) {
+            int lo = Integer.parseInt(rangeMatcher.group(1));
+            int hi = Integer.parseInt(rangeMatcher.group(2));
+            if (lo <= hi) {
+                List<CodificationDescriptor.ClosedListEntry> entries = new ArrayList<>(hi - lo + 1);
+                for (int i = lo; i <= hi; i++) {
+                    String code = Integer.toString(i);
+                    entries.add(new CodificationDescriptor.ClosedListEntry(code, code));
+                }
+                return new CodificationDescriptor(CodificationKind.CLOSED_LIST, Optional.empty(), entries, text);
+            }
+        }
 
         List<CodificationDescriptor.ClosedListEntry> closedList = parseClosedList(text);
 
@@ -61,7 +90,15 @@ public final class CodificationParser {
             return new CodificationDescriptor(CodificationKind.CLOSED_LIST, Optional.empty(), closedList, text);
         }
         if (lower.contains("floating decimal") || lower.startsWith("number")) {
-            return new CodificationDescriptor(CodificationKind.NUMERIC, Optional.empty(), closedList, text);
+            // Some EMT cost/period fields allow EITHER a number OR specific letter codes —
+            // e.g. NUM 55 ("floating decimal or V or S or M or L or H"). Capture those letters
+            // so FormatRule can accept them as alternatives to a numeric value.
+            List<CodificationDescriptor.ClosedListEntry> alternatives = extractOrLetterCodes(text);
+            return new CodificationDescriptor(
+                    CodificationKind.NUMERIC,
+                    Optional.empty(),
+                    alternatives.isEmpty() ? closedList : alternatives,
+                    text);
         }
         Matcher anm = ALPHANUM_PATTERN.matcher(text);
         if (anm.find()) {
@@ -80,6 +117,15 @@ public final class CodificationParser {
                     text);
         }
         return new CodificationDescriptor(CodificationKind.FREE_TEXT, Optional.empty(), closedList, text);
+    }
+
+    private static List<CodificationDescriptor.ClosedListEntry> extractOrLetterCodes(String text) {
+        Matcher m = OR_SINGLE_LETTER.matcher(text);
+        java.util.LinkedHashSet<String> seen = new java.util.LinkedHashSet<>();
+        while (m.find()) seen.add(m.group(1));
+        List<CodificationDescriptor.ClosedListEntry> out = new ArrayList<>(seen.size());
+        for (String code : seen) out.add(new CodificationDescriptor.ClosedListEntry(code, code));
+        return out;
     }
 
     private static List<CodificationDescriptor.ClosedListEntry> parseClosedList(String text) {

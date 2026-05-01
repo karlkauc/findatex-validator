@@ -3,6 +3,7 @@ package com.findatex.validator.template.eet;
 import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.external.ExternalValidationConfig.IdentifierRef;
 import com.findatex.validator.spec.ManifestDrivenSpecLoader;
+import com.findatex.validator.template.api.FindingContextSpec;
 import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.template.api.TemplateDefinition;
 import com.findatex.validator.template.api.TemplateId;
@@ -100,5 +101,20 @@ public final class EetTemplate implements TemplateDefinition {
             throw new NoSuchElementException("EET does not support version " + version.version());
         }
         return EXTERNAL_VALIDATION;
+    }
+
+    /**
+     * EET findings are scoped to a manufacturer + financial instrument. Manufacturer code
+     * (NUM 13) acts as the portfolio-id analogue, manufacturer name (NUM 11) as portfolio name,
+     * and NUM 15 ({@code 10040_General_Reference_Date}) as valuation date. Per-instrument
+     * context comes from NUM 23 (instrument identifier) and NUM 25 (instrument name); EET has
+     * no weight equivalent.
+     */
+    public static final FindingContextSpec FINDING_CONTEXT =
+            new FindingContextSpec("13", "11", "15", "23", "25", null);
+
+    @Override
+    public FindingContextSpec findingContextSpec() {
+        return FINDING_CONTEXT;
     }
 }

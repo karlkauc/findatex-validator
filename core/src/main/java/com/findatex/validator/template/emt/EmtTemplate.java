@@ -3,6 +3,7 @@ package com.findatex.validator.template.emt;
 import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.external.ExternalValidationConfig.IdentifierRef;
 import com.findatex.validator.spec.ManifestDrivenSpecLoader;
+import com.findatex.validator.template.api.FindingContextSpec;
 import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.template.api.TemplateDefinition;
 import com.findatex.validator.template.api.TemplateId;
@@ -100,5 +101,19 @@ public final class EmtTemplate implements TemplateDefinition {
             throw new NoSuchElementException("EMT does not support version " + version.version());
         }
         return EXTERNAL_VALIDATION;
+    }
+
+    /**
+     * EMT carries the issuer LEI as the closest analogue to a portfolio identifier (NUM 3),
+     * the issuer name in NUM 2, and a per-instrument reference date in NUM 8.
+     * Per-position context comes from NUM 9 (instrument identifier), NUM 11 (instrument name);
+     * EMT has no weight equivalent.
+     */
+    public static final FindingContextSpec FINDING_CONTEXT =
+            new FindingContextSpec("3", "2", "8", "9", "11", null);
+
+    @Override
+    public FindingContextSpec findingContextSpec() {
+        return FINDING_CONTEXT;
     }
 }

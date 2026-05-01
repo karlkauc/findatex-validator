@@ -79,9 +79,11 @@ public class RateLimitFilter implements ContainerRequestFilter {
     private String clientIp(ContainerRequestContext ctx) {
         String fwd = ctx.getHeaderString("X-Forwarded-For");
         if (fwd != null && !fwd.isBlank()) {
-            // First hop is the real client; subsequent ones are reverse proxies.
-            int comma = fwd.indexOf(',');
-            return (comma > 0 ? fwd.substring(0, comma) : fwd).trim();
+            // The rightmost entry is the IP our trusted reverse proxy (Apache) appended,
+            // i.e. the TCP source it actually saw. Earlier entries are client-controllable
+            // and would let an attacker mint a fresh bucket per spoofed value.
+            int comma = fwd.lastIndexOf(',');
+            return (comma >= 0 ? fwd.substring(comma + 1) : fwd).trim();
         }
         String real = ctx.getHeaderString("X-Real-IP");
         if (real != null && !real.isBlank()) return real.trim();

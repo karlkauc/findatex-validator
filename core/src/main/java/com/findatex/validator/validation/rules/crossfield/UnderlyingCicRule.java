@@ -4,7 +4,9 @@ import com.findatex.validator.domain.CicCode;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,15 @@ public final class UnderlyingCicRule implements Rule {
     private static final Set<String> NEEDS_UNDERLYING = Set.of("2", "A", "B", "C", "D", "F");
 
     @Override public String id() { return "XF-14/UNDERLYING_CIC"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "Field 67 (Underlying CIC) is mandatory when the main CIC category is one of"
+                        + " {2, A, B, C, D, F} (instruments that have an economic underlying).",
+                Severity.ERROR,
+                List.of("12"),
+                List.of("67"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

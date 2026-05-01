@@ -3,7 +3,9 @@ package com.findatex.validator.validation.rules.crossfield;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +19,14 @@ public final class DateOrderRule implements Rule {
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE;
 
     @Override public String id() { return "XF-12/DATE_ORDER"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "Field 7 (Reporting date) must not precede field 6 (Valuation date).",
+                Severity.ERROR,
+                List.of("6", "7"),
+                List.of("7"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

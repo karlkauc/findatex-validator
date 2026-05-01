@@ -20,6 +20,8 @@ public final class EptVersionRule implements Rule {
         this.expectedVersionToken = Objects.requireNonNull(expectedVersionToken, "expectedVersionToken").trim();
     }
 
+    public String expectedVersionToken() { return expectedVersionToken; }
+
     @Override public String id() { return "EPT-XF-VERSION"; }
 
     @Override

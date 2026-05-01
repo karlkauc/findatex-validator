@@ -4,7 +4,9 @@ import com.findatex.validator.domain.CicCode;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.util.List;
 
@@ -14,6 +16,15 @@ public final class CashPercentageRule implements Rule {
     private static final double TOLERANCE = 0.05; // ±5 %
 
     @Override public String id() { return "XF-05/CASH_PERCENTAGE"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "Declared cash ratio (field 9) must match Σ MarketValuePC of CIC xx7x positions"
+                        + " divided by TotalNetAssets, within ±" + TOLERANCE + ".",
+                Severity.WARNING,
+                List.of("5", "24"),
+                List.of("9"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

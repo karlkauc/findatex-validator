@@ -52,6 +52,7 @@ python3 tools/build_samples.py                 # regenerate core/src/test/resour
 python3 tools/build_examples.py                # regenerate samples/tpt/*
 python3 tools/build_eet_samples.py             # samples/eet/*  (also _emt_, _ept_)
 python3 tools/generate_requirements.py         # rebuild requirements.md from spec
+mvn -pl core -Pdocs exec:java                  # rebuild docs/rules/*.md (per-template rule reference)
 ./package/jpackage.sh                          # native desktop installer
 ```
 

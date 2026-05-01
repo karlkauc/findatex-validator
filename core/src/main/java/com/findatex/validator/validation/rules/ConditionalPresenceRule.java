@@ -25,6 +25,10 @@ public final class ConditionalPresenceRule implements Rule {
         this.profile = profile;
     }
 
+    public FieldSpec spec() { return spec; }
+
+    public ProfileKey profile() { return profile; }
+
     @Override
     public String id() { return "COND_PRESENCE/" + spec.numKey() + "/" + profile.code(); }
 

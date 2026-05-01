@@ -35,6 +35,8 @@ public final class TptVersionRule implements Rule {
         this.expectedNumericToken = minor == null ? major : major + "." + minor;
     }
 
+    public String expectedVersionToken() { return expectedVersion; }
+
     @Override public String id() { return "XF-15/TPT_VERSION"; }
 
     @Override

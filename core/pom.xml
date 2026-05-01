@@ -33,6 +33,22 @@
                     <include>META-INF/findatex-validator.properties</include>
                 </includes>
             </resource>
+            <!--
+                Generated per-template rules reference (mvn -pl core -Pdocs exec:java).
+                Bundled into the JAR under /help/rules/ so HelpResource (web) and HelpDialog
+                (desktop) can serve the same Markdown shipped to GitHub at docs/rules/.
+                Missing-directory tolerated so a fresh checkout still builds before the
+                generator has been run.
+            -->
+            <resource>
+                <directory>${project.basedir}/../docs/rules</directory>
+                <targetPath>help/rules</targetPath>
+                <filtering>false</filtering>
+                <includes>
+                    <include>*.md</include>
+                    <include>index.json</include>
+                </includes>
+            </resource>
         </resources>
     </build>
 

@@ -3,7 +3,9 @@ package com.findatex.validator.validation.rules.crossfield;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,15 @@ import java.util.Locale;
 public final class InterestRateTypeRule implements Rule {
 
     @Override public String id() { return "XF-10/INTEREST_RATE_TYPE"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "When field 32 (interest-rate type) is Floating/Variable, fields 34..37 are mandatory;"
+                        + " when Fixed, field 33 (Coupon rate) is mandatory.",
+                Severity.ERROR,
+                List.of("32"),
+                List.of("33", "34", "35", "36", "37"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

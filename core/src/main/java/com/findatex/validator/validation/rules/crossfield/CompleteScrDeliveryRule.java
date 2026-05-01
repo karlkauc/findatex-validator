@@ -3,7 +3,9 @@ package com.findatex.validator.validation.rules.crossfield;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,15 @@ public final class CompleteScrDeliveryRule implements Rule {
     };
 
     @Override public String id() { return "XF-01/COMPLETE_SCR_DELIVERY"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "When field 11 (CompleteSCRDelivery) is \"Y\", every SCR contribution field"
+                        + " 97..105b must be populated.",
+                Severity.ERROR,
+                List.of("11"),
+                List.of(SCR_FIELDS));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

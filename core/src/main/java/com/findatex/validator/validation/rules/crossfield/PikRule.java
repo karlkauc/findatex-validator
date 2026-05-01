@@ -4,7 +4,9 @@ import com.findatex.validator.domain.CicCode;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,16 @@ public final class PikRule implements Rule {
     private static final Set<String> ALLOWED = Set.of("0", "1", "2", "3", "4");
 
     @Override public String id() { return "XF-13/PIK"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "Field 146 (PIK) must be one of {0, 1, 2, 3, 4} and is meaningful only for bonds"
+                        + " (CIC xx2x) and loans (CIC xx8x). Each PIK case mandates a specific"
+                        + " subset of fields 32, 33, 38, 39, 40, 41 per the PIK guidelines.",
+                Severity.ERROR,
+                List.of("146"),
+                List.of("32", "33", "38", "39", "40", "41", "146"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

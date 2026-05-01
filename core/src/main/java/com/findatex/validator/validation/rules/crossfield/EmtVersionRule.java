@@ -17,6 +17,8 @@ public final class EmtVersionRule implements Rule {
         this.expectedVersion = Objects.requireNonNull(expectedVersion, "expectedVersion").trim();
     }
 
+    public String expectedVersionToken() { return expectedVersion; }
+
     @Override public String id() { return "EMT-XF-VERSION"; }
 
     @Override

@@ -3,7 +3,9 @@ package com.findatex.validator.validation.rules.crossfield;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.util.List;
 
@@ -13,6 +15,14 @@ public final class PositionWeightSumRule implements Rule {
     private static final double TOLERANCE = 0.02; // ±2 % to allow rounding/derivative weights
 
     @Override public String id() { return "XF-04/POSITION_WEIGHT_SUM"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "Σ field 26 (Position weight) across all positions must be ≈ 1.0 within ±" + TOLERANCE + ".",
+                Severity.WARNING,
+                List.of("26"),
+                List.of("26"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

@@ -112,6 +112,28 @@ class IngestCornerCasesTest {
     }
 
     @Test
+    void csvStripsLeadingUtf8Bom(@TempDir Path tmp) throws Exception {
+        // Reproduces the DWS consolidated_ept_de.csv failure: producer prefixes the file
+        // with a UTF-8 BOM (EF BB BF). Without BOM stripping the first header would carry
+        // a hidden ﻿ prefix and never match the spec, leading to spurious "field 1
+        // missing" findings on every row.
+        Path csv = tmp.resolve("bom.csv");
+        byte[] bom = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
+        byte[] body = "12_CIC_code_of_the_instrument|17_Instrument_name\nFR12|Treasury bond\n"
+                .getBytes(StandardCharsets.UTF_8);
+        try (OutputStream out = Files.newOutputStream(csv)) {
+            out.write(bom);
+            out.write(body);
+        }
+        TptFile file = new CsvLoader(CATALOG).load(csv);
+        assertThat(file.rows()).hasSize(1);
+        assertThat(file.rows().get(0).stringValue("12")).contains("FR12");
+        assertThat(file.unmappedHeaders())
+                .as("BOM-prefixed first header should still map cleanly")
+                .isEmpty();
+    }
+
+    @Test
     void csvPipeAcceptsStrayQuotesAsLiterals(@TempDir Path tmp) throws Exception {
         // Reproduces the UBS_Asset_Management_EPT_UBSGAMFundsLtd_V2.1_en.csv failure:
         // pipe-delimited file whose producer wrapped a description in "..." but didn't

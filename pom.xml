@@ -243,4 +243,35 @@
         </plugins>
     </build>
 
+    <profiles>
+        <!--
+            Runs com.findatex.validator.docs.RuleDocGenerator and writes the per-template
+            validation reference into docs/rules/ at the repo root. The generator iterates
+            the live TemplateRegistry, so the output cannot drift from the rules actually
+            executed at runtime. Bundled into the core JAR via core/pom.xml so the same
+            files are served by the desktop Help dialog and the web /api/help/rules endpoint.
+
+            Invoke from the repo root:
+                mvn -pl core -Pdocs exec:java
+        -->
+        <profile>
+            <id>docs</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <configuration>
+                            <mainClass>com.findatex.validator.docs.RuleDocGenerator</mainClass>
+                            <arguments>
+                                <argument>${session.executionRootDirectory}/docs/rules</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

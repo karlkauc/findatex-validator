@@ -21,6 +21,8 @@ public final class EetVersionRule implements Rule {
         this.expectedVersion = Objects.requireNonNull(expectedVersion, "expectedVersion").trim();
     }
 
+    public String expectedVersionToken() { return expectedVersion; }
+
     @Override public String id() { return "EET-XF-VERSION"; }
 
     @Override

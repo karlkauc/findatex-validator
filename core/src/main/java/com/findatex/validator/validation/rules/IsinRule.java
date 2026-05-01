@@ -24,6 +24,10 @@ public final class IsinRule implements Rule {
         this.typeNumKey = typeNumKey;
     }
 
+    public String codeNumKey() { return codeNumKey; }
+
+    public String typeNumKey() { return typeNumKey; }
+
     @Override
     public String id() { return "ISIN/" + codeNumKey + "/" + typeNumKey; }
 

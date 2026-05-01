@@ -3,7 +3,9 @@ package com.findatex.validator.validation.rules.crossfield;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,15 @@ import java.util.List;
 public final class CustodianPairRule implements Rule {
 
     @Override public String id() { return "XF-09/CUSTODIAN_PAIR"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "Custodian identification code (field 140) and its type indicator (field 141)"
+                        + " must be paired: filling one without the other is a finding.",
+                Severity.ERROR,
+                List.of("140", "141"),
+                List.of("140", "141"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

@@ -4,7 +4,9 @@ import com.findatex.validator.domain.CicCode;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +20,15 @@ public final class MaturityAfterReportingRule implements Rule {
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE;
 
     @Override public String id() { return "XF-11/MATURITY_AFTER_REPORTING"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "For dated/interest-rate instruments (CIC categories 1, 2, 5, 6, 8), field 39"
+                        + " (Maturity date) must not precede field 7 (Reporting date).",
+                Severity.WARNING,
+                List.of("7"),
+                List.of("39"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

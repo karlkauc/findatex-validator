@@ -21,6 +21,10 @@ public final class PresenceRule implements Rule {
         this.profile = profile;
     }
 
+    public FieldSpec spec() { return spec; }
+
+    public ProfileKey profile() { return profile; }
+
     @Override
     public String id() { return "PRESENCE/" + spec.numKey() + "/" + profile.code(); }
 

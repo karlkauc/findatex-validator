@@ -3,7 +3,9 @@ package com.findatex.validator.validation.rules.crossfield;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,14 @@ public final class CouponFrequencyRule implements Rule {
     private static final Set<String> ALLOWED = Set.of("0", "1", "2", "4", "12", "52");
 
     @Override public String id() { return "XF-08/COUPON_FREQUENCY"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "Field 38 (Coupon payment frequency) must be one of {0, 1, 2, 4, 12, 52}.",
+                Severity.ERROR,
+                List.of("38"),
+                List.of("38"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

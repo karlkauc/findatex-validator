@@ -37,6 +37,8 @@ public final class FormatRule implements Rule {
         this.spec = spec;
     }
 
+    public FieldSpec spec() { return spec; }
+
     @Override
     public String id() { return "FORMAT/" + spec.numKey(); }
 

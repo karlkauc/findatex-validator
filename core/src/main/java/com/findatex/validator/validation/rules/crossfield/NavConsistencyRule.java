@@ -3,7 +3,9 @@ package com.findatex.validator.validation.rules.crossfield;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
+import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.util.List;
 
@@ -13,6 +15,15 @@ public final class NavConsistencyRule implements Rule {
     private static final double REL_TOLERANCE = 0.01; // 1 % relative
 
     @Override public String id() { return "XF-06/NAV_PRICE_SHARES"; }
+
+    public RuleDoc describe() {
+        return new RuleDoc(
+                "TotalNetAssets (field 5) must match SharePrice (field 8) × Shares (field 8b)"
+                        + " within ±" + REL_TOLERANCE + " relative tolerance.",
+                Severity.WARNING,
+                List.of("8", "8b"),
+                List.of("5"));
+    }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {

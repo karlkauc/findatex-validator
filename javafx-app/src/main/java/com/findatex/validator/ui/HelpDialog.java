@@ -5,6 +5,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -18,29 +20,40 @@ import java.awt.Desktop;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Modal Help window. Loads the canonical {@code help/HELP.md} bundled in the core JAR and renders
- * it via {@link MarkdownRenderer}. Links open in the user's default browser via {@link Desktop}
- * — no JavaFX WebView dependency, no embedded JxBrowser.
+ * Modal Help window. Top tab loads the canonical {@code help/HELP.md}; further tabs load each
+ * per-template validation reference produced by {@code RuleDocGenerator} (one tab per
+ * {@code (template, version)} pair, discovered via {@code help/rules/index.json} on the
+ * classpath). Markdown is rendered via {@link MarkdownRenderer} and links open in the user's
+ * default browser via {@link Desktop} — no JavaFX WebView dependency.
  */
 public final class HelpDialog {
 
     private static final Logger log = LoggerFactory.getLogger(HelpDialog.class);
-    private static final String RESOURCE_PATH = "/help/HELP.md";
+    private static final String HELP_RESOURCE = "/help/HELP.md";
+    private static final String RULES_INDEX_RESOURCE = "/help/rules/index.json";
+    private static final String RULES_DIR_RESOURCE = "/help/rules/";
 
     private HelpDialog() {
     }
 
     public static void show(Stage owner) {
-        String markdown = loadMarkdown();
-        VBox content = MarkdownRenderer.render(markdown, HelpDialog::openLink);
-        content.setPadding(new Insets(20, 28, 20, 28));
-        content.setMaxWidth(820);
+        TabPane tabs = new TabPane();
+        tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        tabs.getTabs().add(buildTab("Operator guide", loadClasspath(HELP_RESOURCE,
+                "# Help unavailable\n\nThe bundled HELP.md resource was not found.")));
 
-        ScrollPane scroll = new ScrollPane(content);
-        scroll.setFitToWidth(true);
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        for (RulesEntry e : loadRulesIndex()) {
+            String md = loadClasspath(RULES_DIR_RESOURCE + e.slug + ".md", null);
+            if (md != null) {
+                tabs.getTabs().add(buildTab(e.tabLabel(), md));
+            }
+        }
 
         Button closeButton = new Button("Close");
         closeButton.setDefaultButton(true);
@@ -51,11 +64,10 @@ public final class HelpDialog {
         actionBar.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
 
         BorderPane root = new BorderPane();
-        root.setCenter(scroll);
+        root.setCenter(tabs);
         root.setBottom(actionBar);
-        VBox.setVgrow(scroll, Priority.ALWAYS);
 
-        Scene scene = new Scene(root, 880, 720);
+        Scene scene = new Scene(root, 980, 760);
         Stage stage = new Stage();
         stage.setTitle("FinDatEx Validator — Help");
         stage.setScene(scene);
@@ -68,17 +80,78 @@ public final class HelpDialog {
         stage.show();
     }
 
-    private static String loadMarkdown() {
-        try (InputStream in = HelpDialog.class.getResourceAsStream(RESOURCE_PATH)) {
+    private static Tab buildTab(String label, String markdown) {
+        VBox content = MarkdownRenderer.render(markdown, HelpDialog::openLink);
+        content.setPadding(new Insets(20, 28, 20, 28));
+        content.setMaxWidth(900);
+
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        VBox.setVgrow(scroll, Priority.ALWAYS);
+
+        Tab tab = new Tab(label);
+        tab.setContent(scroll);
+        return tab;
+    }
+
+    private static String loadClasspath(String resource, String fallback) {
+        try (InputStream in = HelpDialog.class.getResourceAsStream(resource)) {
             if (in == null) {
-                log.warn("Missing classpath resource {}", RESOURCE_PATH);
-                return "# Help unavailable\n\nThe bundled HELP.md resource was not found.";
+                log.warn("Missing classpath resource {}", resource);
+                return fallback;
             }
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.warn("Failed to load {}: {}", RESOURCE_PATH, e.toString());
-            return "# Help unavailable\n\nCould not load HELP.md: " + e.getMessage();
+            log.warn("Failed to load {}: {}", resource, e.toString());
+            return fallback;
         }
+    }
+
+    /** Lightweight description of one entry in the generated rules index. */
+    static final class RulesEntry {
+        final String slug;
+        final String templateDisplayName;
+        final String version;
+
+        RulesEntry(String slug, String templateDisplayName, String version) {
+            this.slug = slug;
+            this.templateDisplayName = templateDisplayName;
+            this.version = version;
+        }
+
+        String tabLabel() { return templateDisplayName + " " + version + " rules"; }
+    }
+
+    /**
+     * Parses {@code help/rules/index.json} into entries without pulling in a JSON dependency.
+     * Returns an empty list if the resource isn't on the classpath (fresh checkout, generator
+     * never run).
+     */
+    static List<RulesEntry> loadRulesIndex() {
+        String json = loadClasspath(RULES_INDEX_RESOURCE, null);
+        List<RulesEntry> out = new ArrayList<>();
+        if (json == null) return out;
+        Pattern entry = Pattern.compile("\\{[^}]*\\}", Pattern.DOTALL);
+        Pattern field = Pattern.compile("\"(slug|templateDisplayName|version)\"\\s*:\\s*\"([^\"]*)\"");
+        Matcher entries = entry.matcher(json);
+        while (entries.find()) {
+            String fragment = entries.group();
+            String slug = null, name = null, version = null;
+            Matcher fm = field.matcher(fragment);
+            while (fm.find()) {
+                switch (fm.group(1)) {
+                    case "slug" -> slug = fm.group(2);
+                    case "templateDisplayName" -> name = fm.group(2);
+                    case "version" -> version = fm.group(2);
+                    default -> { /* ignore */ }
+                }
+            }
+            if (slug != null && name != null && version != null) {
+                out.add(new RulesEntry(slug, name, version));
+            }
+        }
+        return out;
     }
 
     private static void openLink(String url) {

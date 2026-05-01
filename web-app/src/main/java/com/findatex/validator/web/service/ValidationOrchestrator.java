@@ -23,6 +23,7 @@ import com.findatex.validator.validation.ValidationEngine;
 import com.findatex.validator.web.config.WebConfig;
 import com.findatex.validator.web.dto.ExternalOptions;
 import com.findatex.validator.web.dto.FindingDto;
+import com.findatex.validator.web.dto.PerFundScoreDto;
 import com.findatex.validator.web.dto.ScoreDto;
 import com.findatex.validator.web.dto.ValidationResponse;
 import jakarta.annotation.PostConstruct;
@@ -257,7 +258,29 @@ public class ValidationOrchestrator {
 
         List<FindingDto> findingDtos = findings.stream().map(FindingDto::from).toList();
 
-        return new ValidationResponse(summary, scores, perProfile, findingDtos, reportId.toString());
+        List<PerFundScoreDto> perFund = new ArrayList<>();
+        List<com.findatex.validator.domain.FundGroup> fundGroups =
+                com.findatex.validator.domain.FundGrouper.group(file);
+        for (com.findatex.validator.domain.FundGroup g : fundGroups) {
+            Map<ScoreCategory, Double> sc = report.perFundScores().get(g.key());
+            if (sc == null) continue;
+            List<ScoreDto> dtos = new ArrayList<>();
+            for (Map.Entry<ScoreCategory, Double> e : sc.entrySet()) {
+                dtos.add(ScoreDto.of(e.getKey().name(), e.getValue()));
+            }
+            String name = null;
+            for (com.findatex.validator.domain.TptRow r : g.rows()) {
+                String v = r.stringValue("3").orElse(null);
+                if (v != null && !v.isEmpty()) { name = v; break; }
+            }
+            perFund.add(new PerFundScoreDto(
+                    g.key().portfolioId(),
+                    name,
+                    g.key().valuationDate(),
+                    dtos));
+        }
+
+        return new ValidationResponse(summary, scores, perProfile, perFund, findingDtos, reportId.toString());
     }
 
     private static WebApplicationException badRequest(String message) {

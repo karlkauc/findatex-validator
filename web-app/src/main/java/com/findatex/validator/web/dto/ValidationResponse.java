@@ -7,6 +7,7 @@ public record ValidationResponse(
         Summary summary,
         List<ScoreDto> scores,
         Map<String, List<ScoreDto>> perProfileScores,
+        List<PerFundScoreDto> perFundScores,
         List<FindingDto> findings,
         String reportId
 ) {

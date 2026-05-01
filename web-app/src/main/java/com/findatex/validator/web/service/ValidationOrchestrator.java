@@ -268,6 +268,8 @@ public class ValidationOrchestrator {
             for (Map.Entry<ScoreCategory, Double> e : sc.entrySet()) {
                 dtos.add(ScoreDto.of(e.getKey().name(), e.getValue()));
             }
+            // Field 3 = TPT portfolio name. Non-TPT templates yield an empty
+            // perFundScores map, so this loop is a no-op there.
             String name = null;
             for (com.findatex.validator.domain.TptRow r : g.rows()) {
                 String v = r.stringValue("3").orElse(null);

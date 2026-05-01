@@ -554,8 +554,12 @@ public final class TemplateTabController {
                 TemplateRuleSet ruleSet = template.ruleSetFor(selectedVersion);
                 com.findatex.validator.template.api.FindingContextSpec contextSpec =
                         template.findingContextSpec();
+                // Honour the file-level "Reporting" Y/N flags (e.g. EET fields 6–10):
+                // a profile flagged 'N' by the producer is suppressed before rule evaluation.
+                java.util.Set<com.findatex.validator.template.api.ProfileKey> gatedProfiles =
+                        template.activeProfilesForFile(selectedVersion, file, profiles);
                 List<Finding> findings = new ValidationEngine(cat, ruleSet, contextSpec)
-                        .validate(file, profiles);
+                        .validate(file, gatedProfiles);
 
                 if (externalSupported && settings.external().enabled()) {
                     Path cacheDir = resolveExternalCacheDir(settings);
@@ -571,7 +575,7 @@ public final class TemplateTabController {
                     findings = all;
                 }
 
-                return new QualityScorer(cat).score(file, profiles, findings);
+                return new QualityScorer(cat).score(file, gatedProfiles, findings);
             }
         };
         task.setOnSucceeded(ev -> {

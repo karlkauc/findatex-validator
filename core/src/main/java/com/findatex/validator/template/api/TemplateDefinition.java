@@ -1,8 +1,10 @@
 package com.findatex.validator.template.api;
 
+import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.external.ExternalValidationConfig;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Describes one FinDatEx template (TPT, EET, EMT, EPT) and exposes its versions, profiles,
@@ -58,5 +60,22 @@ public interface TemplateDefinition {
      */
     default FindingContextSpec findingContextSpec() {
         return FindingContextSpec.EMPTY;
+    }
+
+    /**
+     * Narrow the requested profile set to those the producer has opted into via the
+     * file's "Reporting" Y/N flags (e.g. EET fields 5–9, EMT/EPT analogues). The orchestrator
+     * calls this between header-mapping and rule evaluation: profiles the producer marked
+     * {@code N} (or omitted) get suppressed so their PRESENCE/&lt;n&gt;/&lt;PROFILE&gt; rules
+     * don't fire — that's how the spec encodes "this file is not an SFDR Entity report,
+     * skip those mandatory fields".
+     *
+     * <p>Default: returns {@code requested} unchanged. Templates without a file-level
+     * applicability flag (e.g. TPT) should leave it alone.
+     */
+    default Set<ProfileKey> activeProfilesForFile(TemplateVersion version,
+                                                  TptFile file,
+                                                  Set<ProfileKey> requested) {
+        return requested;
     }
 }

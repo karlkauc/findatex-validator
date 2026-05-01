@@ -35,8 +35,21 @@ class EmtExampleSamplesTest {
         return Files.isDirectory(samplesDir());
     }
 
+    /**
+     * Resolve {@code samples/emt/} from the JVM's CWD. When Surefire launches
+     * the test JVM with {@code core/} as CWD (the multi-module default) we walk
+     * up to find the project root that actually owns {@code samples/}.
+     */
     private static Path samplesDir() {
-        return Paths.get("").toAbsolutePath().resolve("samples").resolve("emt");
+        Path cwd = Paths.get("").toAbsolutePath();
+        Path direct = cwd.resolve("samples").resolve("emt");
+        if (Files.isDirectory(direct)) return direct;
+        Path parent = cwd.getParent();
+        if (parent != null) {
+            Path up = parent.resolve("samples").resolve("emt");
+            if (Files.isDirectory(up)) return up;
+        }
+        return direct;
     }
 
     @Test

@@ -1,10 +1,12 @@
 package com.findatex.validator.validation.rules.crossfield;
 
+import com.findatex.validator.domain.FundGroup;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
 import com.findatex.validator.validation.ValidationContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -41,19 +43,35 @@ public final class TptVersionRule implements Rule {
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {
-        for (TptRow row : ctx.file().rows()) {
-            String v = row.stringValue("1000").orElse(null);
-            if (v == null) continue;
-            String norm = v.trim().toUpperCase();
-            if (norm.contains(expectedMajorToken) || norm.contains(expectedNumericToken)) return List.of();
-            return List.of(Finding.error(
+        List<FundGroup> groups = ctx.fundGroups();
+        if (groups.isEmpty()) {
+            return List.of(Finding.info(
                     id(), null, "1000", "Field 1000 (TPT version)",
-                    row.rowIndex(), v,
-                    "TPT version must be " + expectedVersion + " (got: " + v + ")"));
+                    null, null,
+                    "TPT version field 1000 is not present"));
         }
-        return List.of(Finding.info(
-                id(), null, "1000", "Field 1000 (TPT version)",
-                null, null,
-                "TPT version field 1000 is not present"));
+        List<Finding> out = new ArrayList<>();
+        for (FundGroup g : groups) {
+            boolean found = false;
+            for (TptRow row : g.rows()) {
+                String v = row.stringValue("1000").orElse(null);
+                if (v == null) continue;
+                found = true;
+                String norm = v.trim().toUpperCase();
+                if (norm.contains(expectedMajorToken) || norm.contains(expectedNumericToken)) break;
+                out.add(Finding.error(
+                        id(), null, "1000", "Field 1000 (TPT version)",
+                        row.rowIndex(), v,
+                        "TPT version must be " + expectedVersion + " (got: " + v + ")"));
+                break;
+            }
+            if (!found) {
+                out.add(Finding.info(
+                        id(), null, "1000", "Field 1000 (TPT version)",
+                        g.firstRowIndex(), null,
+                        "TPT version field 1000 is not present"));
+            }
+        }
+        return out;
     }
 }

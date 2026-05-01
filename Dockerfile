@@ -19,6 +19,10 @@ RUN mvn -B -pl web-app -am dependency:go-offline -DskipTests || true
 # Now copy the rest of the sources and build only what the web app needs.
 COPY core core
 COPY web-app web-app
+# Generated per-template rules reference (docs/rules/*.md + index.json) — bundled
+# into the core JAR via core/pom.xml's <resource> pointing at ../docs/rules.
+# Regenerate before building the image with: mvn -pl core -Pdocs exec:java
+COPY docs/rules docs/rules
 
 RUN mvn -B -pl web-app -am -DskipTests package
 

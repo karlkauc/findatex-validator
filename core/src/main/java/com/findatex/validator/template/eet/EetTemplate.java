@@ -1,9 +1,11 @@
 package com.findatex.validator.template.eet;
 
+import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.external.ExternalValidationConfig.IdentifierRef;
 import com.findatex.validator.spec.ManifestDrivenSpecLoader;
 import com.findatex.validator.template.api.FindingContextSpec;
+import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.template.api.TemplateDefinition;
 import com.findatex.validator.template.api.TemplateId;
@@ -14,6 +16,7 @@ import com.findatex.validator.template.api.TemplateVersion;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * {@link TemplateDefinition} for the European ESG Template (EET). Two bundled versions:
@@ -116,5 +119,17 @@ public final class EetTemplate implements TemplateDefinition {
     @Override
     public FindingContextSpec findingContextSpec() {
         return FINDING_CONTEXT;
+    }
+
+    /**
+     * EET applicability is gated by the producer's "Data Reporting" flags in fields 6–10
+     * (e.g. {@code 00080_EET_Data_Reporting_SFDR_Entity_Level = "N"} suppresses every
+     * SFDR_ENTITY presence rule). Field/profile mapping lives in {@link EetProfileGate}.
+     */
+    @Override
+    public Set<ProfileKey> activeProfilesForFile(TemplateVersion version,
+                                                 TptFile file,
+                                                 Set<ProfileKey> requested) {
+        return EetProfileGate.apply(file, requested);
     }
 }

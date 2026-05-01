@@ -151,8 +151,30 @@ public class ValidationOrchestrator {
                             .build());
         }
 
+        // Honour the file-level "Reporting" Y/N flags (e.g. EET fields 6–10): if the producer
+        // marked SFDR_ENTITY = 'N' we suppress the SFDR_ENTITY rules so they don't fire on
+        // every row. Each suppressed profile gets one INFO finding so the user sees the gate
+        // took effect rather than wondering why some fields aren't being checked.
+        Set<ProfileKey> gatedProfiles = def.activeProfilesForFile(version, file, activeProfiles);
+        List<Finding> profileGateNotes = new ArrayList<>();
+        for (ProfileKey p : activeProfiles) {
+            if (!gatedProfiles.contains(p)) {
+                profileGateNotes.add(Finding.info(
+                        "PROFILE/" + p.code() + "/SKIPPED-PER-FILE-FLAG",
+                        p, null, null, null, null,
+                        "Profile " + p.displayName()
+                                + " not active in this file (Data Reporting flag is not 'Y') — rules skipped."));
+            }
+        }
+
         List<Finding> findings = new ValidationEngine(bundle.catalog, bundle.ruleSet, def.findingContextSpec())
-                .validate(file, activeProfiles);
+                .validate(file, gatedProfiles);
+        if (!profileGateNotes.isEmpty()) {
+            List<Finding> merged = new ArrayList<>(findings.size() + profileGateNotes.size());
+            merged.addAll(profileGateNotes);
+            merged.addAll(findings);
+            findings = merged;
+        }
 
         ExternalValidationConfig externalCfg = def.externalValidationConfigFor(version);
         if (externalOptions != null
@@ -181,7 +203,7 @@ public class ValidationOrchestrator {
             }
         }
 
-        QualityReport report = new QualityScorer(bundle.catalog).score(file, activeProfiles, findings);
+        QualityReport report = new QualityScorer(bundle.catalog).score(file, gatedProfiles, findings);
 
         Path xlsxPath;
         try {

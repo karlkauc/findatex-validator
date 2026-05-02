@@ -55,6 +55,9 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.external.cache-ttl-days", defaultValue = "7")
     int externalCacheTtlDays;
 
+    @ConfigProperty(name = "findatex.web.desktop-download-url")
+    Optional<String> desktopDownloadUrl;
+
     public RateLimit rateLimit() {
         return new RateLimit(rateLimitPerIpPerHour);
     }
@@ -69,6 +72,15 @@ public class WebConfig {
 
     public Report report() {
         return new Report(reportTtlMinutes);
+    }
+
+    /**
+     * Optional download URL for the JavaFX desktop build, surfaced when the web
+     * quota is exhausted so users can switch to the unmetered offline tool.
+     * Returns empty when unset or set to blank.
+     */
+    public Optional<String> desktopDownloadUrl() {
+        return desktopDownloadUrl.map(String::trim).filter(s -> !s.isEmpty());
     }
 
     public External external() {

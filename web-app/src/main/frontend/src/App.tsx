@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HelpCircle, Info, Loader2, ShieldCheck } from 'lucide-react';
-import { fetchTemplates, validateUpload } from './api/client';
+import { fetchRateLimitStatus, fetchTemplates, validateUpload } from './api/client';
 import { TemplatePicker } from './components/TemplatePicker';
 import { ProfileSelector } from './components/ProfileSelector';
 import { FileUpload } from './components/FileUpload';
@@ -10,10 +10,19 @@ import { ErrorBanner } from './components/ErrorBanner';
 import { ExternalValidationToggle } from './components/ExternalValidationToggle';
 import { HelpModal } from './components/HelpModal';
 import { AboutModal } from './components/AboutModal';
-import { ValidationResponse } from './types/api';
+import { RATE_LIMIT_QUERY_KEY, RateLimitBadge } from './components/RateLimitBadge';
+import { QuotaExhaustedNotice } from './components/QuotaExhaustedNotice';
+import { RateLimitStatus, ValidationResponse } from './types/api';
 
 export default function App() {
+  const queryClient = useQueryClient();
   const templatesQuery = useQuery({ queryKey: ['templates'], queryFn: fetchTemplates });
+  const rateLimitQuery = useQuery({
+    queryKey: RATE_LIMIT_QUERY_KEY,
+    queryFn: fetchRateLimitStatus,
+    refetchInterval: 30_000,
+    staleTime: 0,
+  });
 
   const [templateId, setTemplateId] = useState<string>('TPT');
   const [version, setVersion] = useState<string>('');
@@ -52,12 +61,19 @@ export default function App() {
 
   const validateMutation = useMutation({
     mutationFn: validateUpload,
-    onSuccess: (data) => setResult(data),
+    onSuccess: (data) => {
+      setResult(data);
+      queryClient.invalidateQueries({ queryKey: RATE_LIMIT_QUERY_KEY });
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: RATE_LIMIT_QUERY_KEY });
+    },
   });
 
+  const quotaExhausted = isQuotaExhausted(rateLimitQuery.data);
   const canSubmit = useMemo(
-    () => Boolean(file && templateId && version && !validateMutation.isPending),
-    [file, templateId, version, validateMutation.isPending],
+    () => Boolean(file && templateId && version && !validateMutation.isPending && !quotaExhausted),
+    [file, templateId, version, validateMutation.isPending, quotaExhausted],
   );
 
   const submit = () => {
@@ -94,6 +110,7 @@ export default function App() {
               TPT · EET · EMT · EPT — quality and conformance against the official FinDatEx specs.
             </p>
           </div>
+          <RateLimitBadge />
           <button
             type="button"
             onClick={() => setHelpOpen(true)}
@@ -203,6 +220,7 @@ export default function App() {
             </section>
 
             <section className="space-y-5">
+              <QuotaExhaustedNotice />
               {validateMutation.isError && <ErrorBanner error={validateMutation.error} />}
               {result ? (
                 <ResultPanel result={result} />
@@ -230,4 +248,10 @@ export default function App() {
       </footer>
     </div>
   );
+}
+
+function isQuotaExhausted(status: RateLimitStatus | undefined): boolean {
+  // Treat unknown / not-yet-loaded status as "ok to submit" so the very first render
+  // doesn't disable the button before the status query has resolved.
+  return Boolean(status && status.remaining <= 0);
 }

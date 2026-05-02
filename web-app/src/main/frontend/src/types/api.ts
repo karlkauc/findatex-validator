@@ -73,6 +73,14 @@ export interface ValidationResponse {
   reportId: string;
 }
 
+export interface RateLimitStatus {
+  limit: number;
+  remaining: number;
+  windowSeconds: number;
+  resetInSeconds: number;
+  desktopDownloadUrl?: string | null;
+}
+
 export class ApiError extends Error {
   constructor(public status: number, message: string, public retryAfterSeconds?: number) {
     super(message);

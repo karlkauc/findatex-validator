@@ -133,6 +133,9 @@ public final class TemplateTabController {
     private FilteredList<FindingRow> filteredFindings;
     private final ObservableList<FileRow> fileRows = FXCollections.observableArrayList();
     private final Map<ProfileKey, CheckBox> profileCheckBoxes = new LinkedHashMap<>();
+    // Set when allFindings was clipped by FLAT_FINDINGS_DISPLAY_CAP, so applyFilters() can surface
+    // it in the count label. 0 means no truncation in effect.
+    private int totalFindingsBeforeCap;
 
     // --- FXML wiring --------------------------------------------------------
     @FXML private ScrollPane rootPane;
@@ -460,6 +463,7 @@ public final class TemplateTabController {
         currentBatch = null;
         fileRows.clear();
         allFindings.clear();
+        totalFindingsBeforeCap = 0;
         scorePane.getChildren().clear();
         filePathField.setText(folder.toString());
         batchModeLabel.setText("Batch-Modus: alle unterstützten Dateien in '" + folder.getFileName() + "'");
@@ -638,6 +642,7 @@ public final class TemplateTabController {
         exportMenu.setDisable(true);
         fileRows.clear();
         allFindings.clear();
+        totalFindingsBeforeCap = 0;
         scorePane.getChildren().clear();
         statusLabel.setText("Validating " + scan.accepted().size() + " file(s) in '"
                 + batchFolder.getFileName() + "'...");
@@ -871,6 +876,7 @@ public final class TemplateTabController {
             } else {
                 scorePane.getChildren().clear();
                 allFindings.clear();
+                totalFindingsBeforeCap = 0;
                 applyFilters();
                 statusLabel.setText("Could not validate " + r.displayName()
                         + ": " + (r.errorMessage() == null ? r.status().name() : r.errorMessage()));
@@ -934,13 +940,31 @@ public final class TemplateTabController {
             scorePane.getChildren().add(buildScoreCard(label, v));
         }
 
-        List<FindingRow> rows = report.findings().stream().map(FindingRow::of).toList();
-        if (rows.size() > FLAT_FINDINGS_DISPLAY_CAP) {
-            rows = rows.subList(0, FLAT_FINDINGS_DISPLAY_CAP);
-        }
-        allFindings.setAll(rows);
+        DisplayBatch batch = prepareDisplayBatch(report.findings());
+        totalFindingsBeforeCap = batch.totalBeforeCap;
+        allFindings.setAll(batch.rows.stream().map(FindingRow::of).toList());
         applyFilters();
     }
+
+    /**
+     * Sort severity-first (ERROR < WARNING < INFO by enum ordinal) BEFORE the display-cap
+     * truncation. Otherwise, a rule that emits more than FLAT_FINDINGS_DISPLAY_CAP warnings
+     * before any presence-rule errors fire would push every error past the cap, leaving the
+     * table apparently empty even though the file row's Errors column counts thousands.
+     * Package-private + static so it can be unit-tested without bringing up JavaFX.
+     */
+    static DisplayBatch prepareDisplayBatch(List<Finding> findings) {
+        List<Finding> sorted = findings.stream()
+                .sorted(Comparator.comparing(Finding::severity))
+                .toList();
+        if (sorted.size() > FLAT_FINDINGS_DISPLAY_CAP) {
+            return new DisplayBatch(sorted.subList(0, FLAT_FINDINGS_DISPLAY_CAP), sorted.size());
+        }
+        return new DisplayBatch(sorted, 0);
+    }
+
+    /** Result of {@link #prepareDisplayBatch(List)}. {@code totalBeforeCap} is 0 when not truncated. */
+    record DisplayBatch(List<Finding> rows, int totalBeforeCap) { }
 
     private VBox buildScoreCard(String title, double value) {
         VBox card = new VBox();
@@ -968,7 +992,11 @@ public final class TemplateTabController {
             return true;
         });
         if (findingCountLabel != null) {
-            findingCountLabel.setText(filteredFindings.size() + " of " + allFindings.size() + " shown");
+            String text = filteredFindings.size() + " of " + allFindings.size() + " shown";
+            if (totalFindingsBeforeCap > 0) {
+                text += " (truncated from " + totalFindingsBeforeCap + " — use Excel export for full list)";
+            }
+            findingCountLabel.setText(text);
         }
     }
 

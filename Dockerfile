@@ -19,6 +19,11 @@ RUN mvn -B -pl web-app -am dependency:go-offline -DskipTests || true
 # Now copy the rest of the sources and build only what the web app needs.
 COPY core core
 COPY web-app web-app
+# .git is required by web-app's git-commit-id-maven-plugin to record the commit
+# identity in target/classes/git.properties. Without it the build still succeeds
+# (failOnNoGitDirectory=false), but the runtime /api/build-info endpoint reports
+# empty commit/buildTime fields.
+COPY .git .git
 # Generated per-template rules reference (docs/rules/*.md + index.json) — bundled
 # into the core JAR via core/pom.xml's <resource> pointing at ../docs/rules.
 # Regenerate before building the image with: mvn -pl core -Pdocs exec:java

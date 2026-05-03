@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.Desktop;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -155,14 +154,7 @@ public final class HelpDialog {
     }
 
     private static void openLink(String url) {
-        if (url == null || url.isBlank()) return;
-        try {
-            if (!Desktop.isDesktopSupported()) return;
-            Desktop d = Desktop.getDesktop();
-            if (d.isSupported(Desktop.Action.BROWSE)) d.browse(URI.create(url));
-        } catch (Exception e) {
-            log.debug("Could not open {}: {}", url, e.toString());
-        }
+        SafeLinkOpener.open(url);
     }
 
     /** Convenience for callers that don't have a Stage handy (e.g. unit-testing the dialog). */

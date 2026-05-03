@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.findatex.validator.config.PosixPerms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,8 +12,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,10 +58,19 @@ public final class JsonCache<V> {
 
     public synchronized void flush() {
         try {
-            if (file.getParent() != null) Files.createDirectories(file.getParent());
+            // GLEIF/OpenFIGI lookup data isn't a secret, but it does reveal which
+            // ISINs/LEIs were checked. Owner-only perms (0700 dir / 0600 file on
+            // POSIX) keep that out of co-tenants' reach.
+            PosixPerms.createOwnerOnlyParents(file);
             Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
+            if (PosixPerms.posixAvailable()) {
+                Files.deleteIfExists(tmp);
+                Files.createFile(tmp, PosixFilePermissions.asFileAttribute(
+                        EnumSet.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE)));
+            }
             MAPPER.writeValue(tmp.toFile(), map);
             Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            PosixPerms.tightenToOwnerOnly(file);
         } catch (IOException e) {
             log.warn("Cache flush failed for {}: {}", file, e.getMessage());
         }

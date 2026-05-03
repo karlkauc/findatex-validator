@@ -74,7 +74,11 @@ public final class HttpExecutor {
             conn.setRequestMethod(req.method());
             conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
             conn.setReadTimeout(READ_TIMEOUT_MS);
-            conn.setInstanceFollowRedirects(true);
+            // Never follow redirects: GLEIF and OpenFIGI are hardcoded HTTPS endpoints,
+            // so a 3xx is either a misconfiguration or a hostile upstream trying to
+            // siphon the X-OPENFIGI-APIKEY header onto an attacker-controlled host.
+            // Treating 3xx as a non-2xx response is the safer behaviour either way.
+            conn.setInstanceFollowRedirects(false);
             for (Map.Entry<String, String> h : req.headers().entrySet()) {
                 conn.setRequestProperty(h.getKey(), h.getValue());
             }

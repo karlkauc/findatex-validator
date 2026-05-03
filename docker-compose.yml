@@ -9,9 +9,22 @@ services:
       # Host 18082 → container 8080 (host's :8080 is taken by other services).
       - "127.0.0.1:18082:8080"
     restart: unless-stopped
+    # --- Container hardening ---------------------------------------------------
+    # App needs no Linux caps (no <1024 bind, no raw sockets), no privilege
+    # escalation, and no writes outside /tmp + the mounted cache volume.
+    read_only: true
+    tmpfs:
+      - /tmp:exec,nosuid,nodev,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
     environment:
       # --- Throttling --------------------------------------------------------
-      FINDATEX_WEB_RATE_LIMIT_PER_IP_PER_HOUR: "10000"
+      # Conservative no-login default — if an operator fronts the service with
+      # auth or a WAF and wants to lift the cap, they raise this per-deploy.
+      FINDATEX_WEB_RATE_LIMIT_PER_IP_PER_HOUR: "60"
       FINDATEX_WEB_MAX_CONCURRENCY: "8"
       FINDATEX_WEB_REPORT_TTL_MINUTES: "5"
 
@@ -44,7 +57,7 @@ services:
           memory: 512M
 
     healthcheck:
-      # BusyBox wget is bundled in alpine:3.20 — exits 0 on 2xx, non-zero on >=400.
+      # BusyBox wget is bundled in alpine:3.23 — exits 0 on 2xx, non-zero on >=400.
       # Health endpoint moved to /_internal/health/* (out of the public /q/* namespace).
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080/_internal/health/ready"]
       interval: 30s

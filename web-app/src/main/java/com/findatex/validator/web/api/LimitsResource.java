@@ -4,12 +4,12 @@ import com.findatex.validator.web.config.WebConfig;
 import com.findatex.validator.web.dto.RateLimitStatusDto;
 import com.findatex.validator.web.service.RateLimitService;
 import com.findatex.validator.web.service.RateLimitStatus;
+import io.vertx.core.http.HttpServerRequest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/api/limits")
@@ -24,10 +24,11 @@ public class LimitsResource {
 
     @GET
     @Path("/status")
-    public RateLimitStatusDto status(@Context HttpHeaders headers) {
-        RateLimitStatus s = rateLimits.inspect(
-                headers.getHeaderString("X-Forwarded-For"),
-                headers.getHeaderString("X-Real-IP"));
+    public RateLimitStatusDto status(@Context HttpServerRequest request) {
+        String clientIp = (request != null && request.remoteAddress() != null)
+                ? request.remoteAddress().host()
+                : null;
+        RateLimitStatus s = rateLimits.inspect(clientIp);
         return new RateLimitStatusDto(
                 s.limit(),
                 s.remaining(),

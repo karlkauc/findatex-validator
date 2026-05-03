@@ -22,8 +22,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * status endpoint (inspecting a bucket without consuming) share one bucket map.
  *
  * <p>Capacity = {@link WebConfig.RateLimit#perIpPerHour()}; refills 1 token every
- * {@code 3600 / capacity} seconds. The bucket map is keyed by the client IP that
- * a trusted reverse proxy reports — never by client-controllable headers.
+ * {@code 3600 / capacity} seconds.
+ *
+ * <p><b>IP source.</b> The bucket key is the TCP-level source address of the inbound
+ * request (the value Quarkus exposes via {@code HttpServerRequest.remoteAddress()}).
+ * Client-supplied headers like {@code X-Forwarded-For} / {@code X-Real-IP} are
+ * <i>not</i> read by this class — they are trivially forgeable when the service is
+ * exposed without a sanitising reverse proxy, and would let an unauthenticated
+ * attacker mint a fresh bucket per spoofed value.
+ *
+ * <p>Operators behind a real reverse proxy who want per-original-client buckets
+ * must opt in by setting {@code quarkus.http.proxy.proxy-address-forwarding=true}
+ * <b>and</b> {@code quarkus.http.proxy.trusted-proxies=<LB-CIDR>} in
+ * {@code application.properties}; Quarkus then rewrites {@code remoteAddress()}
+ * itself, only honouring forwarded headers from the listed CIDRs.
  */
 @ApplicationScoped
 public class RateLimitService {
@@ -57,12 +69,12 @@ public class RateLimitService {
         return WINDOW_SECONDS;
     }
 
-    public ConsumptionProbe consume(String forwardedFor, String realIp) {
-        return bucketFor(forwardedFor, realIp).tryConsumeAndReturnRemaining(1);
+    public ConsumptionProbe consume(String clientIp) {
+        return bucketFor(clientIp).tryConsumeAndReturnRemaining(1);
     }
 
-    public RateLimitStatus inspect(String forwardedFor, String realIp) {
-        Bucket bucket = bucketFor(forwardedFor, realIp);
+    public RateLimitStatus inspect(String clientIp) {
+        Bucket bucket = bucketFor(clientIp);
         long remaining = bucket.getAvailableTokens();
         long resetInSeconds = 0L;
         if (remaining < capacityPerHour) {
@@ -73,8 +85,8 @@ public class RateLimitService {
         return new RateLimitStatus(capacityPerHour, remaining, WINDOW_SECONDS, resetInSeconds);
     }
 
-    private Bucket bucketFor(String forwardedFor, String realIp) {
-        return buckets.computeIfAbsent(clientIp(forwardedFor, realIp), k -> newBucket());
+    private Bucket bucketFor(String clientIp) {
+        return buckets.computeIfAbsent(normaliseKey(clientIp), k -> newBucket());
     }
 
     private Bucket newBucket() {
@@ -84,21 +96,14 @@ public class RateLimitService {
         return Bucket.builder().addLimit(limit).build();
     }
 
-    String clientIp(String forwardedFor, String realIp) {
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            // Rightmost entry: appended by our trusted reverse proxy (the TCP source it
-            // actually saw). Earlier entries are client-controllable and would let an
-            // attacker mint a fresh bucket per spoofed value.
-            int comma = forwardedFor.lastIndexOf(',');
-            return (comma >= 0 ? forwardedFor.substring(comma + 1) : forwardedFor).trim();
-        }
-        if (realIp != null && !realIp.isBlank()) {
-            return realIp.trim();
+    String normaliseKey(String clientIp) {
+        if (clientIp != null && !clientIp.isBlank()) {
+            return clientIp.trim();
         }
         if (unknownWarned.compareAndSet(false, true)) {
-            log.warn("No X-Forwarded-For/X-Real-IP on incoming request — all such traffic "
-                    + "shares one rate-limit bucket. If you're in production, ensure your "
-                    + "reverse proxy sets these headers.");
+            log.warn("No TCP source address on incoming request — all such traffic shares "
+                    + "one rate-limit bucket. This indicates a Quarkus/Vert.x configuration "
+                    + "issue; per-IP throttling is effectively disabled until fixed.");
         }
         return "unknown";
     }

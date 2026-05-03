@@ -8,6 +8,21 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Locale;
 
+/**
+ * <p><b>TODO — streaming ingest refactor.</b> Both {@link XlsxLoader} and
+ * {@link CsvLoader} currently call {@code in.readAllBytes()} on the {@code
+ * load(InputStream, String)} entry point, which holds the entire upload
+ * resident in a single byte[]. With the web layer's 25 MB body cap and four
+ * concurrent validations in flight, peak resident bytes per request are
+ * ~3× the upload (raw byte[] + POI's parse buffers + the optional
+ * {@code TptFile.sourceBytes} kept for the Annotated-Source report tab).
+ * A streaming refactor would: (a) hand POI the underlying multipart {@code
+ * InputStream} directly, (b) retain {@code sourceBytes} only when the caller
+ * has actually requested annotated-source output. POI's hardening limits
+ * configured in {@code TemplateRegistry.init()} bound the worst case in the
+ * meantime. Tracked separately — non-trivial because both UI surfaces and the
+ * report writer assume the in-memory byte[] is available.
+ */
 public final class TptFileLoader {
 
     private final XlsxLoader xlsxLoader;

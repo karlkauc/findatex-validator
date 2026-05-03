@@ -11,19 +11,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Machine-bound AES-GCM cipher for proxy passwords. The key is derived from a
- * stable per-user seed (user.home path + user.name + os.name + os.arch). The
- * inclusion of {@code user.home} provides real per-user isolation on multi-user
+ * Machine-bound AES-GCM cipher for the proxy password and OpenFIGI API key.
+ * The key is derived from a stable per-user seed
+ * ({@code user.home} + {@code user.name} + {@code os.name} + {@code os.arch}).
+ * Including {@code user.home} provides real per-user isolation on multi-user
  * systems — the same OS/architecture/account-name combination held by another
- * user will still produce a different key, because their home directory differs.
+ * user still produces a different key because their home directory differs.
  *
- * <p>Defends against backup leaks and shoulder-surfing of {@code settings.json}.
- * Does <strong>not</strong> protect against an attacker who can run code as the
- * same OS user (they have full access to the same key derivation).
+ * <h2>Threat model — read this before relying on the encryption</h2>
  *
- * <p>Tokens encrypted before the {@code user.home} mixin was added will fail to
- * decrypt and {@link #decrypt(String)} returns the empty string — the JavaFX UI
- * already handles that as "saved password absent, prompt again".
+ * <p><b>Defends against:</b>
+ * <ul>
+ *   <li>Backup files / disk images that preserve content but not POSIX perms.</li>
+ *   <li>Casual shoulder-surfing of {@code settings.json}.</li>
+ *   <li>Co-tenant reads that bypass POSIX 0600 (e.g. a misconfigured umask).</li>
+ * </ul>
+ *
+ * <p><b>Does NOT defend against:</b> an attacker who can execute code as the
+ * same OS user. The seed is entirely derivable from the running JVM's system
+ * properties, so anyone with shell access under the user account can re-derive
+ * the key and decrypt the file. This is fundamental to the design — true
+ * protection against same-UID code requires an OS keystore (DPAPI on Windows,
+ * Keychain on macOS, libsecret on Linux) that gates key release on a user
+ * authentication event. A future migration to such a keystore is tracked
+ * separately; in the meantime the on-disk encryption is best understood as
+ * defense-in-depth on top of POSIX 0600, not as a strong-secret store.
+ *
+ * <p>Tokens encrypted before the {@code user.home} mixin was added will fail
+ * to decrypt; {@link #decrypt(String)} returns the empty string in that case.
+ * The JavaFX UI handles that as "saved password absent, prompt again", and
+ * {@code SettingsService} treats it as the legacy-plaintext-migration signal
+ * for the OpenFIGI key.
  */
 public final class PasswordCipher {
 

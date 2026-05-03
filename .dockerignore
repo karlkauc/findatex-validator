@@ -33,8 +33,12 @@ tools/
 Thumbs.db
 
 # VCS / CI
-# Note: .git is intentionally NOT excluded — the build stage needs it so
-# git-commit-id-maven-plugin can record the commit identity in git.properties.
+# Commit identity is now injected via Docker build-arg GIT_COMMIT (see
+# Dockerfile + .github/workflows/{ci,release}.yml) so we never copy .git
+# into the build context. Keeps repo history out of intermediate GHA cache
+# layers regardless of cache policy.
+.git
+.git/
 .gitignore
 .github/
 .classpath

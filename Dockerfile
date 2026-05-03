@@ -19,15 +19,19 @@ RUN mvn -B -pl web-app -am dependency:go-offline -DskipTests || true
 # Now copy the rest of the sources and build only what the web app needs.
 COPY core core
 COPY web-app web-app
-# .git is required by web-app's git-commit-id-maven-plugin to record the commit
-# identity in target/classes/git.properties. Without it the build still succeeds
-# (failOnNoGitDirectory=false), but the runtime /api/build-info endpoint reports
-# empty commit/buildTime fields.
-COPY .git .git
 # Generated per-template rules reference (docs/rules/*.md + index.json) — bundled
 # into the core JAR via core/pom.xml's <resource> pointing at ../docs/rules.
 # Regenerate before building the image with: mvn -pl core -Pdocs exec:java
 COPY docs/rules docs/rules
+
+# Commit identity is injected as a build-arg (CI passes ${{ github.sha }}); the
+# runtime endpoint /api/build-info prefers BUILD_GIT_COMMIT/BUILD_TIME env vars
+# over the git-commit-id-plugin's git.properties. We deliberately do NOT copy
+# .git into the build context — even though it lives only in this throwaway
+# stage, GHA layer cache (type=gha,mode=max) can persist intermediate layers
+# in places that aren't always private, and shipping repo history is needless.
+ARG GIT_COMMIT=
+ARG BUILD_TIME=
 
 RUN mvn -B -pl web-app -am -DskipTests package
 
@@ -83,6 +87,15 @@ EXPOSE 8080
 #   G1GC + 200ms pause — good fit for the request/response workload.
 #   ExitOnOutOfMemoryError — let the supervisor restart on OOM rather than thrashing.
 ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ExitOnOutOfMemoryError"
+
+# Surface the build-arg values to the running JVM so BuildInfoResource can
+# report them via /api/build-info. Empty values mean "no info" (the endpoint
+# falls back to the bundled git.properties, which is itself empty in CI now
+# that .git no longer enters the build context).
+ARG GIT_COMMIT=
+ARG BUILD_TIME=
+ENV BUILD_GIT_COMMIT=$GIT_COMMIT
+ENV BUILD_TIME=$BUILD_TIME
 
 # `docker run` and Cloud Run callers don't see the compose-level healthcheck;
 # baking it into the image ensures liveness regardless of the launcher.

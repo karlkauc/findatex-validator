@@ -11,6 +11,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.EnumSet;
 
 public final class SettingsService {
 
@@ -44,14 +47,30 @@ public final class SettingsService {
 
     public synchronized void update(AppSettings next) {
         try {
-            if (file.getParent() != null) Files.createDirectories(file.getParent());
+            // Create parent dir with 0700 on POSIX so the encrypted-credentials file
+            // is never readable by other local users via umask-default 0755 dirs.
+            PosixPerms.createOwnerOnlyParents(file);
             Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
+            // Pre-create the .tmp with 0600 so the subsequent FileOutputStream
+            // (Jackson's writer) inherits the perms — closes the window where the
+            // tmpfile is briefly world-readable before the atomic move.
+            createOrTightenTmp(tmp);
             MAPPER.writeValue(tmp.toFile(), next);
             Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            PosixPerms.tightenToOwnerOnly(file);
             this.current = next;
         } catch (IOException e) {
             throw new UncheckedIOException("Could not save settings to " + file, e);
         }
+    }
+
+    private static void createOrTightenTmp(Path tmp) throws IOException {
+        if (PosixPerms.posixAvailable()) {
+            Files.deleteIfExists(tmp);
+            Files.createFile(tmp, PosixFilePermissions.asFileAttribute(
+                    EnumSet.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE)));
+        }
+        // Windows: rely on default ACL (user-private under user profile).
     }
 
     private AppSettings load() {

@@ -43,10 +43,23 @@ public class BuildInfoResource {
         } catch (IOException ignored) {
             // Treat as "no git info" — log nothing; the endpoint will report empty fields.
         }
-        String commit = p.getProperty("git.commit.id.abbrev", "");
+        // Container builds inject the commit / build time via env vars
+        // (BUILD_GIT_COMMIT, BUILD_TIME) because the .git directory is no longer
+        // copied into the build context. Local mvn builds still get values from
+        // git.properties. Env wins when set so the runtime image matches what CI
+        // recorded for that exact build.
+        String commit = firstNonEmpty(System.getenv("BUILD_GIT_COMMIT"),
+                p.getProperty("git.commit.id.abbrev", ""));
+        if (commit.length() > 7) commit = commit.substring(0, 7);
         boolean dirty = Boolean.parseBoolean(p.getProperty("git.dirty", "false"));
-        String buildTime = p.getProperty("git.build.time", "");
+        String buildTime = firstNonEmpty(System.getenv("BUILD_TIME"),
+                p.getProperty("git.build.time", ""));
         cached = new BuildInfo(version == null ? "" : version, commit, dirty, buildTime);
+    }
+
+    private static String firstNonEmpty(String a, String b) {
+        if (a != null && !a.isBlank()) return a;
+        return b == null ? "" : b;
     }
 
     @GET

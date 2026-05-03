@@ -1,5 +1,12 @@
 # syntax=docker/dockerfile:1.7
 
+# Base images use floating tags for now. Pinning to immutable @sha256: digests
+# is desirable for supply-chain hardening but only safe once a refresh
+# workflow exists (e.g. Renovate) — a stale manual pin permanently misses
+# upstream security patches and is worse than a floating tag. When you adopt
+# Renovate (or an equivalent), run `tools/refresh-base-images.sh` to capture
+# the current digests and replace the FROM lines below with `image:tag@sha256:…`.
+
 # ---- Stage 1: Maven build (Ubuntu, has apt+maven prebuilt) ------------------
 FROM eclipse-temurin:25-jdk-jammy AS build
 

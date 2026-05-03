@@ -29,8 +29,26 @@ public final class SettingsService {
 
     public SettingsService(Path file) {
         this.file = file;
-        this.current = load();
+        AppSettings loaded = load();
+        // If load() detected a legacy unencrypted OpenFIGI key on disk, eagerly
+        // rewrite the file so the plaintext stops sitting there. We use a flag
+        // on the loaded snapshot rather than checking equality (encrypt is
+        // non-deterministic — random IV per call).
+        boolean migrated = legacyMigrationDetected;
+        legacyMigrationDetected = false;
+        this.current = loaded;
+        if (migrated && loaded != null) {
+            try {
+                update(loaded);
+                log.info("Migrated legacy plaintext OpenFIGI key to encrypted form in {}", file);
+            } catch (RuntimeException e) {
+                log.warn("Could not auto-rewrite settings after legacy-key migration: {}", e.toString());
+            }
+        }
     }
+
+    /** Set transiently by {@link #decryptOpenFigiKey(AppSettings)} when a legacy plaintext key was observed. */
+    private volatile boolean legacyMigrationDetected;
 
     public static SettingsService getInstance() {
         SettingsService local = instance;
@@ -55,7 +73,10 @@ public final class SettingsService {
             // (Jackson's writer) inherits the perms — closes the window where the
             // tmpfile is briefly world-readable before the atomic move.
             createOrTightenTmp(tmp);
-            MAPPER.writeValue(tmp.toFile(), next);
+            // Encrypt sensitive fields right before writing so the on-disk form
+            // never holds plaintext. The in-memory record we cache continues to
+            // hold plaintext — encryption is a transparent storage concern.
+            MAPPER.writeValue(tmp.toFile(), encryptOpenFigiKey(next));
             Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             PosixPerms.tightenToOwnerOnly(file);
             this.current = next;
@@ -77,11 +98,55 @@ public final class SettingsService {
         if (!Files.exists(file)) return AppSettings.defaults();
         try {
             AppSettings raw = MAPPER.readValue(file.toFile(), AppSettings.class);
-            return raw == null ? AppSettings.defaults() : raw;
+            return raw == null ? AppSettings.defaults() : decryptOpenFigiKey(raw);
         } catch (IOException e) {
             log.warn("Could not read settings from {} ({}); using defaults", file, e.getMessage());
             return AppSettings.defaults();
         }
+    }
+
+    /** Returns a copy of {@code s} with the OpenFIGI key replaced by its AES-GCM ciphertext. */
+    private static AppSettings encryptOpenFigiKey(AppSettings s) {
+        AppSettings.External e = s.external();
+        if (e == null || e.isin() == null) return s;
+        AppSettings.Isin isin = e.isin();
+        String stored = PasswordCipher.encrypt(isin.openFigiApiKey());
+        return replaceIsin(s, new AppSettings.Isin(
+                isin.enabled(), stored, isin.checkCurrency(), isin.checkCicConsistency()));
+    }
+
+    /**
+     * Inverse of {@link #encryptOpenFigiKey(AppSettings)}. If decryption fails
+     * (returns empty for a non-empty input), assume the file is from a pre-
+     * encryption release and treat the value as legacy plaintext — the
+     * constructor then triggers an immediate re-save in encrypted form.
+     */
+    private AppSettings decryptOpenFigiKey(AppSettings s) {
+        AppSettings.External e = s.external();
+        if (e == null || e.isin() == null) return s;
+        AppSettings.Isin isin = e.isin();
+        String stored = isin.openFigiApiKey();
+        String plaintext;
+        if (stored == null || stored.isEmpty()) {
+            plaintext = "";
+        } else {
+            String decrypted = PasswordCipher.decrypt(stored);
+            if (!decrypted.isEmpty()) {
+                plaintext = decrypted;
+            } else {
+                plaintext = stored;
+                legacyMigrationDetected = true;
+            }
+        }
+        return replaceIsin(s, new AppSettings.Isin(
+                isin.enabled(), plaintext, isin.checkCurrency(), isin.checkCicConsistency()));
+    }
+
+    private static AppSettings replaceIsin(AppSettings s, AppSettings.Isin newIsin) {
+        AppSettings.External e = s.external();
+        return new AppSettings(
+                new AppSettings.External(e.enabled(), e.lei(), newIsin, e.cache()),
+                s.proxy());
     }
 
     private static Path defaultPath() {

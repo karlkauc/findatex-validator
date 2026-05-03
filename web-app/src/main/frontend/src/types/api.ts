@@ -81,6 +81,13 @@ export interface RateLimitStatus {
   desktopDownloadUrl?: string | null;
 }
 
+export interface BuildInfo {
+  version: string;
+  commit: string;
+  dirty: boolean;
+  buildTime: string;
+}
+
 export class ApiError extends Error {
   constructor(public status: number, message: string, public retryAfterSeconds?: number) {
     super(message);

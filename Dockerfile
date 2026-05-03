@@ -84,4 +84,9 @@ EXPOSE 8080
 #   ExitOnOutOfMemoryError — let the supervisor restart on OOM rather than thrashing.
 ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ExitOnOutOfMemoryError"
 
+# `docker run` and Cloud Run callers don't see the compose-level healthcheck;
+# baking it into the image ensures liveness regardless of the launcher.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD wget -q -O /dev/null http://127.0.0.1:8080/_internal/health/ready || exit 1
+
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS_APPEND -jar quarkus-run.jar"]

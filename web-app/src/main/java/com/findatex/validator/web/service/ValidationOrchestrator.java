@@ -37,10 +37,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,9 +136,13 @@ public class ValidationOrchestrator {
         try {
             file = new TptFileLoader(bundle.catalog).load(upload, filename);
         } catch (IOException e) {
+            // Don't echo POI's exception text to the client — it can leak internal
+            // class names and host paths. Full detail is logged server-side.
+            log.warn("Upload parse failed for filename '{}': {}", filename, e.toString());
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Could not parse upload: " + e.getMessage())
+                            .entity("Could not parse upload. Check that the file is a valid XLSX/CSV "
+                                    + "matching the chosen template.")
                             .build());
         }
 
@@ -207,15 +216,16 @@ public class ValidationOrchestrator {
 
         Path xlsxPath;
         try {
-            xlsxPath = Files.createTempFile("findatex-report-", ".xlsx");
+            xlsxPath = createOwnerOnlyTempFile("findatex-report-", ".xlsx");
             new XlsxReportWriter(bundle.catalog,
                     bundle.profileSet,
                     version,
                     com.findatex.validator.report.GenerationUi.WEB)
                     .write(report, xlsxPath);
         } catch (IOException e) {
+            log.error("Could not write report tempfile", e);
             throw new WebApplicationException(
-                    Response.serverError().entity("Could not write report: " + e.getMessage()).build());
+                    Response.serverError().entity("Could not write report.").build());
         }
         UUID reportId = reportStore.store(xlsxPath);
 
@@ -341,6 +351,22 @@ public class ValidationOrchestrator {
     @PreDestroy
     void shutdown() {
         catalogs.clear();
+    }
+
+    /**
+     * Creates a tempfile readable + writable only by the running process owner.
+     * On POSIX systems we explicitly set 0600 so a co-tenant under the same
+     * UID (and the broader umask-default 0644 case on shared hosts) cannot read
+     * the report during the 5-minute single-use TTL window. On Windows the
+     * default ACL is already user-private, so we fall back to the standard call.
+     */
+    private static Path createOwnerOnlyTempFile(String prefix, String suffix) throws IOException {
+        if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+            FileAttribute<?> ownerOnly = PosixFilePermissions.asFileAttribute(
+                    EnumSet.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE));
+            return Files.createTempFile(prefix, suffix, ownerOnly);
+        }
+        return Files.createTempFile(prefix, suffix);
     }
 
     private record CatalogBundle(SpecCatalog catalog, TemplateRuleSet ruleSet, ProfileSet profileSet) {

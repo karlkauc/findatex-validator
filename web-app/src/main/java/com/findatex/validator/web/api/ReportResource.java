@@ -10,9 +10,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.UUID;
 
@@ -33,18 +31,23 @@ public class ReportResource {
             throw new NotFoundException();
         }
 
-        java.nio.file.Path path = reportStore.get(uuid)
+        // Atomic take: removes the entry from the cache and returns its path
+        // in one operation. Closes the TOCTOU race that an earlier "get + stream
+        // + invalidate-in-finally" pattern allowed (two concurrent GETs could
+        // both observe the entry and both stream it). The caller owns the file
+        // from this point — we delete it once the response body is fully written.
+        java.nio.file.Path path = reportStore.take(uuid)
                 .orElseThrow(NotFoundException::new);
 
-        StreamingOutput stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream out) throws IOException {
-                try (InputStream in = Files.newInputStream(path)) {
-                    in.transferTo(out);
-                } finally {
-                    // One-shot download: invalidate immediately so the cache eviction listener
-                    // deletes the temp file from disk. Subsequent GETs for this id return 404.
-                    reportStore.invalidate(uuid);
+        StreamingOutput stream = out -> {
+            try (InputStream in = Files.newInputStream(path)) {
+                in.transferTo(out);
+            } finally {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (java.io.IOException ignored) {
+                    // best-effort: TTL listener is not in play here (EXPLICIT cause was
+                    // skipped on take); leftover tempfiles will be cleaned by the OS tmp reaper.
                 }
             }
         };

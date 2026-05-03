@@ -53,8 +53,9 @@ public final class XlsxReportWriter {
     }
 
     public void write(QualityReport report, Path out) throws IOException {
-        try (XSSFWorkbook wb = new XSSFWorkbook();
-             OutputStream os = Files.newOutputStream(out)) {
+        // Open the OutputStream only after the workbook is fully populated in memory.
+        // Otherwise a writeXxx() failure leaves a 0-byte file behind from Files.newOutputStream.
+        try (XSSFWorkbook wb = new XSSFWorkbook()) {
             CellStyle header = XlsxStyles.headerStyle(wb);
             CellStyle pct = XlsxStyles.percentStyle(wb);
             CellStyle err = XlsxStyles.colourStyle(wb, IndexedColors.ROSE.getIndex());
@@ -71,7 +72,12 @@ public final class XlsxReportWriter {
             writePerPosition(wb, report, header, ok, warn, err);
             writeAnnotatedSource(wb, report, header, err, warn, info);
 
-            wb.write(os);
+            try (OutputStream os = Files.newOutputStream(out)) {
+                wb.write(os);
+            } catch (IOException | RuntimeException ex) {
+                Files.deleteIfExists(out);
+                throw ex;
+            }
         }
     }
 

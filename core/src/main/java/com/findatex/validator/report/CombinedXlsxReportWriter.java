@@ -80,8 +80,9 @@ public final class CombinedXlsxReportWriter {
     }
 
     public void write(BatchSummary summary, Path out, boolean includeAnnotatedSourcePerFile) throws IOException {
-        try (XSSFWorkbook wb = new XSSFWorkbook();
-             OutputStream os = Files.newOutputStream(out)) {
+        // Open the OutputStream only after the workbook is fully populated in memory.
+        // Otherwise a writeXxx() failure leaves a 0-byte file behind from Files.newOutputStream.
+        try (XSSFWorkbook wb = new XSSFWorkbook()) {
             CellStyle header = XlsxStyles.headerStyle(wb);
             CellStyle pct = XlsxStyles.percentStyle(wb);
             CellStyle err = XlsxStyles.colourStyle(wb, IndexedColors.ROSE.getIndex());
@@ -112,7 +113,12 @@ public final class CombinedXlsxReportWriter {
                 }
             }
 
-            wb.write(os);
+            try (OutputStream os = Files.newOutputStream(out)) {
+                wb.write(os);
+            } catch (IOException | RuntimeException ex) {
+                Files.deleteIfExists(out);
+                throw ex;
+            }
         }
     }
 

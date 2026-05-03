@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
@@ -80,9 +81,11 @@ public final class CombinedXlsxReportWriter {
     }
 
     public void write(BatchSummary summary, Path out, boolean includeAnnotatedSourcePerFile) throws IOException {
-        // Atomic write — see XlsxReportWriter.write for the rationale.
+        // Atomic write + SXSSF streaming — see XlsxReportWriter.write for the rationale.
         Path tmp = out.resolveSibling(out.getFileName().toString() + ".tmp");
-        try (XSSFWorkbook wb = new XSSFWorkbook()) {
+        XSSFWorkbook xssfWb = new XSSFWorkbook();
+        try (SXSSFWorkbook wb = new SXSSFWorkbook(xssfWb, 500)) {
+            // see XlsxReportWriter.write — compression skipped in favour of wall-clock.
             CellStyle header = XlsxStyles.headerStyle(wb);
             CellStyle pct = XlsxStyles.percentStyle(wb);
             CellStyle err = XlsxStyles.colourStyle(wb, IndexedColors.ROSE.getIndex());
@@ -90,7 +93,8 @@ public final class CombinedXlsxReportWriter {
             CellStyle info = XlsxStyles.colourStyle(wb, IndexedColors.PALE_BLUE.getIndex());
             CellStyle linkStyle = hyperlinkStyle(wb);
 
-            wb.getProperties().getCustomProperties()
+            // Custom properties live on the underlying XSSF workbook.
+            xssfWb.getProperties().getCustomProperties()
                     .addProperty("Generation-UI", generationUi.label());
 
             Map<BatchResult, String> annotatedSheetNames =
@@ -166,11 +170,12 @@ public final class CombinedXlsxReportWriter {
         return style;
     }
 
-    private void writeBatchSummary(XSSFWorkbook wb, BatchSummary s,
+    private void writeBatchSummary(Workbook wb, BatchSummary s,
                                    CellStyle header, CellStyle pct,
                                    CellStyle linkStyle,
                                    Map<BatchResult, String> annotatedSheetNames) {
         Sheet sheet = wb.createSheet("Batch Summary");
+        XlsxReportWriter.enableAutoSizeTracking(sheet);
         CreationHelper helper = wb.getCreationHelper();
         int row = 0;
         XlsxStyles.addRow(sheet, row++, header,
@@ -274,9 +279,14 @@ public final class CombinedXlsxReportWriter {
         return col + 1;
     }
 
-    private void writeAllFindings(XSSFWorkbook wb, BatchSummary s,
+    private void writeAllFindings(Workbook wb, BatchSummary s,
                                   CellStyle header, CellStyle err, CellStyle warn) {
         Sheet sheet = wb.createSheet("All Findings");
+        // Fixed widths — autoSize is O(rows × cols) and dominates wall-clock at 30K+ findings.
+        // Same column rationale as XlsxReportWriter.writeFindings, plus a leading "File" column.
+        int[] widths = {8000, 2400, 4800, 7200, 4000, 6000, 3200, 1800, 6000, 1400,
+                        4600, 6000, 2200, 4000, 14000};
+        for (int c = 0; c < widths.length; c++) sheet.setColumnWidth(c, widths[c]);
         int row = 0;
         XlsxStyles.addRow(sheet, row++, header,
                 "File", "Severity", "Profile", "Rule",
@@ -316,11 +326,11 @@ public final class CombinedXlsxReportWriter {
             sheet.setAutoFilter(new CellRangeAddress(0, row - 1, 0, 14));
         }
         sheet.createFreezePane(1, 1);
-        for (int c = 0; c < 15; c++) sheet.autoSizeColumn(c);
     }
 
-    private void writeAggregateFieldCoverage(XSSFWorkbook wb, BatchSummary s, CellStyle header) {
+    private void writeAggregateFieldCoverage(Workbook wb, BatchSummary s, CellStyle header) {
         Sheet sheet = wb.createSheet("Aggregate Field Coverage");
+        XlsxReportWriter.enableAutoSizeTracking(sheet);
         int row = 0;
         List<ProfileKey> profiles = profileSet.all();
         java.util.List<String> headers = new java.util.ArrayList<>();
@@ -373,9 +383,10 @@ public final class CombinedXlsxReportWriter {
         for (int c = 0; c < totalCols; c++) sheet.autoSizeColumn(c);
     }
 
-    private void writePerFileScores(XSSFWorkbook wb, BatchSummary s,
+    private void writePerFileScores(Workbook wb, BatchSummary s,
                                     CellStyle header, CellStyle pct) {
         Sheet sheet = wb.createSheet("Per-File Scores");
+        XlsxReportWriter.enableAutoSizeTracking(sheet);
         int row = 0;
         XlsxStyles.addRow(sheet, row++, header, "File", "Category", "Score");
         for (BatchResult r : s.results()) {
@@ -395,8 +406,9 @@ public final class CombinedXlsxReportWriter {
         for (int c = 0; c < 3; c++) sheet.autoSizeColumn(c);
     }
 
-    private void writeSkippedOrFailed(XSSFWorkbook wb, BatchSummary s, CellStyle header) {
+    private void writeSkippedOrFailed(Workbook wb, BatchSummary s, CellStyle header) {
         Sheet sheet = wb.createSheet("Skipped or Failed Files");
+        XlsxReportWriter.enableAutoSizeTracking(sheet);
         int row = 0;
         XlsxStyles.addRow(sheet, row++, header, "File", "Status", "Error message");
         for (BatchResult r : s.results()) {

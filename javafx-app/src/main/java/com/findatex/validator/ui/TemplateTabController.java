@@ -23,6 +23,8 @@ import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.TemplateDefinition;
 import com.findatex.validator.template.api.TemplateRuleSet;
 import com.findatex.validator.template.api.TemplateVersion;
+import com.findatex.validator.ui.notification.Toast;
+import com.findatex.validator.ui.notification.ToastInfo;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.FindingEnricher;
 import com.findatex.validator.validation.Severity;
@@ -65,7 +67,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -762,6 +766,7 @@ public final class TemplateTabController {
             int total = okResults.size();
             int failed = currentBatch.results().size() - total;
             statusLabel.setText("Exporting " + total + " report(s)...");
+            final List<Path> writtenPaths = new ArrayList<>();
             Task<Void> task = new Task<>() {
                 @Override protected Void call() throws Exception {
                     XlsxReportWriter writer = new XlsxReportWriter(cat,
@@ -779,13 +784,21 @@ public final class TemplateTabController {
                                 "Writing report " + curIdx + "/" + total + ": " + name + "..."));
                         Path out = target.resolve(reportFileNameFor(r.displayName()));
                         writer.write(r.report(), out);
+                        writtenPaths.add(out);
                     }
                     return null;
                 }
             };
-            task.setOnSucceeded(ev -> statusLabel.setText("Wrote " + total + " report(s)"
-                    + (failed > 0 ? " (skipped " + failed + " failed file(s))" : "")
-                    + " to " + target.getFileName()));
+            final long t0 = System.nanoTime();
+            task.setOnSucceeded(ev -> {
+                statusLabel.setText("Wrote " + total + " report(s)"
+                        + (failed > 0 ? " (skipped " + failed + " failed file(s))" : "")
+                        + " to " + target.getFileName());
+                showExportToast(ToastInfo.batchFolder(target,
+                        sumFileSizes(writtenPaths),
+                        Duration.ofNanos(System.nanoTime() - t0),
+                        writtenPaths.size()));
+            });
             task.setOnFailed(ev -> reportExportFailure(task.getException()));
             new Thread(task, template.id() + "-export-batch").start();
         } else if (currentReport != null) {
@@ -807,7 +820,13 @@ public final class TemplateTabController {
                     return null;
                 }
             };
-            task.setOnSucceeded(ev -> statusLabel.setText("Report exported: " + target.getFileName()));
+            final long t0 = System.nanoTime();
+            task.setOnSucceeded(ev -> {
+                statusLabel.setText("Report exported: " + target.getFileName());
+                showExportToast(ToastInfo.singleFile(target,
+                        safeFileSize(target),
+                        Duration.ofNanos(System.nanoTime() - t0)));
+            });
             task.setOnFailed(ev -> reportExportFailure(task.getException()));
             new Thread(task, template.id() + "-export").start();
         }
@@ -852,9 +871,37 @@ public final class TemplateTabController {
         String successMsg = withAnnotatedSource
                 ? "Combined report (with annotated source) exported: "
                 : "Combined report exported: ";
-        task.setOnSucceeded(ev -> statusLabel.setText(successMsg + target.getFileName()));
+        final long t0 = System.nanoTime();
+        task.setOnSucceeded(ev -> {
+            statusLabel.setText(successMsg + target.getFileName());
+            showExportToast(ToastInfo.singleFile(target,
+                    safeFileSize(target),
+                    Duration.ofNanos(System.nanoTime() - t0)));
+        });
         task.setOnFailed(ev -> reportExportFailure(task.getException()));
         new Thread(task, template.id() + "-export-combined").start();
+    }
+
+    private void showExportToast(ToastInfo info) {
+        if (stage != null) {
+            Toast.show(stage, info);
+        }
+    }
+
+    private static long safeFileSize(Path p) {
+        try {
+            return Files.size(p);
+        } catch (java.io.IOException ignored) {
+            return 0L;
+        }
+    }
+
+    private static long sumFileSizes(List<Path> paths) {
+        long total = 0L;
+        for (Path p : paths) {
+            total += safeFileSize(p);
+        }
+        return total;
     }
 
     private void reportExportFailure(Throwable th) {

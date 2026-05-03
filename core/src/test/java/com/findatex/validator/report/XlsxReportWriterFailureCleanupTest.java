@@ -32,6 +32,7 @@ class XlsxReportWriterFailureCleanupTest {
                 Map.of(),
                 Instant.now());
         Path out = tmp.resolve("broken.xlsx");
+        Path tmpFile = tmp.resolve("broken.xlsx.tmp");
 
         assertThatThrownBy(() ->
                 new XlsxReportWriter(CATALOG, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.DESKTOP)
@@ -40,6 +41,9 @@ class XlsxReportWriterFailureCleanupTest {
 
         assertThat(Files.exists(out))
                 .as("XlsxReportWriter must not leave a 0-byte file behind on failure")
+                .isFalse();
+        assertThat(Files.exists(tmpFile))
+                .as("XlsxReportWriter must clean up the .tmp scratch file on failure")
                 .isFalse();
     }
 }

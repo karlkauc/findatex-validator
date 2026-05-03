@@ -767,8 +767,16 @@ public final class TemplateTabController {
                     XlsxReportWriter writer = new XlsxReportWriter(cat,
                             template.profilesFor(selectedVersion),
                             selectedVersion, GenerationUi.DESKTOP);
+                    int idx = 0;
                     for (BatchResult r : okResults) {
+                        idx++;
                         if (r.report() == null) continue;
+                        // Per-file status update — large reports take 60-90s each, so without
+                        // this the user sees a frozen status label and assumes the app hung.
+                        final int curIdx = idx;
+                        final String name = r.displayName();
+                        Platform.runLater(() -> statusLabel.setText(
+                                "Writing report " + curIdx + "/" + total + ": " + name + "..."));
                         Path out = target.resolve(reportFileNameFor(r.displayName()));
                         writer.write(r.report(), out);
                     }
@@ -789,6 +797,7 @@ public final class TemplateTabController {
             File out = fc.showSaveDialog(stage);
             if (out == null) return;
             Path target = out.toPath();
+            statusLabel.setText("Writing report: " + target.getFileName() + "...");
             Task<Void> task = new Task<>() {
                 @Override protected Void call() throws Exception {
                     new XlsxReportWriter(cat,
@@ -830,6 +839,7 @@ public final class TemplateTabController {
         File out = fc.showSaveDialog(stage);
         if (out == null) return;
         Path target = out.toPath();
+        statusLabel.setText("Writing combined report: " + target.getFileName() + "...");
         Task<Void> task = new Task<>() {
             @Override protected Void call() throws Exception {
                 new CombinedXlsxReportWriter(cat,

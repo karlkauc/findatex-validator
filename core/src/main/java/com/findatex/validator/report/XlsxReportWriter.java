@@ -53,8 +53,11 @@ public final class XlsxReportWriter {
     }
 
     public void write(QualityReport report, Path out) throws IOException {
-        // Open the OutputStream only after the workbook is fully populated in memory.
-        // Otherwise a writeXxx() failure leaves a 0-byte file behind from Files.newOutputStream.
+        // Atomic write: populate the workbook in memory, stream to a sibling .tmp file, then
+        // rename to the final path. Guarantees the user never sees a 0-byte or partial file at
+        // {out} — either the previous version stays put on failure, or the new file appears
+        // fully formed on success. Also overwrites stale 0-byte files left by older builds.
+        Path tmp = out.resolveSibling(out.getFileName().toString() + ".tmp");
         try (XSSFWorkbook wb = new XSSFWorkbook()) {
             CellStyle header = XlsxStyles.headerStyle(wb);
             CellStyle pct = XlsxStyles.percentStyle(wb);
@@ -72,12 +75,14 @@ public final class XlsxReportWriter {
             writePerPosition(wb, report, header, ok, warn, err);
             writeAnnotatedSource(wb, report, header, err, warn, info);
 
-            try (OutputStream os = Files.newOutputStream(out)) {
+            try (OutputStream os = Files.newOutputStream(tmp)) {
                 wb.write(os);
-            } catch (IOException | RuntimeException ex) {
-                Files.deleteIfExists(out);
-                throw ex;
             }
+            Files.move(tmp, out, java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException | RuntimeException ex) {
+            Files.deleteIfExists(tmp);
+            throw ex;
         }
     }
 

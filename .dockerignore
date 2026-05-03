@@ -33,7 +33,8 @@ tools/
 Thumbs.db
 
 # VCS / CI
-.git/
+# Note: .git is intentionally NOT excluded — the build stage needs it so
+# git-commit-id-maven-plugin can record the commit identity in git.properties.
 .gitignore
 .github/
 .classpath

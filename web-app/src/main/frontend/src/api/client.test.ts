@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { fetchTemplates, validateUpload, reportDownloadUrl } from './client';
+import { fetchTemplates, validateUpload, reportDownloadUrl, fetchBuildInfo } from './client';
 import { ApiError } from '../types/api';
 
 // Minimal mock that matches the bits of Response we use: ok/status/statusText/json/text/headers.get.
@@ -173,6 +173,20 @@ describe('api/client', () => {
   describe('reportDownloadUrl', () => {
     it('builds the report download URL', () => {
       expect(reportDownloadUrl('abc-123')).toBe('/api/report/abc-123');
+    });
+  });
+
+  describe('fetchBuildInfo', () => {
+    it('GETs /api/build-info and returns the JSON body', async () => {
+      fetchSpy.mockResolvedValue(ok({ version: '1.0.0', commit: 'a1b2c3d', dirty: false, buildTime: '2026-05-03T14:32:00Z' }));
+      const result = await fetchBuildInfo();
+      expect(fetchSpy).toHaveBeenCalledWith('/api/build-info');
+      expect(result).toEqual({ version: '1.0.0', commit: 'a1b2c3d', dirty: false, buildTime: '2026-05-03T14:32:00Z' });
+    });
+
+    it('throws ApiError on a 5xx response', async () => {
+      fetchSpy.mockResolvedValue(err(503, 'Service Unavailable'));
+      await expect(fetchBuildInfo()).rejects.toBeInstanceOf(ApiError);
     });
   });
 });

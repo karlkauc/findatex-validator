@@ -81,6 +81,13 @@ jobs:
           echo "image=$dst" >> "$GITHUB_ENV"
 
       - name: Deploy to Cloud Run
+        # --concurrency=8 + --max-instances=10 is the DoS-resistance baseline:
+        # one bad actor opening 8 slow-loris uploads can pin at most a single
+        # instance, leaving Cloud Run free to scale up and serve other users.
+        # Combined with quarkus.http.{read,idle}-timeout in the app this caps
+        # blast radius without adding Cloud Armor. Min-instances=0 keeps the
+        # idle bill at zero; cold starts hit only the first request after a
+        # quiet period.
         run: |
           set -euo pipefail
           gcloud run deploy "${SERVICE_NAME}" \
@@ -93,8 +100,8 @@ jobs:
             --memory=2Gi \
             --cpu=1 \
             --cpu-boost \
-            --concurrency=80 \
-            --max-instances=1 \
+            --concurrency=8 \
+            --max-instances=10 \
             --min-instances=0 \
             --timeout=300 \
             --set-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=false \

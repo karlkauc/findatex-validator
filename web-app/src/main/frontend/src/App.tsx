@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HelpCircle, Info, Loader2, ShieldCheck } from 'lucide-react';
-import { fetchRateLimitStatus, fetchTemplates, validateUpload } from './api/client';
+import { fetchBuildInfo, fetchRateLimitStatus, fetchTemplates, validateUpload } from './api/client';
 import { TemplatePicker } from './components/TemplatePicker';
 import { ProfileSelector } from './components/ProfileSelector';
 import { FileUpload } from './components/FileUpload';
@@ -22,6 +22,13 @@ export default function App() {
     queryFn: fetchRateLimitStatus,
     refetchInterval: 30_000,
     staleTime: 0,
+  });
+
+  const buildInfoQuery = useQuery({
+    queryKey: ['build-info'],
+    queryFn: fetchBuildInfo,
+    staleTime: Infinity,
+    retry: false,
   });
 
   const [templateId, setTemplateId] = useState<string>('TPT');
@@ -242,12 +249,38 @@ export default function App() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-[1600px] px-6 py-4 text-xs text-slate-500 lg:px-8">
-          FinDatEx Validator — Source &amp; Desktop-Build:&nbsp;
-          <span className="font-mono">com.findatex/findatex-validator</span>
+          {buildInfoQuery.data && (
+            <div>
+              FinDatEx Validator{' '}
+              {buildInfoQuery.data.version && <>v{buildInfoQuery.data.version}</>}
+              {buildInfoQuery.data.commit && (
+                <>
+                  {' · '}
+                  <span className="font-mono">
+                    {buildInfoQuery.data.commit}
+                    {buildInfoQuery.data.dirty ? '-dirty' : ''}
+                  </span>
+                </>
+              )}
+              {buildInfoQuery.data.buildTime && (
+                <> · built {formatBuildDate(buildInfoQuery.data.buildTime)}</>
+              )}
+            </div>
+          )}
+          <div>
+            — Source &amp; Desktop-Build:&nbsp;
+            <span className="font-mono">com.findatex/findatex-validator</span>
+          </div>
         </div>
       </footer>
     </div>
   );
+}
+
+function formatBuildDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
 function isQuotaExhausted(status: RateLimitStatus | undefined): boolean {

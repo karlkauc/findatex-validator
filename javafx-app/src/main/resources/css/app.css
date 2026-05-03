@@ -193,3 +193,48 @@
     -fx-text-fill: #9aa6b3;
     -fx-border-color: #dde2e8;
 }
+
+/* ===== Toast notification (report export finished) ===== */
+
+.toast {
+    -fx-background-color: #1f3550;
+    -fx-background-radius: 6;
+    -fx-padding: 12 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0, 0, 3);
+}
+
+.toast-title {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.toast-meta {
+    -fx-text-fill: #c8d6e6;
+    -fx-font-size: 11px;
+    -fx-font-family: "Menlo", "Consolas", monospace;
+}
+
+.toast-action {
+    -fx-background-color: transparent;
+    -fx-text-fill: #5396ff;
+    -fx-padding: 4 8;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+
+.toast-action:hover {
+    -fx-text-fill: white;
+}
+
+.toast-close {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c8d6e6;
+    -fx-padding: 0 6;
+    -fx-cursor: hand;
+    -fx-font-size: 16px;
+}
+
+.toast-close:hover {
+    -fx-text-fill: white;
+}

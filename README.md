@@ -120,6 +120,10 @@ reachable from the **Help** button in either UI.
   checklist for acquiring spec XLSX files from FinDatEx.
 - [`docs/SPEC_INVENTORY.md`](docs/SPEC_INVENTORY.md) — auto-maintained
   list of bundled spec files.
+- [`docs/DEPLOY_CLOUDRUN.md`](docs/DEPLOY_CLOUDRUN.md) — Cloud Run
+  hosting: one-time GCP/WIF bootstrap, runbook for rolling out a new
+  release (`gh workflow run "Deploy to Cloud Run" -f tag=<version>`),
+  rollback, optional custom domain.
 - [`samples/`](samples/) — per-template scenario fixtures (clean +
   broken variants).
 

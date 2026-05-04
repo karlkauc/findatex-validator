@@ -1,11 +1,9 @@
 package com.findatex.validator.spec;
 
 import com.findatex.validator.template.api.ProfileKey;
-import com.findatex.validator.template.tpt.TptProfiles;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

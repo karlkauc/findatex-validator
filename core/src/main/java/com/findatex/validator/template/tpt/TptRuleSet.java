@@ -163,7 +163,7 @@ public final class TptRuleSet implements TemplateRuleSet {
         rules.add(new CustodianPairRule());
         rules.add(new InterestRateTypeRule());
         rules.add(new DateOrderRule());
-        rules.add(new MaturityAfterReportingRule());
+        catalog.byNumKey("39").ifPresent(spec -> rules.add(new MaturityAfterReportingRule(spec)));
         rules.add(new PikRule());
         catalog.byNumKey("67").ifPresent(spec -> rules.add(new UnderlyingCicRule(spec)));
         rules.add(new TptVersionRule(expectedVersionToken));

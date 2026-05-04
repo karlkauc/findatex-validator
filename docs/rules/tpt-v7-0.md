@@ -199,10 +199,10 @@ Each rule below fires per row when its trigger condition holds and the expected 
 - **Target field(s):** `32`, `33`, `38`, `39`, `40`, `41`, `146`
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
 
-### XF-14/UNDERLYING_CIC — Field 67 (Underlying CIC) is mandatory when the main CIC category is one of {2, A, B, C, D, F} (instruments that have an economic underlying).
+### XF-14/UNDERLYING_CIC — Field 67 (Underlying CIC) is mandatory whenever the spec's CIC applicability scope for field 67 covers the row's CIC — i.e. CIC 22, A, B, C, D4, D5, F. Other sub-codes within CIC 2 and CIC D are exempt.
 
 - **Severity:** ERROR
-- **Trigger:** Row CIC ∈ {2, A, B, C, D, F}
+- **Trigger:** Row CIC matches the field-67 applicability scope (CIC 22, A, B, C, D4, D5, F)
 - **Required:** Field 67 (Underlying CIC) must be populated.
 - **Source field(s):** `12`
 - **Target field(s):** `67`
@@ -2217,7 +2217,7 @@ Definition: CIC Code (Complementary Identification Code).
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/67` | (all) | ERROR | Populated cell does not match the codification (CIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-14/UNDERLYING_CIC` | (all) | ERROR | Row CIC ∈ {2, A, B, C, D, F} | Field 67 (Underlying CIC) must be populated. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `XF-14/UNDERLYING_CIC` | (all) | ERROR | Row CIC matches the field-67 applicability scope (CIC 22, A, B, C, D4, D5, F) | Field 67 (Underlying CIC) must be populated. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 
 ---

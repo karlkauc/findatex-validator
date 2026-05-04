@@ -165,7 +165,7 @@ public final class TptRuleSet implements TemplateRuleSet {
         rules.add(new DateOrderRule());
         rules.add(new MaturityAfterReportingRule());
         rules.add(new PikRule());
-        rules.add(new UnderlyingCicRule());
+        catalog.byNumKey("67").ifPresent(spec -> rules.add(new UnderlyingCicRule(spec)));
         rules.add(new TptVersionRule(expectedVersionToken));
 
         // Declarative cross-field conditionals (XF-16..XF-25).

@@ -65,7 +65,7 @@
 
         <quarkus.platform.version>3.35.1</quarkus.platform.version>
         <bucket4j.version>8.10.1</bucket4j.version>
-        <caffeine.version>3.2.3</caffeine.version>
+        <caffeine.version>3.2.4</caffeine.version>
         <rest-assured.version>6.0.0</rest-assured.version>
         <frontend-maven-plugin.version>2.0.0</frontend-maven-plugin.version>
         <git-commit-id-plugin.version>9.0.1</git-commit-id-plugin.version>

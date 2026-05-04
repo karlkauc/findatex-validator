@@ -46,8 +46,7 @@ validation engine is exactly the same.
 
 ### Option A — Web app (no install)
 
-> **Public URL:** `<YOUR_HOSTED_INSTANCE_URL>` *(to be filled in once
-> a public instance is available)*.
+> **Public URL:** <https://findatex-validator-web-274755042473.europe-west3.run.app/>
 
 1. Open the URL in your browser.
 2. Pick the template (TPT / EET / EMT / EPT) and version.

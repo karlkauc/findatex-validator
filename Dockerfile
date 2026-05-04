@@ -7,12 +7,11 @@
 # Renovate (or an equivalent), run `tools/refresh-base-images.sh` to capture
 # the current digests and replace the FROM lines below with `image:tag@sha256:…`.
 
-# ---- Stage 1: Maven build (Ubuntu, has apt+maven prebuilt) ------------------
-FROM eclipse-temurin:25-jdk-jammy AS build
-
-RUN apt-get update \
- && apt-get install -y --no-install-recommends maven ca-certificates \
- && rm -rf /var/lib/apt/lists/*
+# ---- Stage 1: Maven build (official Maven image bundles JDK 25 + Maven 3.9) -
+# Apt-Maven on Ubuntu Jammy is stuck at 3.6.3, which fails plugins that
+# require Maven >= 3.9 (e.g. git-commit-id-maven-plugin v10+). The official
+# `maven:3-eclipse-temurin-25-noble` image ships Maven 3.9.x preinstalled.
+FROM maven:3-eclipse-temurin-25-noble AS build
 
 WORKDIR /src
 

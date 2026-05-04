@@ -121,6 +121,22 @@ event being a tag push starting with `v`, so `release.yml` runs
 triggered by main-branch pushes (which only build the `:edge` image)
 do not bump production.
 
+### Trigger matrix
+
+What actually happens for each combination — verified end-to-end:
+
+| Upstream event                                     | `release.yml` result | `deploy-cloudrun` action                                   |
+| -------------------------------------------------- | -------------------- | ---------------------------------------------------------- |
+| Push `v*` tag                                      | green                | runs, deploys the tag's image (`<tag>` minus the leading `v`) |
+| Push `v*` tag                                      | any failure          | starts via `workflow_run`, **skipped** by job-level `if:` (no half-broken release) |
+| Push to `main`                                     | green                | starts via `workflow_run`, **skipped** (head_branch is `main`, not `v…`) |
+| Push to `main`                                     | any failure          | skipped — same filter |
+| Manual `gh workflow run "Deploy to Cloud Run"`     | n/a                  | always runs with the tag passed in (rollbacks, `:edge`, ad-hoc) |
+
+The skip is recorded as a real workflow run with status `skipped` — it
+shows up in the Actions list but consumes no minutes. This is the
+expected fingerprint of every main-branch release run.
+
 ### Step 1 — Pick the image tag
 
 `release.yml` builds and pushes images to

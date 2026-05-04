@@ -1,6 +1,13 @@
 # Deploys the web-app container to Google Cloud Run (europe-west3).
 #
-# Trigger: manual (workflow_dispatch) with the image tag to deploy.
+# Triggers:
+#   - workflow_dispatch: manual run with the image tag to deploy
+#     (used for rollbacks, deploying :edge, deploying older releases).
+#   - workflow_run: auto-fires after the "Release" workflow finishes
+#     successfully on a v* tag push. The job-level `if:` filters out
+#     main-branch runs of release.yml (which only build the :edge image)
+#     and any failed/cancelled runs.
+#
 # The image is pulled from ghcr.io (built by release.yml) and mirrored into
 # Artifact Registry in the target region for fast cold-start pulls.
 #
@@ -11,8 +18,8 @@
 #   GCP_DEPLOY_SA       Service account email
 #                       (github-deploy@<project>.iam.gserviceaccount.com)
 #
-# One-time GCP bootstrap commands are documented in the chat where this
-# workflow was generated; rerun gcloud commands if any of the above changes.
+# One-time GCP bootstrap commands live in docs/DEPLOY_CLOUDRUN.md; rerun
+# the gcloud commands there if any of the above changes.
 
 name: Deploy to Cloud Run
 
@@ -23,6 +30,9 @@ on:
         description: 'Image tag to deploy (e.g. v1.0.0-rc1, latest, edge)'
         required: true
         type: string
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
 
 permissions:
   contents: read
@@ -43,12 +53,41 @@ env:
 jobs:
   deploy:
     name: Deploy to Cloud Run
+    # workflow_dispatch always runs; workflow_run only when the upstream
+    # Release workflow finished green AND was triggered by a v* tag push.
+    # `head_branch` for tag-triggered upstream runs is the tag name itself
+    # (e.g. "v1.0.4"); main-branch runs of release.yml have head_branch="main"
+    # and are filtered out so :edge does not auto-replace production.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       startsWith(github.event.workflow_run.head_branch, 'v'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      TAG: ${{ inputs.tag }}
       PROJECT: ${{ vars.GCP_PROJECT }}
     steps:
+      - name: Resolve image tag
+        id: resolve_tag
+        # Manual runs pass the tag verbatim. Auto-runs read the upstream
+        # Release workflow's head_branch (the v* tag) and strip the leading
+        # "v" so it matches the GHCR/AR tag (the release pipeline pushes
+        # `1.0.4`, not `v1.0.4`).
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          if [ -n "${INPUT_TAG}" ]; then
+            tag="${INPUT_TAG}"
+          else
+            tag="${HEAD_BRANCH#v}"
+          fi
+          echo "Resolved image tag: ${tag}"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "TAG=${tag}" >> "$GITHUB_ENV"
+
       - name: Authenticate to Google Cloud (WIF)
         uses: google-github-actions/auth@v3
         with:

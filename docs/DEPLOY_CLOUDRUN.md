@@ -106,9 +106,20 @@ In the GitHub UI: **Settings → Secrets and variables → Actions → Variables
 
 ## Running the deploy
 
-The deploy is a manual `workflow_dispatch` — there is no auto-deploy on
-push or on tag, intentionally, so a green tag in `release.yml` does not
-silently flip production.
+There are two paths:
+
+- **Auto-deploy** — every successful `Release` workflow on a `v*` tag
+  fires `Deploy to Cloud Run` automatically (via `workflow_run`). Push
+  the tag, walk away, the live service catches up to the new release
+  once `release.yml` is fully green.
+- **Manual deploy** — `workflow_dispatch` with the tag name. Use this
+  for rollbacks, deploying `:edge`, or deploying a previously-released
+  tag without re-tagging.
+
+The auto-deploy is gated on `conclusion == 'success'` AND the upstream
+event being a tag push starting with `v`, so `release.yml` runs
+triggered by main-branch pushes (which only build the `:edge` image)
+do not bump production.
 
 ### Step 1 — Pick the image tag
 

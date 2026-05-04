@@ -27,6 +27,7 @@ on:
 permissions:
   contents: read
   id-token: write   # required for Workload Identity Federation
+  packages: read    # required so GITHUB_TOKEN can pull the image from ghcr.io
 
 concurrency:
   group: deploy-cloudrun-${{ github.ref }}

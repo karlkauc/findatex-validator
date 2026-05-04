@@ -38,3 +38,17 @@ Thumbs.db
 .DAV/
 *_TPTV7_*.xlsx
 tools/__pycache__/
+
+# Local dev tooling not part of the build (Playwright scraper, dirty-tests
+# harness, ad-hoc screenshots). The scraper has its own node_modules and
+# runs/ output dir; the dirtyTests/ fixtures contain real UBS fund files.
+GEMINI.md
+/package.json
+/package-lock.json
+scraper/
+dirtyTests/
+dirtyTests_results.json
+validate_dirty_tests.py
+core/src/test/java/com/findatex/validator/validation/DirtyTestsValidationTest.java
+/Screenshot *.png
+/quota-exhausted.png

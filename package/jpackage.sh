@@ -9,7 +9,8 @@
 # Run after `mvn -DskipTests package` so the shaded jar exists.
 #
 # Env overrides:
-#   APP_VERSION    Installer version (default 1.0.0).
+#   APP_VERSION    Installer version (default: derived from the shaded jar
+#                  filename so it tracks pom.xml automatically).
 #   APP_VENDOR     Vendor / publisher (default "Karl Kauc").
 #   APP_NAME       Display name (default "FinDatEx Validator").
 #   PACKAGE_TYPE   Override jpackage --type. Set to "app-image" to skip the
@@ -30,13 +31,20 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 TARGET_DIR="$PROJECT_DIR/javafx-app/target"
 
 APP_NAME="${APP_NAME:-FinDatEx Validator}"
-APP_VERSION="${APP_VERSION:-1.0.0}"
 APP_VENDOR="${APP_VENDOR:-Karl Kauc}"
-SHADED_JAR="$TARGET_DIR/findatex-validator-javafx-1.0.0-shaded.jar"
 
-if [[ ! -f "$SHADED_JAR" ]]; then
-  echo "Shaded JAR not found at $SHADED_JAR — run 'mvn -DskipTests package' first." >&2
+# Discover the shaded jar by glob — pom.xml's <version> is in the filename, so
+# this tracks bumps automatically without re-reading the pom.
+SHADED_JAR="$(ls -1 "$TARGET_DIR"/findatex-validator-javafx-*-shaded.jar 2>/dev/null | head -n 1 || true)"
+if [[ -z "$SHADED_JAR" || ! -f "$SHADED_JAR" ]]; then
+  echo "No findatex-validator-javafx-*-shaded.jar in $TARGET_DIR — run 'mvn -DskipTests package' first." >&2
   exit 1
+fi
+
+# Default APP_VERSION from the jar name so the installer label matches the
+# build by default; CI still overrides via env to pin to the git tag.
+if [[ -z "${APP_VERSION:-}" ]]; then
+  APP_VERSION="$(basename "$SHADED_JAR" | sed -E 's/^findatex-validator-javafx-(.+)-shaded\.jar$/\1/')"
 fi
 
 if ! command -v jpackage >/dev/null 2>&1; then

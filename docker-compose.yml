@@ -3,6 +3,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Surfaced to /api/build-info via BUILD_GIT_COMMIT / BUILD_TIME env vars
+      # in the final stage. Set on the host before invoking compose:
+      #   GIT_COMMIT=$(git rev-parse HEAD) \
+      #   BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+      #   docker compose up -d --build
+      # Empty defaults keep `docker compose up` working without any preamble —
+      # the endpoint then reports an empty commit, same as before this hook.
+      args:
+        GIT_COMMIT: ${GIT_COMMIT:-}
+        BUILD_TIME: ${BUILD_TIME:-}
     image: findatex-validator-web:1.0.0
     container_name: findatex-validator-web
     ports:

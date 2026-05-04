@@ -3,7 +3,8 @@ REM Build a Windows .msi installer or portable app-image using jpackage.
 REM Run after `mvn -DskipTests package`.
 REM
 REM Env overrides:
-REM   APP_VERSION    Installer version (default 1.0.0). Must be numeric.
+REM   APP_VERSION    Installer version (default: derived from the shaded jar
+REM                  filename so it tracks pom.xml). Must be numeric.
 REM   APP_VENDOR     Vendor (default "Karl Kauc").
 REM   APP_NAME       Display name (default "FinDatEx Validator").
 REM   PACKAGE_TYPE   "msi" (default) or "app-image" for the no-admin .zip path.
@@ -19,7 +20,6 @@ set "PROJECT_DIR=%SCRIPT_DIR%.."
 set "TARGET_DIR=%PROJECT_DIR%\javafx-app\target"
 
 if "%APP_NAME%"==""    set "APP_NAME=FinDatEx Validator"
-if "%APP_VERSION%"=="" set "APP_VERSION=1.0.0"
 if "%APP_VENDOR%"==""  set "APP_VENDOR=Karl Kauc"
 if "%PACKAGE_TYPE%"=="" set "PACKAGE_TYPE=msi"
 if "%JAVA_OPTIONS%"=="" set "JAVA_OPTIONS=-Xms512m -Xmx8g -XX:+UseG1GC -XX:MaxMetaspaceSize=512m"
@@ -28,12 +28,24 @@ REM Expand each space-separated flag into its own --java-options arg.
 set "JAVA_OPTION_ARGS="
 for %%O in (%JAVA_OPTIONS%) do set "JAVA_OPTION_ARGS=!JAVA_OPTION_ARGS! --java-options %%O"
 
-set "SHADED_JAR=%TARGET_DIR%\findatex-validator-javafx-1.0.0-shaded.jar"
-
-if not exist "%SHADED_JAR%" (
-  echo Shaded JAR not found: %SHADED_JAR%
+REM Discover the shaded jar by glob — pom.xml's <version> is in the filename,
+REM so this tracks bumps automatically without re-reading the pom.
+set "SHADED_JAR="
+set "SHADED_JAR_NAME="
+for /f "usebackq delims=" %%F in (`dir /b /a-d "%TARGET_DIR%\findatex-validator-javafx-*-shaded.jar" 2^>nul`) do (
+  set "SHADED_JAR=%TARGET_DIR%\%%F"
+  set "SHADED_JAR_NAME=%%F"
+)
+if "!SHADED_JAR!"=="" (
+  echo No findatex-validator-javafx-*-shaded.jar in %TARGET_DIR%
   echo Run "mvn -DskipTests package" first.
   exit /b 1
+)
+
+REM Default APP_VERSION from the jar name (findatex-validator-javafx-X.Y.Z-shaded.jar -> X.Y.Z).
+if "%APP_VERSION%"=="" (
+  set "TMP=!SHADED_JAR_NAME:findatex-validator-javafx-=!"
+  set "APP_VERSION=!TMP:-shaded.jar=!"
 )
 
 where jpackage >nul 2>nul
@@ -76,7 +88,7 @@ jpackage ^
   --vendor "%APP_VENDOR%" ^
   --description "FinDatEx data-template validator (TPT, EET, EMT, EPT)" ^
   --input "%INPUT_DIR%" ^
-  --main-jar "findatex-validator-javafx-1.0.0-shaded.jar" ^
+  --main-jar "!SHADED_JAR_NAME!" ^
   --main-class com.findatex.validator.AppLauncher ^
   --add-modules !ADD_MODULES! ^
   !JAVA_OPTION_ARGS! ^

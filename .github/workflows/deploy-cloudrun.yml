@@ -58,7 +58,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Set up crane
-        uses: imjasonh/setup-crane@v0.4
+        uses: imjasonh/setup-crane@v0.5
 
       - name: Log in to GHCR (read-only via GITHUB_TOKEN)
         env:

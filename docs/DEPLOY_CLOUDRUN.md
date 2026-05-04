@@ -106,14 +106,76 @@ In the GitHub UI: **Settings → Secrets and variables → Actions → Variables
 
 ## Running the deploy
 
-1. Make sure the release pipeline has pushed the image tag you want. Tags
-   pushed by `release.yml` (e.g. `v1.0.0-rc1`) appear at
-   `ghcr.io/karlkauc/findatex-validator-web:<tag>`. The `latest` tag points
-   at the most recent stable release; `edge` tracks `main`.
-2. GitHub UI → **Actions → Deploy to Cloud Run → Run workflow**.
-3. Enter the tag (e.g. `v1.0.0-rc1`).
-4. The workflow logs end with the live service URL; it is also written to
-   the run summary.
+The deploy is a manual `workflow_dispatch` — there is no auto-deploy on
+push or on tag, intentionally, so a green tag in `release.yml` does not
+silently flip production.
+
+### Step 1 — Pick the image tag
+
+`release.yml` builds and pushes images to
+`ghcr.io/karlkauc/findatex-validator-web` on every push to `main` and
+every `v*` tag. Available tags after each release:
+
+| Tag         | Points at                               | Use it when                               |
+| ----------- | --------------------------------------- | ----------------------------------------- |
+| `1.0.4`     | the exact `v1.0.4` git tag              | rolling out a specific release            |
+| `1.0`       | the latest 1.0.x patch                  | floating to the newest patch in a minor   |
+| `latest`    | the most recent `v*` tag                | "deploy whatever the last release was"    |
+| `edge`      | tip of `main`                           | testing an unreleased build               |
+
+Verify that the tag actually exists before deploying:
+
+```bash
+gh api -H "Accept: application/vnd.github+json" \
+  /users/karlkauc/packages/container/findatex-validator-web/versions \
+  --jq '.[].metadata.container.tags' | head
+```
+
+### Step 2 — Trigger the deploy
+
+**CLI (recommended):**
+
+```bash
+gh workflow run "Deploy to Cloud Run" -f tag=1.0.4
+```
+
+**GitHub UI alternative:** Actions → *Deploy to Cloud Run* → *Run workflow* →
+enter the tag → *Run workflow*.
+
+### Step 3 — Watch and verify
+
+```bash
+# Watch the run (Ctrl+C to stop tailing; the run keeps going)
+gh run watch "$(gh run list --workflow=deploy-cloudrun.yml --limit=1 --json databaseId --jq '.[0].databaseId')"
+
+# After completion, confirm the live service identity
+curl -fsS https://findatex-validator-web-274755042473.europe-west3.run.app/api/build-info
+# {"version":"1.0.4","commit":"<sha>","dirty":false,"buildTime":"…"}
+```
+
+The workflow's last step also writes the URL to the run summary on the
+GitHub Actions page.
+
+### Workflow permission requirement
+
+The deploy job needs `packages: read` in `permissions:` to pull the
+image from GHCR via `GITHUB_TOKEN`. Without it the step "Mirror GHCR
+image to Artifact Registry" fails with `DENIED: requested access to the
+resource is denied`. The check-in `.github/workflows/deploy-cloudrun.yml`
+already has it; mention it here so a future workflow rewrite preserves it.
+
+### Rollback
+
+To roll back to a previous release, re-trigger the workflow with that
+tag:
+
+```bash
+gh workflow run "Deploy to Cloud Run" -f tag=1.0.3
+```
+
+Cloud Run keeps the previous revision around and routes 100% of traffic
+to the new one only after the new revision passes its readiness probe,
+so a rollback is non-disruptive.
 
 ## Enabling external validation later
 

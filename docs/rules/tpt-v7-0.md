@@ -181,10 +181,10 @@ Each rule below fires per row when its trigger condition holds and the expected 
 - **Target field(s):** `7`
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
 
-### XF-11/MATURITY_AFTER_REPORTING — For dated/interest-rate instruments (CIC categories 1, 2, 5, 6, 8), field 39 (Maturity date) must not precede field 7 (Reporting date).
+### XF-11/MATURITY_AFTER_REPORTING — Field 39 (Maturity date) must not precede field 7 (Reporting date) on any row whose CIC matches the spec's field-39 applicability scope (CIC 1, 2, 5, 6, 7 sub-codes 3/4/5, 8, A, B, C, D, E, F).
 
 - **Severity:** WARNING
-- **Trigger:** Row CIC ∈ {1, 2, 5, 6, 8} and field 39 is populated
+- **Trigger:** Row CIC matches the field-39 applicability scope (CIC 1, 2, 5, 6, 7 sub-codes 3/4/5, 8, A, B, C, D, E, F) and field 39 is populated
 - **Required:** Field 39 (Maturity date) must not precede field 7 (Reporting date).
 - **Source field(s):** `7`
 - **Target field(s):** `39`
@@ -1466,7 +1466,7 @@ Definition: Last redemption date
 | `COND_PRESENCE/39/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
 | `COND_PRESENCE/39/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
 | `FORMAT/39` | (all) | ERROR | Populated cell does not match the codification (DATE) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-11/MATURITY_AFTER_REPORTING` | (all) | WARNING | Row CIC ∈ {1, 2, 5, 6, 8} and field 39 is populated | Field 39 (Maturity date) must not precede field 7 (Reporting date). | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
+| `XF-11/MATURITY_AFTER_REPORTING` | (all) | WARNING | Row CIC matches the field-39 applicability scope (CIC 1, 2, 5, 6, 7 sub-codes 3/4/5, 8, A, B, C, D, E, F) and field 39 is populated | Field 39 (Maturity date) must not precede field 7 (Reporting date). | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 | `XF-13/PIK` | (all) | ERROR | Field 146 (PIK) is populated | Value must be one of {0,1,2,3,4} and case-specific fields must be present. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 

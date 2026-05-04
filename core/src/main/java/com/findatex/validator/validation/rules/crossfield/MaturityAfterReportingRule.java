@@ -2,10 +2,12 @@ package com.findatex.validator.validation.rules.crossfield;
 
 import com.findatex.validator.domain.CicCode;
 import com.findatex.validator.domain.TptRow;
+import com.findatex.validator.spec.FieldSpec;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Rule;
 import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationContext;
+import com.findatex.validator.validation.rules.CicApplicability;
 import com.findatex.validator.validation.rules.RuleDoc;
 
 import java.time.LocalDate;
@@ -13,18 +15,31 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-/** XF-11: field 39 (Maturity date) >= field 7 (Reporting date) for active interest-rate instruments. */
+/**
+ * XF-11: field 39 (Maturity date) ≥ field 7 (Reporting date) for any row whose CIC is covered by
+ * the spec's applicability scope of field 39. The scope is loaded from the per-CIC qualifier text
+ * in the TPT spec and currently covers CIC 1, 2, 5, 6, 7 (sub-codes 3/4/5 only — money market),
+ * 8, A, B, C, D, E, F.
+ */
 public final class MaturityAfterReportingRule implements Rule {
 
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE;
+
+    private final FieldSpec maturitySpec;
+
+    public MaturityAfterReportingRule(FieldSpec maturitySpec) {
+        this.maturitySpec = Objects.requireNonNull(maturitySpec, "maturitySpec");
+    }
 
     @Override public String id() { return "XF-11/MATURITY_AFTER_REPORTING"; }
 
     public RuleDoc describe() {
         return new RuleDoc(
-                "For dated/interest-rate instruments (CIC categories 1, 2, 5, 6, 8), field 39"
-                        + " (Maturity date) must not precede field 7 (Reporting date).",
+                "Field 39 (Maturity date) must not precede field 7 (Reporting date) on any row"
+                        + " whose CIC matches the spec's field-39 applicability scope (CIC 1, 2,"
+                        + " 5, 6, 7 sub-codes 3/4/5, 8, A, B, C, D, E, F).",
                 Severity.WARNING,
                 List.of("7"),
                 List.of("39"));
@@ -45,9 +60,7 @@ public final class MaturityAfterReportingRule implements Rule {
         for (TptRow row : ctx.file().rows()) {
             CicCode cic = row.cic().orElse(null);
             if (cic == null) continue;
-            // Only interest-rate / dated instruments: CIC 1, 2, 5, 6, 8.
-            String cat = cic.categoryDigit();
-            if (!cat.equals("1") && !cat.equals("2") && !cat.equals("5") && !cat.equals("6") && !cat.equals("8")) continue;
+            if (!CicApplicability.applies(maturitySpec, row)) continue;
             String v = row.stringValue("39").orElse(null);
             if (v == null) continue;
             LocalDate maturity;

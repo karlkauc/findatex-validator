@@ -629,7 +629,8 @@ public final class RuleDocGenerator {
                         "Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory.");
             } else if (r instanceof MaturityAfterReportingRule c) {
                 addRuleDoc(out, r.id(), c.describe(),
-                        "Row CIC ∈ {1, 2, 5, 6, 8} and field 39 is populated",
+                        "Row CIC matches the field-39 applicability scope (CIC 1, 2, 5, 6,"
+                                + " 7 sub-codes 3/4/5, 8, A, B, C, D, E, F) and field 39 is populated",
                         "Field 39 (Maturity date) must not precede field 7 (Reporting date).");
             } else if (r instanceof NavConsistencyRule c) {
                 addRuleDoc(out, r.id(), c.describe(),

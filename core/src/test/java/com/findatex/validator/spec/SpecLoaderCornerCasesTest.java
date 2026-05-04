@@ -1,6 +1,5 @@
 package com.findatex.validator.spec;
 
-import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
 
 import org.apache.poi.ss.usermodel.Cell;

@@ -4,7 +4,6 @@ import com.findatex.validator.domain.CicCode;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.ingest.TptFileLoader;
-import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
 import com.findatex.validator.template.tpt.TptRuleSet;
 import com.findatex.validator.spec.SpecCatalog;

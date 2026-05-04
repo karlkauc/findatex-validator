@@ -5,7 +5,6 @@ import com.findatex.validator.template.tpt.TptProfiles;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

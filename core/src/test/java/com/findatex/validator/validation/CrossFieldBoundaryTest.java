@@ -1,7 +1,6 @@
 package com.findatex.validator.validation;
 
 import com.findatex.validator.domain.TptFile;
-import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
@@ -13,7 +12,6 @@ import com.findatex.validator.validation.rules.crossfield.PositionWeightSumRule;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Set;
 
 import static com.findatex.validator.validation.TestFileBuilder.values;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -190,7 +188,7 @@ class CrossFieldBoundaryTest {
         TptFile f = new TestFileBuilder()
                 .row(values("7", "2025-12-31", "12", "FR12", "39", "2030-12-31"))
                 .build();
-        assertThat(new MaturityAfterReportingRule().evaluate(ctx(f))).isEmpty();
+        assertThat(new MaturityAfterReportingRule(CATALOG.byNumKey("39").orElseThrow()).evaluate(ctx(f))).isEmpty();
     }
 
     @Test
@@ -198,7 +196,7 @@ class CrossFieldBoundaryTest {
         TptFile f = new TestFileBuilder()
                 .row(values("7", "2025-12-31", "12", "FR12", "39", "2020-01-01"))
                 .build();
-        List<Finding> findings = new MaturityAfterReportingRule().evaluate(ctx(f));
+        List<Finding> findings = new MaturityAfterReportingRule(CATALOG.byNumKey("39").orElseThrow()).evaluate(ctx(f));
         assertThat(findings).hasSize(1);
         assertThat(findings.get(0).severity()).isEqualTo(Severity.WARNING);
     }
@@ -208,7 +206,7 @@ class CrossFieldBoundaryTest {
         TptFile f = new TestFileBuilder()
                 .row(values("7", "2025-12-31", "12", "DE31", "39", "2020-01-01"))   // CIC 3 = equity
                 .build();
-        assertThat(new MaturityAfterReportingRule().evaluate(ctx(f))).isEmpty();
+        assertThat(new MaturityAfterReportingRule(CATALOG.byNumKey("39").orElseThrow()).evaluate(ctx(f))).isEmpty();
     }
 
     @Test
@@ -216,7 +214,7 @@ class CrossFieldBoundaryTest {
         TptFile f = new TestFileBuilder()
                 .row(values("12", "FR12", "39", "2020-01-01"))   // no field 7
                 .build();
-        assertThat(new MaturityAfterReportingRule().evaluate(ctx(f))).isEmpty();
+        assertThat(new MaturityAfterReportingRule(CATALOG.byNumKey("39").orElseThrow()).evaluate(ctx(f))).isEmpty();
     }
 
     // ---------------------------------------- combined: empty file edge case
@@ -228,6 +226,6 @@ class CrossFieldBoundaryTest {
         assertThat(new CashPercentageRule().evaluate(ctx(f))).isEmpty();
         assertThat(new NavConsistencyRule().evaluate(ctx(f))).isEmpty();
         assertThat(new DateOrderRule().evaluate(ctx(f))).isEmpty();
-        assertThat(new MaturityAfterReportingRule().evaluate(ctx(f))).isEmpty();
+        assertThat(new MaturityAfterReportingRule(CATALOG.byNumKey("39").orElseThrow()).evaluate(ctx(f))).isEmpty();
     }
 }

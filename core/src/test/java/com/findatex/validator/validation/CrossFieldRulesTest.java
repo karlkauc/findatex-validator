@@ -1,7 +1,6 @@
 package com.findatex.validator.validation;
 
 import com.findatex.validator.domain.TptFile;
-import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
@@ -12,7 +11,6 @@ import com.findatex.validator.validation.rules.crossfield.TptVersionRule;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Set;
 
 import static com.findatex.validator.validation.TestFileBuilder.values;
 import static org.assertj.core.api.Assertions.assertThat;

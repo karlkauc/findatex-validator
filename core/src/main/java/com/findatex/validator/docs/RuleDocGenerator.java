@@ -645,7 +645,7 @@ public final class RuleDocGenerator {
                         "Σ field 26 (Position weight) must be ≈ 1.0 within ±0.02.");
             } else if (r instanceof UnderlyingCicRule c) {
                 addRuleDoc(out, r.id(), c.describe(),
-                        "Row CIC ∈ {2, A, B, C, D, F}",
+                        "Row CIC matches the field-67 applicability scope (CIC 22, A, B, C, D4, D5, F)",
                         "Field 67 (Underlying CIC) must be populated.");
             }
         }

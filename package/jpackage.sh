@@ -21,9 +21,8 @@
 #
 # The shaded jar already contains JavaFX classes + native libraries, so we
 # do NOT pass --module-path / --add-modules javafx.* — that would split-package
-# against the classpath copy. We only enumerate the JDK modules we need
-# (computed via jdeps with --ignore-missing-deps) so jlink can build a slim
-# runtime that still works on vanilla Temurin.
+# against the classpath copy. We pass a curated list of JDK modules so jlink
+# can build a slim runtime that still works on vanilla Temurin.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -111,25 +110,13 @@ if [[ -n "$ICON_PATH" && -f "$ICON_PATH" ]]; then
   ICON_ARG=(--icon "$ICON_PATH")
 fi
 
-# Compute JDK modules required by the shaded jar so jlink builds a slim
-# runtime. Falls back to a hand-curated list if jdeps is unavailable or
-# returns nothing.
-ADD_MODULES=""
-if command -v jdeps >/dev/null 2>&1; then
-  set +e
-  # jdeps prints split-package warnings interleaved on stdout; the actual
-  # module list is the last non-warning, comma-separated line.
-  ADD_MODULES="$(jdeps --multi-release 21 \
-                       --ignore-missing-deps \
-                       --print-module-deps \
-                       "$SHADED_JAR" 2>/dev/null \
-                | grep -v '^Warning:' \
-                | tail -n 1)"
-  set -e
-fi
-if [[ -z "$ADD_MODULES" ]]; then
-  ADD_MODULES="java.base,java.desktop,java.naming,java.net.http,java.scripting,java.security.jgss,java.sql,java.xml,java.xml.crypto,java.logging,java.management,jdk.crypto.ec,jdk.jfr,jdk.unsupported"
-fi
+# JDK modules baked into jlink's slim runtime. We previously ran jdeps
+# --print-module-deps, but on JDKs with bundled JavaFX (Liberica Full,
+# Azul FX) split-package detection returns a truncated list missing
+# java.logging / java.xml / java.management. The launcher then dies
+# silently on first JavaFX logger call. Using a curated list adds ~10 MB
+# to the runtime but guarantees the app starts.
+ADD_MODULES="java.base,java.desktop,java.naming,java.net.http,java.scripting,java.security.jgss,java.sql,java.xml,java.xml.crypto,java.logging,java.management,jdk.crypto.ec,jdk.jfr,jdk.unsupported"
 
 # Heap settings baked into the launcher binary. Batch-Mode mit hunderten XLSX-
 # Dateien hält pro Datei TptFile + Findings + QualityReport im Speicher; 8 GiB

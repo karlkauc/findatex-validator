@@ -12,7 +12,7 @@ REM   JAVA_OPTIONS   JVM flags baked into the launcher (default:
 REM                  "-Xms512m -Xmx8g -XX:+UseG1GC -XX:MaxMetaspaceSize=512m").
 REM
 REM The shaded jar already contains JavaFX classes + native libraries, so we
-REM only enumerate JDK modules via jdeps for jlink. No --module-path javafx.*.
+REM only pass a curated JDK module list to jlink. No --module-path javafx.*.
 
 setlocal EnableDelayedExpansion
 set "SCRIPT_DIR=%~dp0"
@@ -29,6 +29,12 @@ if "%APP_NAME%"==""    set "APP_NAME=FinDatEx Validator"
 if "%APP_VENDOR%"==""  set "APP_VENDOR=Karl Kauc"
 if "%PACKAGE_TYPE%"=="" set "PACKAGE_TYPE=msi"
 if "%JAVA_OPTIONS%"=="" set "JAVA_OPTIONS=-Xms512m -Xmx8g -XX:+UseG1GC -XX:MaxMetaspaceSize=512m"
+
+REM Debug switch: set WIN_CONSOLE=1 to build a launcher that opens a console
+REM window so JVM startup errors / stack traces are visible. Default off
+REM (regular GUI app — no console flicker on doubleclick).
+set "CONSOLE_FLAG="
+if "%WIN_CONSOLE%"=="1" set "CONSOLE_FLAG=--win-console"
 
 REM Expand each space-separated flag into its own --java-options arg.
 set "JAVA_OPTION_ARGS="
@@ -91,9 +97,13 @@ REM A literal SP-separated value with the path quoted ONCE avoids that.
 set "ICON_ARG="
 if exist "%SCRIPT_DIR%icon.ico" set ICON_ARG=--icon "%SCRIPT_DIR%icon.ico"
 
-set "ADD_MODULES="
-for /f "usebackq delims=" %%M in (`jdeps --multi-release 21 --ignore-missing-deps --print-module-deps "%SHADED_JAR%" 2^>nul`) do set "ADD_MODULES=%%M"
-if "!ADD_MODULES!"=="" set "ADD_MODULES=java.base,java.desktop,java.naming,java.net.http,java.scripting,java.security.jgss,java.sql,java.xml,java.xml.crypto,java.logging,java.management,jdk.crypto.ec,jdk.jfr,jdk.unsupported"
+REM jdeps on JDKs with bundled JavaFX (Liberica Full, Azul FX, ...) hits split
+REM packages between the shaded jar and the JDK's javafx.* modules and returns
+REM a truncated module list missing java.logging / java.xml / java.management.
+REM Result: jlink builds a slim runtime, JavaFX silently exits on first
+REM Logger.getLogger(...) call. We always use the curated fallback to keep the
+REM runtime self-contained — adds ~10 MB but the launcher actually works.
+set "ADD_MODULES=java.base,java.desktop,java.naming,java.net.http,java.scripting,java.security.jgss,java.sql,java.xml,java.xml.crypto,java.logging,java.management,jdk.crypto.ec,jdk.jfr,jdk.unsupported"
 
 echo Building %PACKAGE_TYPE% for Windows - version %APP_VERSION%, vendor "%APP_VENDOR%"
 echo   add-modules:  !ADD_MODULES!
@@ -113,6 +123,7 @@ jpackage ^
   !JAVA_OPTION_ARGS! ^
   %ICON_ARG% ^
   %INSTALLER_FLAGS% ^
+  %CONSOLE_FLAG% ^
   --temp "%TEMP_DIR%" ^
   --verbose ^
   --dest "%OUT_DIR%"

@@ -16,7 +16,13 @@ REM only enumerate JDK modules via jdeps for jlink. No --module-path javafx.*.
 
 setlocal EnableDelayedExpansion
 set "SCRIPT_DIR=%~dp0"
-set "PROJECT_DIR=%SCRIPT_DIR%.."
+REM Resolve PROJECT_DIR to a canonical absolute path (no "..\") — JDK 21 jpackage
+REM trips on parent-traversal segments in some path-normalisation paths and
+REM crashes with "Cannot invoke java.nio.file.Path.getFileSystem() because path
+REM is null". Going through pushd/popd gives us the resolved form.
+pushd "%SCRIPT_DIR%.." >nul
+set "PROJECT_DIR=%CD%"
+popd >nul
 set "TARGET_DIR=%PROJECT_DIR%\javafx-app\target"
 
 if "%APP_NAME%"==""    set "APP_NAME=FinDatEx Validator"
@@ -70,8 +76,13 @@ if exist "%INPUT_DIR%" rmdir /s /q "%INPUT_DIR%"
 mkdir "%INPUT_DIR%"
 copy /Y "%SHADED_JAR%" "%INPUT_DIR%\" >nul
 
+REM Build "--icon <path>" with a single set+quote pass; using
+REM   set "ICON_ARG=--icon "%SCRIPT_DIR%icon.ico""
+REM nests quotes inside the assignment value and on some cmd builds collapses
+REM into an empty second arg that jpackage then dereferences as a null Path.
+REM A literal SP-separated value with the path quoted ONCE avoids that.
 set "ICON_ARG="
-if exist "%SCRIPT_DIR%icon.ico" set "ICON_ARG=--icon "%SCRIPT_DIR%icon.ico""
+if exist "%SCRIPT_DIR%icon.ico" set ICON_ARG=--icon "%SCRIPT_DIR%icon.ico"
 
 set "ADD_MODULES="
 for /f "usebackq delims=" %%M in (`jdeps --multi-release 21 --ignore-missing-deps --print-module-deps "%SHADED_JAR%" 2^>nul`) do set "ADD_MODULES=%%M"
@@ -81,6 +92,7 @@ echo Building %PACKAGE_TYPE% for Windows - version %APP_VERSION%, vendor "%APP_V
 echo   add-modules:  !ADD_MODULES!
 echo   java-options: %JAVA_OPTIONS%
 
+REM --verbose left in so the next NPE / jlink miss prints a stack trace.
 jpackage ^
   --type %PACKAGE_TYPE% ^
   --name "%APP_NAME%" ^
@@ -94,6 +106,7 @@ jpackage ^
   !JAVA_OPTION_ARGS! ^
   %ICON_ARG% ^
   %INSTALLER_FLAGS% ^
+  --verbose ^
   --dest "%OUT_DIR%"
 
 echo.

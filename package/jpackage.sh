@@ -100,6 +100,12 @@ rm -rf "$INPUT_DIR"
 mkdir -p "$INPUT_DIR"
 cp "$SHADED_JAR" "$INPUT_DIR/"
 
+# JDK 25's refactored BuildEnvBuilder NPEs when --temp is omitted (auto-temp
+# path is broken — Objects.requireNonNull on Path root). Harmless on JDK 21.
+TEMP_DIR="$TARGET_DIR/jpackage-temp"
+rm -rf "$TEMP_DIR"
+mkdir -p "$TEMP_DIR"
+
 ICON_ARG=()
 if [[ -n "$ICON_PATH" && -f "$ICON_PATH" ]]; then
   ICON_ARG=(--icon "$ICON_PATH")
@@ -154,6 +160,7 @@ jpackage \
   ${JAVA_OPTION_ARGS[@]+"${JAVA_OPTION_ARGS[@]}"} \
   ${ICON_ARG[@]+"${ICON_ARG[@]}"} \
   ${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"} \
+  --temp "$TEMP_DIR" \
   --dest "$OUT_DIR"
 
 echo "Output at $OUT_DIR:"

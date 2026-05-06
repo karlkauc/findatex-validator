@@ -76,6 +76,13 @@ if exist "%INPUT_DIR%" rmdir /s /q "%INPUT_DIR%"
 mkdir "%INPUT_DIR%"
 copy /Y "%SHADED_JAR%" "%INPUT_DIR%\" >nul
 
+REM JDK 24+ jpackage refactored BuildEnvBuilder requires --temp explicitly;
+REM the auto-temp-dir path NPEs (BuildEnvBuilder.java:39, Objects.requireNonNull
+REM on Path root). JDK 21 doesn't need this, but setting it is harmless on 21.
+set "TEMP_DIR=%TARGET_DIR%\jpackage-temp"
+if exist "%TEMP_DIR%" rmdir /s /q "%TEMP_DIR%"
+mkdir "%TEMP_DIR%"
+
 REM Build "--icon <path>" with a single set+quote pass; using
 REM   set "ICON_ARG=--icon "%SCRIPT_DIR%icon.ico""
 REM nests quotes inside the assignment value and on some cmd builds collapses
@@ -106,6 +113,7 @@ jpackage ^
   !JAVA_OPTION_ARGS! ^
   %ICON_ARG% ^
   %INSTALLER_FLAGS% ^
+  --temp "%TEMP_DIR%" ^
   --verbose ^
   --dest "%OUT_DIR%"
 

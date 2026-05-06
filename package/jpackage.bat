@@ -37,8 +37,21 @@ set "CONSOLE_FLAG="
 if "%WIN_CONSOLE%"=="1" set "CONSOLE_FLAG=--win-console"
 
 REM Expand each space-separated flag into its own --java-options arg.
+REM Hand-rolled tokenizer because plain "for %%O in (set)" splits on '=' as
+REM well as whitespace, which mangles -XX:MaxMetaspaceSize=512m into two
+REM broken options (-XX:MaxMetaspaceSize, 512m) and makes the JVM refuse to
+REM start with "Improperly specified VM option". "for /f delims= " is
+REM space-only and preserves the '=' inside option values.
 set "JAVA_OPTION_ARGS="
-for %%O in (%JAVA_OPTIONS%) do set "JAVA_OPTION_ARGS=!JAVA_OPTION_ARGS! --java-options %%O"
+set "JAVA_OPT_REMAIN=%JAVA_OPTIONS%"
+:JAVA_OPT_LOOP
+if "!JAVA_OPT_REMAIN!"=="" goto :JAVA_OPT_DONE
+for /f "tokens=1* delims= " %%a in ("!JAVA_OPT_REMAIN!") do (
+  set "JAVA_OPTION_ARGS=!JAVA_OPTION_ARGS! --java-options %%a"
+  set "JAVA_OPT_REMAIN=%%b"
+)
+goto :JAVA_OPT_LOOP
+:JAVA_OPT_DONE
 
 REM Discover the shaded jar by glob — pom.xml's <version> is in the filename,
 REM so this tracks bumps automatically without re-reading the pom.

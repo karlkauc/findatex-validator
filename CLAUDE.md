@@ -53,7 +53,9 @@ python3 tools/build_examples.py                # regenerate samples/tpt/*
 python3 tools/build_eet_samples.py             # samples/eet/*  (also _emt_, _ept_)
 python3 tools/generate_requirements.py         # rebuild requirements.md from spec
 mvn -pl core -Pdocs exec:java                  # rebuild docs/rules/*.md (per-template rule reference)
-./package/jpackage.sh                          # native desktop installer
+./package/jpackage.sh                          # native desktop installer (CDS+AOT+splash baked in; see docs/JPACKAGE_OPTIMIZATIONS.md)
+./package/benchmark-startup.sh                 # cold-start bench: none vs CDS vs AOT (5 runs each)
+OUT_DIR=… PACKAGE_TYPE=app-image bash package/jpackage.sh   # custom output dir (used by benchmark-startup)
 ```
 
 Java 21, JavaFX 21, POI 5.x, Commons CSV, Jackson, JUnit 5, AssertJ; web-app
@@ -254,3 +256,29 @@ mirrors what's physically present in `core/src/main/resources/spec/`.
   desktop user gets no Quarkus heap overhead.
 - Don't modify files under `specs/` (operator drop zone). Don't commit real
   fund instance files (gitignore: `20260331_TPTV7_*.xlsx`, `.DAV/`).
+
+## Native packaging (jpackage)
+
+`package/jpackage.sh` runs a two-stage flow: (1) build intermediate
+app-image, (2) training run that auto-exits via App.java's
+`-Dfindatex.training=<ms>` hook to dump a CDS archive (`app.jsa`) or AOT
+cache (`app.aot`), (3) patch the launcher `.cfg` and wrap into the final
+installer. Defaults: low `-Xms`, `-XX:TieredStopAtLevel=1`, splash baked
+in, AOT on JDK ≥ 24, dynamic CDS otherwise. Full rationale + gotchas
+in `docs/JPACKAGE_OPTIMIZATIONS.md`.
+
+- **Runtime JVM options live in `<APP_NAME>.cfg`** — `-J<flag>` on the
+  launcher CLI is jpackage build-time-only, silently swallowed at runtime.
+  `_JAVA_OPTIONS` works but splits on whitespace, mangling any path that
+  contains "FinDatEx Validator". Patch the `.cfg` for path-bearing flags.
+- **AOT/CDS path-sensitivity**: archive encodes the classpath path. Works
+  for `app-image` (portable, build-path == install-path); breaks for
+  installer types after install (warning + fallback to vanilla CDS).
+- **AOT training needs the bundled JVM**, not system `java` — runtime's
+  `lib/modules` hash must match. jpackage strips `bin/java`; the script
+  copies `$JAVA_HOME/bin/java` in for training and removes it after.
+- **Preserve timestamps when relocating the bundle** — AOT verifies jar
+  mtime, so `cp -a` on Linux/macOS, `robocopy /COPYALL` on Windows.
+- **Headless training (xvfb) requires `System.exit()` fallback** — under
+  xvfb the GTK runloop sometimes won't process `Platform.exit()`. App.java's
+  `maybeScheduleTrainingExit` schedules a hard exit 1.5 s after Platform.exit.

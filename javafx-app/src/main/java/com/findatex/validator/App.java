@@ -8,6 +8,7 @@ import com.findatex.validator.external.proxy.ProxyService;
 import com.findatex.validator.template.api.TemplateRegistry;
 import com.findatex.validator.ui.MainController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -66,6 +67,44 @@ public final class App extends Application {
         stage.setTitle("FinDatEx Validator");
         stage.setScene(scene);
         stage.show();
+
+        maybeScheduleTrainingExit();
+    }
+
+    /**
+     * jpackage CDS / AOT training hook. When -Dfindatex.training is set, the
+     * launcher exits after a configurable delay so the JVM dumps a
+     * dynamic-CDS archive (-XX:ArchiveClassesAtExit) or an AOT cache
+     * (-XX:AOTCacheOutput) against a realistically-warmed image.
+     * <p>Values: "true" → 2000 ms (default), a number → that many ms.
+     * Anything else (incl. unset) → no-op.
+     * <p>Fallback chain: Platform.exit() first (clean JavaFX shutdown), then
+     * after another 1.5 s a hard System.exit(0). The hard exit is needed under
+     * headless / xvfb where the toolkit's render loop sometimes won't process
+     * the Platform.exit() event. JVM shutdown hooks still run, so the
+     * dynamic-CDS / AOT cache dump completes.
+     */
+    private static void maybeScheduleTrainingExit() {
+        String prop = System.getProperty("findatex.training");
+        if (prop == null || prop.isBlank() || "false".equalsIgnoreCase(prop)) return;
+        long delayMs;
+        if ("true".equalsIgnoreCase(prop)) {
+            delayMs = 2000L;
+        } else {
+            try { delayMs = Long.parseLong(prop.trim()); }
+            catch (NumberFormatException e) { delayMs = 2000L; }
+        }
+        long finalDelay = Math.max(0L, delayMs);
+        System.out.println("[findatex-training] active — exiting in " + finalDelay + " ms");
+        Thread t = new Thread(() -> {
+            try { Thread.sleep(finalDelay); } catch (InterruptedException ignored) {}
+            try { Platform.runLater(Platform::exit); } catch (Throwable ignored) {}
+            try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
+            System.out.println("[findatex-training] hard exit");
+            System.exit(0);
+        }, "findatex-training-exiter");
+        t.setDaemon(false); // must NOT be daemon — System.exit needs to actually fire
+        t.start();
     }
 
     /**

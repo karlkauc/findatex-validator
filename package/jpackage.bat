@@ -290,8 +290,19 @@ if /I "%PACKAGE_TYPE%"=="app-image" (
   echo Final output is portable app-image ^(no installer wrap^).
   if exist "%OUT_DIR%" rmdir /s /q "%OUT_DIR%"
   mkdir "%OUT_DIR%"
-  REM /MIR + /COPYALL preserves timestamps so AOT cache file-stat hashes match.
-  robocopy "%APP_BUNDLE%" "%OUT_DIR%\%APP_NAME%" /MIR /COPYALL /NJH /NJS /NP /NFL /NDL >nul
+  REM /COPY:DAT + /DCOPY:DAT preserves timestamps so AOT cache file-stat hashes
+  REM match. Don't use /COPYALL: its O (owner) and U (auditing/SACL) parts need
+  REM SeRestorePrivilege / SeSecurityPrivilege which a normal user shell lacks,
+  REM and robocopy then refuses to copy anything — silently, because it writes
+  REM diagnostics to stdout which our >nul used to swallow. /E (no /PURGE)
+  REM because the dest was just freshly mkdir'd and there's nothing to mirror.
+  robocopy "%APP_BUNDLE%" "%OUT_DIR%\%APP_NAME%" /E /COPY:DAT /DCOPY:DAT /NJH /NJS /NP /NFL /NDL
+  REM Robocopy exit codes 0-7 are success variants (0=nothing to do, 1=files
+  REM copied, ...). 8+ means real failure.
+  if errorlevel 8 (
+    echo robocopy failed with errorlevel !errorlevel! - portable bundle not produced.
+    exit /b 5
+  )
 ) else (
   echo Wrapping app-image into final %PACKAGE_TYPE% ...
   jpackage ^

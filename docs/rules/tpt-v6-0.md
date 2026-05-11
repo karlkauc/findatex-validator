@@ -4043,7 +4043,7 @@ Definition: Beta of the issuer of the private equity calculated according to art
 
 ### Field 137 — 137_Counterparty_sector
 
-Codification: CLOSED_LIST, closed list of 12 entries
+Codification: CLOSED_LIST, closed list of 13 entries
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: Classification of the issuer or counterparty according to IORP II regulation based on FINREP breakdown ( ESA 2010) and EIOPA specifications
 

@@ -149,10 +149,13 @@ public final class CodificationParser {
             String label = m.group(3).trim();
             entries.add(new CodificationDescriptor.ClosedListEntry(code, label));
         }
-        // The regex also matches free-text bullets like "1. ISO 6166". To reduce false
-        // positives, drop entries when the same field's label looks like a sentence (>120 chars
-        // or contains a period followed by a capital letter).
-        entries.removeIf(e -> e.label().length() > 200);
+        // The regex also matches free-text bullets like a stray "1. ISO 6166 …" inside
+        // narrative paragraphs. Heuristic: a *single* bullet with a very long label looks
+        // like that kind of sentence and is discarded; multiple parsed entries form an
+        // obvious enumeration (TPT V7 #137 has 13 entries, one with a 323-char label).
+        if (entries.size() == 1 && entries.get(0).label().length() > 200) {
+            entries.clear();
+        }
         if (!entries.isEmpty()) return entries;
 
         // Fall back to quoted-token closed lists ("Bullet", "Sinkable" / "Y" ; "N" / etc.).

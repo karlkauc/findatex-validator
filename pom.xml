@@ -63,7 +63,7 @@
         <jackson.version>2.21.3</jackson.version>
         <commonmark.version>0.28.0</commonmark.version>
 
-        <quarkus.platform.version>3.35.1</quarkus.platform.version>
+        <quarkus.platform.version>3.35.2</quarkus.platform.version>
         <bucket4j.version>8.10.1</bucket4j.version>
         <caffeine.version>3.2.4</caffeine.version>
         <rest-assured.version>6.0.0</rest-assured.version>

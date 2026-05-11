@@ -92,14 +92,53 @@ class CodificationParserCornerCasesTest {
     }
 
     @Test
-    void closedListEntryWithVeryLongLabelIsDropped() {
-        // A "free-text bullet" with > 200 char label shouldn't be picked up.
+    void singleBulletWithVeryLongLabelIsDropped() {
+        // A lone "free-text bullet" with > 200 char label looks like a narrative sentence
+        // accidentally matching the bullet regex; drop it.
+        String longLabel = "x".repeat(220);
+        CodificationDescriptor d = CodificationParser.parse("1 - " + longLabel);
+        assertThat(d.kind()).isEqualTo(CodificationKind.FREE_TEXT);
+        assertThat(d.closedList()).isEmpty();
+    }
+
+    @Test
+    void multipleBulletsKeepEntriesEvenWithLongLabel() {
+        // Real specs (TPT V7 #137 Counterparty_sector, #146 PIK) have an enumeration
+        // where one entry carries a long explanatory label. Keep all entries — the
+        // multi-entry shape proves it is a genuine closed list, not narrative text.
         String longLabel = "x".repeat(220);
         String raw = "1 - " + longLabel + "\n2 - short label";
         CodificationDescriptor d = CodificationParser.parse(raw);
-        // Only the short label survives; falls back to single -> dropped, then quoted fallback empty.
+        assertThat(d.kind()).isEqualTo(CodificationKind.CLOSED_LIST);
         assertThat(d.closedList()).extracting(CodificationDescriptor.ClosedListEntry::code)
-                .containsExactly("2");
+                .containsExactly("1", "2");
+    }
+
+    @Test
+    void tptCounterpartySectorKeepsAllThirteenCodes() {
+        // Verbatim TPT V7 #137 codification — entry "5" has a 323-char label.
+        // Regression: pre-fix the >200-char filter dropped code "5" and the producer's
+        // value "5" was rejected as "not in the closed list".
+        String raw = """
+                Alphanumeric (2)
+                1 – central bank (ESA 2010 sector S.121)
+                2 – deposit-taking corporations except the central bank (ESA 2010 sector S.122)
+                3 – money market funds (ESA 2010 sector S.123)
+                4 – investment funds other than money market funds (ESA 2010 sector S.124)
+                5 – other financial intermediaries, except insurance corporations and pension funds (excluding financial vehicle corporations engaged in securitisation transactions) + financial auxiliaries + captive financial institutions and money lenders (ESA 2010 sector S.125 excluding FVCs + ESA 2010 sector S.126 + ESA 2010 sector S.127)
+                6 – financial vehicle corporations engaged in securitisation transactions (a subdivision of ESA 2010 sector S.125)
+                7 – insurance corporations (ESA 2010 sector S.128)
+                8 – pension funds (ESA 2010 sector S.129)
+                9 – non-financial corporations (ESA 2010 sector S.11)
+                10 – general government (ESA 2010 sector S.13)
+                11 – households and non-profit institutions serving households (ESA 2010 sector S.14 + ESA 2010 sector S.15)
+                12 – for cash & deposit only (CIC xx7x) : central bank (ESA 2010 sector S.121), deposit-taking corporations except the central bank (ESA 2010 sector S.122) and money market funds (ESA 2010 sector S.123)
+                13 – for cash & deposit only (CIC xx7x) : non-MFIs, not included under 12
+                """;
+        CodificationDescriptor d = CodificationParser.parse(raw);
+        assertThat(d.kind()).isEqualTo(CodificationKind.CLOSED_LIST);
+        assertThat(d.closedList()).extracting(CodificationDescriptor.ClosedListEntry::code)
+                .containsExactly("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13");
     }
 
     @Test

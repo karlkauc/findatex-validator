@@ -11,7 +11,7 @@
 # Apt-Maven on Ubuntu Jammy is stuck at 3.6.3, which fails plugins that
 # require Maven >= 3.9 (e.g. git-commit-id-maven-plugin v10+). The official
 # `maven:3-eclipse-temurin-25-noble` image ships Maven 3.9.x preinstalled.
-FROM maven:3-eclipse-temurin-25-noble AS build
+FROM maven:3-eclipse-temurin-26-noble AS build
 
 WORKDIR /src
 

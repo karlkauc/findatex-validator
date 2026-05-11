@@ -66,9 +66,27 @@ public final class App extends Application {
 
         stage.setTitle("FinDatEx Validator");
         stage.setScene(scene);
+        stage.setOnShown(e -> closeAwtSplashScreen());
         stage.show();
 
         maybeScheduleTrainingExit();
+    }
+
+    /**
+     * Dismiss the AWT splash baked into the jpackage launcher via {@code -splash:}.
+     * <p>The JDK only auto-closes the splash when the first AWT/Swing Window
+     * becomes visible — JavaFX uses Glass, not AWT, so the splash would
+     * otherwise stay on screen until the JVM exits. Called from
+     * {@code stage.setOnShown(...)} so the splash hands off to a fully-rendered
+     * JavaFX window with no visible gap.
+     */
+    private static void closeAwtSplashScreen() {
+        try {
+            java.awt.SplashScreen splash = java.awt.SplashScreen.getSplashScreen();
+            if (splash != null && splash.isVisible()) splash.close();
+        } catch (UnsupportedOperationException | IllegalStateException e) {
+            log.debug("Splash close skipped: {}", e.toString());
+        }
     }
 
     /**

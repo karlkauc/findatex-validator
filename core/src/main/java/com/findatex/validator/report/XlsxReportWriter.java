@@ -337,8 +337,8 @@ public final class XlsxReportWriter {
         java.util.List<ProfileKey> profiles = profileSet.all();
         java.util.List<String> headers = new java.util.ArrayList<>();
         headers.add("Field#");
-        headers.add("NUM_DATA");
-        headers.add("FunDataXML path");
+        headers.add("Field name");
+        headers.add("FundsXML path");
         for (ProfileKey p : profiles) headers.add(p.displayName());
         headers.add("Present");
         headers.add("Missing");
@@ -368,7 +368,7 @@ public final class XlsxReportWriter {
             Row rr = s.createRow(row++);
             int col = 0;
             rr.createCell(col++).setCellValue(spec.numKey());
-            rr.createCell(col++).setCellValue(spec.numData());
+            rr.createCell(col++).setCellValue(spec.name());
             rr.createCell(col++).setCellValue(spec.fundXmlPath() == null ? "" : spec.fundXmlPath());
             for (ProfileKey p : profiles) {
                 rr.createCell(col++).setCellValue(spec.flag(p).name());

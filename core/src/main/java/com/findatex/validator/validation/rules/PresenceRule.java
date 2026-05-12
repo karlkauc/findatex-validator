@@ -39,7 +39,7 @@ public final class PresenceRule implements Rule {
                         id(),
                         profile,
                         spec.numKey(),
-                        spec.numData(),
+                        spec.name(),
                         row.rowIndex(),
                         null,
                         "Mandatory field for " + profile.displayName() + " is missing"));

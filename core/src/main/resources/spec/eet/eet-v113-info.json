@@ -6,7 +6,7 @@
   "firstDataRow": 7,
   "columns": {
     "numData": 1,
-    "path": 2,
+    "name": 2,
     "definition": 3,
     "codification": 4,
     "comment": 5,

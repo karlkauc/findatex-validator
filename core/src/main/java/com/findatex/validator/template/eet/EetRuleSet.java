@@ -132,6 +132,11 @@ public final class EetRuleSet implements TemplateRuleSet {
      * the per-indicator "Considered_In_The_Investment_Strategy" Y/N flags. Only NUM=106
      * carries the explicit "Conditional to item 20100 set to Yes" comment in the spec; the
      * remainder of the block is gated implicitly — wiring them all matches operator intent.
+     * Severity = WARNING (downgraded from ERROR) because for 26 of the 27 indicators the
+     * mandate is *extrapolated* operator-intent, not literal spec text — analogous to
+     * {@link #ART_FIELDS_FORBIDDEN_WHEN_OUT_OF_SCOPE} which also uses WARNING for the same
+     * "convention-not-spec" reason. See {@code findatex-testdata/SPEC-AUDIT.md} §
+     * "Validator-Bug-Verdachtsliste".
      */
     private static final List<String> PAI_BLOCK = List.of(
             "103", "104",
@@ -234,12 +239,14 @@ public final class EetRuleSet implements TemplateRuleSet {
         }
 
         // PAI gating — when NUM=33 = "Y" (product considers Principal Adverse Impacts),
-        // every NUM in the PAI block must be present.
+        // every NUM in the PAI block must be present. Severity = WARNING (see PAI_BLOCK
+        // Javadoc) because the spec only explicitly mandates NUM=106; the remaining 26
+        // indicators are extrapolated operator-intent.
         for (String num : PAI_BLOCK) {
             rules.add(new ConditionalFieldPresenceRule(new ConditionalRequirement(
                     "EET-XF-PAI-" + num,
                     "33", FieldPredicate.EqualsAny.of("Y", "Yes", "TRUE", "1"),
-                    num, Severity.ERROR)));
+                    num, Severity.WARNING)));
         }
 
         // Taxonomy at-least-one-of attribution: NUM=41 → {42,43,44}; NUM=45 → {46,47}.

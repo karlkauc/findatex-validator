@@ -23,19 +23,22 @@ public final class EmtVersionRule implements Rule {
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {
+        String fieldName = ctx.catalog().byNumKey("1")
+                .map(com.findatex.validator.spec.FieldSpec::name)
+                .orElse("00001_EMT_Version");
         for (TptRow row : ctx.file().rows()) {
             String v = row.stringValue("1").orElse(null);
             if (v == null) continue;
             String norm = v.trim().toUpperCase();
             if (norm.contains(expectedVersion.toUpperCase())) return List.of();
             return List.of(Finding.error(
-                    id(), null, "1", "Field 1 (00001_EMT_Version)",
+                    id(), null, "1", fieldName,
                     row.rowIndex(), v,
                     "EMT version must be " + expectedVersion + " (got: " + v + ")"));
         }
         return List.of(Finding.info(
-                id(), null, "1", "Field 1 (00001_EMT_Version)",
+                id(), null, "1", fieldName,
                 null, null,
-                "EMT version field 1 (00001_EMT_Version) is not present"));
+                "EMT version field 1 (" + fieldName + ") is not present"));
     }
 }

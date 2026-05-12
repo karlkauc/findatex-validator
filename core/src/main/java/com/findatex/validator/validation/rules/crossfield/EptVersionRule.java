@@ -26,6 +26,9 @@ public final class EptVersionRule implements Rule {
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {
+        String fieldName = ctx.catalog().byNumKey("1")
+                .map(com.findatex.validator.spec.FieldSpec::name)
+                .orElse("00001_EPT_Version");
         String compact = expectedVersionToken.replace(".", "").toUpperCase();
         for (TptRow row : ctx.file().rows()) {
             String v = row.stringValue("1").orElse(null);
@@ -33,13 +36,13 @@ public final class EptVersionRule implements Rule {
             String norm = v.trim().toUpperCase().replace(".", "");
             if (norm.contains(compact)) return List.of();
             return List.of(Finding.error(
-                    id(), null, "1", "Field 1 (00001_EPT_Version)",
+                    id(), null, "1", fieldName,
                     row.rowIndex(), v,
                     "EPT version must be " + expectedVersionToken + " (got: " + v + ")"));
         }
         return List.of(Finding.info(
-                id(), null, "1", "Field 1 (00001_EPT_Version)",
+                id(), null, "1", fieldName,
                 null, null,
-                "EPT version field 1 (00001_EPT_Version) is not present"));
+                "EPT version field 1 (" + fieldName + ") is not present"));
     }
 }

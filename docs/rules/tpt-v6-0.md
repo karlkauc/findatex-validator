@@ -331,7 +331,7 @@ One entry per `FieldSpec` in spec order. Each entry lists every check that can f
 
 ### Field 1 — 1_Portfolio_identifying_data
 
-Path: `Portfolio / PortfolioID / Code`
+FundsXML path: `Portfolio / PortfolioID / Code`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identification of the fund or share class
@@ -359,7 +359,7 @@ Definition: Identification of the fund or share class
 
 ### Field 2 — 2_Type_of_identification_code_for_the_fund_share_or_portfolio
 
-Path: `Portfolio / PortfolioID / CodificationSystem`
+FundsXML path: `Portfolio / PortfolioID / CodificationSystem`
 Codification: CLOSED_LIST, closed list of 10 entries
 Applicability: all rows
 Definition: Codification chosen to identify the share of the CIS
@@ -387,7 +387,7 @@ Definition: Codification chosen to identify the share of the CIS
 
 ### Field 3 — 3_Portfolio_name
 
-Path: `Portfolio / PorfolioName`
+FundsXML path: `Portfolio / PorfolioName`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of the Portfolio or name of the CIS
@@ -415,7 +415,7 @@ Definition: Name of the Portfolio or name of the CIS
 
 ### Field 4 — 4_Portfolio_currency_(B)
 
-Path: `Portfolio / PortfolioCurrency`
+FundsXML path: `Portfolio / PortfolioCurrency`
 Codification: ISO_4217
 Applicability: all rows
 Definition: Valuation currency of the portfolio
@@ -443,7 +443,7 @@ Definition: Valuation currency of the portfolio
 
 ### Field 5 — 5_Net_asset_valuation_of_the_portfolio_or_the_share_class_in_portfolio_currency
 
-Path: `Portfolio / TotalNetAssets`
+FundsXML path: `Portfolio / TotalNetAssets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Portfolio valuation
@@ -473,7 +473,7 @@ Definition: Portfolio valuation
 
 ### Field 6 — 6_Valuation_date
 
-Path: `Portfolio / ValuationDate`
+FundsXML path: `Portfolio / ValuationDate`
 Codification: DATE
 Applicability: all rows
 Definition: Date of valuation (date positions valid for)
@@ -502,7 +502,7 @@ Definition: Date of valuation (date positions valid for)
 
 ### Field 7 — 7_Reporting_date
 
-Path: `Portfolio / ReportingDate`
+FundsXML path: `Portfolio / ReportingDate`
 Codification: DATE
 Applicability: all rows
 Definition: Date of reference for the reporting
@@ -532,7 +532,7 @@ Definition: Date of reference for the reporting
 
 ### Field 8 — 8_Share_price
 
-Path: `Portfolio / ShareClass / SharePrice`
+FundsXML path: `Portfolio / ShareClass / SharePrice`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Share price of the fund/share class
@@ -561,7 +561,7 @@ Definition: Share price of the fund/share class
 
 ### Field 8b — 8b_Total_number_of_shares
 
-Path: `Portfolio / ShareClass / TotalNumberOfShares`
+FundsXML path: `Portfolio / ShareClass / TotalNumberOfShares`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Total number of shares (per share class, if applicable)
@@ -590,7 +590,7 @@ Definition: Total number of shares (per share class, if applicable)
 
 ### Field 9 — 9_Cash_ratio
 
-Path: `Portfolio / CashPercentage`
+FundsXML path: `Portfolio / CashPercentage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Amount of cash of the fund / total net asset value of the fund, in %
@@ -616,7 +616,7 @@ Definition: Amount of cash of the fund / total net asset value of the fund, in %
 
 ### Field 10 — 10_Portfolio_modified_duration
 
-Path: `Portfolio / PortfolioModifiedDuration`
+FundsXML path: `Portfolio / PortfolioModifiedDuration`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Weighted average modified duration of portfolio positions
@@ -641,7 +641,7 @@ Definition: Weighted average modified duration of portfolio positions
 
 ### Field 11 — 11_Complete_SCR_delivery
 
-Path: `Portfolio / CompleteSCRDelivery`
+FundsXML path: `Portfolio / CompleteSCRDelivery`
 Codification: ALPHA (max 1)
 Applicability: all rows
 Definition: Y/N
@@ -668,7 +668,7 @@ Definition: Y/N
 
 ### Field 12 — 12_CIC_code_of_the_instrument
 
-Path: `Position / InstrumentCIC`
+FundsXML path: `Position / InstrumentCIC`
 Codification: CIC
 Applicability: all rows
 Definition: CIC Code (Complementary Identification Code).
@@ -698,7 +698,7 @@ Definition: CIC Code (Complementary Identification Code).
 
 ### Field 13 — 13_Economic_zone_of_the_quotation_place
 
-Path: `Position / EconomicArea`
+FundsXML path: `Position / EconomicArea`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC3
 Definition: Indication of the economic zone of the quotation place
@@ -724,7 +724,7 @@ Definition: Indication of the economic zone of the quotation place
 
 ### Field 14 — 14_Identification_code_of_the_instrument
 
-Path: `Position / InstrumentCode / Code`
+FundsXML path: `Position / InstrumentCode / Code`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identification code of the financial instrument - including identifier for leg of instrument if required
@@ -754,7 +754,7 @@ Definition: Identification code of the financial instrument - including identifi
 
 ### Field 15 — 15_Type_of_identification_code_for_the_instrument
 
-Path: `Position / InstrumentCode / CodificationSystem`
+FundsXML path: `Position / InstrumentCode / CodificationSystem`
 Codification: CLOSED_LIST, closed list of 10 entries
 Applicability: all rows
 Definition: Codification chosen to identify the instrument
@@ -782,7 +782,7 @@ Definition: Codification chosen to identify the instrument
 
 ### Field 16 — 16_Grouping_code_for_multiple_leg_instruments
 
-Path: `Position / GroupID`
+FundsXML path: `Position / GroupID`
 Codification: ALPHANUMERIC (max 255)
 Applicability: CIC categories CICA, CICB, CICC, CICD, CICE; CICE sub-categories [2]; CICC sub-categories [3]; CICB sub-categories [3]; CICA sub-categories [3]
 Definition: grouping code for operations on multi leg instruments
@@ -809,7 +809,7 @@ Definition: grouping code for operations on multi leg instruments
 
 ### Field 17 — 17_Instrument_name
 
-Path: `Position / InstrumentName`
+FundsXML path: `Position / InstrumentName`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: instrument name
@@ -837,7 +837,7 @@ Definition: instrument name
 
 ### Field 17b — 17b_Asset_liability
 
-Path: `Position / Valuation / AssetOrLiability`
+FundsXML path: `Position / Valuation / AssetOrLiability`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: all rows
 Definition: Asset/Liability identification if needed
@@ -862,7 +862,7 @@ Definition: Asset/Liability identification if needed
 
 ### Field 18 — 18_Quantity
 
-Path: `Position / Valuation / Quantity`
+FundsXML path: `Position / Valuation / Quantity`
 Codification: NUMERIC
 Applicability: CIC categories CIC0, CIC2, CIC3, CIC4, CICA, CICB, CICC, CICD; CICD sub-categories [4, 5, 9]; CICC sub-categories [1, 4, 5, 9]; CIC2 sub-categories [2, 9]; CICB sub-categories [1, 4, 5, 9]; CICA sub-categories [1, 5, 9]
 Definition: Number of instruments on position
@@ -889,7 +889,7 @@ Definition: Number of instruments on position
 
 ### Field 19 — 19_Nominal_amount
 
-Path: `Position / Valuation / TotalNominalValueQC`
+FundsXML path: `Position / Valuation / TotalNominalValueQC`
 Codification: NUMERIC
 Applicability: CIC categories CIC0, CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF; CICC sub-categories [2, 3, 6, 7, 8, 9]; CICB sub-categories [2, 3, 6, 7, 8, 9]; CICA sub-categories [2, 3, 9]
 Definition: Quantity * nominal unit amount
@@ -917,7 +917,7 @@ Definition: Quantity * nominal unit amount
 
 ### Field 20 — 20_Contract_size_for_derivatives
 
-Path: `Position / Valuation / ContractSize`
+FundsXML path: `Position / Valuation / ContractSize`
 Codification: NUMERIC
 Applicability: CIC categories CICA, CICB, CICC
 Definition: Contract size
@@ -944,7 +944,7 @@ Definition: Contract size
 
 ### Field 21 — 21_Quotation_currency_(A)
 
-Path: `Position / Valuation / QuotationCurrency`
+FundsXML path: `Position / Valuation / QuotationCurrency`
 Codification: ISO_4217
 Applicability: all rows
 Definition: Currency of quotation for the instrument or denomination
@@ -973,7 +973,7 @@ Definition: Currency of quotation for the instrument or denomination
 
 ### Field 22 — 22_Market_valuation_in_quotation_currency_(A)
 
-Path: `Position / Valuation / MarketValueQC`
+FundsXML path: `Position / Valuation / MarketValueQC`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation of the position accrued interest included in quotation currency
@@ -1001,7 +1001,7 @@ Definition: Market valuation of the position accrued interest included in quotat
 
 ### Field 23 — 23_Clean_market_valuation_in_quotation_currency_(A)
 
-Path: `Position / Valuation / CleanValueQC`
+FundsXML path: `Position / Valuation / CleanValueQC`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation of the position accrued interest excluded in quotation currency
@@ -1028,7 +1028,7 @@ Definition: Market valuation of the position accrued interest excluded in quotat
 
 ### Field 24 — 24_Market_valuation_in_portfolio_currency_(B)
 
-Path: `Position / Valuation / MarketValuePC`
+FundsXML path: `Position / Valuation / MarketValuePC`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation of the position accrued interest included in portfolio currency
@@ -1058,7 +1058,7 @@ Definition: Market valuation of the position accrued interest included in portfo
 
 ### Field 25 — 25_Clean_market_valuation_in_portfolio_currency_(B)
 
-Path: `Position / Valuation / CleanValuePC`
+FundsXML path: `Position / Valuation / CleanValuePC`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation of the position accrued interest excluded in portfolio currency
@@ -1085,7 +1085,7 @@ Definition: Market valuation of the position accrued interest excluded in portfo
 
 ### Field 26 — 26_Valuation_weight
 
-Path: `Position / Valuation / PositionWeight`
+FundsXML path: `Position / Valuation / PositionWeight`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation in portfolio currency / portfolio net asset value in %
@@ -1115,7 +1115,7 @@ Definition: Market valuation in portfolio currency / portfolio net asset value i
 
 ### Field 27 — 27_Market_exposure_amount_in_quotation_currency_(A)
 
-Path: `Position / Valuation / MarketExposureQC`
+FundsXML path: `Position / Valuation / MarketExposureQC`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market exposure amount different from market valuation for derivatives (valuation of the equivalent position on the underlying asset)
@@ -1143,7 +1143,7 @@ Definition: Market exposure amount different from market valuation for derivativ
 
 ### Field 28 — 28_Market_exposure_amount_in_portfolio_currency_(B)
 
-Path: `Position / Valuation / MarketExposurePC`
+FundsXML path: `Position / Valuation / MarketExposurePC`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market exposure amount different from market valuation for derivatives (valuation of the equivalent position on the underlying asset) in the quotation currency of the portfolio
@@ -1171,7 +1171,7 @@ Definition: Market exposure amount different from market valuation for derivativ
 
 ### Field 29 — 29_Market_exposure_amount_for_the_3rd_quotation_currency_(C)
 
-Path: `Position / Valuation / MarketExposureLeg2`
+FundsXML path: `Position / Valuation / MarketExposureLeg2`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market exposure amount different from market valuation for derivatives (valuation of the equivalent position on the underlying asset) in the quotation currency of the underlying asset
@@ -1197,7 +1197,7 @@ Definition: Market exposure amount different from market valuation for derivativ
 
 ### Field 30 — 30_Market_exposure_in_weight
 
-Path: `Position / Valuation / MarketExposureWeight`
+FundsXML path: `Position / Valuation / MarketExposureWeight`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Exposure valuation in portfolio currency / total net asset value of the fund, in %
@@ -1224,7 +1224,7 @@ Definition: Exposure valuation in portfolio currency / total net asset value of 
 
 ### Field 31 — 31_Market_exposure_for_the_3rd_currency_in_weight_over_NAV
 
-Path: `Position / Valuation / MarketExposureWeightLeg2`
+FundsXML path: `Position / Valuation / MarketExposureWeightLeg2`
 Codification: NUMERIC
 Applicability: CIC categories CICE
 Definition: Exposure valuation for leg 2 in portfolio currency / total net asset value of the fund, in %
@@ -1250,7 +1250,7 @@ Definition: Exposure valuation for leg 2 in portfolio currency / total net asset
 
 ### Field 32 — 32_Interest_rate_type
 
-Path: `Position / BondCharacteristics / RateType`
+FundsXML path: `Position / BondCharacteristics / RateType`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]; CICE sub-categories [1]; CICD sub-categories [1, 3]
 Definition: * Fixed - plain vanilla fixed coupon rate * Floating - plain vanilla floating coupon rates (for all interest rates, which refer to a reference interest rate like EONIA or Libor or Libor + margin in BP) * Variable - all other variable interest rates like step-up or step-down or fixed-to-float bonds. The variable feature is the (credit) margin or the change between fixed and float. * Infation_linked for inflation linked bonds in order to identify them.
@@ -1280,7 +1280,7 @@ Definition: * Fixed - plain vanilla fixed coupon rate * Floating - plain vanilla
 
 ### Field 33 — 33_Coupon_rate
 
-Path: `Position / BondCharacteristics / CouponRate`
+FundsXML path: `Position / BondCharacteristics / CouponRate`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]; CICF sub-categories [1, 3, 4]; CICE sub-categories [1]; CICD sub-categories [1, 3]
 Definition: Fixed rate: coupon rate as a percentage of nominal amount Floating rate: last fixing rate + margin as a percentage of nominal amount Variable rate: estimation of current rate over the period + margin as a percentage of nominal amount all rates are expressed on an annual basis
@@ -1307,7 +1307,7 @@ Definition: Fixed rate: coupon rate as a percentage of nominal amount Floating r
 
 ### Field 34 — 34_Interest_rate_reference_identification
 
-Path: `Position / BondCharacteristics / VariableRate / IndexID / Code`
+FundsXML path: `Position / BondCharacteristics / VariableRate / IndexID / Code`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF
 Definition: identification code for interest rate index
@@ -1334,7 +1334,7 @@ Definition: identification code for interest rate index
 
 ### Field 35 — 35_Identification_type_for_interest_rate_index
 
-Path: `Position / BondCharacteristics / VariableRate / IndexID / CodificationSystem`
+FundsXML path: `Position / BondCharacteristics / VariableRate / IndexID / CodificationSystem`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF
 Definition: Type of codification used for interest rate index
@@ -1361,7 +1361,7 @@ Definition: Type of codification used for interest rate index
 
 ### Field 36 — 36_Interest_rate_index_name
 
-Path: `Position / BondCharacteristics / VariableRate / IndexName`
+FundsXML path: `Position / BondCharacteristics / VariableRate / IndexName`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF
 Definition: name of interest rate index
@@ -1388,7 +1388,7 @@ Definition: name of interest rate index
 
 ### Field 37 — 37_Interest_rate_margin
 
-Path: `Position / BondCharacteristics / VariableRate / Margin`
+FundsXML path: `Position / BondCharacteristics / VariableRate / Margin`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF
 Definition: Facial margin as a percentage of nominal amount on an annual basis
@@ -1415,7 +1415,7 @@ Definition: Facial margin as a percentage of nominal amount on an annual basis
 
 ### Field 38 — 38_Coupon_payment_frequency
 
-Path: `Position / BondCharacteristics / CouponFrequency`
+FundsXML path: `Position / BondCharacteristics / CouponFrequency`
 Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]; CICF sub-categories [1, 3, 4]; CICE sub-categories [1]; CICD sub-categories [1, 3]
 Definition: number of coupon payment per year 0 = other than below options: 1= annual 2= biannual 4= quarterly 12= monthly 52= weekly
@@ -1445,7 +1445,7 @@ Definition: number of coupon payment per year 0 = other than below options: 1= a
 
 ### Field 39 — 39_Maturity_date
 
-Path: `Position / BondCharacteristics / Redemption / MaturityDate`
+FundsXML path: `Position / BondCharacteristics / Redemption / MaturityDate`
 Codification: DATE
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]
 Definition: Last redemption date
@@ -1474,7 +1474,7 @@ Definition: Last redemption date
 
 ### Field 40 — 40_Redemption_type
 
-Path: `Position / BondCharacteristics / Redemption /Type`
+FundsXML path: `Position / BondCharacteristics / Redemption /Type`
 Codification: CLOSED_LIST, closed list of 3 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE; CIC7 sub-categories [3, 4, 5]; CICE sub-categories [1]; CICD sub-categories [1, 3]
 Definition: Type of redemption payment schedule : bullet, constant annuity…
@@ -1502,7 +1502,7 @@ Definition: Type of redemption payment schedule : bullet, constant annuity…
 
 ### Field 41 — 41_Redemption_rate
 
-Path: `Position / BondCharacteristics / Redemption / Rate`
+FundsXML path: `Position / BondCharacteristics / Redemption / Rate`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE; CIC7 sub-categories [3, 4, 5]; CICE sub-categories [1]; CICD sub-categories [1, 3]
 Definition: Redemption amount in % of nominal amount
@@ -1530,7 +1530,7 @@ Definition: Redemption amount in % of nominal amount
 
 ### Field 42 — 42_Callable_putable
 
-Path: `Position / BondCharacteristics / OptionalCallPut / CallPutType`
+FundsXML path: `Position / BondCharacteristics / OptionalCallPut / CallPutType`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8
 Definition: Cal = Call Put = Put Cap = Cap Flr= Floor empty if none
@@ -1558,7 +1558,7 @@ Definition: Cal = Call Put = Put Cap = Cap Flr= Floor empty if none
 
 ### Field 43 — 43_Call_put_date
 
-Path: `Position / BondCharacteristics / OptionalCallPut / CallPutDate`
+FundsXML path: `Position / BondCharacteristics / OptionalCallPut / CallPutDate`
 Codification: DATE
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8
 Definition: Next call/put date
@@ -1584,7 +1584,7 @@ Definition: Next call/put date
 
 ### Field 44 — 44_Issuer_bearer_option_exercise
 
-Path: `Position / BondCharacteristics / OptionalCallPut / OptionDirection`
+FundsXML path: `Position / BondCharacteristics / OptionalCallPut / OptionDirection`
 Codification: CLOSED_LIST, closed list of 3 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8
 Definition: I : issuer B : bearer O : Both
@@ -1610,7 +1610,7 @@ Definition: I : issuer B : bearer O : Both
 
 ### Field 45 — 45_Strike_price_for_embedded_(call_put)_options
 
-Path: `Position / BondCharacteristics / OptionalCallPut / StrikePrice`
+FundsXML path: `Position / BondCharacteristics / OptionalCallPut / StrikePrice`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8
 Definition: strike price, floor or cap rate for embedded options expressed as a percentage of the nominal amount.
@@ -1636,7 +1636,7 @@ Definition: strike price, floor or cap rate for embedded options expressed as a 
 
 ### Field 46 — 46_Issuer_name
 
-Path: `Position / CreditRiskData / InstrumentIssuer / Name`
+FundsXML path: `Position / CreditRiskData / InstrumentIssuer / Name`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: name of the issuer
@@ -1663,7 +1663,7 @@ Definition: name of the issuer
 
 ### Field 47 — 47_Issuer_identification_code
 
-Path: `Position / CreditRiskData / InstrumentIssuer / Code / Code`
+FundsXML path: `Position / CreditRiskData / InstrumentIssuer / Code / Code`
 Codification: ALPHANUMERIC (max 20)
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: LEI
@@ -1691,7 +1691,7 @@ Definition: LEI
 
 ### Field 48 — 48_Type_of_identification_code_for_issuer
 
-Path: `Position / CreditRiskData / InstrumentIssuer / Code / CodificationSystem`
+FundsXML path: `Position / CreditRiskData / InstrumentIssuer / Code / CodificationSystem`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: C0220 1- LEI 9 - None
@@ -1719,7 +1719,7 @@ Definition: C0220 1- LEI 9 - None
 
 ### Field 49 — 49_Name_of_the_group_of_the_issuer
 
-Path: `Position / CreditRiskData / IssuerGroup / Name`
+FundsXML path: `Position / CreditRiskData / IssuerGroup / Name`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: Name of the highest parent company
@@ -1746,7 +1746,7 @@ Definition: Name of the highest parent company
 
 ### Field 50 — 50_Identification_of_the_group
 
-Path: `Position / CreditRiskData / IssuerGroup / Code / Code`
+FundsXML path: `Position / CreditRiskData / IssuerGroup / Code / Code`
 Codification: ALPHANUMERIC (max 20)
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: LEI
@@ -1774,7 +1774,7 @@ Definition: LEI
 
 ### Field 51 — 51_Type_of_identification_code_for_issuer_group
 
-Path: `Position / CreditRiskData / IssuerGroup / Code / CodificationSystem`
+FundsXML path: `Position / CreditRiskData / IssuerGroup / Code / CodificationSystem`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: C0260 1- LEI 9 - None
@@ -1802,7 +1802,7 @@ Definition: C0260 1- LEI 9 - None
 
 ### Field 52 — 52_Issuer_country
 
-Path: `Position / CreditRiskData / IssuerCountry`
+FundsXML path: `Position / CreditRiskData / IssuerCountry`
 Codification: ISO_3166_A2
 Applicability: all rows
 Definition: Country of the issuer company
@@ -1831,7 +1831,7 @@ Definition: Country of the issuer company
 
 ### Field 53 — 53_Issuer_economic_area
 
-Path: `Position / CreditRiskData / EconomicArea`
+FundsXML path: `Position / CreditRiskData / EconomicArea`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
@@ -1856,7 +1856,7 @@ Definition: Economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
 
 ### Field 54 — 54_Economic_sector
 
-Path: `Position / CreditRiskData / EconomicSector`
+FundsXML path: `Position / CreditRiskData / EconomicSector`
 Codification: NACE
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: Economic sector
@@ -1884,7 +1884,7 @@ Definition: Economic sector
 
 ### Field 55 — 55_Covered_not_covered
 
-Path: `Position / CreditRiskData / Covered`
+FundsXML path: `Position / CreditRiskData / Covered`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: CIC categories CIC1, CIC2
 
@@ -1910,7 +1910,7 @@ Applicability: CIC categories CIC1, CIC2
 
 ### Field 56 — 56_Securitisation
 
-Path: `Position / Securitisation / Securitised`
+FundsXML path: `Position / Securitisation / Securitised`
 Codification: CLOSED_LIST, closed list of 11 entries
 Applicability: CIC categories CIC5, CIC6
 Definition: Securitisation typology
@@ -1937,7 +1937,7 @@ Definition: Securitisation typology
 
 ### Field 57 — 57_Explicit_guarantee_by_the_country_of_issue
 
-Path: `Position / CreditRiskData / StateGuarantee`
+FundsXML path: `Position / CreditRiskData / StateGuarantee`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6
 Definition: Y = guaranteed N = without guarantee
@@ -1964,7 +1964,7 @@ Definition: Y = guaranteed N = without guarantee
 
 ### Field 58 — 58_Subordinated_debt
 
-Path: `Position / SubordinatedDebt`
+FundsXML path: `Position / SubordinatedDebt`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: all rows
 Definition: Subordinated or not ?
@@ -1989,7 +1989,7 @@ Definition: Subordinated or not ?
 
 ### Field 58b — 58b_Nature_of_the_tranche
 
-Path: `Position / Securitisation / TrancheLevel`
+FundsXML path: `Position / Securitisation / TrancheLevel`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Tranche level (seniority)
@@ -2014,7 +2014,7 @@ Definition: Tranche level (seniority)
 
 ### Field 59 — 59_Credit_quality_step
 
-Path: `Position / CreditRiskData / CreditQualitStep`
+FundsXML path: `Position / CreditRiskData / CreditQualitStep`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICB, CICC, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]
 Definition: Credit quality step as defined by S2 regulation
@@ -2039,7 +2039,7 @@ Definition: Credit quality step as defined by S2 regulation
 
 ### Field 60 — 60_Call_Put_Cap_Floor
 
-Path: `Position / DerivativeOrConvertible / OptionCharacteristics / CallPutType`
+FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / CallPutType`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CIC2, CICB, CICC, CICE; CIC2 sub-categories [2]
 Definition: Cal = Call Put = Put Cap = Cap Flr= Floor empty if none
@@ -2066,7 +2066,7 @@ Definition: Cal = Call Put = Put Cap = Cap Flr= Floor empty if none
 
 ### Field 61 — 61_Strike_price
 
-Path: `Position / DerivativeOrConvertible / OptionCharacteristics / StrikePrice`
+FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / StrikePrice`
 Codification: NUMERIC
 Applicability: CIC categories CIC2, CICB, CICC, CICE; CIC2 sub-categories [2]
 Definition: Strike price expressed as the quotation of the underlying asset
@@ -2093,7 +2093,7 @@ Definition: Strike price expressed as the quotation of the underlying asset
 
 ### Field 62 — 62_Conversion_factor_(convertibles)_concordance_factor_parity_(options)
 
-Path: `Position / DerivativeOrConvertible / OptionCharacteristics / ConversionRatio`
+FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / ConversionRatio`
 Codification: NUMERIC
 Applicability: CIC categories CIC2, CICA, CICB, CICC; CIC2 sub-categories [2]
 
@@ -2119,7 +2119,7 @@ Applicability: CIC categories CIC2, CICA, CICB, CICC; CIC2 sub-categories [2]
 
 ### Field 63 — 63_Effective_date_of_instrument
 
-Path: `Position / DerivativeOrConvertible / OptionCharacteristics / Effective Date`
+FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / Effective Date`
 Codification: DATE
 Applicability: all rows
 Definition: Effective Date
@@ -2144,7 +2144,7 @@ Definition: Effective Date
 
 ### Field 64 — 64_Exercise_type
 
-Path: `Position / DerivativeOrConvertible / OptionCharacteristics / OptionStyle`
+FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / OptionStyle`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CICB, CICC
 Definition: AMerican, EUropean, ASiatic, BErmudian
@@ -2171,7 +2171,7 @@ Definition: AMerican, EUropean, ASiatic, BErmudian
 
 ### Field 65 — 65_Hedging_rolling
 
-Path: `Position / HedgingStrategy`
+FundsXML path: `Position / HedgingStrategy`
 Codification: CLOSED_LIST, closed list of 3 entries
 Applicability: CIC categories CICA, CICB, CICC, CICD, CICE, CICF
 Definition: Indication of existing Risk Mitigation program ( Y = used for Risk Mitigation purpose and the position is systematically rolled before maturity, N = used for hedging purpose but no systematic roll before maturity); EPM = Efficient Portfolio Management / not used for hedging purpose .
@@ -2198,7 +2198,7 @@ Definition: Indication of existing Risk Mitigation program ( Y = used for Risk M
 
 ### Field 67 — 67_CIC_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / InstrumentCIC`
+FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / InstrumentCIC`
 Codification: CIC
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: CIC Code (Complementary Identification Code).
@@ -2224,7 +2224,7 @@ Definition: CIC Code (Complementary Identification Code).
 
 ### Field 68 — 68_Identification_code_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / InstrumentCode / Code`
+FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / InstrumentCode / Code`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: identification code of underlying asset
@@ -2253,7 +2253,7 @@ Definition: identification code of underlying asset
 
 ### Field 69 — 69_Type_of_identification_code_for_the_underlying_asset
 
-Path: `Position / UnderlyingInstrument / InstrumentCode / CodificationSystem`
+FundsXML path: `Position / UnderlyingInstrument / InstrumentCode / CodificationSystem`
 Codification: CLOSED_LIST, closed list of 10 entries
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: name of the codification used for identification of the underlying asset
@@ -2280,7 +2280,7 @@ Definition: name of the codification used for identification of the underlying a
 
 ### Field 70 — 70_Name_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / InstrumentName`
+FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / InstrumentName`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: Name
@@ -2307,7 +2307,7 @@ Definition: Name
 
 ### Field 71 — 71_Quotation_currency_of_the_underlying_asset_(C)
 
-Path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / Currency`
+FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / Currency`
 Codification: ISO_4217
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: currency of quotation for the asset
@@ -2334,7 +2334,7 @@ Definition: currency of quotation for the asset
 
 ### Field 72 — 72_Last_valuation_price_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / MarketPrice`
+FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / MarketPrice`
 Codification: NUMERIC
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: Last valuation price of the underlying asset
@@ -2361,7 +2361,7 @@ Definition: Last valuation price of the underlying asset
 
 ### Field 73 — 73_Country_of_quotation_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / Country`
+FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / Country`
 Codification: ISO_3166_A2
 Applicability: all rows
 Definition: Country of quotation of the underlying asset
@@ -2386,7 +2386,7 @@ Definition: Country of quotation of the underlying asset
 
 ### Field 74 — 74_Economic_area_of_quotation_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / EconomicArea`
+FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / EconomicArea`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: economic area of quotation 0= non listed, listed 1=EEA / 2=NON EEA / 3=NON OECD
@@ -2412,7 +2412,7 @@ Definition: economic area of quotation 0= non listed, listed 1=EEA / 2=NON EEA /
 
 ### Field 75 — 75_Coupon_rate_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / CouponRate`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / CouponRate`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Fixed rate : coupon rate as a percentage of nominal amount all rates are expressed on an annual basis
@@ -2437,7 +2437,7 @@ Definition: Fixed rate : coupon rate as a percentage of nominal amount all rates
 
 ### Field 76 — 76_Coupon_payment_frequency_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / CouponFrequency`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / CouponFrequency`
 Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: all rows
 Definition: number of coupon payment per year 0 = other than below options: 1= annual 2= biannual 4= quarterly 12= monthly 52= weekly
@@ -2462,7 +2462,7 @@ Definition: number of coupon payment per year 0 = other than below options: 1= a
 
 ### Field 77 — 77_Maturity_date_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / Redemption / MaturityDate`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / Redemption / MaturityDate`
 Codification: DATE
 Applicability: all rows
 Definition: Last redemption date
@@ -2487,7 +2487,7 @@ Definition: Last redemption date
 
 ### Field 78 — 78_Redemption_profile_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / Redemption / Type`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / Redemption / Type`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: all rows
 Definition: Type of redemption payment schedule : bullet, constant annuity…
@@ -2512,7 +2512,7 @@ Definition: Type of redemption payment schedule : bullet, constant annuity…
 
 ### Field 79 — 79_Redemption_rate_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / Redemption / Rate`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / Redemption / Rate`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Redemption amount in % of nominal amount
@@ -2537,7 +2537,7 @@ Definition: Redemption amount in % of nominal amount
 
 ### Field 80 — 80_Issuer_name_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / InstrumentIssuer / Name`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / InstrumentIssuer / Name`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: name of the issuer
@@ -2563,7 +2563,7 @@ Definition: name of the issuer
 
 ### Field 81 — 81_Issuer_identification_code_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / InstrumentIssuer / Code / Code`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / InstrumentIssuer / Code / Code`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: identification code of the issuer
@@ -2591,7 +2591,7 @@ Definition: identification code of the issuer
 
 ### Field 82 — 82_Type_of_issuer_identification_code_of_the_underlying_asset
 
-Path: `Position / UnderlyingInstrument / Issuer / InstrumentIssuer / Identification / Code`
+FundsXML path: `Position / UnderlyingInstrument / Issuer / InstrumentIssuer / Identification / Code`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: C0220 1- LEI 9 - None
@@ -2617,7 +2617,7 @@ Definition: C0220 1- LEI 9 - None
 
 ### Field 83 — 83_Name_of_the_group_of_the_issuer_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / IssuerGroup / Name`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / IssuerGroup / Name`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: Name of the highest parent company
@@ -2643,7 +2643,7 @@ Definition: Name of the highest parent company
 
 ### Field 84 — 84_Identification_of_the_group_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / IssuerGroup / Code / Code`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / IssuerGroup / Code / Code`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF
 Definition: Identification code of the group
@@ -2671,7 +2671,7 @@ Definition: Identification code of the group
 
 ### Field 85 — 85_Type_of_the_group_identification_code_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / IssuerGroup / Code / CodificationSystem`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / IssuerGroup / Code / CodificationSystem`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: C0260 1- LEI 9 - None
@@ -2698,7 +2698,7 @@ Definition: C0260 1- LEI 9 - None
 
 ### Field 86 — 86_Issuer_country_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / Country`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / Country`
 Codification: ISO_3166_A2
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: Country of the issuer company
@@ -2724,7 +2724,7 @@ Definition: Country of the issuer company
 
 ### Field 87 — 87_Issuer_economic_area_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / EconomicArea`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / EconomicArea`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
@@ -2749,7 +2749,7 @@ Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
 
 ### Field 88 — 88_Explicit_guarantee_by_the_country_of_issue_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData  / StateGuarantee`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData  / StateGuarantee`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: all rows
 Definition: Y = Guaranteed N = without guarantee
@@ -2774,7 +2774,7 @@ Definition: Y = Guaranteed N = without guarantee
 
 ### Field 89 — 89_Credit_quality_step_of_the_underlying_asset
 
-Path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData  / CreditQualityStep`
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData  / CreditQualityStep`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICF; CICF sub-categories [1, 2]; CICC sub-categories [2]; CIC2 sub-categories [2]; CICB sub-categories [2]; CICA sub-categories [2]
 Definition: Credit quality step as defined by S2 regulation
@@ -2799,7 +2799,7 @@ Definition: Credit quality step as defined by S2 regulation
 
 ### Field 90 — 90_Modified_duration_to_maturity_date
 
-Path: `Position / Analytics / ModifiedDurationToMaturity`
+FundsXML path: `Position / Analytics / ModifiedDurationToMaturity`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD; CIC7 sub-categories [3, 4, 5]; CIC6 sub-categories [2, 4]; CIC5 sub-categories [2, 4]; CICD sub-categories [1, 3]; CICC sub-categories [2]; CICB sub-categories [2]; CICA sub-categories [2]
 
@@ -2826,7 +2826,7 @@ Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CI
 
 ### Field 91 — 91_Modified_duration_to_next_option_exercise_date
 
-Path: `Position / Analytics / ModifiedDurationToCall`
+FundsXML path: `Position / Analytics / ModifiedDurationToCall`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICB, CICC, CICD; CIC7 sub-categories [3, 4, 5]; CIC6 sub-categories [2, 4]; CIC5 sub-categories [2, 4]; CICD sub-categories [1, 3]; CICC sub-categories [2]; CICB sub-categories [2]
 
@@ -2853,7 +2853,7 @@ Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICB, CICC, CI
 
 ### Field 92 — 92_Credit_sensitivity
 
-Path: `Position / Analytics / CreditSensitivity`
+FundsXML path: `Position / Analytics / CreditSensitivity`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICF; CIC7 sub-categories [3, 4, 5]; CIC6 sub-categories [2, 4]; CIC5 sub-categories [2, 4]; CICD sub-categories [1, 3]
 
@@ -2879,7 +2879,7 @@ Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICF; CI
 
 ### Field 93 — 93_Sensitivity_to_underlying_asset_price_(delta)
 
-Path: `Position / Analytics / Delta`
+FundsXML path: `Position / Analytics / Delta`
 Codification: NUMERIC
 Applicability: CIC categories CIC2, CIC5, CIC6, CICA, CICB, CICC, CICE, CICF; CIC6 sub-categories [1, 3, 6]; CIC5 sub-categories [1, 3, 6]; CIC2 sub-categories [2]; CICA sub-categories [3, 5]
 Definition: Sensitivity to the underlying asset
@@ -2906,7 +2906,7 @@ Definition: Sensitivity to the underlying asset
 
 ### Field 94 — 94_Convexity_gamma_for_derivatives
 
-Path: `Position / Analytics / Convexity`
+FundsXML path: `Position / Analytics / Convexity`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Convexity for interest rates instruments; or gamma for derivatives with optional components
@@ -2931,7 +2931,7 @@ Definition: Convexity for interest rates instruments; or gamma for derivatives w
 
 ### Field 94b — 94b_Vega
 
-Path: `Position / Analytics / Vega`
+FundsXML path: `Position / Analytics / Vega`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -2955,7 +2955,7 @@ Applicability: all rows
 
 ### Field 95 — 95_Identification_of_the_original_portfolio_for_positions_embedded_in_a_fund
 
-Path: `Position / LookThroughISIN`
+FundsXML path: `Position / LookThroughISIN`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: identification code of the investee funds
@@ -2980,7 +2980,7 @@ Definition: identification code of the investee funds
 
 ### Field 97 — 97_SCR_mrkt_IR_up_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktIntUp`
+FundsXML path: `Position / ContributionToSCR / MktIntUp`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for interest rate risk for the "up" shock (Delta between Market value before and market value after stress)
@@ -3006,7 +3006,7 @@ Definition: Capital requirement for interest rate risk for the "up" shock (Delta
 
 ### Field 98 — 98_SCR_mrkt_IR_down_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktintDown`
+FundsXML path: `Position / ContributionToSCR / MktintDown`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for interest rate risk for the "down" shock (Delta between Market value before and market value after stress)
@@ -3032,7 +3032,7 @@ Definition: Capital requirement for interest rate risk for the "down" shock (Del
 
 ### Field 99 — 99_SCR_mrkt_eq_type1_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktEqGlobal`
+FundsXML path: `Position / ContributionToSCR / MktEqGlobal`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for equity risk - Type 1 *) (Delta between Market value before and market value after stress)
@@ -3058,7 +3058,7 @@ Definition: Capital requirement for equity risk - Type 1 *) (Delta between Marke
 
 ### Field 100 — 100_SCR_mrkt_eq_type2_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktEqOther`
+FundsXML path: `Position / ContributionToSCR / MktEqOther`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for equity risk - Type 2 *) (Delta between Market value before and market value after stress)
@@ -3084,7 +3084,7 @@ Definition: Capital requirement for equity risk - Type 2 *) (Delta between Marke
 
 ### Field 101 — 101_SCR_mrkt_prop_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktProp`
+FundsXML path: `Position / ContributionToSCR / MktProp`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for property risk (Delta between Market value before and market value after stress)
@@ -3110,7 +3110,7 @@ Definition: Capital requirement for property risk (Delta between Market value be
 
 ### Field 102 — 102_SCR_mrkt_spread_bonds_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktSpread / Bonds`
+FundsXML path: `Position / ContributionToSCR / MktSpread / Bonds`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for spread risk on bonds (Delta between Market value before and market value after stress)
@@ -3136,7 +3136,7 @@ Definition: Capital requirement for spread risk on bonds (Delta between Market v
 
 ### Field 103 — 103_SCR_mrkt_spread_structured_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktSpread / Structured`
+FundsXML path: `Position / ContributionToSCR / MktSpread / Structured`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for spread risk on structured products (Delta between Market value before and market value after stress)
@@ -3162,7 +3162,7 @@ Definition: Capital requirement for spread risk on structured products (Delta be
 
 ### Field 104 — 104_SCR_mrkt_spread_derivatives_up_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktSpread / DerivativesUp`
+FundsXML path: `Position / ContributionToSCR / MktSpread / DerivativesUp`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for spread risk - credit derivatives (upward shock) (Delta between Market value before and market value after stress)
@@ -3188,7 +3188,7 @@ Definition: Capital requirement for spread risk - credit derivatives (upward sho
 
 ### Field 105 — 105_SCR_mrkt_spread_derivatives_down_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktSpread / DerivativesDown`
+FundsXML path: `Position / ContributionToSCR / MktSpread / DerivativesDown`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for spread risk - credit derivatives (downward shock) (Delta between Market value before and market value after stress)
@@ -3214,7 +3214,7 @@ Definition: Capital requirement for spread risk - credit derivatives (downward s
 
 ### Field 105a — 105a_SCR_mrkt_FX_up_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktFXUp`
+FundsXML path: `Position / ContributionToSCR / MktFXUp`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for FX (upward shock) (Delta between Market value before and market value after stress)
@@ -3240,7 +3240,7 @@ Definition: Capital requirement for FX (upward shock) (Delta between Market valu
 
 ### Field 105b — 105b_SCR_mrkt_FX_down_weight_over_NAV
 
-Path: `Position / ContributionToSCR / MktFXDown`
+FundsXML path: `Position / ContributionToSCR / MktFXDown`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for FX (downward shock) (Delta between Market value before and market value after stress)
@@ -3266,7 +3266,7 @@ Definition: Capital requirement for FX (downward shock) (Delta between Market va
 
 ### Field 106 — 106_Asset_pledged_as_collateral
 
-Path: `Position / QRTPositionInformation / CollateralisedAsset`
+FundsXML path: `Position / QRTPositionInformation / CollateralisedAsset`
 Codification: CLOSED_LIST, closed list of 5 entries
 Applicability: all rows
 Definition: Indicator used to identify the under-written instruments (Assets D1)
@@ -3291,7 +3291,7 @@ Definition: Indicator used to identify the under-written instruments (Assets D1)
 
 ### Field 107 — 107_Place_of_deposit
 
-Path: `Position / QRTPositionInformation / PlaceOfDeposit`
+FundsXML path: `Position / QRTPositionInformation / PlaceOfDeposit`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Instruments' place of deposit (S.06.02 - old: Assets D1)
@@ -3316,7 +3316,7 @@ Definition: Instruments' place of deposit (S.06.02 - old: Assets D1)
 
 ### Field 108 — 108_Participation
 
-Path: `Position / QRTPositionInformation / Participation`
+FundsXML path: `Position / QRTPositionInformation / Participation`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicator used to identify the guidelines of participation in accountancy terms
@@ -3341,7 +3341,7 @@ Definition: Indicator used to identify the guidelines of participation in accoun
 
 ### Field 110 — 110_Valorisation_method
 
-Path: `Position / QRTPositionInformation / ValorisationMethod`
+FundsXML path: `Position / QRTPositionInformation / ValorisationMethod`
 Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: all rows
 Definition: valuation method (cf specifications QRT) (S.06.02 - old: Assets D1)
@@ -3366,7 +3366,7 @@ Definition: valuation method (cf specifications QRT) (S.06.02 - old: Assets D1)
 
 ### Field 111 — 111_Value_of_acquisition
 
-Path: `Position / QRTPositionInformation / AverageBuyPrice`
+FundsXML path: `Position / QRTPositionInformation / AverageBuyPrice`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Value of acquisition (S.06.02 - old: Assets D1)
@@ -3391,7 +3391,7 @@ Definition: Value of acquisition (S.06.02 - old: Assets D1)
 
 ### Field 112 — 112_Credit_rating
 
-Path: `Position / QRTPositionInformation / CounterpartyRating / RatingValue`
+FundsXML path: `Position / QRTPositionInformation / CounterpartyRating / RatingValue`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Rating of the counterparty / issuer (cf specifications QRT) (S.06.02 - old: Assets D1)
@@ -3416,7 +3416,7 @@ Definition: Rating of the counterparty / issuer (cf specifications QRT) (S.06.02
 
 ### Field 113 — 113_Rating_agency
 
-Path: `Position / QRTPositionInformation / CounterpartyRating / RatingAgency`
+FundsXML path: `Position / QRTPositionInformation / CounterpartyRating / RatingAgency`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Name of the rating agency (cf specification QRT) (S.06.02 - old: Assets D1)
@@ -3441,7 +3441,7 @@ Definition: Name of the rating agency (cf specification QRT) (S.06.02 - old: Ass
 
 ### Field 114 — 114_Issuer_economic_area
 
-Path: `Position / QRTPositionInformation / IssuerEconomicArea`
+FundsXML path: `Position / QRTPositionInformation / IssuerEconomicArea`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
@@ -3466,7 +3466,7 @@ Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
 
 ### Field 115 — 115_Fund_issuer_code
 
-Path: `Portfolio / QRTPortfolioInformation / FundIssuer / Code / Code`
+FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / Code / Code`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: LEI when available, otherwise not reported
@@ -3494,7 +3494,7 @@ Definition: LEI when available, otherwise not reported
 
 ### Field 116 — 116_Fund_issuer_code_type
 
-Path: `Portfolio / QRTPortfolioInformation / FundIssuer / Code / CodificationSystem`
+FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / Code / CodificationSystem`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: C0220 1- LEI 9 - None
@@ -3522,7 +3522,7 @@ Definition: C0220 1- LEI 9 - None
 
 ### Field 117 — 117_Fund_issuer_name
 
-Path: `Portfolio / QRTPortfolioInformation / FundIssuer / Name`
+FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / Name`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Name of Issuer of Fund or Share Class
@@ -3548,7 +3548,7 @@ Definition: Name of Issuer of Fund or Share Class
 
 ### Field 118 — 118_Fund_issuer_sector
 
-Path: `Portfolio / QRTPortfolioInformation / FundIssuer / EconomicSector`
+FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / EconomicSector`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: NACE code of Issuer of Fund or Share Class
@@ -3575,7 +3575,7 @@ Definition: NACE code of Issuer of Fund or Share Class
 
 ### Field 119 — 119_Fund_issuer_group_code
 
-Path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Code / Code`
+FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Code / Code`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: LEI of ultimate parent when available, otherwise not reported
@@ -3603,7 +3603,7 @@ Definition: LEI of ultimate parent when available, otherwise not reported
 
 ### Field 120 — 120_Fund_issuer_group_code_type
 
-Path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Code / CodificationSystem`
+FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Code / CodificationSystem`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: C0260 1- LEI 9 - None
@@ -3631,7 +3631,7 @@ Definition: C0260 1- LEI 9 - None
 
 ### Field 121 — 121_Fund_issuer_group_name
 
-Path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Name`
+FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Name`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Name of Ultimate parent of issuer of Fund or Share Class
@@ -3658,7 +3658,7 @@ Definition: Name of Ultimate parent of issuer of Fund or Share Class
 
 ### Field 122 — 122_Fund_issuer_country
 
-Path: `Portfolio / QRTPortfolioInformation / FundIssuer / Country`
+FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / Country`
 Codification: ISO_3166_A2
 Applicability: all rows
 Definition: Country ISO of Issuer of Fund or Share Class
@@ -3685,7 +3685,7 @@ Definition: Country ISO of Issuer of Fund or Share Class
 
 ### Field 123 — 123_Fund_CIC
 
-Path: `Portfolio / QRTPortfolioInformation / PortfolioCIC`
+FundsXML path: `Portfolio / QRTPortfolioInformation / PortfolioCIC`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: CIC code - Fund or Share Class (4 digits)
@@ -3712,7 +3712,7 @@ Definition: CIC code - Fund or Share Class (4 digits)
 
 ### Field 123a — 123a_Fund_custodian_country
 
-Path: `Portfolio / QRTPortfolioInformation / FundCustodianCountry`
+FundsXML path: `Portfolio / QRTPortfolioInformation / FundCustodianCountry`
 Codification: ISO_3166_A2
 Applicability: all rows
 Definition: First level of Custody - Fund or seggregated account Custodian
@@ -3739,7 +3739,7 @@ Definition: First level of Custody - Fund or seggregated account Custodian
 
 ### Field 124 — 124_Duration
 
-Path: `Portfolio / QRTPortfolioInformation / PortfolioModifiedDuration`
+FundsXML path: `Portfolio / QRTPortfolioInformation / PortfolioModifiedDuration`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: mainly invested in bonds (>50%) - Fund modified Duration (Residual modified duration)
@@ -3765,7 +3765,7 @@ Definition: mainly invested in bonds (>50%) - Fund modified Duration (Residual m
 
 ### Field 125 — 125_Accrued_income_(Security Denominated Currency)
 
-Path: `Portfolio / QRTPortfolioInformation /  AccruedIncomeQC ????`
+FundsXML path: `Portfolio / QRTPortfolioInformation /  AccruedIncomeQC ????`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Amount of accrued income in security denomination currency at report date
@@ -3790,7 +3790,7 @@ Definition: Amount of accrued income in security denomination currency at report
 
 ### Field 126 — 126_Accrued_income_(Portfolio Denominated Currency)
 
-Path: `Portfolio / QRTPortfolioInformation / AccruedIncomePC`
+FundsXML path: `Portfolio / QRTPortfolioInformation / AccruedIncomePC`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Amount of accrued income in portfolio denomination currency at report date
@@ -3816,7 +3816,7 @@ Definition: Amount of accrued income in portfolio denomination currency at repor
 
 ### Field 127 — 127_Bond_floor_(convertible_instrument_only)
 
-Path: `Position / DerivativeOrConvertible / OptionCharacteristics / Convertible / BondFloor`
+FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / Convertible / BondFloor`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Lowest value of a convertible bond expressed in quotation currency, at current issuer spread
@@ -3841,7 +3841,7 @@ Definition: Lowest value of a convertible bond expressed in quotation currency, 
 
 ### Field 128 — 128_Option_premium_(convertible_instrument_only)
 
-Path: `Position / DerivativeOrConvertible / OptionCharacteristics / Convertible / OptionPremium`
+FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / Convertible / OptionPremium`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Premium of the embedded option of a convertible bond in quotation currency
@@ -3866,7 +3866,7 @@ Definition: Premium of the embedded option of a convertible bond in quotation cu
 
 ### Field 129 — 129_Valuation_yield
 
-Path: `Position / BondCharacteristics / ValuationYieldCurve /  Yield`
+FundsXML path: `Position / BondCharacteristics / ValuationYieldCurve /  Yield`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Valuation Yield of the interest rate instrument
@@ -3891,7 +3891,7 @@ Definition: Valuation Yield of the interest rate instrument
 
 ### Field 130 — 130_Valuation_z_spread
 
-Path: `Position / BondCharacteristics / ValuationYieldCurve /  Spread`
+FundsXML path: `Position / BondCharacteristics / ValuationYieldCurve /  Spread`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Issuer spread calculated from Z coupon IRS curve of quotation currency
@@ -3916,7 +3916,7 @@ Definition: Issuer spread calculated from Z coupon IRS curve of quotation curren
 
 ### Field 131 — 131_Underlying_asset_category
 
-Path: `Position / Instrument/ UAC`
+FundsXML path: `Position / Instrument/ UAC`
 Codification: CLOSED_LIST, closed list of 18 entries
 Applicability: all rows
 Definition: SII definition as per QRT S.06.03
@@ -3943,7 +3943,7 @@ Definition: SII definition as per QRT S.06.03
 
 ### Field 132 — 132_Infrastructure_investment
 
-Path: `To be defined with Fundxml`
+FundsXML path: `To be defined with Fundxml`
 Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC5, CIC6, CIC8, CIC9
 Definition: Type of infrastructure investment according to Type of infrastructure investment according to COMMISSION DELEGATED REGULATION (EU) 2016/467 of 30 September 2015 amending Commission Delegated Regulation (EU) 2015/35 concerning the calculation of regulatory capital requirements for several categories of assets held by insurance and reinsurance undertakings and COMMISSION DELEGATED REGULATION (EU) 2017/1542 as of 8 June 2017 amending Delegated Regulation (EU) 2015/35 concerning the calculation of regulatory capital requirements for certain categories of assets held by insurance and reinsurance undertakings (infrastructure corporates).
@@ -3968,7 +3968,7 @@ Definition: Type of infrastructure investment according to Type of infrastructur
 
 ### Field 133 — 133_custodian_name
 
-Path: `To be defined with Fundxml`
+FundsXML path: `To be defined with Fundxml`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Name of the custodian of the seggregated account

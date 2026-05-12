@@ -91,9 +91,8 @@ No cross-field rules are wired for this template/version. Regulatory cross-field
 
 One entry per `FieldSpec` in spec order. Each entry lists every check that can fire on the field, with the profile scope, severity, trigger condition, and quantified score impact.
 
-### Field 1 — 1
+### Field 1 — 00001_EPT_Version
 
-Path: `00001_EPT_Version`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: This field specifies the version of the template and is used by the recipient to understand the number of fields expected, their labelling and order.
@@ -116,9 +115,8 @@ Definition: This field specifies the version of the template and is used by the 
 
 ---
 
-### Field 2 — 2
+### Field 2 — 00002_EPT_Producer_Name
 
-Path: `00002_EPT_Producer_Name`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: If the manufacturer has outsourced the production of the EPT to another party responsible for the production and publication of the EPT data set, the party should be identified in this field.
@@ -140,9 +138,8 @@ Definition: If the manufacturer has outsourced the production of the EPT to anot
 
 ---
 
-### Field 3 — 3
+### Field 3 — 00004_EPT_Producer_Email
 
-Path: `00004_EPT_Producer_Email`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Contact point for distributors regarding EPT.
@@ -164,9 +161,8 @@ Definition: Contact point for distributors regarding EPT.
 
 ---
 
-### Field 4 — 4
+### Field 4 — 00005_File_Generation_Date_And_Time
 
-Path: `00005_File_Generation_Date_And_Time`
 Codification: DATETIME
 Applicability: all rows
 Definition: Date and time of the creation of the EPT file.
@@ -189,9 +185,8 @@ Definition: Date and time of the creation of the EPT file.
 
 ---
 
-### Field 5 — 5
+### Field 5 — 00006_EPT_Data_Reporting_Narratives
 
-Path: `00006_EPT_Data_Reporting_Narratives`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Specifies if the Narratives section has been completed in the current EPT.
@@ -214,9 +209,8 @@ Definition: Specifies if the Narratives section has been completed in the curren
 
 ---
 
-### Field 6 — 6
+### Field 6 — 00007_EPT_Data_Reporting_Costs
 
-Path: `00007_EPT_Data_Reporting_Costs`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Specifies if the Costs section has been completed in the current EPT.
@@ -239,9 +233,8 @@ Definition: Specifies if the Costs section has been completed in the current EPT
 
 ---
 
-### Field 7 — 7
+### Field 7 — 00008_EPT_Data_Reporting_Additional_Requirements_German_MOPs
 
-Path: `00008_EPT_Data_Reporting_Additional_Requirements_German_MOPs`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Specifies if the section "Additional information required for German MOPs" has been completed in the current EPT.
@@ -264,9 +257,8 @@ Definition: Specifies if the section "Additional information required for German
 
 ---
 
-### Field 8 — 8
+### Field 8 — 00009_EPT_Additional_Information_Structured_Products
 
-Path: `00009_EPT_Additional_Information_Structured_Products`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Specifies if the section "Additional information required for structured PRIIPs" has been completed in the current EPT posting.
@@ -289,9 +281,8 @@ Definition: Specifies if the section "Additional information required for struct
 
 ---
 
-### Field 9 — 9
+### Field 9 — 00010_Portfolio_Manufacturer_Name
 
-Path: `00010_Portfolio_Manufacturer_Name`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of the management company of the UCITS or AIF or the manufacturer of the structured product.
@@ -315,9 +306,8 @@ Definition: Name of the management company of the UCITS or AIF or the manufactur
 
 ---
 
-### Field 10 — 10
+### Field 10 — 00015_Portfolio_Manufacturer_Group_Name
 
-Path: `00015_Portfolio_Manufacturer_Group_Name`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of the group the PRIIPs manufacturer belongs to
@@ -340,9 +330,8 @@ Definition: Name of the group the PRIIPs manufacturer belongs to
 
 ---
 
-### Field 11 — 11
+### Field 11 — 00016_Portfolio_Manufacturer_LEI
 
-Path: `00016_Portfolio_Manufacturer_LEI`
 Codification: ALPHANUMERIC (max 20)
 Applicability: all rows
 Definition: Legal Entity Identifier, LEI of the manufacturer of the portfolio
@@ -365,9 +354,8 @@ Definition: Legal Entity Identifier, LEI of the manufacturer of the portfolio
 
 ---
 
-### Field 12 — 12
+### Field 12 — 00017_Portfolio_Manufacturer_Email
 
-Path: `00017_Portfolio_Manufacturer_Email`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Contact point for communication with the manufacturer to either provide feedback reporting or to retrieve details on how to provide feedback reporting.
@@ -389,9 +377,8 @@ Definition: Contact point for communication with the manufacturer to either prov
 
 ---
 
-### Field 13 — 13
+### Field 13 — 00020_Portfolio_Guarantor_Name
 
-Path: `00020_Portfolio_Guarantor_Name`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of guarantor of the financial instrument. i.e. the entity to which the end investor has counterparty risk
@@ -413,9 +400,8 @@ Definition: Name of guarantor of the financial instrument. i.e. the entity to wh
 
 ---
 
-### Field 14 — 14
+### Field 14 — 00030_Portfolio_Identifying_Data
 
-Path: `00030_Portfolio_Identifying_Data`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identification of the fund or share class or segregated account
@@ -440,9 +426,8 @@ Definition: Identification of the fund or share class or segregated account
 
 ---
 
-### Field 15 — 15
+### Field 15 — 00040_Type_Of_Identification_Code_For_The_Fund_Share_Or_Portfolio
 
-Path: `00040_Type_Of_Identification_Code_For_The_Fund_Share_Or_Portfolio`
 Codification: CLOSED_LIST, closed list of 10 entries
 Applicability: all rows
 Definition: Codification chosen to identify the share of the CIS
@@ -466,9 +451,8 @@ Definition: Codification chosen to identify the share of the CIS
 
 ---
 
-### Field 16 — 16
+### Field 16 — 00050_Portfolio_Name
 
-Path: `00050_Portfolio_Name`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of the portfolio or name of the CIS
@@ -492,9 +476,8 @@ Definition: Name of the portfolio or name of the CIS
 
 ---
 
-### Field 17 — 17
+### Field 17 — 00060_Portfolio_Or_Share_Class_Currency
 
-Path: `00060_Portfolio_Or_Share_Class_Currency`
 Codification: ISO_4217
 Applicability: all rows
 Definition: Denomination currency of the share class in case the product has multiple share classes. Denomination currency of the product or portfolio in the other cases.
@@ -518,9 +501,8 @@ Definition: Denomination currency of the share class in case the product has mul
 
 ---
 
-### Field 18 — 18
+### Field 18 — 00070_PRIIPs_KID_Publication_Date
 
-Path: `00070_PRIIPs_KID_Publication_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Date of the latest PRIIPs KID produced for the portfolio or share class.
@@ -544,9 +526,8 @@ Definition: Date of the latest PRIIPs KID produced for the portfolio or share cl
 
 ---
 
-### Field 18a — 18a
+### Field 18a — 00075_PRIIPs_KID_Web_Address
 
-Path: `00075_PRIIPs_KID_Web_Address`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Direct link to the PRIIPs KID
@@ -568,9 +549,8 @@ Definition: Direct link to the PRIIPs KID
 
 ---
 
-### Field 19 — 19
+### Field 19 — 00080_Portfolio_PRIIPs_Category
 
-Path: `00080_Portfolio_PRIIPs_Category`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: PRIIPs category of the portfolio
@@ -593,9 +573,8 @@ Definition: PRIIPs category of the portfolio
 
 ---
 
-### Field 20 — 20
+### Field 20 — 00090_Fund_CIC_Code
 
-Path: `00090_Fund_CIC_Code`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: CIC code - fund (4 digits)
@@ -617,9 +596,8 @@ Definition: CIC code - fund (4 digits)
 
 ---
 
-### Field 21 — 21
+### Field 21 — 00110_Is_An_Autocallable_Product
 
-Path: `00110_Is_An_Autocallable_Product`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indication of whether the product is an autocallable
@@ -642,9 +620,8 @@ Definition: Indication of whether the product is an autocallable
 
 ---
 
-### Field 22 — 22
+### Field 22 — 00120_Reference_Language
 
-Path: `00120_Reference_Language`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Language in which the linked website with past performance, the historical performance (02190_Past_Performance_Link and 02200_Previous_Performance_Scenarios_Calculation_Link) and all narratives/texts of this set of data are written
@@ -667,9 +644,8 @@ Definition: Language in which the linked website with past performance, the hist
 
 ---
 
-### Field 23 — 23
+### Field 23 — 01010_Valuation_Frequency
 
-Path: `01010_Valuation_Frequency`
 Codification: CLOSED_LIST, closed list of 9 entries
 Applicability: all rows
 Definition: Number of valuation days per year for the portfolio or fund or share class.
@@ -691,9 +667,8 @@ Definition: Number of valuation days per year for the portfolio or fund or share
 
 ---
 
-### Field 24 — 24
+### Field 24 — 01020_Portfolio_VEV_Reference
 
-Path: `01020_Portfolio_VEV_Reference`
 Codification: NUMERIC
 Applicability: all rows
 Definition: VEV of the portfolio/ share class
@@ -715,9 +690,8 @@ Definition: VEV of the portfolio/ share class
 
 ---
 
-### Field 25 — 25
+### Field 25 — 01030_IS_Flexible
 
-Path: `01030_IS_Flexible`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicator to alert if the portfolio is flexible. If the annex II number 14 of the PRIIPs RTS applies
@@ -739,9 +713,8 @@ Definition: Indicator to alert if the portfolio is flexible. If the annex II num
 
 ---
 
-### Field 26 — 26
+### Field 26 — 01040_Flex_VEV_Historical
 
-Path: `01040_Flex_VEV_Historical`
 Codification: NUMERIC
 Applicability: all rows
 Definition: VaR equivalent volatility of the portfolio
@@ -763,9 +736,8 @@ Definition: VaR equivalent volatility of the portfolio
 
 ---
 
-### Field 27 — 27
+### Field 27 — 01050_Flex_VEV_Ref_Asset_Allocation
 
-Path: `01050_Flex_VEV_Ref_Asset_Allocation`
 Codification: NUMERIC
 Applicability: all rows
 Definition: VaR equivalent volatility of the reference asset allocation of the portfolio
@@ -787,9 +759,8 @@ Definition: VaR equivalent volatility of the reference asset allocation of the p
 
 ---
 
-### Field 28 — 28
+### Field 28 — 01060_IS_Risk_Limit_Relevant
 
-Path: `01060_IS_Risk_Limit_Relevant`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicator to alert if there is a relevant risk limit for flexible funds
@@ -811,9 +782,8 @@ Definition: Indicator to alert if there is a relevant risk limit for flexible fu
 
 ---
 
-### Field 29 — 29
+### Field 29 — 01070_Flex_VEV_Risk_Limit
 
-Path: `01070_Flex_VEV_Risk_Limit`
 Codification: NUMERIC
 Applicability: all rows
 Definition: VaR equivalent volatility of the risk limit of the portfolio
@@ -835,9 +805,8 @@ Definition: VaR equivalent volatility of the risk limit of the portfolio
 
 ---
 
-### Field 30 — 30
+### Field 30 — 01080_Existing_Credit_Risk
 
-Path: `01080_Existing_Credit_Risk`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicator to alert if there is a credit risk
@@ -861,9 +830,8 @@ Definition: Indicator to alert if there is a credit risk
 
 ---
 
-### Field 31 — 31
+### Field 31 — 01090_SRI
 
-Path: `01090_SRI`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Summary risk indicator of the portfolio
@@ -886,9 +854,8 @@ Definition: Summary risk indicator of the portfolio
 
 ---
 
-### Field 32 — 32
+### Field 32 — 01095_IS_SRI_Adjusted
 
-Path: `01095_IS_SRI_Adjusted`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Whether or not the manufacturer has manually increased the SRI
@@ -911,9 +878,8 @@ Definition: Whether or not the manufacturer has manually increased the SRI
 
 ---
 
-### Field 33 — 33
+### Field 33 — 01100_MRM
 
-Path: `01100_MRM`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market risk measure of the portfolio
@@ -936,9 +902,8 @@ Definition: Market risk measure of the portfolio
 
 ---
 
-### Field 34 — 34
+### Field 34 — 01110_CRM
 
-Path: `01110_CRM`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Credit risk measure of the fund or the portfolio
@@ -961,9 +926,8 @@ Definition: Credit risk measure of the fund or the portfolio
 
 ---
 
-### Field 35 — 35
+### Field 35 — 01120_Recommended_Holding_Period
 
-Path: `01120_Recommended_Holding_Period`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Recommended holding period of the portfolio
@@ -986,9 +950,8 @@ Definition: Recommended holding period of the portfolio
 
 ---
 
-### Field 36 — 36
+### Field 36 — 01125_Has_A_Contractual_Maturity_Date
 
-Path: `01125_Has_A_Contractual_Maturity_Date`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicates the existence of a contractual maturity date of the portfolio
@@ -1011,9 +974,8 @@ Definition: Indicates the existence of a contractual maturity date of the portfo
 
 ---
 
-### Field 37 — 37
+### Field 37 — 01130_Maturity_Date
 
-Path: `01130_Maturity_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Date of maturity
@@ -1036,9 +998,8 @@ Definition: Date of maturity
 
 ---
 
-### Field 38 — 38
+### Field 38 — 01140_Liquidity_Risk
 
-Path: `01140_Liquidity_Risk`
 Codification: CLOSED_LIST, closed list of 3 entries
 Applicability: all rows
 Definition: Risk of liquidity at the level of the fund or the portfolio, also used for narrative M = material liquidity risk, I = illiquid, L = no liquidity issue.
@@ -1061,9 +1022,8 @@ Definition: Risk of liquidity at the level of the fund or the portfolio, also us
 
 ---
 
-### Field 39 — 39
+### Field 39 — 02010_Portfolio_Return_Unfavourable_Scenario_1_Year
 
-Path: `02010_Portfolio_Return_Unfavourable_Scenario_1_Year`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annual return of the portfolio, fund, share class corresponding to the unfavourable scenario, after one year
@@ -1086,9 +1046,8 @@ Definition: Average annual return of the portfolio, fund, share class correspond
 
 ---
 
-### Field 40 — 40
+### Field 40 — 02020_Portfolio_Return_Unfavourable_Scenario_Half_RHP
 
-Path: `02020_Portfolio_Return_Unfavourable_Scenario_Half_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annual return of the portfolio, fund, share class corresponding to the unfavourable scenario, after half of the RHP
@@ -1111,9 +1070,8 @@ Definition: Average annual return of the portfolio, fund, share class correspond
 
 ---
 
-### Field 41 — 41
+### Field 41 — 02030_Portfolio_Return_Unfavourable_Scenario_RHP_Or_First_Call_Date
 
-Path: `02030_Portfolio_Return_Unfavourable_Scenario_RHP_Or_First_Call_Date`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annual return of the portfolio, fund, share class corresponding to the unfavourable scenario, at the RHP
@@ -1136,9 +1094,8 @@ Definition: Average annual return of the portfolio, fund, share class correspond
 
 ---
 
-### Field 42 — 42
+### Field 42 — 02032_Autocall_Applied_Unfavourable_Scenario
 
-Path: `02032_Autocall_Applied_Unfavourable_Scenario`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicate if the call has been applied in the unfavourable scenario
@@ -1161,9 +1118,8 @@ Definition: Indicate if the call has been applied in the unfavourable scenario
 
 ---
 
-### Field 43 — 43
+### Field 43 — 02035_Autocall_Date_Unfavourable_Scenario
 
-Path: `02035_Autocall_Date_Unfavourable_Scenario`
 Codification: DATE
 Applicability: all rows
 Definition: Call date applied in the unfavourable scenario
@@ -1186,9 +1142,8 @@ Definition: Call date applied in the unfavourable scenario
 
 ---
 
-### Field 44 — 44
+### Field 44 — 02040_Portfolio_Return_Moderate_Scenario_1_Year
 
-Path: `02040_Portfolio_Return_Moderate_Scenario_1_Year`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Return of the portfolio, fund, share class corresponding to the moderate scenario, after 1 year
@@ -1211,9 +1166,8 @@ Definition: Return of the portfolio, fund, share class corresponding to the mode
 
 ---
 
-### Field 45 — 45
+### Field 45 — 02050_Portfolio_Return_Moderate_Scenario_Half_RHP
 
-Path: `02050_Portfolio_Return_Moderate_Scenario_Half_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annual return of the portfolio, fund, share class corresponding to the moderate scenario, after half of the RHP
@@ -1236,9 +1190,8 @@ Definition: Average annual return of the portfolio, fund, share class correspond
 
 ---
 
-### Field 46 — 46
+### Field 46 — 02060_Portfolio_Return_Moderate_Scenario_RHP_Or_First_Call_Date
 
-Path: `02060_Portfolio_Return_Moderate_Scenario_RHP_Or_First_Call_Date`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annual return of the portfolio, fund, share class corresponding to the moderate scenario, at the RHP
@@ -1261,9 +1214,8 @@ Definition: Average annual return of the portfolio, fund, share class correspond
 
 ---
 
-### Field 47 — 47
+### Field 47 — 02062_Autocall_Applied_Moderate_Scenario
 
-Path: `02062_Autocall_Applied_Moderate_Scenario`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicate if the call has been applied in the moderate scenario
@@ -1286,9 +1238,8 @@ Definition: Indicate if the call has been applied in the moderate scenario
 
 ---
 
-### Field 48 — 48
+### Field 48 — 02065_Autocall_Date_Moderate_Scenario
 
-Path: `02065_Autocall_Date_Moderate_Scenario`
 Codification: DATE
 Applicability: all rows
 Definition: Call date applied in the moderate scenario
@@ -1311,9 +1262,8 @@ Definition: Call date applied in the moderate scenario
 
 ---
 
-### Field 49 — 49
+### Field 49 — 02070_Portfolio_Return_Favourable_Scenario_1_Year
 
-Path: `02070_Portfolio_Return_Favourable_Scenario_1_Year`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Annual return of the portfolio, fund, share class corresponding to the favourable scenario, after 1 year
@@ -1336,9 +1286,8 @@ Definition: Annual return of the portfolio, fund, share class corresponding to t
 
 ---
 
-### Field 50 — 50
+### Field 50 — 02080_Portfolio_Return_Favourable_Scenario_Half_RHP
 
-Path: `02080_Portfolio_Return_Favourable_Scenario_Half_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annual return of the portfolio, fund, share class corresponding to the favourable scenario, after half of the RHP
@@ -1361,9 +1310,8 @@ Definition: Average annual return of the portfolio, fund, share class correspond
 
 ---
 
-### Field 51 — 51
+### Field 51 — 02090_Portfolio_Return_Favourable_Scenario_RHP_Or_First_Call_Date
 
-Path: `02090_Portfolio_Return_Favourable_Scenario_RHP_Or_First_Call_Date`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annual return of the portfolio, fund, share class corresponding to the favourable scenario, at the RHP
@@ -1386,9 +1334,8 @@ Definition: Average annual return of the portfolio, fund, share class correspond
 
 ---
 
-### Field 52 — 52
+### Field 52 — 02092_Autocall_Applied_Favourable_Scenario
 
-Path: `02092_Autocall_Applied_Favourable_Scenario`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicate if the call has been applied in the favourable scenario
@@ -1411,9 +1358,8 @@ Definition: Indicate if the call has been applied in the favourable scenario
 
 ---
 
-### Field 53 — 53
+### Field 53 — 02095_Autocall_Date_Favourable_Scenario
 
-Path: `02095_Autocall_Date_Favourable_Scenario`
 Codification: DATE
 Applicability: all rows
 Definition: Call date applied in the favourable scenario
@@ -1436,9 +1382,8 @@ Definition: Call date applied in the favourable scenario
 
 ---
 
-### Field 54 — 54
+### Field 54 — 02100_Portfolio_Return_Stress_Scenario_1_Year
 
-Path: `02100_Portfolio_Return_Stress_Scenario_1_Year`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Annual return of the portfolio, fund, share class corresponding to the stress scenario, after 1 year
@@ -1461,9 +1406,8 @@ Definition: Annual return of the portfolio, fund, share class corresponding to t
 
 ---
 
-### Field 55 — 55
+### Field 55 — 02110_Portfolio_Return_Stress_Scenario_Half_RHP
 
-Path: `02110_Portfolio_Return_Stress_Scenario_Half_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annual return of the portfolio, fund, share class corresponding to the stress scenario, after half of the RHP
@@ -1486,9 +1430,8 @@ Definition: Average annual return of the portfolio, fund, share class correspond
 
 ---
 
-### Field 56 — 56
+### Field 56 — 02120_Portfolio_Return_Stress_Scenario_RHP_Or_First_Call_Date
 
-Path: `02120_Portfolio_Return_Stress_Scenario_RHP_Or_First_Call_Date`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annual return of the portfolio, fund, share class corresponding to the stress scenario, at the RHP
@@ -1511,9 +1454,8 @@ Definition: Average annual return of the portfolio, fund, share class correspond
 
 ---
 
-### Field 57 — 57
+### Field 57 — 02122_Autocall_Applied_Stress_Scenario
 
-Path: `02122_Autocall_Applied_Stress_Scenario`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicate if the call has been applied
@@ -1536,9 +1478,8 @@ Definition: Indicate if the call has been applied
 
 ---
 
-### Field 58 — 58
+### Field 58 — 02125_Autocall_Date_Stress_Scenario
 
-Path: `02125_Autocall_Date_Stress_Scenario`
 Codification: DATE
 Applicability: all rows
 Definition: Call date corresponding to the stress scenario of autocallables
@@ -1561,9 +1502,8 @@ Definition: Call date corresponding to the stress scenario of autocallables
 
 ---
 
-### Field 59 — 59
+### Field 59 — 02130_Portfolio_Number_Of_Observed_Return_M0
 
-Path: `02130_Portfolio_Number_Of_Observed_Return_M0`
 Codification: NUMERIC
 Applicability: all rows
 Definition: See PRIIPs Regulation
@@ -1585,9 +1525,8 @@ Definition: See PRIIPs Regulation
 
 ---
 
-### Field 60 — 60
+### Field 60 — 02140_Portfolio_Mean_Observed_Returns_M1
 
-Path: `02140_Portfolio_Mean_Observed_Returns_M1`
 Codification: NUMERIC
 Applicability: all rows
 Definition: See PRIIPs Regulation
@@ -1609,9 +1548,8 @@ Definition: See PRIIPs Regulation
 
 ---
 
-### Field 61 — 61
+### Field 61 — 02150_Portfolio_Observed_Sigma
 
-Path: `02150_Portfolio_Observed_Sigma`
 Codification: NUMERIC
 Applicability: all rows
 Definition: See PRIIPs Regulation
@@ -1633,9 +1571,8 @@ Definition: See PRIIPs Regulation
 
 ---
 
-### Field 62 — 62
+### Field 62 — 02160_Portfolio_Observed_Skewness
 
-Path: `02160_Portfolio_Observed_Skewness`
 Codification: NUMERIC
 Applicability: all rows
 Definition: See PRIIPs Regulation
@@ -1657,9 +1594,8 @@ Definition: See PRIIPs Regulation
 
 ---
 
-### Field 63 — 63
+### Field 63 — 02170_Portfolio_Observed_Excess_Kurtosis
 
-Path: `02170_Portfolio_Observed_Excess_Kurtosis`
 Codification: NUMERIC
 Applicability: all rows
 Definition: See PRIIPs Regulation
@@ -1681,9 +1617,8 @@ Definition: See PRIIPs Regulation
 
 ---
 
-### Field 64 — 64
+### Field 64 — 02180_Portfolio_Observed_Stressed_Volatility
 
-Path: `02180_Portfolio_Observed_Stressed_Volatility`
 Codification: NUMERIC
 Applicability: all rows
 Definition: See PRIIPs Regulation
@@ -1705,9 +1640,8 @@ Definition: See PRIIPs Regulation
 
 ---
 
-### Field 65 — 65
+### Field 65 — 02185_Portfolio_Past_Performance_Disclosure_Required
 
-Path: `02185_Portfolio_Past_Performance_Disclosure_Required`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does this product fulfil conditions sets in Annex VIII number 1 (a) and (b) ?
@@ -1730,9 +1664,8 @@ Definition: Does this product fulfil conditions sets in Annex VIII number 1 (a) 
 
 ---
 
-### Field 66 — 66
+### Field 66 — 02190_Past_Performance_Link
 
-Path: `02190_Past_Performance_Link`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Reference Art. 8(3) RTS
@@ -1755,9 +1688,8 @@ Definition: Reference Art. 8(3) RTS
 
 ---
 
-### Field 67 — 67
+### Field 67 — 02200_Previous_Performance_Scenarios_Calculation_Link
 
-Path: `02200_Previous_Performance_Scenarios_Calculation_Link`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Link to the previous calculations
@@ -1780,9 +1712,8 @@ Definition: Link to the previous calculations
 
 ---
 
-### Field 68 — 68
+### Field 68 — 02210_Past_Performance_Number_Of_Years
 
-Path: `02210_Past_Performance_Number_Of_Years`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Number of years for which past performance is presented
@@ -1805,9 +1736,8 @@ Definition: Number of years for which past performance is presented
 
 ---
 
-### Field 69 — 69
+### Field 69 — 02220_Reference_Invested_Amount
 
-Path: `02220_Reference_Invested_Amount`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Reference Invested amount used to present performance and costs
@@ -1830,9 +1760,8 @@ Definition: Reference Invested amount used to present performance and costs
 
 ---
 
-### Field 70 — 70
+### Field 70 — 03010_One_Off_Cost_Portfolio_Entry_Cost
 
-Path: `03010_One_Off_Cost_Portfolio_Entry_Cost`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Subscription fees not acquired to the fund or the share class or portfolio mandate. Expressed as a % of the amount to be invested
@@ -1855,9 +1784,8 @@ Definition: Subscription fees not acquired to the fund or the share class or por
 
 ---
 
-### Field 71 — 71
+### Field 71 — 03015_One_Off_Cost_Portfolio_Entry_Cost_Acquired
 
-Path: `03015_One_Off_Cost_Portfolio_Entry_Cost_Acquired`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Subscription fees acquired to the fund or the share class or portfolio mandate. Expressed as a % of the amount to be invested
@@ -1880,9 +1808,8 @@ Definition: Subscription fees acquired to the fund or the share class or portfol
 
 ---
 
-### Field 72 — 72
+### Field 72 — 03020_One_Off_Costs_Portfolio_Exit_Cost_At_RHP
 
-Path: `03020_One_Off_Costs_Portfolio_Exit_Cost_At_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Exit fees at the end of RHP for the portfolio or fund or share class. It is expressed as a % of net asset value.
@@ -1905,9 +1832,8 @@ Definition: Exit fees at the end of RHP for the portfolio or fund or share class
 
 ---
 
-### Field 73 — 73
+### Field 73 — 03030_One_Off_Costs_Portfolio_Exit_Cost_At_1_Year
 
-Path: `03030_One_Off_Costs_Portfolio_Exit_Cost_At_1_Year`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Exit fees after one year for the portfolio or fund or share class. It is expressed as a % of net asset value.
@@ -1931,9 +1857,8 @@ Definition: Exit fees after one year for the portfolio or fund or share class. I
 
 ---
 
-### Field 73 — 73
+### Field 73 — 03040_One_Off_Costs_Portfolio_Exit_Cost_At_Half_RHP
 
-Path: `03040_One_Off_Costs_Portfolio_Exit_Cost_At_Half_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Exit fees after half of the RHP for the portfolio or fund or share class. It is expressed as a % of net asset value.
@@ -1957,9 +1882,8 @@ Definition: Exit fees after half of the RHP for the portfolio or fund or share c
 
 ---
 
-### Field 74 — 74
+### Field 74 — 03050_One_Off_Costs_Portfolio_Sliding_Exit_Cost_Indicator
 
-Path: `03050_One_Off_Costs_Portfolio_Sliding_Exit_Cost_Indicator`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicates whether there is a sliding exit cost or not
@@ -1982,9 +1906,8 @@ Definition: Indicates whether there is a sliding exit cost or not
 
 ---
 
-### Field 75 — 75
+### Field 75 — 03060_Ongoing_Costs_Management_Fees_And_Other_Administrative_Or_Operating_Costs
 
-Path: `03060_Ongoing_Costs_Management_Fees_And_Other_Administrative_Or_Operating_Costs`
 Codification: NUMERIC
 Applicability: all rows
 Definition: See PRIIPs definition as a % of NAV of the portfolio, the funds or the share class / per annum. Management fees and other administrative or operating costs
@@ -2007,9 +1930,8 @@ Definition: See PRIIPs definition as a % of NAV of the portfolio, the funds or t
 
 ---
 
-### Field 76 — 76
+### Field 76 — 03080_Ongoing_Costs_Portfolio_Transaction_Costs
 
-Path: `03080_Ongoing_Costs_Portfolio_Transaction_Costs`
 Codification: NUMERIC
 Applicability: all rows
 Definition: See PRIIPs definition as a % of NAV of the portfolio, the funds or the share class / per annum.
@@ -2032,9 +1954,8 @@ Definition: See PRIIPs definition as a % of NAV of the portfolio, the funds or t
 
 ---
 
-### Field 77 — 77
+### Field 77 — 03090_Existing_Incidental_Costs_Portfolio
 
-Path: `03090_Existing_Incidental_Costs_Portfolio`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicates whether there are existing performance fees or carried interest
@@ -2057,9 +1978,8 @@ Definition: Indicates whether there are existing performance fees or carried int
 
 ---
 
-### Field 78 — 78
+### Field 78 — 03095_Incidental_Costs
 
-Path: `03095_Incidental_Costs`
 Codification: NUMERIC
 Applicability: all rows
 Definition: See PRIIPs definition as a % of NAV of the portfolio, the funds or the share class / per annum
@@ -2082,9 +2002,8 @@ Definition: See PRIIPs definition as a % of NAV of the portfolio, the funds or t
 
 ---
 
-### Field 79 — 79
+### Field 79 — 04020_Comprehension_Alert_Portfolio
 
-Path: `04020_Comprehension_Alert_Portfolio`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: cf Art.14a + annex 1
@@ -2107,9 +2026,8 @@ Definition: cf Art.14a + annex 1
 
 ---
 
-### Field 80 — 80
+### Field 80 — 04030_Intended_Target_Market_Retail_Investor_Portfolio
 
-Path: `04030_Intended_Target_Market_Retail_Investor_Portfolio`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Text in reference language, as proposed by the asset manager The description of the type of retail investor to whom the PRIIP is intended to be marketed in the section entitled ‘What is this product?’ of the key information document shall include information on the target retail investors identified by the PRIIP manufacturer, in particular depending on the needs, characteristics and objectives of the type of client for whom the PRIIPs is compatible. This determination shall be based upon the ability of retail investors to bear investment loss and their investment horizon preferences, their theoretical knowledge of, and past experience with PRIIPs, the financial markets as well as the needs, characteristics and objectives of potential end clients.
@@ -2132,9 +2050,8 @@ Definition: Text in reference language, as proposed by the asset manager The des
 
 ---
 
-### Field 81 — 81
+### Field 81 — 04040_Investment_Objective_Portfolio
 
-Path: `04040_Investment_Objective_Portfolio`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Text in reference language, as proposed by the asset manager Information stating the objectives of the PRIIP and the means for achieving those objectives in the section entitled ‘What is this product?’ of the key information document shall be summarised in a brief, clear and easily understandable manner. That information shall identify the main factors upon which return depends, the underlying investment assets or reference values, and how the return is determined, as well as the relationship between the PRIIP’s return and that of the underlying investment assets or reference values.
@@ -2157,9 +2074,8 @@ Definition: Text in reference language, as proposed by the asset manager Informa
 
 ---
 
-### Field 82 — 82
+### Field 82 — 04050_Risk_Narrative_Portfolio
 
-Path: `04050_Risk_Narrative_Portfolio`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Text in reference language, as proposed by the asset manager [insert a brief explanation of the classification of the product with a maximum of 300 characters in plain language] The field shall contain well-formulated text which can be used directly by the insurer in the KID according to article 14 of the regulation
@@ -2181,9 +2097,8 @@ Definition: Text in reference language, as proposed by the asset manager [insert
 
 ---
 
-### Field 83 — 83
+### Field 83 — 04060_Other_Materially_Relevant_Risk_Narrative_Portfolio
 
-Path: `04060_Other_Materially_Relevant_Risk_Narrative_Portfolio`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Text in reference language, as proposed by the asset managers : (Element E) [Where applicable: element h] [Other risks materially relevant to the PRIIP not included in the summary risk indicator to be explained with a maximum of 200 characters] The field shall contain well-formulated text which can be used directly by the insurer in the KID according to article 14 of the regulation.
@@ -2206,9 +2121,8 @@ Definition: Text in reference language, as proposed by the asset managers : (Ele
 
 ---
 
-### Field 84 — 84
+### Field 84 — 04070_Type_Of_Underlying_Investment_Option
 
-Path: `04070_Type_Of_Underlying_Investment_Option`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: understandable to the customer
@@ -2231,9 +2145,8 @@ Definition: understandable to the customer
 
 ---
 
-### Field 85 — 85
+### Field 85 — 04080_Capital_Guarantee
 
-Path: `04080_Capital_Guarantee`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Boolean to identify whether the portfolio has a general capital guarantee or not.
@@ -2256,9 +2169,8 @@ Definition: Boolean to identify whether the portfolio has a general capital guar
 
 ---
 
-### Field 86 — 86
+### Field 86 — 04081_Capital_Guarantee_Level
 
-Path: `04081_Capital_Guarantee_Level`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital Guarantee level. Minimum amount will be paid at redemption in%. Cf annex 3, point 7, Element F
@@ -2281,9 +2193,8 @@ Definition: Capital Guarantee level. Minimum amount will be paid at redemption i
 
 ---
 
-### Field 87 — 87
+### Field 87 — 04082_Capital_Guarantee_Limitations
 
-Path: `04082_Capital_Guarantee_Limitations`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: [insert a brief explanation of the guarantee limits of the product with a maximum of 300 characters in plain language] The field shall contain well-formulated text which can be used directly by the insurer in the KID according to article 14 of the regulation.
@@ -2306,9 +2217,8 @@ Definition: [insert a brief explanation of the guarantee limits of the product w
 
 ---
 
-### Field 88 — 88
+### Field 88 — 04083_Capital_Guarantee_Early_Exit_Conditions
 
-Path: `04083_Capital_Guarantee_Early_Exit_Conditions`
 Codification: DATE
 Applicability: all rows
 Definition: Date before which the early exit conditions apply.
@@ -2331,9 +2241,8 @@ Definition: Date before which the early exit conditions apply.
 
 ---
 
-### Field 89 — 89
+### Field 89 — 04084_Capital_Guarantee_Portfolio
 
-Path: `04084_Capital_Guarantee_Portfolio`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: characteristics of the guarantee: open ended or fixed maturity, daily or monthly lockin, monthly reset, constant guarantee, reference value (highest NAV, NAV of start period,…), other particularities, name of the guarantor
@@ -2356,9 +2265,8 @@ Definition: characteristics of the guarantee: open ended or fixed maturity, dail
 
 ---
 
-### Field 90 — 90
+### Field 90 — 04085_Possible_Maximum_Loss_Portfolio
 
-Path: `04085_Possible_Maximum_Loss_Portfolio`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -2379,9 +2287,8 @@ Applicability: all rows
 
 ---
 
-### Field 91 — 91
+### Field 91 — 04086_Description_Past_Interval_Unfavourable_Scenario
 
-Path: `04086_Description_Past_Interval_Unfavourable_Scenario`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Describes the historical time period the unfavourable scenario corresponds to
@@ -2404,9 +2311,8 @@ Definition: Describes the historical time period the unfavourable scenario corre
 
 ---
 
-### Field 92 — 92
+### Field 92 — 04087_Description_Past_Interval_Moderate_Scenario
 
-Path: `04087_Description_Past_Interval_Moderate_Scenario`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Describes the historical time period the moderate scenario corresponds to
@@ -2429,9 +2335,8 @@ Definition: Describes the historical time period the moderate scenario correspon
 
 ---
 
-### Field 93 — 93
+### Field 93 — 04088_Description_Past_Interval_Favourable_Scenario
 
-Path: `04088_Description_Past_Interval_Favourable_Scenario`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Describes the historical time period the favourable scenario corresponds to
@@ -2454,9 +2359,8 @@ Definition: Describes the historical time period the favourable scenario corresp
 
 ---
 
-### Field 94 — 94
+### Field 94 — 04089_Was_Benchmark_Used_Performance_Calculation
 
-Path: `04089_Was_Benchmark_Used_Performance_Calculation`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Boolean to identify whether a benchmark or proxy was used for performance calculation in the unfavourable, moderate and favourable scenarios.
@@ -2479,9 +2383,8 @@ Definition: Boolean to identify whether a benchmark or proxy was used for perfor
 
 ---
 
-### Field 95 — 95
+### Field 95 — 04090_Portfolio_Performance_Fees_Carried_Interest_Narrative
 
-Path: `04090_Portfolio_Performance_Fees_Carried_Interest_Narrative`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Describes the incidental costs taken under specific conditions.
@@ -2504,9 +2407,8 @@ Definition: Describes the incidental costs taken under specific conditions.
 
 ---
 
-### Field 96 — 96
+### Field 96 — 04120_One_Off_Cost_Portfolio_Entry_Cost_Description
 
-Path: `04120_One_Off_Cost_Portfolio_Entry_Cost_Description`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Description of the entry cost, not more than 300 characters.
@@ -2528,9 +2430,8 @@ Definition: Description of the entry cost, not more than 300 characters.
 
 ---
 
-### Field 97 — 97
+### Field 97 — 04130_One_Off_Cost_Portfolio_Exit_Cost_Description
 
-Path: `04130_One_Off_Cost_Portfolio_Exit_Cost_Description`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Description of exit cost, not more than 300 characters.
@@ -2553,9 +2454,8 @@ Definition: Description of exit cost, not more than 300 characters.
 
 ---
 
-### Field 98 — 98
+### Field 98 — 04140_Ongoing_Costs_Portfolio_Management_Costs_Description
 
-Path: `04140_Ongoing_Costs_Portfolio_Management_Costs_Description`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Description of the ongoing cost, not more than 150 characters.
@@ -2578,9 +2478,8 @@ Definition: Description of the ongoing cost, not more than 150 characters.
 
 ---
 
-### Field 99 — 99
+### Field 99 — 04150_Do_Costs_Depend_On_Invested_Amount
 
-Path: `04150_Do_Costs_Depend_On_Invested_Amount`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indicates whether the costs depend on the invested amount.
@@ -2603,9 +2502,8 @@ Definition: Indicates whether the costs depend on the invested amount.
 
 ---
 
-### Field 100 — 100
+### Field 100 — 04160_Cost_Dependence_Explanation
 
-Path: `04160_Cost_Dependence_Explanation`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Describes the dependence of costs on the invested amount, not more than 300 characters.
@@ -2628,9 +2526,8 @@ Definition: Describes the dependence of costs on the invested amount, not more t
 
 ---
 
-### Field 101 — 101
+### Field 101 — 06005_German_MOPs_Reference_Date
 
-Path: `06005_German_MOPs_Reference_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Last calculation date of the additional information required in Germany.
@@ -2653,9 +2550,8 @@ Definition: Last calculation date of the additional information required in Germ
 
 ---
 
-### Field 102 — 102
+### Field 102 — 06010_Bonds_Weight
 
-Path: `06010_Bonds_Weight`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Proportion (weight) of bonds and bonds futures within the fund/portfolio measured in percentage of market value.
@@ -2678,9 +2574,8 @@ Definition: Proportion (weight) of bonds and bonds futures within the fund/portf
 
 ---
 
-### Field 103 — 103
+### Field 103 — 06020_Annualized_Return_Volatility
 
-Path: `06020_Annualized_Return_Volatility`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Average annualised daily volatility of the fund / portfolio over the last 5 years.
@@ -2703,9 +2598,8 @@ Definition: Average annualised daily volatility of the fund / portfolio over the
 
 ---
 
-### Field 104 — 104
+### Field 104 — 06030_Duration_Bonds
 
-Path: `06030_Duration_Bonds`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Valuation Weighted Macaulay-Duration in years of the fund / portfolio
@@ -2728,9 +2622,8 @@ Definition: Valuation Weighted Macaulay-Duration in years of the fund / portfoli
 
 ---
 
-### Field 105 — 105
+### Field 105 — 06040_Existing_Capital_Preservation
 
-Path: `06040_Existing_Capital_Preservation`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identifies if a capital preservation method is used (Y) or not (N).
@@ -2753,9 +2646,8 @@ Definition: Identifies if a capital preservation method is used (Y) or not (N).
 
 ---
 
-### Field 106 — 106
+### Field 106 — 06050_Capital_Preservation_Level
 
-Path: `06050_Capital_Preservation_Level`
 Codification: NUMERIC
 Applicability: all rows
 Definition: 100% minus the maximum possible loss in percentage of its market value.
@@ -2778,9 +2670,8 @@ Definition: 100% minus the maximum possible loss in percentage of its market val
 
 ---
 
-### Field 107 — 107
+### Field 107 — 06060_Time_Interval_Maximum_Loss
 
-Path: `06060_Time_Interval_Maximum_Loss`
 Codification: DATE, closed list of 8 entries
 Applicability: all rows
 Definition: The time period in which a possible loss of a capital preservation funds is measured.
@@ -2803,9 +2694,8 @@ Definition: The time period in which a possible loss of a capital preservation f
 
 ---
 
-### Field 108 — 108
+### Field 108 — 06070_Uses_PI
 
-Path: `06070_Uses_PI`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identifies if PI (Portfolio Insurance including CPPI Constant Proportion Portfolio Insurance) is used (Y) or not (N) for capital preservation.
@@ -2828,9 +2718,8 @@ Definition: Identifies if PI (Portfolio Insurance including CPPI Constant Propor
 
 ---
 
-### Field 109 — 109
+### Field 109 — 06080_Multiplier_PI
 
-Path: `06080_Multiplier_PI`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Gives the maximum multiplier value if PI algorithm is used.
@@ -2853,9 +2742,8 @@ Definition: Gives the maximum multiplier value if PI algorithm is used.
 
 ---
 
-### Field 110 — 110
+### Field 110 — 07005_First_Possible_Call_Date
 
-Path: `07005_First_Possible_Call_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Date of the first possible call for autocallable products
@@ -2878,9 +2766,8 @@ Definition: Date of the first possible call for autocallable products
 
 ---
 
-### Field 111 — 111
+### Field 111 — 07010_Total_Cost_1_Year_Or_First_Call
 
-Path: `07010_Total_Cost_1_Year_Or_First_Call`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Total cost in 00060_Portfolio_Or_Share_Class_Currency terms in case the investor cashes in after one year, as requested in the "Costs over time" table. Rebased to 1.
@@ -2902,9 +2789,8 @@ Definition: Total cost in 00060_Portfolio_Or_Share_Class_Currency terms in case 
 
 ---
 
-### Field 112 — 112
+### Field 112 — 07020_RIY_1_Year_Or_First_Call
 
-Path: `07020_RIY_1_Year_Or_First_Call`
 Codification: NUMERIC
 Applicability: all rows
 Definition: RIY in case the investor cashes in after one year, as requested in the "Costs over time" table.
@@ -2926,9 +2812,8 @@ Definition: RIY in case the investor cashes in after one year, as requested in t
 
 ---
 
-### Field 113 — 113
+### Field 113 — 07030_Total_Cost_Half_RHP
 
-Path: `07030_Total_Cost_Half_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Total cost in 00060_Portfolio_Or_Share_Class_Currency terms in case the investor cashes in at the middle of the RHP, as requested in the "Costs over time" table.
@@ -2950,9 +2835,8 @@ Definition: Total cost in 00060_Portfolio_Or_Share_Class_Currency terms in case 
 
 ---
 
-### Field 114 — 114
+### Field 114 — 07040_RIY_Half_RHP
 
-Path: `07040_RIY_Half_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: RIY in case the investor cashes in at the middle of the RHP, as requested in the "Costs over time" table.
@@ -2974,9 +2858,8 @@ Definition: RIY in case the investor cashes in at the middle of the RHP, as requ
 
 ---
 
-### Field 115 — 115
+### Field 115 — 07050_Total_Cost_RHP
 
-Path: `07050_Total_Cost_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Total cost in 00060_Portfolio_Or_Share_Class_Currency terms in case the investor cashes in at the RHP, as requested in the "Costs over time" table.
@@ -2998,9 +2881,8 @@ Definition: Total cost in 00060_Portfolio_Or_Share_Class_Currency terms in case 
 
 ---
 
-### Field 116 — 116
+### Field 116 — 07060_RIY_RHP
 
-Path: `07060_RIY_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: RIY in case the investor cashes in at the RHP, as requested in the "Costs over time" table.
@@ -3022,9 +2904,8 @@ Definition: RIY in case the investor cashes in at the RHP, as requested in the "
 
 ---
 
-### Field 117 — 117
+### Field 117 — 07070_One_Off_Costs_Portfolio_Entry_Cost
 
-Path: `07070_One_Off_Costs_Portfolio_Entry_Cost`
 Codification: NUMERIC
 Applicability: all rows
 Definition: The entry cost at one year (or at RHP if RHP<1y), as requested in the narrative part of the "Composition of costs" table.
@@ -3046,9 +2927,8 @@ Definition: The entry cost at one year (or at RHP if RHP<1y), as requested in th
 
 ---
 
-### Field 118 — 118
+### Field 118 — 07080_One_Off_Costs_Portfolio_Exit_Cost
 
-Path: `07080_One_Off_Costs_Portfolio_Exit_Cost`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: The exit cost at one year (or at RHP if RHP<1y), as requested in the narrative part of the "Composition of costs" table.
@@ -3070,9 +2950,8 @@ Definition: The exit cost at one year (or at RHP if RHP<1y), as requested in the
 
 ---
 
-### Field 119 — 119
+### Field 119 — 07090_Ongoing_Costs_Portfolio_Transaction_Costs
 
-Path: `07090_Ongoing_Costs_Portfolio_Transaction_Costs`
 Codification: NUMERIC
 Applicability: all rows
 Definition: The portfolio transaction costs at one year (or at RHP if RHP<1y), as requested in the narrative part of the "Composition of costs" table.
@@ -3094,9 +2973,8 @@ Definition: The portfolio transaction costs at one year (or at RHP if RHP<1y), a
 
 ---
 
-### Field 120 — 120
+### Field 120 — 07100_Ongoing_Costs_Management_Fees_And_Other_Administrative_Or_Operating_Costs
 
-Path: `07100_Ongoing_Costs_Management_Fees_And_Other_Administrative_Or_Operating_Costs`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: The other ongoing costs term at one year (or at RHP if RHP<1y), as requested in the narrative part of the "Composition of costs" table
@@ -3118,9 +2996,8 @@ Definition: The other ongoing costs term at one year (or at RHP if RHP<1y), as r
 
 ---
 
-### Field 121 — 121
+### Field 121 — 07110_Incidental_Costs_Portfolio_Performance_Fees_Carried _Interest
 
-Path: `07110_Incidental_Costs_Portfolio_Performance_Fees_Carried _Interest`
 Codification: NUMERIC
 Applicability: all rows
 Definition: The performance fees, as requested in the "Composition of costs" table.

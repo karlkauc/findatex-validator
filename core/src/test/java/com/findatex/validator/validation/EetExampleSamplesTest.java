@@ -122,14 +122,16 @@ class EetExampleSamplesTest {
     }
 
     @Test
-    void paiYesWithEmptyBlockFiresPaiErrors() throws Exception {
+    void paiYesWithEmptyBlockFiresPaiWarnings() throws Exception {
         List<Finding> findings = run("07_pai_yes_block_missing.xlsx");
-        long paiErrors = findings.stream()
+        long paiWarnings = findings.stream()
                 .filter(f -> f.ruleId().startsWith("EET-XF-PAI-"))
-                .filter(f -> f.severity() == Severity.ERROR)
+                .filter(f -> f.severity() == Severity.WARNING)
                 .count();
-        // PAI block has 27 NUMs; expect one error per blank PAI field.
-        assertThat(paiErrors).as("expected 27 EET-XF-PAI-* errors").isEqualTo(27);
+        // PAI block has 27 NUMs; expect one warning per blank PAI field.
+        // Severity is WARNING because for 26/27 indicators the mandate is operator-intent
+        // extrapolation, not literal spec text — see EetRuleSet.PAI_BLOCK Javadoc.
+        assertThat(paiWarnings).as("expected 27 EET-XF-PAI-* warnings").isEqualTo(27);
     }
 
     @Test

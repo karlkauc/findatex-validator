@@ -40,7 +40,7 @@ class EetPaiGatingRuleTest {
 
     @ParameterizedTest
     @MethodSource("versions")
-    void paiYesWithEmptyBlockEmitsErrorPerTarget(TemplateVersion v) {
+    void paiYesWithEmptyBlockEmitsWarningPerTarget(TemplateVersion v) {
         EetTemplate eet = new EetTemplate();
         SpecCatalog catalog = eet.specLoaderFor(v).load();
         TemplateRuleSet rs = eet.ruleSetFor(v);
@@ -56,7 +56,7 @@ class EetPaiGatingRuleTest {
                 .toList();
 
         assertThat(paiFindings).hasSize(PAI_BLOCK.size());
-        assertThat(paiFindings).extracting(Finding::severity).containsOnly(Severity.ERROR);
+        assertThat(paiFindings).extracting(Finding::severity).containsOnly(Severity.WARNING);
         assertThat(paiFindings).extracting(Finding::fieldNum)
                 .containsExactlyInAnyOrderElementsOf(PAI_BLOCK);
     }

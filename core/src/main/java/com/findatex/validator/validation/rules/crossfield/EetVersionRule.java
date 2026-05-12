@@ -27,19 +27,22 @@ public final class EetVersionRule implements Rule {
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {
+        String fieldName = ctx.catalog().byNumKey("1")
+                .map(com.findatex.validator.spec.FieldSpec::name)
+                .orElse("00010_EET_Version");
         for (TptRow row : ctx.file().rows()) {
             String v = row.stringValue("1").orElse(null);
             if (v == null) continue;
             String norm = v.trim().toUpperCase();
             if (norm.contains(expectedVersion.toUpperCase())) return List.of();
             return List.of(Finding.error(
-                    id(), null, "1", "Field 1 (00010_EET_Version)",
+                    id(), null, "1", fieldName,
                     row.rowIndex(), v,
                     "EET version must be " + expectedVersion + " (got: " + v + ")"));
         }
         return List.of(Finding.info(
-                id(), null, "1", "Field 1 (00010_EET_Version)",
+                id(), null, "1", fieldName,
                 null, null,
-                "EET version field 1 (00010_EET_Version) is not present"));
+                "EET version field 1 (" + fieldName + ") is not present"));
     }
 }

@@ -26,7 +26,7 @@ class ManifestDrivenSpecLoaderTest {
                 "2026-01-01",
                 "S1",
                 3,                                       // first data row (1-based)
-                new SpecManifest.Columns(1, 2, 3, 4, 5, 6),
+                new SpecManifest.Columns(1, null, 2, 3, 4, 5, 6),
                 new SpecManifest.ApplicabilityColumns("CIC", 7, 7, List.of("CIC2")),
                 List.of(new SpecManifest.ProfileColumn(
                         "BASIC", "Basic profile", 6, null, "flag")));

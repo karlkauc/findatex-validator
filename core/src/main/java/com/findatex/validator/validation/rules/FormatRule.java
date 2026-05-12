@@ -66,7 +66,7 @@ public final class FormatRule implements Rule {
             String error = checkFormat(codif, v);
             if (error != null) {
                 out.add(Finding.error(
-                        id(), null, spec.numKey(), spec.numData(),
+                        id(), null, spec.numKey(), spec.name(),
                         row.rowIndex(), v, error));
             }
         }

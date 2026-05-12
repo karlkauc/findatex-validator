@@ -363,9 +363,9 @@ public final class RuleDocGenerator {
 
     private void renderFieldEntry(MarkdownEmitter md, FieldSpec spec, ProfileSet profileSet,
                                   BucketedRules buckets, Set<String> extCoverage) {
-        md.heading3("Field " + spec.numKey() + " — " + spec.numData());
+        md.heading3("Field " + spec.numKey() + " — " + spec.name());
         if (spec.fundXmlPath() != null && !spec.fundXmlPath().isBlank()) {
-            md.line("Path: `" + spec.fundXmlPath() + "`");
+            md.line("FundsXML path: `" + spec.fundXmlPath() + "`");
         }
         md.line("Codification: " + describeCodification(spec.codification()));
         md.line("Applicability: " + describeApplicability(spec));

@@ -34,6 +34,9 @@ public final class LeiRule implements Rule {
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {
         List<Finding> out = new ArrayList<>();
+        String fieldName = ctx.catalog().byNumKey(codeNumKey)
+                .map(com.findatex.validator.spec.FieldSpec::name)
+                .orElse("LEI check on field " + codeNumKey);
         for (TptRow row : ctx.file().rows()) {
             String type = row.stringValue(typeNumKey).orElse("");
             if (!"1".equals(type.trim())) continue;
@@ -42,7 +45,7 @@ public final class LeiRule implements Rule {
             String c = code.trim().toUpperCase(Locale.ROOT);
             if (!isValidLei(c)) {
                 out.add(Finding.error(
-                        id(), null, codeNumKey, "LEI check on field " + codeNumKey,
+                        id(), null, codeNumKey, fieldName,
                         row.rowIndex(), code,
                         "Invalid LEI: must be 20 alphanumeric chars with ISO 17442 mod-97 checksum"));
             }

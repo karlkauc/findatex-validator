@@ -39,7 +39,7 @@ public final class ConditionalAnyFieldPresenceRule implements Rule {
         List<Finding> out = new ArrayList<>();
         String anchorNum = req.targetFieldNums().get(0);
         String anchorName = ctx.catalog().byNumKey(anchorNum)
-                .map(FieldSpec::numData)
+                .map(FieldSpec::name)
                 .orElse("Field " + anchorNum);
 
         for (TptRow row : ctx.file().rows()) {

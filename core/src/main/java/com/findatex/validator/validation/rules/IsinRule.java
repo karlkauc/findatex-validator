@@ -34,6 +34,9 @@ public final class IsinRule implements Rule {
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {
         List<Finding> out = new ArrayList<>();
+        String fieldName = ctx.catalog().byNumKey(codeNumKey)
+                .map(com.findatex.validator.spec.FieldSpec::name)
+                .orElse("ISIN check on field " + codeNumKey);
         for (TptRow row : ctx.file().rows()) {
             String type = row.stringValue(typeNumKey).orElse("");
             if (!"1".equals(type.trim())) continue;
@@ -42,7 +45,7 @@ public final class IsinRule implements Rule {
             String c = code.trim().toUpperCase(Locale.ROOT);
             if (!isValidIsin(c)) {
                 out.add(Finding.error(
-                        id(), null, codeNumKey, "ISIN check on field " + codeNumKey,
+                        id(), null, codeNumKey, fieldName,
                         row.rowIndex(), code,
                         "Invalid ISIN: must be 12 chars + Luhn checksum"));
             }

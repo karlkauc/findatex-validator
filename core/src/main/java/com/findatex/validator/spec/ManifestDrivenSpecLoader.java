@@ -83,9 +83,14 @@ public final class ManifestDrivenSpecLoader implements TemplateSpecLoader {
             Row row = sheet.getRow(rIdx);
             if (row == null) continue;
             String num  = SpecLoader.stringValue(row, cols.numData());
-            String path = SpecLoader.stringValue(row, cols.path());
-            if (SpecLoader.isBlank(num) && SpecLoader.isBlank(path)) continue;
-            if (SpecLoader.isBlank(path) && !SpecLoader.looksLikeFieldLabel(num)) continue;
+            String name = cols.name() != null ? SpecLoader.stringValue(row, cols.name()) : "";
+            String path = cols.path() != null ? SpecLoader.stringValue(row, cols.path()) : "";
+
+            // Section/header padding rows: nothing in numData and nothing in the label/path either.
+            if (SpecLoader.isBlank(num) && SpecLoader.isBlank(name) && SpecLoader.isBlank(path)) continue;
+            // If we only have a number with no companion label and the number itself doesn't look
+            // like a field token, treat it as a sub-section heading and skip it.
+            if (SpecLoader.isBlank(name) && SpecLoader.isBlank(path) && !SpecLoader.looksLikeFieldLabel(num)) continue;
 
             String definition = SpecLoader.stringValue(row, cols.definition());
             String comment    = SpecLoader.stringValue(row, cols.comment());
@@ -95,7 +100,13 @@ public final class ManifestDrivenSpecLoader implements TemplateSpecLoader {
             ApplicabilityScope scope = readApplicabilityScope(row);
             Map<String, Flag> flags = readProfileFlags(row);
 
-            FieldSpec spec = new FieldSpec(num.trim(), path.trim(), definition, comment,
+            // For TPT (no `name` column declared) the loader falls back to numData inside FieldSpec.
+            // For EMT/EET/EPT (`name` declared, no FundsXML path), fundXmlPath stays null and the
+            // descriptive label lives on FieldSpec.name(); see the manifest comments.
+            FieldSpec spec = new FieldSpec(num.trim(),
+                    name.isBlank() ? null : name.trim(),
+                    path.isBlank() ? null : path.trim(),
+                    definition, comment,
                     codifRaw, codif, flags, scope, rIdx + 1);
             fields.add(spec);
         }

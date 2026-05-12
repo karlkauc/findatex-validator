@@ -45,7 +45,7 @@ public final class ConditionalPresenceRule implements Rule {
                         id(),
                         profile,
                         spec.numKey(),
-                        spec.numData(),
+                        spec.name(),
                         row.rowIndex(),
                         null,
                         "Conditional field for " + profile.displayName()

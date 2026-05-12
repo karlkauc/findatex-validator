@@ -10,16 +10,21 @@ public final class SpecCatalog {
     private final List<FieldSpec> fields;
     private final Map<String, FieldSpec> byNumKey;
     private final Map<String, FieldSpec> byNumData;
+    private final Map<String, FieldSpec> byName;
     private final Map<String, FieldSpec> byPath;
 
     public SpecCatalog(List<FieldSpec> fields) {
         this.fields = List.copyOf(fields);
         this.byNumKey = new LinkedHashMap<>();
         this.byNumData = new LinkedHashMap<>();
+        this.byName = new LinkedHashMap<>();
         this.byPath = new LinkedHashMap<>();
         for (FieldSpec f : fields) {
             byNumKey.putIfAbsent(f.numKey(), f);
             byNumData.putIfAbsent(normalize(f.numData()), f);
+            if (f.name() != null && !f.name().isBlank()) {
+                byName.putIfAbsent(normalize(f.name()), f);
+            }
             if (f.fundXmlPath() != null && !f.fundXmlPath().isBlank()) {
                 byPath.putIfAbsent(normalizePath(f.fundXmlPath()), f);
             }
@@ -36,11 +41,15 @@ public final class SpecCatalog {
         return Optional.ofNullable(byNumData.get(normalize(numData)));
     }
 
+    public Optional<FieldSpec> byName(String name) {
+        return Optional.ofNullable(byName.get(normalize(name)));
+    }
+
     public Optional<FieldSpec> byPath(String path) {
         return Optional.ofNullable(byPath.get(normalizePath(path)));
     }
 
-    /** Header name match: try numKey, numData, FunDataXML path. */
+    /** Header name match: try numKey, numData, display name, FundsXML path. */
     public Optional<FieldSpec> matchHeader(String header) {
         if (header == null || header.isBlank()) return Optional.empty();
         String h = header.trim();
@@ -58,6 +67,9 @@ public final class SpecCatalog {
 
         Optional<FieldSpec> nd = byNumData(h);
         if (nd.isPresent()) return nd;
+
+        Optional<FieldSpec> bn = byName(h);
+        if (bn.isPresent()) return bn;
 
         Optional<FieldSpec> bp = byPath(h);
         if (bp.isPresent()) return bp;

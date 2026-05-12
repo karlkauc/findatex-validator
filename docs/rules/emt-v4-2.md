@@ -89,9 +89,8 @@ No cross-field rules are wired for this template/version. Regulatory cross-field
 
 One entry per `FieldSpec` in spec order. Each entry lists every check that can fire on the field, with the profile scope, severity, trigger condition, and quantified score impact.
 
-### Field 1 — 1
+### Field 1 — 00001_EMT_Version
 
-Path: `00001_EMT_Version`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: This field specifies the output version of the template and is used by the recipient to understand the number of fields expected, their labeling and order.
@@ -112,9 +111,8 @@ Definition: This field specifies the output version of the template and is used 
 
 ---
 
-### Field 2 — 2
+### Field 2 — 00002_EMT_Producer_Name
 
-Path: `00002_EMT_Producer_Name`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: If the Manufacturer/Issuer have chosen to outsource the production of an EMT posting to another party responsible for the production and publication of the EMT data set, such party name should be entered in this field.
@@ -134,9 +132,8 @@ Definition: If the Manufacturer/Issuer have chosen to outsource the production o
 
 ---
 
-### Field 3 — 3
+### Field 3 — 00003_EMT_Producer_LEI
 
-Path: `00003_EMT_Producer_LEI`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: If the Manufacturer/Issuer have chosen to outsource the production of an EMT posting to another party responsible for the production and publication of the EMT data set, such party LEI should be entered in this field.
@@ -157,9 +154,8 @@ Definition: If the Manufacturer/Issuer have chosen to outsource the production o
 
 ---
 
-### Field 4 — 4
+### Field 4 — 00004_EMT_Producer_Email
 
-Path: `00004_EMT_Producer_Email`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Contact entry point for distributors regarding EMT
@@ -179,9 +175,8 @@ Definition: Contact entry point for distributors regarding EMT
 
 ---
 
-### Field 5 — 5
+### Field 5 — 00005_File_Generation_Date_And_Time
 
-Path: `00005_File_Generation_Date_And_Time`
 Codification: DATETIME
 Applicability: all rows
 Definition: Date and Time of the creation of the EMT file
@@ -202,9 +197,8 @@ Definition: Date and Time of the creation of the EMT file
 
 ---
 
-### Field 6 — 6
+### Field 6 — 00006_EMT_Data_Reporting_Target_Market
 
-Path: `00006_EMT_Data_Reporting_Target_Market`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Specifies if the Target Market section is filled in the current EMT posting.
@@ -225,9 +219,8 @@ Definition: Specifies if the Target Market section is filled in the current EMT 
 
 ---
 
-### Field 7 — 7
+### Field 7 — 00007_EMT_Data_Reporting_Ex_Ante
 
-Path: `00007_EMT_Data_Reporting_Ex_Ante`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Specifies if the Ex-Ante Cost & Charges section is filled in the current EMT posting.
@@ -248,9 +241,8 @@ Definition: Specifies if the Ex-Ante Cost & Charges section is filled in the cur
 
 ---
 
-### Field 8 — 8
+### Field 8 — 00008_EMT_Data_Reporting_Ex_Post
 
-Path: `00008_EMT_Data_Reporting_Ex_Post`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Specifies if the Ex-Post Cost & Charges section is filled in the current EMT posting.
@@ -271,9 +263,8 @@ Definition: Specifies if the Ex-Post Cost & Charges section is filled in the cur
 
 ---
 
-### Field 9 — 9
+### Field 9 — 00010_Financial_Instrument_Identifying_Data
 
-Path: `00010_Financial_Instrument_Identifying_Data`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identification of the financial instrument
@@ -295,9 +286,8 @@ Definition: Identification of the financial instrument
 
 ---
 
-### Field 10 — 10
+### Field 10 — 00020_Type_Of_Identification_Code_For_The_Financial_Instrument
 
-Path: `00020_Type_Of_Identification_Code_For_The_Financial_Instrument`
 Codification: CLOSED_LIST, closed list of 11 entries
 Applicability: all rows
 Definition: Codification chosen to identify the financial instrument
@@ -318,9 +308,8 @@ Definition: Codification chosen to identify the financial instrument
 
 ---
 
-### Field 11 — 11
+### Field 11 — 00030_Financial_Instrument_Name
 
-Path: `00030_Financial_Instrument_Name`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of the financial instrument
@@ -341,9 +330,8 @@ Definition: Name of the financial instrument
 
 ---
 
-### Field 12 — 12
+### Field 12 — 00040_Financial_Instrument_Currency
 
-Path: `00040_Financial_Instrument_Currency`
 Codification: ISO_4217
 Applicability: all rows
 Definition: Denomination currency of the financial instrument
@@ -364,9 +352,8 @@ Definition: Denomination currency of the financial instrument
 
 ---
 
-### Field 13 — 13
+### Field 13 — 00045_Financial_Instrument_Performance_Fee
 
-Path: `00045_Financial_Instrument_Performance_Fee`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does this financial instrument have potential performance fees or carried interest?
@@ -387,9 +374,8 @@ Definition: Does this financial instrument have potential performance fees or ca
 
 ---
 
-### Field 14 — 14
+### Field 14 — 00047_Financial_Instrument_Distribution_Of_Cash
 
-Path: `00047_Financial_Instrument_Distribution_Of_Cash`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does this financial instrument distribute Income in the form of cash to the investor?
@@ -410,9 +396,8 @@ Definition: Does this financial instrument distribute Income in the form of cash
 
 ---
 
-### Field 15 — 15
+### Field 15 — 00050_General_Reference_Date
 
-Path: `00050_General_Reference_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Date to which the General data within the EMT refer
@@ -433,9 +418,8 @@ Definition: Date to which the General data within the EMT refer
 
 ---
 
-### Field 16 — 16
+### Field 16 — 00060_Financial_Instrument_Product_Type
 
-Path: `00060_Financial_Instrument_Product_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Structured Securities or Structured Funds or UCITS or Non UCITS or UCITS Money Market Funds or Non UCITS Money Market Funds or Exchanged Traded Commodities or Bonds
@@ -456,9 +440,8 @@ Definition: Structured Securities or Structured Funds or UCITS or Non UCITS or U
 
 ---
 
-### Field 17 — 17
+### Field 17 — 00065_Maturity_Date
 
-Path: `00065_Maturity_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Date of Maturity
@@ -479,9 +462,8 @@ Definition: Date of Maturity
 
 ---
 
-### Field 18 — 18
+### Field 18 — 00067_May_Be_Terminated_Early
 
-Path: `00067_May_Be_Terminated_Early`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -502,9 +484,8 @@ Definition: Yes or No
 
 ---
 
-### Field 19 — 19
+### Field 19 — 00070_Financial_Instrument_Manufacturer_Name
 
-Path: `00070_Financial_Instrument_Manufacturer_Name`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of Manufacturer of the financial instrument. The one who is responsible for the financial instrument management/issuance
@@ -525,9 +506,8 @@ Definition: Name of Manufacturer of the financial instrument. The one who is res
 
 ---
 
-### Field 20 — 20
+### Field 20 — 00073_Financial_Instrument_Manufacturer_LEI
 
-Path: `00073_Financial_Instrument_Manufacturer_LEI`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Legal Entity Identifier, LEI of the Manufacturer of the financial instrument
@@ -548,9 +528,8 @@ Definition: Legal Entity Identifier, LEI of the Manufacturer of the financial in
 
 ---
 
-### Field 21 — 21
+### Field 21 — 00074_Financial_Instrument_Manufacturer_Email
 
-Path: `00074_Financial_Instrument_Manufacturer_Email`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Contact entry point for communication with the Manufacturer to either provide feed back reporting or to retrieve details on how to provide feed back reporting.
@@ -570,9 +549,8 @@ Definition: Contact entry point for communication with the Manufacturer to eithe
 
 ---
 
-### Field 22 — 22
+### Field 22 — 00075_Financial_Instrument_Manufacturer_Product_Governance_Process
 
-Path: `00075_Financial_Instrument_Manufacturer_Product_Governance_Process`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: A = Product governance procedure pursuant to MiFID II B = Product governance procedure comparable to MiFID II C = Product governance procedure not in accordance with MiFID II D = No information is requested from the issuer
@@ -592,9 +570,8 @@ Definition: A = Product governance procedure pursuant to MiFID II B = Product go
 
 ---
 
-### Field 23 — 23
+### Field 23 — 00080_Financial_Instrument_Guarantor_Name
 
-Path: `00080_Financial_Instrument_Guarantor_Name`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of Guarantor of the financial instrument.
@@ -614,9 +591,8 @@ Definition: Name of Guarantor of the financial instrument.
 
 ---
 
-### Field 24 — 24
+### Field 24 — 00085_Financial_Instrument_Type_Notional_Or_Item_Based
 
-Path: `00085_Financial_Instrument_Type_Notional_Or_Item_Based`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: N for Notional based instrument, I for Item based instrument
@@ -637,9 +613,8 @@ Definition: N for Notional based instrument, I for Item based instrument
 
 ---
 
-### Field 25 — 25
+### Field 25 — 00090_Product_Category_Or_Nature_Germany
 
-Path: `00090_Product_Category_Or_Nature_Germany`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Designation of the respective product category or nature for Germany
@@ -660,9 +635,8 @@ Definition: Designation of the respective product category or nature for Germany
 
 ---
 
-### Field 26 — 26
+### Field 26 — 00095_Structured_Securities_Product_Category_Or_Nature
 
-Path: `00095_Structured_Securities_Product_Category_Or_Nature`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Designation of the respective product category or nature. EUSIPA Map/Codes for structured securities (https://eusipa.org/governance/#EusipaDMap)
@@ -682,9 +656,8 @@ Definition: Designation of the respective product category or nature. EUSIPA Map
 
 ---
 
-### Field 27 — 27
+### Field 27 — 00096_Structured_Securities_Quotation
 
-Path: `00096_Structured_Securities_Quotation`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Defines if the quotation type in the Ex-Ante and Ex-Post section of the EMT file is in UNITS or in PERCENTAGE related to the specific Reference as presented in field 07150,07155, 08110 and 08120 respectively.
@@ -705,9 +678,8 @@ Definition: Defines if the quotation type in the Ex-Ante and Ex-Post section of 
 
 ---
 
-### Field 28 — 28
+### Field 28 — 00100_Leveraged_Financial_Instrument_Or_Contingent_Liability_Instrument
 
-Path: `00100_Leveraged_Financial_Instrument_Or_Contingent_Liability_Instrument`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -727,9 +699,8 @@ Definition: Yes or No
 
 ---
 
-### Field 29 — 29
+### Field 29 — 00110_Fund_Share_Class_Without_Retrocession
 
-Path: `00110_Fund_Share_Class_Without_Retrocession`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -749,9 +720,8 @@ Definition: Yes or No
 
 ---
 
-### Field 30 — 30
+### Field 30 — 00120_Ex_Post_Cost_Calculation_Basis_Italy
 
-Path: `00120_Ex_Post_Cost_Calculation_Basis_Italy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Rolling based (last 12 months) or Fixed base (calendar year)
@@ -772,9 +742,8 @@ Definition: Rolling based (last 12 months) or Fixed base (calendar year)
 
 ---
 
-### Field 31 — 31
+### Field 31 — 01000_Target_Market_Reference_Date
 
-Path: `01000_Target_Market_Reference_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Date to which the Target Market data within the EMT refer
@@ -795,9 +764,8 @@ Definition: Date to which the Target Market data within the EMT refer
 
 ---
 
-### Field 32 — 32
+### Field 32 — 01010_Investor_Type_Retail
 
-Path: `01010_Investor_Type_Retail`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -818,9 +786,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 33 — 33
+### Field 33 — 01020_Investor_Type_Professional
 
-Path: `01020_Investor_Type_Professional`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Professional Per Se or Elective Professional
@@ -841,9 +808,8 @@ Definition: Yes or No or Professional Per Se or Elective Professional
 
 ---
 
-### Field 34 — 34
+### Field 34 — 01030_Investor_Type_Eligible_Counterparty
 
-Path: `01030_Investor_Type_Eligible_Counterparty`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -864,9 +830,8 @@ Definition: Yes or No
 
 ---
 
-### Field 35 — 35
+### Field 35 — 02010_Basic_Investor
 
-Path: `02010_Basic_Investor`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -887,9 +852,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 36 — 36
+### Field 36 — 02020_Informed_Investor
 
-Path: `02020_Informed_Investor`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -910,9 +874,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 37 — 37
+### Field 37 — 02030_Advanced_Investor
 
-Path: `02030_Advanced_Investor`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -933,9 +896,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 38 — 38
+### Field 38 — 02040_Expert_Investor_Germany
 
-Path: `02040_Expert_Investor_Germany`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -955,9 +917,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 39 — 39
+### Field 39 — 03010_Compatible_With_Clients_Who_Can_Not_Bear_Capital_Loss
 
-Path: `03010_Compatible_With_Clients_Who_Can_Not_Bear_Capital_Loss`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Investor can bear no loss of capital. Minor losses especially due to costs possible. Yes or No or Neutral
@@ -978,9 +939,8 @@ Definition: Investor can bear no loss of capital. Minor losses especially due to
 
 ---
 
-### Field 40 — 40
+### Field 40 — 03020_Compatible_With_Clients_Who_Can_Bear_Limited_Capital_Loss
 
-Path: `03020_Compatible_With_Clients_Who_Can_Bear_Limited_Capital_Loss`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Investor seeking to preserve capital or can bear losses limited to a level specified by the product. Assessment of loss level is based on investments in the same currency as the instrument denomination and do not take into consideration potential adverse FX market performance. To be filled only for structured securities & funds with an explicit capital protection or for Money Market funds. Yes or No or Neutral
@@ -1001,9 +961,8 @@ Definition: Investor seeking to preserve capital or can bear losses limited to a
 
 ---
 
-### Field 41 — 41
+### Field 41 — 03030_Limited_Capital_Loss_Level
 
-Path: `03030_Limited_Capital_Loss_Level`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Loss up to XX%
@@ -1024,9 +983,8 @@ Definition: Loss up to XX%
 
 ---
 
-### Field 42 — 42
+### Field 42 — 03040_Compatible_With_Clients_Who_Do_Not_Need_Capital_Guarantee
 
-Path: `03040_Compatible_With_Clients_Who_Do_Not_Need_Capital_Guarantee`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: No Capital Guarantee nor protection. 100% capital at risk . Yes or No or Neutral
@@ -1047,9 +1005,8 @@ Definition: No Capital Guarantee nor protection. 100% capital at risk . Yes or N
 
 ---
 
-### Field 43 — 43
+### Field 43 — 03050_Compatible_With_Clients_Who_Can_Bear_Loss_Beyond_Capital
 
-Path: `03050_Compatible_With_Clients_Who_Can_Bear_Loss_Beyond_Capital`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Loss Beyond the Capital. Yes or No or Neutral
@@ -1070,9 +1027,8 @@ Definition: Loss Beyond the Capital. Yes or No or Neutral
 
 ---
 
-### Field 44 — 44
+### Field 44 — 04010_Risk_Tolerance_PRIIPS_Methodology
 
-Path: `04010_Risk_Tolerance_PRIIPS_Methodology`
 Codification: CLOSED_LIST, closed list of 7 entries
 Applicability: all rows
 Definition: SRI
@@ -1093,9 +1049,8 @@ Definition: SRI
 
 ---
 
-### Field 45 — 45
+### Field 45 — 04020_Risk_Tolerance_UCITS_Methodology
 
-Path: `04020_Risk_Tolerance_UCITS_Methodology`
 Codification: CLOSED_LIST, closed list of 7 entries
 Applicability: all rows
 Definition: SRRI
@@ -1116,9 +1071,8 @@ Definition: SRRI
 
 ---
 
-### Field 46 — 46
+### Field 46 — 04030_Risk_Tolerance_Internal_Methodology_For_Non_PRIIPS_And_Non_UCITS
 
-Path: `04030_Risk_Tolerance_Internal_Methodology_For_Non_PRIIPS_And_Non_UCITS`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Low/medium/high
@@ -1139,9 +1093,8 @@ Definition: Low/medium/high
 
 ---
 
-### Field 47 — 47
+### Field 47 — 04040_Risk_Tolerance_For_Non_PRIIPS_And_Non_UCITS_Spain
 
-Path: `04040_Risk_Tolerance_For_Non_PRIIPS_And_Non_UCITS_Spain`
 Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: all rows
 Definition: Spanish SRI
@@ -1161,9 +1114,8 @@ Definition: Spanish SRI
 
 ---
 
-### Field 48 — 48
+### Field 48 — 04050_Not_For_Investors_With_The_Lowest_Risk_Tolerance_Germany
 
-Path: `04050_Not_For_Investors_With_The_Lowest_Risk_Tolerance_Germany`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or Neutral
@@ -1183,9 +1135,8 @@ Definition: Yes or Neutral
 
 ---
 
-### Field 49 — 49
+### Field 49 — 05010_Return_Profile_Client_Looking_For_Preservation
 
-Path: `05010_Return_Profile_Client_Looking_For_Preservation`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -1206,9 +1157,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 50 — 50
+### Field 50 — 05020_Return_Profile_Client_Looking_For_Capital_Growth
 
-Path: `05020_Return_Profile_Client_Looking_For_Capital_Growth`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -1229,9 +1179,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 51 — 51
+### Field 51 — 05030_Return_Profile_Client_Looking_For_Income
 
-Path: `05030_Return_Profile_Client_Looking_For_Income`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -1252,9 +1201,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 52 — 52
+### Field 52 — 05040_Return_Profile_Hedging
 
-Path: `05040_Return_Profile_Hedging`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -1275,9 +1223,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 53 — 53
+### Field 53 — 05050_Option_Or_Leveraged_Return_Profile
 
-Path: `05050_Option_Or_Leveraged_Return_Profile`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -1297,9 +1244,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 54 — 54
+### Field 54 — 05070_Return_Profile_Pension_Scheme_Germany
 
-Path: `05070_Return_Profile_Pension_Scheme_Germany`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No or Neutral
@@ -1319,9 +1265,8 @@ Definition: Yes or No or Neutral
 
 ---
 
-### Field 55 — 55
+### Field 55 — 05080_Minimum_Recommended_Holding_Period
 
-Path: `05080_Minimum_Recommended_Holding_Period`
 Codification: NUMERIC, closed list of 5 entries
 Applicability: all rows
 Definition: Minimum recommending holding period: RHP in years or Very Short Term (<1Y)or Short term (>=1Y) or Medium term (>=3Y) or Long term (>5Y) or Hold To Maturity
@@ -1342,9 +1287,8 @@ Definition: Minimum recommending holding period: RHP in years or Very Short Term
 
 ---
 
-### Field 56 — 56
+### Field 56 — 05105_Does_This_Financial_Instrument_Consider_End_Client_Sustainability_Preferences
 
-Path: `05105_Does_This_Financial_Instrument_Consider_End_Client_Sustainability_Preferences`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or Neutral
@@ -1365,9 +1309,8 @@ Definition: Yes or Neutral
 
 ---
 
-### Field 57 — 57
+### Field 57 — 05115_Other_Specific_Investment_Need
 
-Path: `05115_Other_Specific_Investment_Need`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: No, Islamic banking or Other
@@ -1387,9 +1330,8 @@ Definition: No, Islamic banking or Other
 
 ---
 
-### Field 58 — 58
+### Field 58 — 06010_Execution_Only
 
-Path: `06010_Execution_Only`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Retail or Professional or Both or Neither
@@ -1409,9 +1351,8 @@ Definition: Retail or Professional or Both or Neither
 
 ---
 
-### Field 59 — 59
+### Field 59 — 06020_Execution_With_Appropriateness_Test_Or_Non_Advised_Services
 
-Path: `06020_Execution_With_Appropriateness_Test_Or_Non_Advised_Services`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Retail or Professional or Both or Neither
@@ -1431,9 +1372,8 @@ Definition: Retail or Professional or Both or Neither
 
 ---
 
-### Field 60 — 60
+### Field 60 — 06030_Investment_Advice
 
-Path: `06030_Investment_Advice`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Retail or Professional or Both or Neither
@@ -1453,9 +1393,8 @@ Definition: Retail or Professional or Both or Neither
 
 ---
 
-### Field 61 — 61
+### Field 61 — 06040_Portfolio_Management
 
-Path: `06040_Portfolio_Management`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Retail or Professional or Both or Neither
@@ -1475,9 +1414,8 @@ Definition: Retail or Professional or Both or Neither
 
 ---
 
-### Field 62 — 62
+### Field 62 — 07020_Gross_One-off_Cost_Financial_Instrument_Maximum_Entry_Cost_Non_Acquired
 
-Path: `07020_Gross_One-off_Cost_Financial_Instrument_Maximum_Entry_Cost_Non_Acquired`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum not acquired to the fund. Expressed as a % of the amount to be invested.
@@ -1498,9 +1436,8 @@ Definition: Maximum not acquired to the fund. Expressed as a % of the amount to 
 
 ---
 
-### Field 63 — 63
+### Field 63 — 07025_Net_One-off_Cost_Structured_Products_Entry_Cost_Non_Acquired
 
-Path: `07025_Net_One-off_Cost_Structured_Products_Entry_Cost_Non_Acquired`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Expressed as a % of the amount to be invested. Subscription NAV - Fair Value
@@ -1520,9 +1457,8 @@ Definition: Expressed as a % of the amount to be invested. Subscription NAV - Fa
 
 ---
 
-### Field 64 — 64
+### Field 64 — 07030_One-off_Cost_Financial_Instrument_Maximum_Entry_Cost_Fixed_Amount_Italy
 
-Path: `07030_One-off_Cost_Financial_Instrument_Maximum_Entry_Cost_Fixed_Amount_Italy`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum fixed amount per subscription, not incorporated. Flat fixed fee definied by the manufacturer (Linked to Paying Agent)
@@ -1543,9 +1479,8 @@ Definition: Maximum fixed amount per subscription, not incorporated. Flat fixed 
 
 ---
 
-### Field 65 — 65
+### Field 65 — 07040_One-off_Cost_Financial_Instrument_Maximum_Entry_Cost_Acquired
 
-Path: `07040_One-off_Cost_Financial_Instrument_Maximum_Entry_Cost_Acquired`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Subscription fees acquired to the fund Expressed as a % of the amount to be invested
@@ -1566,9 +1501,8 @@ Definition: Subscription fees acquired to the fund Expressed as a % of the amoun
 
 ---
 
-### Field 66 — 66
+### Field 66 — 07050_One-off_Costs_Financial_Instrument_Maximum_Exit_Cost_Non_Acquired
 
-Path: `07050_One-off_Costs_Financial_Instrument_Maximum_Exit_Cost_Non_Acquired`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum not acquired to the fund Expressed as a % of the NAV.
@@ -1589,9 +1523,8 @@ Definition: Maximum not acquired to the fund Expressed as a % of the NAV.
 
 ---
 
-### Field 67 — 67
+### Field 67 — 07060_One-off_Costs_Financial_Instrument_Maximum_Exit_Cost_Fixed_Amount_Italy
 
-Path: `07060_One-off_Costs_Financial_Instrument_Maximum_Exit_Cost_Fixed_Amount_Italy`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum fixed amount per redemption, not incorporated. Flat fee definied by the manufacturer
@@ -1612,9 +1545,8 @@ Definition: Maximum fixed amount per redemption, not incorporated. Flat fee defi
 
 ---
 
-### Field 68 — 68
+### Field 68 — 07070_One-off_Costs_Financial_Instrument_Maximum_Exit_Cost_Acquired
 
-Path: `07070_One-off_Costs_Financial_Instrument_Maximum_Exit_Cost_Acquired`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum Exit fees acquired to the fund Expressed as a % of the NAV
@@ -1635,9 +1567,8 @@ Definition: Maximum Exit fees acquired to the fund Expressed as a % of the NAV
 
 ---
 
-### Field 69 — 69
+### Field 69 — 07080_One-off_Costs_Financial_Instrument_Typical_Exit_Cost
 
-Path: `07080_One-off_Costs_Financial_Instrument_Typical_Exit_Cost`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Current exit cost linked to the RHP or Time to Maturity or 1Y (V) or 3Y(S) or 5Y (M L) (the value of 05080_Minimum_Recommended_Holding_Period)
@@ -1657,9 +1588,8 @@ Definition: Current exit cost linked to the RHP or Time to Maturity or 1Y (V) or
 
 ---
 
-### Field 70 — 70
+### Field 70 — 07090_One-off_Cost_Financial_Instrument_Exit_Cost_Structured_Products_Prior_RHP
 
-Path: `07090_One-off_Cost_Financial_Instrument_Exit_Cost_Structured_Products_Prior_RHP`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Expressed as a % of the amount to be divested. Fair Value - Exit Value (eg Bid Price)
@@ -1680,9 +1610,8 @@ Definition: Expressed as a % of the amount to be divested. Fair Value - Exit Val
 
 ---
 
-### Field 71 — 71
+### Field 71 — 07100_Financial_Instrument_Gross_Ongoing_Costs
 
-Path: `07100_Financial_Instrument_Gross_Ongoing_Costs`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -1703,9 +1632,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 72 — 72
+### Field 72 — 07105_Financial_Instrument_Borrowing_Costs_Ex_Ante_UK
 
-Path: `07105_Financial_Instrument_Borrowing_Costs_Ex_Ante_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Financing costs related to borrowing for the purposes of gearing expressed as a % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -1725,9 +1653,8 @@ Definition: Financing costs related to borrowing for the purposes of gearing exp
 
 ---
 
-### Field 73 — 73
+### Field 73 — 07110_Financial_Instrument_Management_Fee
 
-Path: `07110_Financial_Instrument_Management_Fee`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -1748,9 +1675,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 74 — 74
+### Field 74 — 07120_Financial_Instrument_Distribution_Fee
 
-Path: `07120_Financial_Instrument_Distribution_Fee`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -1771,9 +1697,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 75 — 75
+### Field 75 — 07130_Financial_Instrument_Transaction_Costs_Ex_Ante
 
-Path: `07130_Financial_Instrument_Transaction_Costs_Ex_Ante`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -1794,9 +1719,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 76 — 76
+### Field 76 — 07140_Financial_Instrument_Incidental_Costs_Ex_Ante
 
-Path: `07140_Financial_Instrument_Incidental_Costs_Ex_Ante`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied). Includes Performance Fees and other costs.
@@ -1817,9 +1741,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 77 — 77
+### Field 77 — 07150_Structured_Securities_Reference_Price_Ex_Ante
 
-Path: `07150_Structured_Securities_Reference_Price_Ex_Ante`
 Codification: NUMERIC
 Applicability: all rows
 Definition: The Reference Price is the instrument price to which a Unit disclosed Ex-Post cost is based and to which a Percentage disclosed cost should be multiplied in order to retrieve the Unit cost. This field is conditional and only used if 07155 is not used.
@@ -1840,9 +1763,8 @@ Definition: The Reference Price is the instrument price to which a Unit disclose
 
 ---
 
-### Field 78 — 78
+### Field 78 — 07155_Structured_Securities_Notional_Reference_Amount_Ex_Ante
 
-Path: `07155_Structured_Securities_Notional_Reference_Amount_Ex_Ante`
 Codification: NUMERIC
 Applicability: all rows
 Definition: The Notional Reference Amount is the amount expressed in number of currency units to which a Unit disclosed Ex-Post cost is based and to which a Percentage disclosed cost should be multiplied in order to retrieve the Unit cost. This field is conditional and only used if 07150 is not used.
@@ -1863,9 +1785,8 @@ Definition: The Notional Reference Amount is the amount expressed in number of c
 
 ---
 
-### Field 79 — 79
+### Field 79 — 07160_Ex_Ante_Costs_Reference_Date
 
-Path: `07160_Ex_Ante_Costs_Reference_Date`
 Codification: DATE
 Applicability: all rows
 Definition: The Reference Date to which all Ex-Ante Cost disclosures refer (i.e NOT to be misstaken for General Reference Date, field 00050 or Generation Date and Time, field 00005)
@@ -1886,9 +1807,8 @@ Definition: The Reference Date to which all Ex-Ante Cost disclosures refer (i.e 
 
 ---
 
-### Field 80 — 80
+### Field 80 — 08010_Gross_One-off_Cost_Structured_Securities_Entry_Cost_Ex_Post
 
-Path: `08010_Gross_One-off_Cost_Structured_Securities_Entry_Cost_Ex_Post`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Fixed Amount
@@ -1909,9 +1829,8 @@ Definition: Fixed Amount
 
 ---
 
-### Field 81 — 81
+### Field 81 — 08015_Net_One-off_Cost_Structured_Securities_Entry_Cost_Ex_Post
 
-Path: `08015_Net_One-off_Cost_Structured_Securities_Entry_Cost_Ex_Post`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Net One-off Entry cost = 08010 less upfront distribution fee embedded in the 08010. In practice 08015 will be the portion of the 08010 retained by the manufacturer.
@@ -1931,9 +1850,8 @@ Definition: Net One-off Entry cost = 08010 less upfront distribution fee embedde
 
 ---
 
-### Field 82 — 82
+### Field 82 — 08020_One-off_Costs_Structured_Securities_Exit_Cost_Ex_Post
 
-Path: `08020_One-off_Costs_Structured_Securities_Exit_Cost_Ex_Post`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Fixed amount
@@ -1954,9 +1872,8 @@ Definition: Fixed amount
 
 ---
 
-### Field 83 — 83
+### Field 83 — 08025_One-off_Cost_Financial_Instrument_Entry_Cost_Acquired
 
-Path: `08025_One-off_Cost_Financial_Instrument_Entry_Cost_Acquired`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV
@@ -1977,9 +1894,8 @@ Definition: % of NAV
 
 ---
 
-### Field 84 — 84
+### Field 84 — 08030_Financial_Instrument_Ongoing_Costs_Ex_Post
 
-Path: `08030_Financial_Instrument_Ongoing_Costs_Ex_Post`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2000,9 +1916,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 85 — 85
+### Field 85 — 08040_Structured_Securities_Ongoing_Costs_Ex_Post_Accumulated
 
-Path: `08040_Structured_Securities_Ongoing_Costs_Ex_Post_Accumulated`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Sum of each daily Recurring Product Costs
@@ -2022,9 +1937,8 @@ Definition: Sum of each daily Recurring Product Costs
 
 ---
 
-### Field 86 — 86
+### Field 86 — 08045_Financial_Instrument_Borrowing_Costs_Ex_Post_UK
 
-Path: `08045_Financial_Instrument_Borrowing_Costs_Ex_Post_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Financing costs related to borrowing for the purposes of gearing expressed as a % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2044,9 +1958,8 @@ Definition: Financing costs related to borrowing for the purposes of gearing exp
 
 ---
 
-### Field 87 — 87
+### Field 87 — 08050_Financial_Instrument_Management_Fee_Ex_Post
 
-Path: `08050_Financial_Instrument_Management_Fee_Ex_Post`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2067,9 +1980,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 88 — 88
+### Field 88 — 08060_Financial_Instrument_Distribution_Fee_Ex_Post
 
-Path: `08060_Financial_Instrument_Distribution_Fee_Ex_Post`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2090,9 +2002,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 89 — 89
+### Field 89 — 08070_Financial_Instrument_Transaction_Costs_Ex_Post
 
-Path: `08070_Financial_Instrument_Transaction_Costs_Ex_Post`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2113,9 +2024,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 90 — 90
+### Field 90 — 08080_Financial_Instrument_Incidental_Costs_Ex_Post
 
-Path: `08080_Financial_Instrument_Incidental_Costs_Ex_Post`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2136,9 +2046,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 91 — 91
+### Field 91 — 08090_Beginning_Of_Reference_Period
 
-Path: `08090_Beginning_Of_Reference_Period`
 Codification: DATE
 Applicability: all rows
 Definition: The Date that specifies the start of the Reference Period. Defined as "From and including". All ex-post cost disclosures apart from 08040 refers to all dates in such period.
@@ -2159,9 +2068,8 @@ Definition: The Date that specifies the start of the Reference Period. Defined a
 
 ---
 
-### Field 92 — 92
+### Field 92 — 08100_End_Of_Reference_Period
 
-Path: `08100_End_Of_Reference_Period`
 Codification: DATE
 Applicability: all rows
 Definition: The Date that specifies the end of the Reference Period. Defined as "To and including". All ex-post cost disclosures apart from 08040 refers to all dates in such period. For the avoidance of doubt, this date can be specified as equal to the date specified in 08090.
@@ -2182,9 +2090,8 @@ Definition: The Date that specifies the end of the Reference Period. Defined as 
 
 ---
 
-### Field 93 — 93
+### Field 93 — 08110_Structured_Securities_Reference_Price_Ex_Post
 
-Path: `08110_Structured_Securities_Reference_Price_Ex_Post`
 Codification: NUMERIC
 Applicability: all rows
 Definition: The Reference Price is the instrument price to which a Unit disclosed Ex-Post cost is based and to which a Percentage disclosed cost should be multiplied in order to retrieve the Unit cost. This field is conditional and only used if 08120 is not used.
@@ -2205,9 +2112,8 @@ Definition: The Reference Price is the instrument price to which a Unit disclose
 
 ---
 
-### Field 94 — 94
+### Field 94 — 08120_Structured_Securities_Notional_Reference_Amount
 
-Path: `08120_Structured_Securities_Notional_Reference_Amount`
 Codification: NUMERIC
 Applicability: all rows
 Definition: The Notional Reference Amount is the amount expressed in number of currency units to which a Unit disclosed Ex-Post cost is based and to which a Percentage disclosed cost should be multiplied in order to retrieve the Unit cost. This field is conditional and only used if 08110 is not used.
@@ -2228,9 +2134,8 @@ Definition: The Notional Reference Amount is the amount expressed in number of c
 
 ---
 
-### Field 95 — 95
+### Field 95 — 09010_Financial_Instrument_Transaction_Costs_Ex_Ante_UK
 
-Path: `09010_Financial_Instrument_Transaction_Costs_Ex_Ante_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2250,9 +2155,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 96 — 96
+### Field 96 — 09020_Financial_Instrument_Transaction_Costs_Ex_Post_UK
 
-Path: `09020_Financial_Instrument_Transaction_Costs_Ex_Post_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2272,9 +2176,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 97 — 97
+### Field 97 — 09030_EMT_Data_Reporting_VFM_UK
 
-Path: `09030_EMT_Data_Reporting_VFM_UK`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Specifies if the Value for Money section is filled in the current EMT posting.
@@ -2295,9 +2198,8 @@ Definition: Specifies if the Value for Money section is filled in the current EM
 
 ---
 
-### Field 98 — 98
+### Field 98 — 09040_Is_Assessment_Of_Value_Required_Under_COLL_UK
 
-Path: `09040_Is_Assessment_Of_Value_Required_Under_COLL_UK`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -2318,9 +2220,8 @@ Definition: Yes or No
 
 ---
 
-### Field 99 — 99
+### Field 99 — 09050_Outcome_Of_COLL_Assessment_Of_Value_UK
 
-Path: `09050_Outcome_Of_COLL_Assessment_Of_Value_UK`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: 1 – charges are justified based on assessment and any action identified or, where the first assessment is not yet due, based on initial product design 2 – charges are not justified, significant action is required
@@ -2341,9 +2242,8 @@ Definition: 1 – charges are justified based on assessment and any action ident
 
 ---
 
-### Field 100 — 100
+### Field 100 — 09060_Outcome_Of_PRIN_Value_Assessment_Or_Review_UK
 
-Path: `09060_Outcome_Of_PRIN_Value_Assessment_Or_Review_UK`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: 1 – product expected to provide fair value for reasonably foreseeable period 2 – review indicates significant changes required in order to provide fair value
@@ -2364,9 +2264,8 @@ Definition: 1 – product expected to provide fair value for reasonably foreseea
 
 ---
 
-### Field 101 — 101
+### Field 101 — 09070_Other_Review_Related_To_Value_And_Or_Charges_UK
 
-Path: `09070_Other_Review_Related_To_Value_And_Or_Charges_UK`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: A – In line with ESMA supervisory briefing on the supervision of costs in UCITS and AIFs or relevant NCA supervisory activity O – Other local requirements or procedures
@@ -2386,9 +2285,8 @@ Definition: A – In line with ESMA supervisory briefing on the supervision of c
 
 ---
 
-### Field 102 — 102
+### Field 102 — 09080_Further_Information_UK
 
-Path: `09080_Further_Information_UK`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Link to sources of relevant information
@@ -2408,9 +2306,8 @@ Definition: Link to sources of relevant information
 
 ---
 
-### Field 103 — 103
+### Field 103 — 09090_Review_Date_UK
 
-Path: `09090_Review_Date_UK`
 Codification: DATE
 Applicability: all rows
 Definition: Date of value assessment review or date COLL assessment of value report published or initial launch date
@@ -2431,9 +2328,8 @@ Definition: Date of value assessment review or date COLL assessment of value rep
 
 ---
 
-### Field 104 — 104
+### Field 104 — 09100_Review_Next_Due_UK
 
-Path: `09100_Review_Next_Due_UK`
 Codification: DATE
 Applicability: all rows
 
@@ -2452,9 +2348,8 @@ Applicability: all rows
 
 ---
 
-### Field 105 — 105
+### Field 105 — 10000_Financial_Instrument_Indirect_Costs_Open_Ended_Ex_Ante_UK
 
-Path: `10000_Financial_Instrument_Indirect_Costs_Open_Ended_Ex_Ante_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2474,9 +2369,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 106 — 106
+### Field 106 — 10010_Financial_Instrument_Indirect_Costs_Closed_Ended_Ex_Ante_UK
 
-Path: `10010_Financial_Instrument_Indirect_Costs_Closed_Ended_Ex_Ante_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2496,9 +2390,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 107 — 107
+### Field 107 — 10020_Financial_Instrument_Real_Assets_Costs_Ex_Ante_UK
 
-Path: `10020_Financial_Instrument_Real_Assets_Costs_Ex_Ante_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2518,9 +2411,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 108 — 108
+### Field 108 — 10030_Financial_Instrument_Indirect_Costs_Open_Ended_Ex_Post_UK
 
-Path: `10030_Financial_Instrument_Indirect_Costs_Open_Ended_Ex_Post_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2540,9 +2432,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 109 — 109
+### Field 109 — 10040_Financial_Instrument_Indirect_Costs_Closed_Ended_Ex_Post_UK
 
-Path: `10040_Financial_Instrument_Indirect_Costs_Closed_Ended_Ex_Post_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2562,9 +2453,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 110 — 110
+### Field 110 — 10050_Financial_Instrument_Real_Assets_Costs_Ex_Post_UK
 
-Path: `10050_Financial_Instrument_Real_Assets_Costs_Ex_Post_UK`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of NAV of the Financial Product expressed in annualized terms (rate of cost deduction to be applied)
@@ -2584,9 +2474,8 @@ Definition: % of NAV of the Financial Product expressed in annualized terms (rat
 
 ---
 
-### Field 111 — 111
+### Field 111 — 10060_Does_Financial_Instrument_Produce_Client_Facing_Disclosures_UK
 
-Path: `10060_Does_Financial_Instrument_Produce_Client_Facing_Disclosures_UK`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Y - Yes, there is a CFD I - There is an intention to produce a CFD N - No, there is no intention to produce a CFD

@@ -283,246 +283,246 @@ Each rule below fires per row when its trigger condition holds and the expected 
 
 ### EET-XF-PAI-103 — Conditional presence of field 103
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `103` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `103`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-104 — Conditional presence of field 104
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `104` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `104`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-106 — Conditional presence of field 106
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `106` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `106`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-110 — Conditional presence of field 110
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `110` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `110`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-114 — Conditional presence of field 114
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `114` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `114`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-118 — Conditional presence of field 118
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `118` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `118`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-122 — Conditional presence of field 122
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `122` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `122`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-126 — Conditional presence of field 126
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `126` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `126`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-130 — Conditional presence of field 130
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `130` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `130`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-134 — Conditional presence of field 134
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `134` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `134`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-138 — Conditional presence of field 138
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `138` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `138`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-142 — Conditional presence of field 142
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `142` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `142`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-146 — Conditional presence of field 146
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `146` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `146`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-150 — Conditional presence of field 150
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `150` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `150`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-154 — Conditional presence of field 154
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `154` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `154`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-158 — Conditional presence of field 158
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `158` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `158`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-162 — Conditional presence of field 162
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `162` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `162`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-166 — Conditional presence of field 166
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `166` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `166`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-170 — Conditional presence of field 170
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `170` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `170`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-174 — Conditional presence of field 174
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `174` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `174`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-178 — Conditional presence of field 178
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `178` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `178`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-182 — Conditional presence of field 182
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `182` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `182`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-186 — Conditional presence of field 186
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `186` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `186`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-190 — Conditional presence of field 190
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `190` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `190`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-194 — Conditional presence of field 194
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `194` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `194`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-198 — Conditional presence of field 198
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `198` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `198`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-PAI-202 — Conditional presence of field 202
 
-- **Severity:** ERROR
+- **Severity:** WARNING
 - **Trigger:** Field `33` ∈ [Y, YES, TRUE, 1]
 - **Required:** Field `202` must be non-empty.
 - **Source field(s):** `33`
 - **Target field(s):** `202`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
+- **Score impact:** Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY).
 
 ### EET-XF-ART8-MIN-SI-SPLIT — At least one of fields [42, 43, 44] must be present
 
@@ -564,9 +564,8 @@ Each rule below fires per row when its trigger condition holds and the expected 
 
 One entry per `FieldSpec` in spec order. Each entry lists every check that can fire on the field, with the profile scope, severity, trigger condition, and quantified score impact.
 
-### Field 1 — 1
+### Field 1 — 00010_EET_Version
 
-Path: `00010_EET_Version`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: This field specifies the output version of the template and is used by the recipient to understand the number of fields expected, their labeling and order.
@@ -601,9 +600,8 @@ Definition: This field specifies the output version of the template and is used 
 
 ---
 
-### Field 2 — 2
+### Field 2 — 00020_EET_Producer_Name
 
-Path: `00020_EET_Producer_Name`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: If the Manufacturer/Issuer have chosen to outsource the production of an EET posting to another party responsible for the production and publication of the EET data set, such party name should be entered in this field.
@@ -630,9 +628,8 @@ Definition: If the Manufacturer/Issuer have chosen to outsource the production o
 
 ---
 
-### Field 3 — 3
+### Field 3 — 00030_EET_Producer_LEI
 
-Path: `00030_EET_Producer_LEI`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: If the Manufacturer/Issuer have chosen to outsource the production of an EET posting to another party responsible for the production and publication of the EET data set, such party LEI should be entered in this field.
@@ -660,9 +657,8 @@ Definition: If the Manufacturer/Issuer have chosen to outsource the production o
 
 ---
 
-### Field 4 — 4
+### Field 4 — 00040_EET_Producer_Email
 
-Path: `00040_EET_Producer_Email`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Contact entry point for distributors regarding EET
@@ -689,9 +685,8 @@ Definition: Contact entry point for distributors regarding EET
 
 ---
 
-### Field 5 — 5
+### Field 5 — 00050_EET_File_Generation_Date_And_Time
 
-Path: `00050_EET_File_Generation_Date_And_Time`
 Codification: DATETIME
 Applicability: all rows
 Definition: Date and Time of the creation of the EET file
@@ -726,9 +721,8 @@ Definition: Date and Time of the creation of the EET file
 
 ---
 
-### Field 6 — 6
+### Field 6 — 00060_EET_Data_Reporting_SFDR_Pre_Contractual
 
-Path: `00060_EET_Data_Reporting_SFDR_Pre_Contractual`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Data points refer to column J
@@ -757,9 +751,8 @@ Definition: Data points refer to column J
 
 ---
 
-### Field 7 — 7
+### Field 7 — 00070_EET_Data_Reporting_SFDR_Periodic
 
-Path: `00070_EET_Data_Reporting_SFDR_Periodic`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Data points refer to column I No means that there is not yet a periodic reporting. The M related fields have not to be fullfiled
@@ -788,9 +781,8 @@ Definition: Data points refer to column I No means that there is not yet a perio
 
 ---
 
-### Field 8 — 8
+### Field 8 — 00080_EET_Data_Reporting_SFDR_Entity_Level
 
-Path: `00080_EET_Data_Reporting_SFDR_Entity_Level`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Data points refer to column K
@@ -819,9 +811,8 @@ Definition: Data points refer to column K
 
 ---
 
-### Field 9 — 9
+### Field 9 — 00090_EET_Data_Reporting_MiFID
 
-Path: `00090_EET_Data_Reporting_MiFID`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Data points refer to column L & N
@@ -851,9 +842,8 @@ Definition: Data points refer to column L & N
 
 ---
 
-### Field 10 — 10
+### Field 10 — 00100_EET_Data_Reporting_IDD
 
-Path: `00100_EET_Data_Reporting_IDD`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Data points refer to column M & O
@@ -883,9 +873,8 @@ Definition: Data points refer to column M & O
 
 ---
 
-### Field 11 — 11
+### Field 11 — 10000_Manufacturer_Name
 
-Path: `10000_Manufacturer_Name`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Name of the Manufacturer
@@ -920,9 +909,8 @@ Definition: Name of the Manufacturer
 
 ---
 
-### Field 12 — 12
+### Field 12 — 10010_Manufacturer_Code_Type
 
-Path: `10010_Manufacturer_Code_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Codification used to determine the identification code. Either LEI or None.
@@ -957,9 +945,8 @@ Definition: Codification used to determine the identification code. Either LEI o
 
 ---
 
-### Field 13 — 13
+### Field 13 — 10020_Manufacturer_Code
 
-Path: `10020_Manufacturer_Code`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identification code of the Manufacturer
@@ -995,9 +982,8 @@ Definition: Identification code of the Manufacturer
 
 ---
 
-### Field 14 — 14
+### Field 14 — 10030_Manufacturer_Email
 
-Path: `10030_Manufacturer_Email`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Contact entry point for distributors for content question
@@ -1024,9 +1010,8 @@ Definition: Contact entry point for distributors for content question
 
 ---
 
-### Field 15 — 15
+### Field 15 — 10040_General_Reference_Date
 
-Path: `10040_General_Reference_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Date to which the general data refer
@@ -1061,9 +1046,8 @@ Definition: Date to which the general data refer
 
 ---
 
-### Field 16 — 16
+### Field 16 — 11000_Manufacturer_PRI_Or_PRB_Signatory
 
-Path: `11000_Manufacturer_PRI_Or_PRB_Signatory`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Has the Manufacturer signed the Principle for Responsible Investment ?
@@ -1090,9 +1074,8 @@ Definition: Has the Manufacturer signed the Principle for Responsible Investment
 
 ---
 
-### Field 17 — 17
+### Field 17 — 11011_Manufacturer_PRI_Notation_Percentage
 
-Path: `11011_Manufacturer_PRI_Notation_Percentage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Notation of the Manufacturer by the PRI on the "Policy, Governance and Strategy policy"
@@ -1119,9 +1102,8 @@ Definition: Notation of the Manufacturer by the PRI on the "Policy, Governance a
 
 ---
 
-### Field 18 — 18
+### Field 18 — 11020_Manufacturer_PRI_Or_PRB_Compliant
 
-Path: `11020_Manufacturer_PRI_Or_PRB_Compliant`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: The manufacturer is a subsidary of a PRI/PRB entity.
@@ -1148,9 +1130,8 @@ Definition: The manufacturer is a subsidary of a PRI/PRB entity.
 
 ---
 
-### Field 19 — 19
+### Field 19 — 11030_Manufacturer_PRI_Or_PRB_Like
 
-Path: `11030_Manufacturer_PRI_Or_PRB_Like`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: The Manufacturer is not a PRI/PRB signatory but considers it follows PRI/PRB rules.
@@ -1177,9 +1158,8 @@ Definition: The Manufacturer is not a PRI/PRB signatory but considers it follows
 
 ---
 
-### Field 20 — 20
+### Field 20 — 11040_Manufacturer_Other_Commitments
 
-Path: `11040_Manufacturer_Other_Commitments`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Other Commitments by Manufacturers
@@ -1206,9 +1186,8 @@ Definition: Other Commitments by Manufacturers
 
 ---
 
-### Field 21 — 21
+### Field 21 — 12000_Manufacturer_Stewardship_Code_Signatory
 
-Path: `12000_Manufacturer_Stewardship_Code_Signatory`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Disclosure of the applicable Stewardship Code
@@ -1235,9 +1214,8 @@ Definition: Disclosure of the applicable Stewardship Code
 
 ---
 
-### Field 22 — 22
+### Field 22 — 13000_Manufacturer_Website_Information_Stewardship_And_Engagement
 
-Path: `13000_Manufacturer_Website_Information_Stewardship_And_Engagement`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Internet address where the client can find all relevant informations regarding stewardship and engagement of the manufacturer.
@@ -1266,9 +1244,8 @@ Definition: Internet address where the client can find all relevant informations
 
 ---
 
-### Field 23 — 23
+### Field 23 — 20000_Financial_Instrument_Identifying_Data
 
-Path: `20000_Financial_Instrument_Identifying_Data`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identification of the financial instrument
@@ -1304,9 +1281,8 @@ Definition: Identification of the financial instrument
 
 ---
 
-### Field 24 — 24
+### Field 24 — 20010_Financial_Instrument_Type_Of_Identification_Code
 
-Path: `20010_Financial_Instrument_Type_Of_Identification_Code`
 Codification: CLOSED_LIST, closed list of 11 entries
 Applicability: all rows
 Definition: Codification chosen to identify the financial instrument
@@ -1341,9 +1317,8 @@ Definition: Codification chosen to identify the financial instrument
 
 ---
 
-### Field 25 — 25
+### Field 25 — 20020_Financial_Instrument_Name
 
-Path: `20020_Financial_Instrument_Name`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of the financial instrument
@@ -1378,9 +1353,8 @@ Definition: Name of the financial instrument
 
 ---
 
-### Field 26 — 26
+### Field 26 — 20030_Financial_Instrument_Currency
 
-Path: `20030_Financial_Instrument_Currency`
 Codification: ISO_4217
 Applicability: all rows
 Definition: Denomination Currency of the Financial Instrument
@@ -1415,9 +1389,8 @@ Definition: Denomination Currency of the Financial Instrument
 
 ---
 
-### Field 27 — 27
+### Field 27 — 20040_Financial_Instrument_SFDR_Product_Type
 
-Path: `20040_Financial_Instrument_SFDR_Product_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Reference of the article of SFDR european regulation applying to the product (art 6, art 8 or art 9). 0= product is not in SFDR scope 6= product not Art8/9 8=Art. 8 SFDR Product (ESG characteristics); 9=Art. 9 SFDR product (ESG objective)
@@ -1451,9 +1424,8 @@ Definition: Reference of the article of SFDR european regulation applying to the
 
 ---
 
-### Field 28 — 28
+### Field 28 — 20050_Financial_Instrument_SFDR_Product_Type_Eligible
 
-Path: `20050_Financial_Instrument_SFDR_Product_Type_Eligible`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Conditional to 20040 set to 0 For funds & products not being in SFDR scope, which includes structured products 0= product does not follow any SFDR guideline 6= product follows Art6 guidelines 8= product is Art 8 like 9= product is Art 9 like
@@ -1482,9 +1454,8 @@ Definition: Conditional to 20040 set to 0 For funds & products not being in SFDR
 
 ---
 
-### Field 29 — 29
+### Field 29 — 20060_Financial_Instrument_ESG_Label_Or_Standard
 
-Path: `20060_Financial_Instrument_ESG_Label_Or_Standard`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Disclosure of applicable ESG Label/s
@@ -1511,9 +1482,8 @@ Definition: Disclosure of applicable ESG Label/s
 
 ---
 
-### Field 30 — 30
+### Field 30 — 20070_Financial_Instrument_Percentage_Of_Minimum_SFDR_Art_8_Funds
 
-Path: `20070_Financial_Instrument_Percentage_Of_Minimum_SFDR_Art_8_Funds`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Proportion in look through of art 8 sub invested funds for funds of funds Nav based
@@ -1542,9 +1512,8 @@ Definition: Proportion in look through of art 8 sub invested funds for funds of 
 
 ---
 
-### Field 31 — 31
+### Field 31 — 20080_Financial_Instrument_Percentage_Of_Minimum_SFDR_Art_9_Funds
 
-Path: `20080_Financial_Instrument_Percentage_Of_Minimum_SFDR_Art_9_Funds`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Proportion in look through of art 9 sub invested funds for funds of funds Nav based
@@ -1573,9 +1542,8 @@ Definition: Proportion in look through of art 9 sub invested funds for funds of 
 
 ---
 
-### Field 32 — 32
+### Field 32 — 20090_Financial_Instrument_Main_ESG_Focus
 
-Path: `20090_Financial_Instrument_Main_ESG_Focus`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Indication of the "main focus" of the Financial_Instrument ( for example E for green bonds…). E or S or G or MF (Multi focus) or Blank (if no focus at all)
@@ -1602,9 +1570,8 @@ Definition: Indication of the "main focus" of the Financial_Instrument ( for exa
 
 ---
 
-### Field 33 — 33
+### Field 33 — 20100_Financial_Instrument_Does_This_Product_Consider_Principle_Adverse_Impact_In_Their_Investment
 
-Path: `20100_Financial_Instrument_Does_This_Product_Consider_Principle_Adverse_Impact_In_Their_Investment`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Consideration of PAI is commitment to reduce or mitigate adverse impacts and can be done quantitative or qualitatively
@@ -1638,9 +1605,8 @@ Definition: Consideration of PAI is commitment to reduce or mitigate adverse imp
 
 ---
 
-### Field 34 — 34
+### Field 34 — 20110_Financial_Instrument_Languages
 
-Path: `20110_Financial_Instrument_Languages`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Each insurance company needs to have the pre contractual, periodic, websites translated and published in the language of the countries of distribution. This field allows to list the languages in which the annexes documents are translated. The asset managers and structured product houses are due to provide the langagues of the countries of distribution of their funds: the list of the countries/languages is similar to the list of countries where EPT are distributed
@@ -1669,9 +1635,8 @@ Definition: Each insurance company needs to have the pre contractual, periodic, 
 
 ---
 
-### Field 35 — 35
+### Field 35 — 20120_Financial_Instrument_Link_To_PCDFP_For_MOP
 
-Path: `20120_Financial_Instrument_Link_To_PCDFP_For_MOP`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Pre Contractual Disclosure for Financial Products referred to in Article 8(1) and 9(1), (2) and (3) (EU) 2019/2088 as stand alone document PDF for underlying investment options in Multi Option Products. Annex I, Annex II (EU) 2019/2088. The asset managers and structured product houses are due to provide the langagues of the countries of distribution of their funds: the list of the countries/languages is similar to the list of countries where EPT are distributed
@@ -1699,9 +1664,8 @@ Definition: Pre Contractual Disclosure for Financial Products referred to in Art
 
 ---
 
-### Field 36 — 36
+### Field 36 — 20130_Financial_Instrument_Production_Date_PCDFP
 
-Path: `20130_Financial_Instrument_Production_Date_PCDFP`
 Codification: DATE_LIST
 Applicability: all rows
 Definition: Dates of production of PCDFP for the different languages
@@ -1729,9 +1693,8 @@ Definition: Dates of production of PCDFP for the different languages
 
 ---
 
-### Field 37 — 37
+### Field 37 — 20140_Financial_Instrument_Link_To_PDFP_for_MOP
 
-Path: `20140_Financial_Instrument_Link_To_PDFP_for_MOP`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Periodic Disclosure for Financial Products referred to in Article 8(1) and 9(1), (2) and (3) (EU) 2019/2088 as stand alone document PDF for underlying investment options in Multi Option Products. Annex III, Annex IV (EU) 2019/2088. The asset managers and structured product houses are due to provide the langagues of the countries of distribution of their funds: the list of the countries/languages is similar to the list of countries where EPT are distributed
@@ -1761,9 +1724,8 @@ Definition: Periodic Disclosure for Financial Products referred to in Article 8(
 
 ---
 
-### Field 38 — 38
+### Field 38 — 20150_Financial_Instrument_End_Date_Of_Reporting_Period_PDFP
 
-Path: `20150_Financial_Instrument_End_Date_Of_Reporting_Period_PDFP`
 Codification: DATE
 Applicability: all rows
 Definition: End Date Of Reporting Period PDFP (based on 12 months reporting report market usage)
@@ -1793,9 +1755,8 @@ Definition: End Date Of Reporting Period PDFP (based on 12 months reporting repo
 
 ---
 
-### Field 39 — 39
+### Field 39 — 20160_Financial_Instrument_Link_To_SFDR_Website_Product_Disclosures
 
-Path: `20160_Financial_Instrument_Link_To_SFDR_Website_Product_Disclosures`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Art 10 SFDR - 24 RTS & 37 RTS The asset managers and structured product houses are due to provide the langagues of the countries of distribution of their funds: the list of the countries/languages is similar to the list of countries where EPT are distributed The link has to be to the actual full disclosure website and not to a generic
@@ -1824,9 +1785,8 @@ Definition: Art 10 SFDR - 24 RTS & 37 RTS The asset managers and structured prod
 
 ---
 
-### Field 40 — 40
+### Field 40 — 20170_Financial_Instrument_Sustainable_Investments_Art_8
 
-Path: `20170_Financial_Instrument_Sustainable_Investments_Art_8`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does the art 8 product invest in sustainable investment?
@@ -1861,9 +1821,8 @@ Definition: Does the art 8 product invest in sustainable investment?
 
 ---
 
-### Field 41 — 41
+### Field 41 — 20180_Financial_Instrument_Products_Minimal_Proportion_Of_Sustainable_Investments_Art_8
 
-Path: `20180_Financial_Instrument_Products_Minimal_Proportion_Of_Sustainable_Investments_Art_8`
 Codification: NUMERIC
 Applicability: all rows
 Definition: For art 8 products, the minimum proportion of sustainable investments.
@@ -1893,9 +1852,8 @@ Definition: For art 8 products, the minimum proportion of sustainable investment
 
 ---
 
-### Field 42 — 42
+### Field 42 — 20190_Financial_Instrument_Sustainable_Investment_EU_Taxonomy_Art_8
 
-Path: `20190_Financial_Instrument_Sustainable_Investment_EU_Taxonomy_Art_8`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does the minimum specified in field 20180 include EU Taxonomy sustainable investment?
@@ -1930,9 +1888,8 @@ Definition: Does the minimum specified in field 20180 include EU Taxonomy sustai
 
 ---
 
-### Field 43 — 43
+### Field 43 — 20200_Financial_Instrument_Sustainable_Investment_Environmental_Not_EU_Taxonomy_Art_8
 
-Path: `20200_Financial_Instrument_Sustainable_Investment_Environmental_Not_EU_Taxonomy_Art_8`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does the minimum specified in field 20180 include Non EU Taxonomy Environmental sustainable investment?
@@ -1967,9 +1924,8 @@ Definition: Does the minimum specified in field 20180 include Non EU Taxonomy En
 
 ---
 
-### Field 44 — 44
+### Field 44 — 20210_Financial_Instrument_Sustainable_Investment_Social_Objective_Art_8
 
-Path: `20210_Financial_Instrument_Sustainable_Investment_Social_Objective_Art_8`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does the minimum specified in field 20180 include sustainable investment with social objective?
@@ -2004,9 +1960,8 @@ Definition: Does the minimum specified in field 20180 include sustainable invest
 
 ---
 
-### Field 45 — 45
+### Field 45 — 20220_Financial_Instrument_Minimum_Sustainable_Investment_With_Environmental_Objective_Art_9
 
-Path: `20220_Financial_Instrument_Minimum_Sustainable_Investment_With_Environmental_Objective_Art_9`
 Codification: NUMERIC
 Applicability: all rows
 Definition: For art 9 products, the minimum proportion of sustainable investments with environmental objective.
@@ -2036,9 +1991,8 @@ Definition: For art 9 products, the minimum proportion of sustainable investment
 
 ---
 
-### Field 46 — 46
+### Field 46 — 20230_Financial_Instrument_Environmentally_Sustainable_Investment_EU_Taxonomy_Art_9
 
-Path: `20230_Financial_Instrument_Environmentally_Sustainable_Investment_EU_Taxonomy_Art_9`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does the minimum specified in field 20220 include EU Taxonomy Environmental sustainable investment?
@@ -2073,9 +2027,8 @@ Definition: Does the minimum specified in field 20220 include EU Taxonomy Enviro
 
 ---
 
-### Field 47 — 47
+### Field 47 — 20240_Financial_Instrument_Environmentally_Sustainable_Investment_Not_EU_Taxonomy_Art_9
 
-Path: `20240_Financial_Instrument_Environmentally_Sustainable_Investment_Not_EU_Taxonomy_Art_9`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does the minimum specified in field 20220 include Non EU Taxonomy Environmental sustainable investment?
@@ -2110,9 +2063,8 @@ Definition: Does the minimum specified in field 20220 include Non EU Taxonomy En
 
 ---
 
-### Field 48 — 48
+### Field 48 — 20250_Financial_Instrument_Minimum_Sustainable_Investment_Social_Objective_Art_9
 
-Path: `20250_Financial_Instrument_Minimum_Sustainable_Investment_Social_Objective_Art_9`
 Codification: NUMERIC
 Applicability: all rows
 Definition: For art 9 products, the minimum proportion of sustainable investments with social objective.
@@ -2141,9 +2093,8 @@ Definition: For art 9 products, the minimum proportion of sustainable investment
 
 ---
 
-### Field 49 — 49
+### Field 49 — 20260_Financial_Instrument_ESG_Existing_Thematic_Characteristics
 
-Path: `20260_Financial_Instrument_ESG_Existing_Thematic_Characteristics`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does this Financial_Instrument incorporate ESG factors through ESG thematic approach ?
@@ -2170,9 +2121,8 @@ Definition: Does this Financial_Instrument incorporate ESG factors through ESG t
 
 ---
 
-### Field 50 — 50
+### Field 50 — 20270_Financial_Instrument_Environmental_Thematic_Characteristics
 
-Path: `20270_Financial_Instrument_Environmental_Thematic_Characteristics`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Description of the product environment thematic investment strategy, according to SFDR art 2(17). Multiple answers fields. A - energy B - renewable energy C - raw materials D - water and land E - waste F - greenhouse gas emissions G - biodiversity H - circular economy I - environment other J - none
@@ -2199,9 +2149,8 @@ Definition: Description of the product environment thematic investment strategy,
 
 ---
 
-### Field 51 — 51
+### Field 51 — 20280_Financial_Instrument_Social_Thematic_Characteristics
 
-Path: `20280_Financial_Instrument_Social_Thematic_Characteristics`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Description of the product social thematic investment strategy, according to SFDR art 2(17) Multiple answers fields. A - inequality B - social cohesion C - social integration D - labour relations E - investment in human capital F - economically or socially disadvantaged communities G - social other H - none
@@ -2228,9 +2177,8 @@ Definition: Description of the product social thematic investment strategy, acco
 
 ---
 
-### Field 52 — 52
+### Field 52 — 20290_Financial_Instrument_Governance_Thematic_Characteristics
 
-Path: `20290_Financial_Instrument_Governance_Thematic_Characteristics`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Description of the product thematic investment strategy, according to SFDR art 2(17) Multiple answers field A - sound management structures B - employee relations C - remuneration of staff D - tax compliance E - governance other F - none
@@ -2257,9 +2205,8 @@ Definition: Description of the product thematic investment strategy, according t
 
 ---
 
-### Field 53 — 53
+### Field 53 — 20300_Financial_Instrument_Alignment_With_Sustainable_Development_Goals
 
-Path: `20300_Financial_Instrument_Alignment_With_Sustainable_Development_Goals`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Alignment with SDG means that SDG are used in the investment process (screening) or targeted by the fund. Multiple answers field. A - No Poverty B - Zero Hunger C - Good Health and Well-Being D - Quality Education E - Gender Equality F - Clean Water and Sanitaion G - Affordable and Clean Energy H - Decent Work and Economic Growth I - Industry, Innovation and Infrastructure J - Reduced Inequality K - Sustainable Cities and Communities L - Responsible Consumption and Production M - Climate Action N - Life Below Water O - Life on Land P - Peace and Justice, Strong Institutions Q - Partnerships to achive to Goal R - None
@@ -2286,9 +2233,8 @@ Definition: Alignment with SDG means that SDG are used in the investment process
 
 ---
 
-### Field 54 — 54
+### Field 54 — 20310_Financial_Instrument_Weight_Of_Eligible_Issuers
 
-Path: `20310_Financial_Instrument_Weight_Of_Eligible_Issuers`
 Codification: NUMERIC
 Applicability: all rows
 Definition: This field indicates the weight of issuers holdings during the period
@@ -2315,9 +2261,8 @@ Definition: This field indicates the weight of issuers holdings during the perio
 
 ---
 
-### Field 55 — 55
+### Field 55 — 20320_Financial_Instrument_Number_Of_Eligible_Issuers
 
-Path: `20320_Financial_Instrument_Number_Of_Eligible_Issuers`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: This field indicates the number of issuers holdings during the period
@@ -2344,9 +2289,8 @@ Definition: This field indicates the number of issuers holdings during the perio
 
 ---
 
-### Field 56 — 56
+### Field 56 — 20330_Financial_Instrument_Weight_Of_ESG_Covered_Issuers
 
-Path: `20330_Financial_Instrument_Weight_Of_ESG_Covered_Issuers`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of investments in issuers covered by an ESG analysis
@@ -2373,9 +2317,8 @@ Definition: % of investments in issuers covered by an ESG analysis
 
 ---
 
-### Field 57 — 57
+### Field 57 — 20340_Financial_Instrument_Number_Of_ESG_Covered_Issuers
 
-Path: `20340_Financial_Instrument_Number_Of_ESG_Covered_Issuers`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Number of issuers covered by an ESG analysis
@@ -2402,9 +2345,8 @@ Definition: Number of issuers covered by an ESG analysis
 
 ---
 
-### Field 58 — 58
+### Field 58 — 20350_Financial_Instrument_Weight_Of_Engaged_Issuers
 
-Path: `20350_Financial_Instrument_Weight_Of_Engaged_Issuers`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of investments in issuers that have been subject to formal Engagement process
@@ -2431,9 +2373,8 @@ Definition: % of investments in issuers that have been subject to formal Engagem
 
 ---
 
-### Field 59 — 59
+### Field 59 — 20360_Financial_Instrument_Number_Of_Engaged_Issuers
 
-Path: `20360_Financial_Instrument_Number_Of_Engaged_Issuers`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Number of issuers that have been subject to formal Engagement process
@@ -2460,9 +2401,8 @@ Definition: Number of issuers that have been subject to formal Engagement proces
 
 ---
 
-### Field 60 — 60
+### Field 60 — 20370_Financial_Instrument_Has_A_Reference_ESG_Benchmark
 
-Path: `20370_Financial_Instrument_Has_A_Reference_ESG_Benchmark`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Has a reference benchmark been designated for the purpose of attaining the environmental or social characteristics promoted by the financial product?
@@ -2495,9 +2435,8 @@ Definition: Has a reference benchmark been designated for the purpose of attaini
 
 ---
 
-### Field 61 — 61
+### Field 61 — 20380_Financial_Instrument_Benchmark_Name
 
-Path: `20380_Financial_Instrument_Benchmark_Name`
 Codification: ALPHANUMERIC (max 500)
 Applicability: all rows
 Definition: Identification of benchmark
@@ -2530,9 +2469,8 @@ Definition: Identification of benchmark
 
 ---
 
-### Field 62 — 62
+### Field 62 — 20390_Financial_Instrument_Minimum_Or_Planned_Asset_Allocation_Date
 
-Path: `20390_Financial_Instrument_Minimum_Or_Planned_Asset_Allocation_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -2564,9 +2502,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 63 — 63
+### Field 63 — 20400_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_With_Environmental_Or_Social_Characteristics
 
-Path: `20400_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_With_Environmental_Or_Social_Characteristics`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -2598,9 +2535,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 64 — 64
+### Field 64 — 20410_Financial_Instrument_EU_SFDR_Methodology_For_Sustainable_Investments_Calculation
 
-Path: `20410_Financial_Instrument_EU_SFDR_Methodology_For_Sustainable_Investments_Calculation`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue(R), Capex(C), Opex(O), other approach(A)
@@ -2627,9 +2563,8 @@ Definition: Revenue(R), Capex(C), Opex(O), other approach(A)
 
 ---
 
-### Field 65 — 65
+### Field 65 — 20420_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments
 
-Path: `20420_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -2661,9 +2596,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 66 — 66
+### Field 66 — 20430_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Other_Investments_With_Environmental_Or_Social_Characteristics
 
-Path: `20430_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Other_Investments_With_Environmental_Or_Social_Characteristics`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -2695,9 +2629,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 67 — 67
+### Field 67 — 20440_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Environmental
 
-Path: `20440_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Environmental`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -2729,9 +2662,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 68 — 68
+### Field 68 — 20450_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Taxonomy_Aligned
 
-Path: `20450_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Taxonomy_Aligned`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -2763,9 +2695,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 69 — 69
+### Field 69 — 20460_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Other_Environmental
 
-Path: `20460_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Other_Environmental`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -2797,9 +2728,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 70 — 70
+### Field 70 — 20470_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Social
 
-Path: `20470_Financial_Instrument_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Social`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -2831,9 +2761,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 71 — 71
+### Field 71 — 20480_Financial_Instrument_Last_Reported_Asset_Allocation_Date
 
-Path: `20480_Financial_Instrument_Last_Reported_Asset_Allocation_Date`
 Codification: DATE
 Applicability: all rows
 Definition: The date to which the disclosure refer
@@ -2865,9 +2794,8 @@ Definition: The date to which the disclosure refer
 
 ---
 
-### Field 72 — 72
+### Field 72 — 20490_Financial_Instrument_EU_SFDR_Last_Reported_Investments_With_Environmental_Or_Social_Characteristics
 
-Path: `20490_Financial_Instrument_EU_SFDR_Last_Reported_Investments_With_Environmental_Or_Social_Characteristics`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please Refer to Periodic Report in RTS
@@ -2899,9 +2827,8 @@ Definition: Please Refer to Periodic Report in RTS
 
 ---
 
-### Field 73 — 73
+### Field 73 — 20500_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Not_Sustainable_Other
 
-Path: `20500_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Not_Sustainable_Other`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please Refer to Periodic Report in RTS
@@ -2933,9 +2860,8 @@ Definition: Please Refer to Periodic Report in RTS
 
 ---
 
-### Field 74 — 74
+### Field 74 — 20510_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments
 
-Path: `20510_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please Refer to Periodic Report in RTS
@@ -2967,9 +2893,8 @@ Definition: Please Refer to Periodic Report in RTS
 
 ---
 
-### Field 75 — 75
+### Field 75 — 20520_Financial_Instrument_EU_SFDR_Last_Reported_Other_Investments_With_Environmental_Or_Social_Characteristics
 
-Path: `20520_Financial_Instrument_EU_SFDR_Last_Reported_Other_Investments_With_Environmental_Or_Social_Characteristics`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please Refer to Periodic Report in RTS
@@ -3001,9 +2926,8 @@ Definition: Please Refer to Periodic Report in RTS
 
 ---
 
-### Field 76 — 76
+### Field 76 — 20530_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments_Environmental
 
-Path: `20530_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments_Environmental`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please Refer to Periodic Report in RTS
@@ -3035,9 +2959,8 @@ Definition: Please Refer to Periodic Report in RTS
 
 ---
 
-### Field 77 — 77
+### Field 77 — 20540_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments_Taxonomy_Aligned
 
-Path: `20540_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments_Taxonomy_Aligned`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please Refer to Periodic Report in RTS
@@ -3069,9 +2992,8 @@ Definition: Please Refer to Periodic Report in RTS
 
 ---
 
-### Field 78 — 78
+### Field 78 — 20550_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments_Other_Environmental
 
-Path: `20550_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments_Other_Environmental`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please Refer to Periodic Report in RTS
@@ -3103,9 +3025,8 @@ Definition: Please Refer to Periodic Report in RTS
 
 ---
 
-### Field 79 — 79
+### Field 79 — 20560_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments_Social
 
-Path: `20560_Financial_Instrument_EU_SFDR_Last_Reported_Investments_Are_Sustainable_Investments_Social`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please Refer to Periodic Report in RTS
@@ -3137,9 +3058,8 @@ Definition: Please Refer to Periodic Report in RTS
 
 ---
 
-### Field 80 — 80
+### Field 80 — 20570_Financial_Instrument_With_Objective_Of_A_Reduction_In_Carbon_Emissions
 
-Path: `20570_Financial_Instrument_With_Objective_Of_A_Reduction_In_Carbon_Emissions`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does the Financial Instrument have the objective of reduction in carbon emissions?
@@ -3167,9 +3087,8 @@ Definition: Does the Financial Instrument have the objective of reduction in car
 
 ---
 
-### Field 81 — 81
+### Field 81 — 20580_Financial_Instrument_Aligned_With_Paris_Agreement
 
-Path: `20580_Financial_Instrument_Aligned_With_Paris_Agreement`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Is the Financial Instrument Aligned with the Paris Agreement?
@@ -3197,9 +3116,8 @@ Definition: Is the Financial Instrument Aligned with the Paris Agreement?
 
 ---
 
-### Field 82 — 82
+### Field 82 — 20590_Does_This_Financial_Instrument_Consider_End_Client_Sustainability_Preferences
 
-Path: `20590_Does_This_Financial_Instrument_Consider_End_Client_Sustainability_Preferences`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: MIFID: COMMISSION DELEGATED REGULATION (EU) 2021/1253 Art. 1 IDD: COMMISSION DELEGATED DIRECTIVE (EU) 2021/1257 Art. 2 answer = Yes or Neutral
@@ -3228,9 +3146,8 @@ Definition: MIFID: COMMISSION DELEGATED REGULATION (EU) 2021/1253 Art. 1 IDD: CO
 
 ---
 
-### Field 83 — 83
+### Field 83 — 20600_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Incl_Sovereign_Bonds
 
-Path: `20600_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Incl_Sovereign_Bonds`
 Codification: NUMERIC
 Applicability: all rows
 Definition: include statement and question for financial products referred to in Article 6 of Regulation (EU) 2020/852 with sustainable investments in environmentally sustainable economic activities
@@ -3263,9 +3180,8 @@ Definition: include statement and question for financial products referred to in
 
 ---
 
-### Field 84 — 84
+### Field 84 — 20610_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Excl_Sovereign_Bonds
 
-Path: `20610_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Excl_Sovereign_Bonds`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3297,9 +3213,8 @@ Applicability: all rows
 
 ---
 
-### Field 85 — 85
+### Field 85 — 20620_Financial_Instrument_Was_This_Statement_Subject_To_An_External_Review_By_Third_Party
 
-Path: `20620_Financial_Instrument_Was_This_Statement_Subject_To_An_External_Review_By_Third_Party`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -3331,9 +3246,8 @@ Applicability: all rows
 
 ---
 
-### Field 86 — 86
+### Field 86 — 20630_Financial_Instrument_Methodology_Used_For_Alignment_Calculation_With_EU_Taxonomy
 
-Path: `20630_Financial_Instrument_Methodology_Used_For_Alignment_Calculation_With_EU_Taxonomy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Discloses the methodology used for alignment calculation with the EU Taxonomy, defined as either Revenue, CapEx or OpEx.
@@ -3366,9 +3280,8 @@ Definition: Discloses the methodology used for alignment calculation with the EU
 
 ---
 
-### Field 87 — 87
+### Field 87 — 20640_Financial_Instrument_Minimum_Share_Of_Transitional_Activities
 
-Path: `20640_Financial_Instrument_Minimum_Share_Of_Transitional_Activities`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3400,9 +3313,8 @@ Applicability: all rows
 
 ---
 
-### Field 88 — 88
+### Field 88 — 20650_Financial_Instrument_Minimum_Share_Of_Enabling_Activities
 
-Path: `20650_Financial_Instrument_Minimum_Share_Of_Enabling_Activities`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3434,9 +3346,8 @@ Applicability: all rows
 
 ---
 
-### Field 89 — 89
+### Field 89 — 20660_Financial_Instrument_Percentage_Taxonomy_Aligned_Incl_Sovereign_Revenue
 
-Path: `20660_Financial_Instrument_Percentage_Taxonomy_Aligned_Incl_Sovereign_Revenue`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3469,9 +3380,8 @@ Applicability: all rows
 
 ---
 
-### Field 90 — 90
+### Field 90 — 20670_Financial_Instrument_Percentage_Taxonomy_Aligned_Incl_Sovereign_Capex
 
-Path: `20670_Financial_Instrument_Percentage_Taxonomy_Aligned_Incl_Sovereign_Capex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3504,9 +3414,8 @@ Applicability: all rows
 
 ---
 
-### Field 91 — 91
+### Field 91 — 20680_Financial_Instrument_Percentage_Taxonomy_Aligned_Incl_Sovereign_Opex
 
-Path: `20680_Financial_Instrument_Percentage_Taxonomy_Aligned_Incl_Sovereign_Opex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3539,9 +3448,8 @@ Applicability: all rows
 
 ---
 
-### Field 92 — 92
+### Field 92 — 20690_Financial_Instrument_Percentage_Taxonomy_Aligned_Excl_Sovereign_Revenue
 
-Path: `20690_Financial_Instrument_Percentage_Taxonomy_Aligned_Excl_Sovereign_Revenue`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3574,9 +3482,8 @@ Applicability: all rows
 
 ---
 
-### Field 93 — 93
+### Field 93 — 20700_Financial_Instrument_Percentage_Taxonomy_Aligned_Excl_Sovereign_Capex
 
-Path: `20700_Financial_Instrument_Percentage_Taxonomy_Aligned_Excl_Sovereign_Capex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3609,9 +3516,8 @@ Applicability: all rows
 
 ---
 
-### Field 94 — 94
+### Field 94 — 20710_Financial_Instrument_Percentage_Taxonomy_Aligned_Excl_Sovereign_Opex
 
-Path: `20710_Financial_Instrument_Percentage_Taxonomy_Aligned_Excl_Sovereign_Opex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3644,9 +3550,8 @@ Applicability: all rows
 
 ---
 
-### Field 95 — 95
+### Field 95 — 20721_Financial_Instrument_Climate_Change_Mitigation_Percentage
 
-Path: `20721_Financial_Instrument_Climate_Change_Mitigation_Percentage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: cf Art 55 paragraph 1a
@@ -3680,9 +3585,8 @@ Definition: cf Art 55 paragraph 1a
 
 ---
 
-### Field 96 — 96
+### Field 96 — 20731_Financial_Instrument_Climate_Change_Adaptation_Percentage
 
-Path: `20731_Financial_Instrument_Climate_Change_Adaptation_Percentage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: cf Art 55 paragraph 1a
@@ -3716,9 +3620,8 @@ Definition: cf Art 55 paragraph 1a
 
 ---
 
-### Field 97 — 97
+### Field 97 — 20741_Financial_Instrument_Sustainable_Use_And_Protection_Of_Water_And_Marine_Resources_Percentage
 
-Path: `20741_Financial_Instrument_Sustainable_Use_And_Protection_Of_Water_And_Marine_Resources_Percentage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: cf Art 55 paragraph 1a
@@ -3752,9 +3655,8 @@ Definition: cf Art 55 paragraph 1a
 
 ---
 
-### Field 98 — 98
+### Field 98 — 20751_Financial_Instrument_Transition_To_A_Circular_Economy_Percentage
 
-Path: `20751_Financial_Instrument_Transition_To_A_Circular_Economy_Percentage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: cf Art 55 paragraph 1a
@@ -3788,9 +3690,8 @@ Definition: cf Art 55 paragraph 1a
 
 ---
 
-### Field 99 — 99
+### Field 99 — 20761_Financial_Instrument_Pollution_Prevention_And_Control_Percentage
 
-Path: `20761_Financial_Instrument_Pollution_Prevention_And_Control_Percentage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: cf Art 55 paragraph 1a
@@ -3824,9 +3725,8 @@ Definition: cf Art 55 paragraph 1a
 
 ---
 
-### Field 100 — 100
+### Field 100 — 20771_Financial_Instrument_Protection_And_Restoration_Of_Biodiversity_And_Ecosystems_Percentage
 
-Path: `20771_Financial_Instrument_Protection_And_Restoration_Of_Biodiversity_And_Ecosystems_Percentage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: cf Art 55 paragraph 1a
@@ -3860,9 +3760,8 @@ Definition: cf Art 55 paragraph 1a
 
 ---
 
-### Field 101 — 101
+### Field 101 — 20780_Financial_Instrument_Share_Of_Transitional_Activities
 
-Path: `20780_Financial_Instrument_Share_Of_Transitional_Activities`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3895,9 +3794,8 @@ Applicability: all rows
 
 ---
 
-### Field 102 — 102
+### Field 102 — 20790_Financial_Instrument_Share_Of_Enabling_Activities
 
-Path: `20790_Financial_Instrument_Share_Of_Enabling_Activities`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -3930,9 +3828,8 @@ Applicability: all rows
 
 ---
 
-### Field 103 — 103
+### Field 103 — 30000_PAI_Snapshot_Frequency
 
-Path: `30000_PAI_Snapshot_Frequency`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Annual (Calendar year) or Quarterly (Calendar quarter) or Monthly
@@ -3955,14 +3852,13 @@ Definition: Annual (Calendar year) or Quarterly (Calendar quarter) or Monthly
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/103` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-103` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `103` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-103` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `103` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 104 — 104
+### Field 104 — 30010_PAI_Reference_Date
 
-Path: `30010_PAI_Reference_Date`
 Codification: DATE
 Applicability: all rows
 Definition: Date to which data refer
@@ -3985,14 +3881,13 @@ Definition: Date to which data refer
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/104` | (all) | ERROR | Populated cell does not match the codification (DATE) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-104` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `104` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-104` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `104` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 105 — 105
+### Field 105 — 30020_GHG_Emissions_Scope_1_Value
 
-Path: `30020_GHG_Emissions_Scope_1_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: scope 1 emissions
@@ -4020,9 +3915,8 @@ Definition: Metric: scope 1 emissions
 
 ---
 
-### Field 106 — 106
+### Field 106 — 30030_GHG_Emissions_Scope_1_Considered_In_The_Investment_Strategy
 
-Path: `30030_GHG_Emissions_Scope_1_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -4045,14 +3939,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/106` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-106` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `106` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-106` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `106` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 107 — 107
+### Field 107 — 30040_GHG_Emissions_Scope_1_Coverage
 
-Path: `30040_GHG_Emissions_Scope_1_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -4080,9 +3973,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 108 — 108
+### Field 108 — 30050_GHG_Emissions_Scope_1_Eligible_Assets
 
-Path: `30050_GHG_Emissions_Scope_1_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -4110,9 +4002,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 109 — 109
+### Field 109 — 30060_GHG_Emissions_Scope_2_Value
 
-Path: `30060_GHG_Emissions_Scope_2_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: scope 2 emissions
@@ -4140,9 +4031,8 @@ Definition: Metric: scope 2 emissions
 
 ---
 
-### Field 110 — 110
+### Field 110 — 30070_GHG_Emissions_Scope_2_Considered_In_The_Investment_Strategy
 
-Path: `30070_GHG_Emissions_Scope_2_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -4165,14 +4055,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/110` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-110` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `110` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-110` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `110` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 111 — 111
+### Field 111 — 30080_GHG_Emissions_Scope_2_Coverage
 
-Path: `30080_GHG_Emissions_Scope_2_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -4200,9 +4089,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 112 — 112
+### Field 112 — 30090_GHG_Emissions_Scope_2_Eligible_Assets
 
-Path: `30090_GHG_Emissions_Scope_2_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -4230,9 +4118,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 113 — 113
+### Field 113 — 30100_GHG_Emissions_Scope_3_Value
 
-Path: `30100_GHG_Emissions_Scope_3_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: scope 3 emissions
@@ -4260,9 +4147,8 @@ Definition: Metric: scope 3 emissions
 
 ---
 
-### Field 114 — 114
+### Field 114 — 30110_GHG_Emissions_Scope_3_Considered_In_The_Investment_Strategy
 
-Path: `30110_GHG_Emissions_Scope_3_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -4285,14 +4171,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/114` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-114` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `114` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-114` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `114` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 115 — 115
+### Field 115 — 30120_GHG_Emissions_Scope_3_Coverage
 
-Path: `30120_GHG_Emissions_Scope_3_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -4320,9 +4205,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 116 — 116
+### Field 116 — 30130_GHG_Emissions_Scope_3_Eligible_Assets
 
-Path: `30130_GHG_Emissions_Scope_3_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -4350,9 +4234,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 117 — 117
+### Field 117 — 30140_GHG_Emissions_Total_Scope12_Value
 
-Path: `30140_GHG_Emissions_Total_Scope12_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: scope 1 and scope 2 emissions
@@ -4380,9 +4263,8 @@ Definition: Metric: scope 1 and scope 2 emissions
 
 ---
 
-### Field 118 — 118
+### Field 118 — 30150_GHG_Emissions_Total_Scope12_Considered_In_The_Investment_Strategy
 
-Path: `30150_GHG_Emissions_Total_Scope12_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -4405,14 +4287,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/118` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-118` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `118` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-118` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `118` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 119 — 119
+### Field 119 — 30160_GHG_Emissions_Total_Scope12_Coverage
 
-Path: `30160_GHG_Emissions_Total_Scope12_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -4440,9 +4321,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 120 — 120
+### Field 120 — 30170_GHG_Emissions_Total_Scope12_Eligible_Assets
 
-Path: `30170_GHG_Emissions_Total_Scope12_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -4470,9 +4350,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 121 — 121
+### Field 121 — 30180_GHG_Emissions_Total_Scope123_Value
 
-Path: `30180_GHG_Emissions_Total_Scope123_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: scope 1, scope 2 and scope 3 emissions
@@ -4500,9 +4379,8 @@ Definition: Metric: scope 1, scope 2 and scope 3 emissions
 
 ---
 
-### Field 122 — 122
+### Field 122 — 30190_GHG_Emissions_Total_Scope123_Considered_In_The_Investment_Strategy
 
-Path: `30190_GHG_Emissions_Total_Scope123_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -4525,14 +4403,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/122` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-122` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `122` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-122` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `122` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 123 — 123
+### Field 123 — 30200_GHG_Emissions_Total_Scope123_Coverage
 
-Path: `30200_GHG_Emissions_Total_Scope123_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -4560,9 +4437,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 124 — 124
+### Field 124 — 30210_GHG_Emissions_Total_Scope123_Eligible_Assets
 
-Path: `30210_GHG_Emissions_Total_Scope123_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -4590,9 +4466,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 125 — 125
+### Field 125 — 30220_Carbon_Footprint_Scope12_Value
 
-Path: `30220_Carbon_Footprint_Scope12_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: scope 1 and scope 2 emissions
@@ -4620,9 +4495,8 @@ Definition: Metric: scope 1 and scope 2 emissions
 
 ---
 
-### Field 126 — 126
+### Field 126 — 30230_Carbon_Footprint_Scope12_Considered_In_The_Investment_Strategy
 
-Path: `30230_Carbon_Footprint_Scope12_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -4645,14 +4519,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/126` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-126` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `126` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-126` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `126` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 127 — 127
+### Field 127 — 30240_Carbon_Footprint_Scope12_Coverage
 
-Path: `30240_Carbon_Footprint_Scope12_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -4680,9 +4553,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 128 — 128
+### Field 128 — 30250_Carbon_Footprint_Scope12_Eligible_Assets
 
-Path: `30250_Carbon_Footprint_Scope12_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -4710,9 +4582,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 129 — 129
+### Field 129 — 30260_Carbon_Footprint_Scope123_Value
 
-Path: `30260_Carbon_Footprint_Scope123_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: scope 1 , scope 2 and scope 3 emissions
@@ -4740,9 +4611,8 @@ Definition: Metric: scope 1 , scope 2 and scope 3 emissions
 
 ---
 
-### Field 130 — 130
+### Field 130 — 30270_Carbon_Footprint_Scope123_Considered_In_The_Investment_Strategy
 
-Path: `30270_Carbon_Footprint_Scope123_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -4765,14 +4635,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/130` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-130` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `130` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-130` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `130` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 131 — 131
+### Field 131 — 30280_Carbon_Footprint_Scope123_Coverage
 
-Path: `30280_Carbon_Footprint_Scope123_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -4800,9 +4669,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 132 — 132
+### Field 132 — 30290_Carbon_Footprint_Scope123_Eligible_Assets
 
-Path: `30290_Carbon_Footprint_Scope123_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -4830,9 +4698,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 133 — 133
+### Field 133 — 30300_GHG_Intensity_Of_Investee_Companies_Scope12_Value
 
-Path: `30300_GHG_Intensity_Of_Investee_Companies_Scope12_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: scope 1 and scope 2 emissions
@@ -4860,9 +4727,8 @@ Definition: Metric: scope 1 and scope 2 emissions
 
 ---
 
-### Field 134 — 134
+### Field 134 — 30310_GHG_Intensity_Of_Investee_Companies_Scope12_Considered_In_The_Investment_Strategy
 
-Path: `30310_GHG_Intensity_Of_Investee_Companies_Scope12_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -4885,14 +4751,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/134` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-134` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `134` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-134` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `134` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 135 — 135
+### Field 135 — 30320_GHG_Intensity_Of_Investee_Companies_Scope12_Coverage
 
-Path: `30320_GHG_Intensity_Of_Investee_Companies_Scope12_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -4920,9 +4785,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 136 — 136
+### Field 136 — 30330_GHG_Intensity_Of_Investee_Companies_Scope12_Eligible_Assets
 
-Path: `30330_GHG_Intensity_Of_Investee_Companies_Scope12_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -4950,9 +4814,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 137 — 137
+### Field 137 — 30340_GHG_Intensity_Of_Investee_Companies_Scope123_Value
 
-Path: `30340_GHG_Intensity_Of_Investee_Companies_Scope123_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: scope 1, scope 2 and scope 3 emissions
@@ -4980,9 +4843,8 @@ Definition: Metric: scope 1, scope 2 and scope 3 emissions
 
 ---
 
-### Field 138 — 138
+### Field 138 — 30350_GHG_Intensity_Of_Investee_Companies_Scope123_Considered_In_The_Investment_Strategy
 
-Path: `30350_GHG_Intensity_Of_Investee_Companies_Scope123_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -5005,14 +4867,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/138` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-138` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `138` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-138` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `138` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 139 — 139
+### Field 139 — 30360_GHG_Intensity_Of_Investee_Companies_Scope123_Coverage
 
-Path: `30360_GHG_Intensity_Of_Investee_Companies_Scope123_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -5040,9 +4901,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 140 — 140
+### Field 140 — 30370_GHG_Intensity_Of_Investee_Companies_Scope123_Eligible_Assets
 
-Path: `30370_GHG_Intensity_Of_Investee_Companies_Scope123_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -5070,9 +4930,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 141 — 141
+### Field 141 — 30380_Exposure_To_Companies_Active_In_The_Fossil_Fuel_Sector_Value
 
-Path: `30380_Exposure_To_Companies_Active_In_The_Fossil_Fuel_Sector_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: share of investments in companies active in the fossil fuel sector
@@ -5100,9 +4959,8 @@ Definition: Metric: share of investments in companies active in the fossil fuel 
 
 ---
 
-### Field 142 — 142
+### Field 142 — 30390_Exposure_To_Companies_Active_In_The_Fossil_Fuel_Sector_Considered_In_The_Investment_Strategy
 
-Path: `30390_Exposure_To_Companies_Active_In_The_Fossil_Fuel_Sector_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -5125,14 +4983,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/142` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-142` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `142` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-142` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `142` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 143 — 143
+### Field 143 — 30400_Exposure_To_Companies_Active_In_The_Fossil_Fuel_Sector_Coverage
 
-Path: `30400_Exposure_To_Companies_Active_In_The_Fossil_Fuel_Sector_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -5160,9 +5017,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 144 — 144
+### Field 144 — 30410_Exposure_To_Companies_Active_In_The_Fossil_Fuel_Sector_Eligible_Assets
 
-Path: `30410_Exposure_To_Companies_Active_In_The_Fossil_Fuel_Sector_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -5190,9 +5046,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 145 — 145
+### Field 145 — 30420_Share_Energy_Consumption_From_Non-Renewable_Sources_Value
 
-Path: `30420_Share_Energy_Consumption_From_Non-Renewable_Sources_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: share non-renewable energy consumption of investee companies from non-renewable energy sources compared to renewable energy sources, expressed as percentage of total energy sources
@@ -5220,9 +5075,8 @@ Definition: Metric: share non-renewable energy consumption of investee companies
 
 ---
 
-### Field 146 — 146
+### Field 146 — 30430_Share_Energy_Consumption_From_Non-Renewable_Sources_Considered_In_The_Investment_Strategy
 
-Path: `30430_Share_Energy_Consumption_From_Non-Renewable_Sources_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -5245,14 +5099,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/146` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-146` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `146` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-146` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `146` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 147 — 147
+### Field 147 — 30440_Share_Energy_Consumption_From_Non-Renewable_Sources_Coverage
 
-Path: `30440_Share_Energy_Consumption_From_Non-Renewable_Sources_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -5280,9 +5133,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 148 — 148
+### Field 148 — 30450_Share_Energy_Consumption_From_Non-Renewable_Sources_Eligible_Assets
 
-Path: `30450_Share_Energy_Consumption_From_Non-Renewable_Sources_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -5310,9 +5162,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 149 — 149
+### Field 149 — 30460_Share_Energy_Production_From_Non-Renewable_Sources_Value
 
-Path: `30460_Share_Energy_Production_From_Non-Renewable_Sources_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: share non-renewable energy production of investee companies from non-reneable energy sources compared to renewable energy sources, expressed as percentage of total energy sources
@@ -5340,9 +5191,8 @@ Definition: Metric: share non-renewable energy production of investee companies 
 
 ---
 
-### Field 150 — 150
+### Field 150 — 30470_Share_Energy_Production_From_Non-Renewable_Sources_Considered_In_The_Investment_Strategy
 
-Path: `30470_Share_Energy_Production_From_Non-Renewable_Sources_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -5365,14 +5215,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/150` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-150` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `150` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-150` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `150` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 151 — 151
+### Field 151 — 30480_Share_Energy_Production_From_Non-Renewable_Sources_Coverage
 
-Path: `30480_Share_Energy_Production_From_Non-Renewable_Sources_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -5400,9 +5249,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 152 — 152
+### Field 152 — 30490_Share_Energy_Production_From_Non-Renewable_Sources_Eligible_Assets
 
-Path: `30490_Share_Energy_Production_From_Non-Renewable_Sources_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -5430,9 +5278,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 153 — 153
+### Field 153 — 30500_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_A_Value
 
-Path: `30500_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_A_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh per million EUR of revenue of investee companies, per high impact climate sector
@@ -5460,9 +5307,8 @@ Definition: Metric: Energy consumption in GWh per million EUR of revenue of inve
 
 ---
 
-### Field 154 — 154
+### Field 154 — 30510_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_A_Considered_In_The_Investment_Strategy
 
-Path: `30510_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_A_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -5485,14 +5331,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/154` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-154` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `154` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-154` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `154` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 155 — 155
+### Field 155 — 30520_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_A_Coverage
 
-Path: `30520_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_A_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -5520,9 +5365,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 156 — 156
+### Field 156 — 30530_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_A_Eligible_Assets
 
-Path: `30530_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_A_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -5550,9 +5394,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 157 — 157
+### Field 157 — 30540_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_B_Value
 
-Path: `30540_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_B_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh per million EUR of revenue of investee companies, per high impact climate sector
@@ -5580,9 +5423,8 @@ Definition: Metric: Energy consumption in GWh per million EUR of revenue of inve
 
 ---
 
-### Field 158 — 158
+### Field 158 — 30550_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_B_Considered_In_The_Investment_Strategy
 
-Path: `30550_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_B_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -5605,14 +5447,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/158` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-158` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `158` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-158` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `158` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 159 — 159
+### Field 159 — 30560_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_B_Coverage
 
-Path: `30560_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_B_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -5640,9 +5481,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 160 — 160
+### Field 160 — 30570_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_B_Eligible_Assets
 
-Path: `30570_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_B_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -5670,9 +5510,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 161 — 161
+### Field 161 — 30580_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_C_Value
 
-Path: `30580_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_C_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh per million EUR of revenue of investee companies, per high impact climate sector
@@ -5700,9 +5539,8 @@ Definition: Metric: Energy consumption in GWh per million EUR of revenue of inve
 
 ---
 
-### Field 162 — 162
+### Field 162 — 30590_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_C_Considered_In_The_Investment_Strategy
 
-Path: `30590_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_C_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -5725,14 +5563,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/162` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-162` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `162` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-162` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `162` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 163 — 163
+### Field 163 — 30600_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_C_Coverage
 
-Path: `30600_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_C_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -5760,9 +5597,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 164 — 164
+### Field 164 — 30610_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_C_Eligible_Assets
 
-Path: `30610_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_C_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -5790,9 +5626,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 165 — 165
+### Field 165 — 30620_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_D_Value
 
-Path: `30620_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_D_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh per million EUR of revenue of investee companies, per high impact climate sector
@@ -5820,9 +5655,8 @@ Definition: Metric: Energy consumption in GWh per million EUR of revenue of inve
 
 ---
 
-### Field 166 — 166
+### Field 166 — 30630_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_D_Considered_In_The_Investment_Strategy
 
-Path: `30630_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_D_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -5845,14 +5679,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/166` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-166` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `166` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-166` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `166` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 167 — 167
+### Field 167 — 30640_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_D_Coverage
 
-Path: `30640_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_D_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -5880,9 +5713,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 168 — 168
+### Field 168 — 30650_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_D_Eligible_Assets
 
-Path: `30650_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_D_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -5910,9 +5742,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 169 — 169
+### Field 169 — 30660_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_E_Value
 
-Path: `30660_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_E_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh per million EUR of revenue of investee companies, per high impact climate sector
@@ -5940,9 +5771,8 @@ Definition: Metric: Energy consumption in GWh per million EUR of revenue of inve
 
 ---
 
-### Field 170 — 170
+### Field 170 — 30670_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_E_Considered_In_The_Investment_Strategy
 
-Path: `30670_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_E_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -5965,14 +5795,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/170` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-170` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `170` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-170` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `170` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 171 — 171
+### Field 171 — 30680_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_E_Coverage
 
-Path: `30680_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_E_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -6000,9 +5829,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 172 — 172
+### Field 172 — 30690_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_E_Eligible_Assets
 
-Path: `30690_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_E_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -6030,9 +5858,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 173 — 173
+### Field 173 — 30700_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_F_Value
 
-Path: `30700_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_F_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh per million EUR of revenue of investee companies, per high impact climate sector
@@ -6060,9 +5887,8 @@ Definition: Metric: Energy consumption in GWh per million EUR of revenue of inve
 
 ---
 
-### Field 174 — 174
+### Field 174 — 30710_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_F_Considered_In_The_Investment_Strategy
 
-Path: `30710_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_F_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -6085,14 +5911,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/174` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-174` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `174` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-174` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `174` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 175 — 175
+### Field 175 — 30720_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_F_Coverage
 
-Path: `30720_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_F_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -6120,9 +5945,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 176 — 176
+### Field 176 — 30730_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_F_Eligible_Assets
 
-Path: `30730_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_F_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -6150,9 +5974,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 177 — 177
+### Field 177 — 30740_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_G_Value
 
-Path: `30740_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_G_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh per million EUR of revenue of investee companies, per high impact climate sector
@@ -6180,9 +6003,8 @@ Definition: Metric: Energy consumption in GWh per million EUR of revenue of inve
 
 ---
 
-### Field 178 — 178
+### Field 178 — 30750_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_G_Considered_In_The_Investment_Strategy
 
-Path: `30750_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_G_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -6205,14 +6027,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/178` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-178` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `178` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-178` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `178` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 179 — 179
+### Field 179 — 30760_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_G_Coverage
 
-Path: `30760_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_G_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -6240,9 +6061,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 180 — 180
+### Field 180 — 30770_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_G_Eligible_Assets
 
-Path: `30770_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_G_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -6270,9 +6090,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 181 — 181
+### Field 181 — 30780_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_H_Value
 
-Path: `30780_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_H_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh per million EUR of revenue of investee companies, per high impact climate sector
@@ -6300,9 +6119,8 @@ Definition: Metric: Energy consumption in GWh per million EUR of revenue of inve
 
 ---
 
-### Field 182 — 182
+### Field 182 — 30790_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_H_Considered_In_The_Investment_Strategy
 
-Path: `30790_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_H_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -6325,14 +6143,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/182` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-182` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `182` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-182` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `182` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 183 — 183
+### Field 183 — 30800_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_H_Coverage
 
-Path: `30800_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_H_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -6360,9 +6177,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 184 — 184
+### Field 184 — 30810_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_H_Eligible_Assets
 
-Path: `30810_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_H_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -6390,9 +6206,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 185 — 185
+### Field 185 — 30820_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_M_Value
 
-Path: `30820_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_M_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh per million EUR of revenue of investee companies, per high impact climate sector
@@ -6420,9 +6235,8 @@ Definition: Metric: Energy consumption in GWh per million EUR of revenue of inve
 
 ---
 
-### Field 186 — 186
+### Field 186 — 30830_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_M_Considered_In_The_Investment_Strategy
 
-Path: `30830_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_M_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -6445,14 +6259,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/186` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-186` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `186` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-186` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `186` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 187 — 187
+### Field 187 — 30840_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_M_Coverage
 
-Path: `30840_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_M_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -6480,9 +6293,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 188 — 188
+### Field 188 — 30850_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_M_Eligible_Assets
 
-Path: `30850_Energy_Consumption_Intensity_Per_High_Impact_Climate_Sector_NACE_M_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -6510,9 +6322,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 189 — 189
+### Field 189 — 30860_Activities_Negatively_Affecting_Biodiversity-sensitive_Areas_Value
 
-Path: `30860_Activities_Negatively_Affecting_Biodiversity-sensitive_Areas_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies with sites/operations located in or near to biodiversity-sensitive areas where activities of those investee companies negatively affect those areas
@@ -6540,9 +6351,8 @@ Definition: Metric: Share of investments in investee companies with sites/operat
 
 ---
 
-### Field 190 — 190
+### Field 190 — 30870_Activities_Negatively_Affecting_Biodiversity-sensitive_Areas_Considered_In_The_Investment_Strategy
 
-Path: `30870_Activities_Negatively_Affecting_Biodiversity-sensitive_Areas_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -6565,14 +6375,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/190` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-190` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `190` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-190` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `190` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 191 — 191
+### Field 191 — 30880_Activities_Negatively_Affecting_Biodiversity-sensitive_Areas_Coverage
 
-Path: `30880_Activities_Negatively_Affecting_Biodiversity-sensitive_Areas_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -6600,9 +6409,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 192 — 192
+### Field 192 — 30890_Activities_Negatively_Affecting_Biodiversity-sensitive_Areas_Eligible_Assets
 
-Path: `30890_Activities_Negatively_Affecting_Biodiversity-sensitive_Areas_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -6630,9 +6438,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 193 — 193
+### Field 193 — 30900_Water_Emissions_Value
 
-Path: `30900_Water_Emissions_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Tonnes of emissions to water generated by investee companies per million EUR invested, expressed as a weighted average
@@ -6660,9 +6467,8 @@ Definition: Metric: Tonnes of emissions to water generated by investee companies
 
 ---
 
-### Field 194 — 194
+### Field 194 — 30910_Water_Emissions_Considered_In_The_Investment_Strategy
 
-Path: `30910_Water_Emissions_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -6685,14 +6491,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/194` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-194` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `194` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-194` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `194` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 195 — 195
+### Field 195 — 30920_Water_Emissions_Coverage
 
-Path: `30920_Water_Emissions_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -6720,9 +6525,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 196 — 196
+### Field 196 — 30930_Water_Emissions_Eligible_Assets
 
-Path: `30930_Water_Emissions_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -6750,9 +6554,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 197 — 197
+### Field 197 — 30940_Hazardous_Waste_Ratio_Value
 
-Path: `30940_Hazardous_Waste_Ratio_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Tonnes of hazardous waste generated by investee companies per million EUR invested, expressed as a weighted average
@@ -6780,9 +6583,8 @@ Definition: Metric: Tonnes of hazardous waste generated by investee companies pe
 
 ---
 
-### Field 198 — 198
+### Field 198 — 30950_Hazardous_Waste_Ratio_Considered_In_The_Investment_Strategy
 
-Path: `30950_Hazardous_Waste_Ratio_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -6805,14 +6607,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/198` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-198` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `198` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-198` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `198` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 199 — 199
+### Field 199 — 30960_Hazardous_Waste_Ratio_Coverage
 
-Path: `30960_Hazardous_Waste_Ratio_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -6840,9 +6641,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 200 — 200
+### Field 200 — 30970_Hazardous_Waste_Ratio_Eligible_Assets
 
-Path: `30970_Hazardous_Waste_Ratio_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -6870,9 +6670,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 201 — 201
+### Field 201 — 30980_Share_Of_Companies_Involved_In_Violation_Of_UN_Global_Compact_Principles_And_OECD_Guidelines_For_Multinational_Enterprises_Value
 
-Path: `30980_Share_Of_Companies_Involved_In_Violation_Of_UN_Global_Compact_Principles_And_OECD_Guidelines_For_Multinational_Enterprises_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in companies that have been involved in violations of the UNGC principles of OECD Guidelines for Multinational enterprises
@@ -6900,9 +6699,8 @@ Definition: Metric: Share of investments in companies that have been involved in
 
 ---
 
-### Field 202 — 202
+### Field 202 — 30990_Share_Of_Companies_Involved_In_Violation_Of_UN_Global_Compact_Principles_And_OECD_Guidelines_For_Multinational_Enterprises_Considered_In_The_Investment_Strategy
 
-Path: `30990_Share_Of_Companies_Involved_In_Violation_Of_UN_Global_Compact_Principles_And_OECD_Guidelines_For_Multinational_Enterprises_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -6925,14 +6723,13 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/202` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `EET-XF-PAI-202` | (all) | ERROR | Field `33` ∈ [Y, YES, TRUE, 1] | Field `202` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `EET-XF-PAI-202` | (all) | WARNING | Field `33` ∈ [Y, YES, TRUE, 1] | Field `202` must be non-empty. | Severity = WARNING — surfaced in the report but not factored into the score (only ERROR severity feeds CROSS_FIELD_CONSISTENCY). |
 
 
 ---
 
-### Field 203 — 203
+### Field 203 — 31000_Share_of_Companies_Involved_in_Violation_of_UN_Global_Compact_principles_and_OECD_Guidelines_for_Multinational_Enterprises_Coverage
 
-Path: `31000_Share_of_Companies_Involved_in_Violation_of_UN_Global_Compact_principles_and_OECD_Guidelines_for_Multinational_Enterprises_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -6960,9 +6757,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 204 — 204
+### Field 204 — 31010_Share_Of_Companies_Involved_In_Violation_Of_UN_Global_Compact_Principles_And_OECD_Guidelines_For_Multinational_Enterprises_Eligible_Assets
 
-Path: `31010_Share_Of_Companies_Involved_In_Violation_Of_UN_Global_Compact_Principles_And_OECD_Guidelines_For_Multinational_Enterprises_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -6990,9 +6786,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 205 — 205
+### Field 205 — 31020_Share_Of_Companies_Without_Policies_To_Monitor_Compliance_With_UNGCP_And_OECD_Guidelines_For_Multinational_Enterprises_Value
 
-Path: `31020_Share_Of_Companies_Without_Policies_To_Monitor_Compliance_With_UNGCP_And_OECD_Guidelines_For_Multinational_Enterprises_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in companies without policies to monitor compliance with the UNGC principles of OECD Guidelines for Multinational enterprises or grievance/complaints handling mechanisms to address violations of the UNGC principles or OECD Guidelines for Multinational enterprises
@@ -7020,9 +6815,8 @@ Definition: Metric: Share of investments in companies without policies to monito
 
 ---
 
-### Field 206 — 206
+### Field 206 — 31030_Share_Of_Companies_Without_Policies_To_Monitor_Compliance_With_UNGCP_And_OECD_Guidelines_For_Multinational_Enterprises_Considered_In_The_Investment_Strategy
 
-Path: `31030_Share_Of_Companies_Without_Policies_To_Monitor_Compliance_With_UNGCP_And_OECD_Guidelines_For_Multinational_Enterprises_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -7049,9 +6843,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 207 — 207
+### Field 207 — 31040_Share_Of_Companies_Without_Policies_To_Monitor_Compliance_With_UNGCP_And_OECD_Guidelines_For_Multinational_Enterprises_Coverage
 
-Path: `31040_Share_Of_Companies_Without_Policies_To_Monitor_Compliance_With_UNGCP_And_OECD_Guidelines_For_Multinational_Enterprises_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -7079,9 +6872,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 208 — 208
+### Field 208 — 31045_Share_of_Companies_Without_Policies_To_Monitor_Compliance_With_UNGCP_And_OECD_Guidelines_For_Multinational_Enterprises_Eligible_Assets
 
-Path: `31045_Share_of_Companies_Without_Policies_To_Monitor_Compliance_With_UNGCP_And_OECD_Guidelines_For_Multinational_Enterprises_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -7109,9 +6901,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 209 — 209
+### Field 209 — 31050_Unadjusted_Gender_Pay_Gap_Value
 
-Path: `31050_Unadjusted_Gender_Pay_Gap_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Average unadjusted gender pay gap of investee companies
@@ -7139,9 +6930,8 @@ Definition: Metric: Average unadjusted gender pay gap of investee companies
 
 ---
 
-### Field 210 — 210
+### Field 210 — 31060_Unadjusted_Gender_Pay_Gap_Considered_In_The_Investment_Strategy
 
-Path: `31060_Unadjusted_Gender_Pay_Gap_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -7168,9 +6958,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 211 — 211
+### Field 211 — 31070_Unadjusted_Gender_Pay_Gap_Coverage
 
-Path: `31070_Unadjusted_Gender_Pay_Gap_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -7198,9 +6987,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 212 — 212
+### Field 212 — 31080_Unadjusted_Gender_Pay_Gap_Eligible_Assets
 
-Path: `31080_Unadjusted_Gender_Pay_Gap_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -7228,9 +7016,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 213 — 213
+### Field 213 — 31090_Board_Gender_Diversity_Value
 
-Path: `31090_Board_Gender_Diversity_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Average ratio of female to male board members in investee companies, expressed as a percentage of all board members.
@@ -7258,9 +7045,8 @@ Definition: Metric: Average ratio of female to male board members in investee co
 
 ---
 
-### Field 214 — 214
+### Field 214 — 31100_Board_Gender_Diversity_Considered_In_The_Investment_Strategy
 
-Path: `31100_Board_Gender_Diversity_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -7287,9 +7073,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 215 — 215
+### Field 215 — 31110_Board_Gender_Diversity_Coverage
 
-Path: `31110_Board_Gender_Diversity_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -7317,9 +7102,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 216 — 216
+### Field 216 — 31120_Board_Gender_Diversity_Eligible_Assets
 
-Path: `31120_Board_Gender_Diversity_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -7347,9 +7131,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 217 — 217
+### Field 217 — 31130_Share_Of_Investments_Involved_In_Controversial_Weapons_Value
 
-Path: `31130_Share_Of_Investments_Involved_In_Controversial_Weapons_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investements in investee companies involved in the manufacture or selling of controversial weapons
@@ -7377,9 +7160,8 @@ Definition: Metric: Share of investements in investee companies involved in the 
 
 ---
 
-### Field 218 — 218
+### Field 218 — 31140_Share_Of_Investments_Involved_In_Controversial_Weapons_Considered_In_The_Investment_Strategy
 
-Path: `31140_Share_Of_Investments_Involved_In_Controversial_Weapons_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -7406,9 +7188,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 219 — 219
+### Field 219 — 31150_Share_Of_Investments_Involved_In_Controversial_Weapons_Coverage
 
-Path: `31150_Share_Of_Investments_Involved_In_Controversial_Weapons_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -7436,9 +7217,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 220 — 220
+### Field 220 — 31160_Share_Of_Investments_Involved_In_Controversial_Weapons_Eligible_Assets
 
-Path: `31160_Share_Of_Investments_Involved_In_Controversial_Weapons_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -7466,9 +7246,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 221 — 221
+### Field 221 — 31170_GHG_Intensity_Value
 
-Path: `31170_GHG_Intensity_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: GHG intensity of investee countries
@@ -7496,9 +7275,8 @@ Definition: Metric: GHG intensity of investee countries
 
 ---
 
-### Field 222 — 222
+### Field 222 — 31180_GHG_Intensity_Considered_In_The_Investment_Strategy
 
-Path: `31180_GHG_Intensity_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -7525,9 +7303,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 223 — 223
+### Field 223 — 31190_GHG_Intensity_Coverage
 
-Path: `31190_GHG_Intensity_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -7555,9 +7332,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 224 — 224
+### Field 224 — 31200_GHG_Intensity_Eligible_Assets
 
-Path: `31200_GHG_Intensity_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -7585,9 +7361,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 225 — 225
+### Field 225 — 31210_Number_Of_Countries_Subject_To_Social_Violations_Value
 
-Path: `31210_Number_Of_Countries_Subject_To_Social_Violations_Value`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Metric: Number of investee countries subject to social violations (absolute number) as referred to in international treaties and conventions, United Nations principles and, where applicable national law
@@ -7616,9 +7391,8 @@ Definition: Metric: Number of investee countries subject to social violations (a
 
 ---
 
-### Field 226 — 226
+### Field 226 — 31220_Number_Of_Countries_Subject_To_Social_Violations_Considered_In_The_Investment_Strategy
 
-Path: `31220_Number_Of_Countries_Subject_To_Social_Violations_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -7645,9 +7419,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 227 — 227
+### Field 227 — 31230_Number_Of_Countries_Subject_To_Social_Violations_Coverage
 
-Path: `31230_Number_Of_Countries_Subject_To_Social_Violations_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -7675,9 +7448,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 228 — 228
+### Field 228 — 31240_Number_Of_Countries_Subject_To_Social_Violations_Eligible_Assets
 
-Path: `31240_Number_Of_Countries_Subject_To_Social_Violations_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -7706,9 +7478,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 229 — 229
+### Field 229 — 31250_Percent_Of_Countries_Subject_To_Social_Violations_Value
 
-Path: `31250_Percent_Of_Countries_Subject_To_Social_Violations_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Number of investee countries subject to social violations (relative number divided by all investee countries) as referred to in international treaties and conventions, United Nations principles and, where applicable national law
@@ -7736,9 +7507,8 @@ Definition: Metric: Number of investee countries subject to social violations (r
 
 ---
 
-### Field 230 — 230
+### Field 230 — 31260_Percent_Of_Countries_Subject_To_Social_Violations_Considered_In_The_Investment_Strategy
 
-Path: `31260_Percent_Of_Countries_Subject_To_Social_Violations_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -7765,9 +7535,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 231 — 231
+### Field 231 — 31270_Percent_Of_Countries_Subject_To_Social_Violations_Coverage
 
-Path: `31270_Percent_Of_Countries_Subject_To_Social_Violations_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -7795,9 +7564,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 232 — 232
+### Field 232 — 31280_Percent_Of_Countries_Subject_To_Social_Violations_Eligible_Assets
 
-Path: `31280_Percent_Of_Countries_Subject_To_Social_Violations_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -7825,9 +7593,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 233 — 233
+### Field 233 — 31290_Exposure_To_Fossil_Fuels_Extraction_Storage_Transport_Manufacture_Value
 
-Path: `31290_Exposure_To_Fossil_Fuels_Extraction_Storage_Transport_Manufacture_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in real estate assets involved in the extraction, storage, transport or manufacture of fossil fuels
@@ -7855,9 +7622,8 @@ Definition: Metric: Share of investments in real estate assets involved in the e
 
 ---
 
-### Field 234 — 234
+### Field 234 — 31300_Exposure_To_Fossil_Fuels_Extraction_Storage_Transport_Manufacture_Considered_In_The_Investment_Strategy
 
-Path: `31300_Exposure_To_Fossil_Fuels_Extraction_Storage_Transport_Manufacture_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -7884,9 +7650,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 235 — 235
+### Field 235 — 31310_Exposure_To_Fossil_Fuels_Extraction_Storage_Transport_Manufacture_Coverage
 
-Path: `31310_Exposure_To_Fossil_Fuels_Extraction_Storage_Transport_Manufacture_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -7914,9 +7679,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 236 — 236
+### Field 236 — 31320_Exposure_To_Fossil_Fuels_Extraction_Storage_Transport_Manufacture_Eligible_Assets
 
-Path: `31320_Exposure_To_Fossil_Fuels_Extraction_Storage_Transport_Manufacture_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -7944,9 +7708,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 237 — 237
+### Field 237 — 31330_Exposure_To_Energy-inefficient_Real_Estate_Assets_Value
 
-Path: `31330_Exposure_To_Energy-inefficient_Real_Estate_Assets_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in energy-inefficient real estate assets
@@ -7974,9 +7737,8 @@ Definition: Metric: Share of investments in energy-inefficient real estate asset
 
 ---
 
-### Field 238 — 238
+### Field 238 — 31340_Exposure_To_Energy-inefficient_Real_Estate_Assets_Considered_In_The_Investment_Strategy
 
-Path: `31340_Exposure_To_Energy-inefficient_Real_Estate_Assets_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -8003,9 +7765,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 239 — 239
+### Field 239 — 31350_Exposure_To_Energy-inefficient_Real_Estate_Assets_Coverage
 
-Path: `31350_Exposure_To_Energy-inefficient_Real_Estate_Assets_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -8033,9 +7794,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 240 — 240
+### Field 240 — 31360_Exposure_To_Energy-inefficient_Real_Estate_Assets_Eligible_Assets
 
-Path: `31360_Exposure_To_Energy-inefficient_Real_Estate_Assets_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -8063,9 +7823,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 241 — 241
+### Field 241 — 31370_Emissions_Of_Inorganic_Pollutants_Value
 
-Path: `31370_Emissions_Of_Inorganic_Pollutants_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Tonnes of inorganic pollutants equivalent per million EUR invested, expressed as a weighted average
@@ -8092,9 +7851,8 @@ Definition: Metric: Tonnes of inorganic pollutants equivalent per million EUR in
 
 ---
 
-### Field 242 — 242
+### Field 242 — 31380_Emissions_Of_Inorganic_Pollutants_Considered_In_The_Investment_Strategy
 
-Path: `31380_Emissions_Of_Inorganic_Pollutants_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -8121,9 +7879,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 243 — 243
+### Field 243 — 31390_Emissions_Of_Inorganic_Pollutants_Coverage
 
-Path: `31390_Emissions_Of_Inorganic_Pollutants_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -8150,9 +7907,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 244 — 244
+### Field 244 — 31400_Emissions_Of_Inorganic_Pollutants_Eligible_Assets
 
-Path: `31400_Emissions_Of_Inorganic_Pollutants_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -8179,9 +7935,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 245 — 245
+### Field 245 — 31410_Emissions_Of_Air_Pollutants_Value
 
-Path: `31410_Emissions_Of_Air_Pollutants_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Tonnes of air pollutants equivalent per million EUR invested, expressed as a weighted average
@@ -8208,9 +7963,8 @@ Definition: Metric: Tonnes of air pollutants equivalent per million EUR invested
 
 ---
 
-### Field 246 — 246
+### Field 246 — 31420_Emissions_Of_Air_Pollutants_Considered_In_The_Investment_Strategy
 
-Path: `31420_Emissions_Of_Air_Pollutants_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -8237,9 +7991,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 247 — 247
+### Field 247 — 31430_Emissions_Of_Air_Pollutants_Coverage
 
-Path: `31430_Emissions_Of_Air_Pollutants_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -8266,9 +8019,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 248 — 248
+### Field 248 — 31440_Emissions_Of_Air_Pollutants_Eligible_Assets
 
-Path: `31440_Emissions_Of_Air_Pollutants_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -8295,9 +8047,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 249 — 249
+### Field 249 — 31450_Emissions_Of_Ozone_Depletion_Substances_Value
 
-Path: `31450_Emissions_Of_Ozone_Depletion_Substances_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Tonnes of ozone depleting substance equivalent per million EUR invested, expressed as a weighted average
@@ -8324,9 +8075,8 @@ Definition: Metric: Tonnes of ozone depleting substance equivalent per million E
 
 ---
 
-### Field 250 — 250
+### Field 250 — 31460_Emissions_Of_Ozone_Depletion_Substances_Considered_In_The_Investment_Strategy
 
-Path: `31460_Emissions_Of_Ozone_Depletion_Substances_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -8353,9 +8103,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 251 — 251
+### Field 251 — 31470_Emissions_Of_Ozone_Depletion_Substances_Coverage
 
-Path: `31470_Emissions_Of_Ozone_Depletion_Substances_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -8382,9 +8131,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 252 — 252
+### Field 252 — 31480_Emissions_Of_Ozone_Depletion_Substances_Eligible_Assets
 
-Path: `31480_Emissions_Of_Ozone_Depletion_Substances_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -8411,9 +8159,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 253 — 253
+### Field 253 — 31490_Investing_In_Companies_Without_Carbon_Emission_Reduction_Initiatives_Investment_Weight_Value
 
-Path: `31490_Investing_In_Companies_Without_Carbon_Emission_Reduction_Initiatives_Investment_Weight_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share in investments in investee companies without carbon emission reduction initiatives aimed at aligning with the Paris Agreement
@@ -8440,9 +8187,8 @@ Definition: Metric: Share in investments in investee companies without carbon em
 
 ---
 
-### Field 254 — 254
+### Field 254 — 31500_Investing_In_Companies_Without_Carbon_Emission_Reduction_Initiatives_Investment_Weight_Considered_In_The_Investment_Strategy
 
-Path: `31500_Investing_In_Companies_Without_Carbon_Emission_Reduction_Initiatives_Investment_Weight_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -8469,9 +8215,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 255 — 255
+### Field 255 — 31505_Investing_In_Companies_Without_Carbon_Emission_Reduction_Initiatives_Investment_Weight_Coverage
 
-Path: `31505_Investing_In_Companies_Without_Carbon_Emission_Reduction_Initiatives_Investment_Weight_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -8498,9 +8243,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 256 — 256
+### Field 256 — 31510_Investing_In_Companies_Without_Carbon_Emission_Reduction_Initiatives_Investment_Weight_Eligible_Assets
 
-Path: `31510_Investing_In_Companies_Without_Carbon_Emission_Reduction_Initiatives_Investment_Weight_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -8527,9 +8271,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 257 — 257
+### Field 257 — 31520_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Oil_Value
 
-Path: `31520_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Oil_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: metric: Share of energy consumption from oil source
@@ -8556,9 +8299,8 @@ Definition: metric: Share of energy consumption from oil source
 
 ---
 
-### Field 258 — 258
+### Field 258 — 31530_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Oil_Considered_In_The_Investment_Strategy
 
-Path: `31530_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Oil_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -8585,9 +8327,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 259 — 259
+### Field 259 — 31540_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Oil_Coverage
 
-Path: `31540_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Oil_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -8614,9 +8355,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 260 — 260
+### Field 260 — 31550_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Oil_Eligible_Assets
 
-Path: `31550_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Oil_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -8643,9 +8383,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 261 — 261
+### Field 261 — 31560_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Natural_Gas_Value
 
-Path: `31560_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Natural_Gas_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: metric: Share of energy consumption from natural gas source
@@ -8672,9 +8411,8 @@ Definition: metric: Share of energy consumption from natural gas source
 
 ---
 
-### Field 262 — 262
+### Field 262 — 31570_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Natural_Gas_Considered_In_The_Investment_Strategy
 
-Path: `31570_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Natural_Gas_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -8701,9 +8439,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 263 — 263
+### Field 263 — 31580_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Natural_Gas_Coverage
 
-Path: `31580_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Natural_Gas_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -8730,9 +8467,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 264 — 264
+### Field 264 — 31590_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Natural_Gas_Eligible_Assets
 
-Path: `31590_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Natural_Gas_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -8759,9 +8495,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 265 — 265
+### Field 265 — 31600_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Coal_Value
 
-Path: `31600_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Coal_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: metric: Share of energy consumption from coal source
@@ -8788,9 +8523,8 @@ Definition: metric: Share of energy consumption from coal source
 
 ---
 
-### Field 266 — 266
+### Field 266 — 31610_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Coal_Considered_In_The_Investment_Strategy
 
-Path: `31610_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Coal_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -8817,9 +8551,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 267 — 267
+### Field 267 — 31620_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Coal_Coverage
 
-Path: `31620_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Coal_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -8846,9 +8579,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 268 — 268
+### Field 268 — 31630_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Coal_Eligible_Assets
 
-Path: `31630_Breakdown_Of_Energy_Consumption_By_Type_Of_Non-renewable_Sources_Of_Energy_Coal_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -8875,9 +8607,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 269 — 269
+### Field 269 — 31640_Water_Usage_And_Recycling_Average_Amount_Value
 
-Path: `31640_Water_Usage_And_Recycling_Average_Amount_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Average amount of water consumed and reclaimed by the investee companies (in cubic meters) per million EUR of revenu of investee companies; Weighted average percentage of water recycled and reused by investee companies
@@ -8904,9 +8635,8 @@ Definition: Metric: Average amount of water consumed and reclaimed by the invest
 
 ---
 
-### Field 270 — 270
+### Field 270 — 31650_Water_Usage_And_Recycling_Average_Amount_Considered_In_The_Investment_Strategy
 
-Path: `31650_Water_Usage_And_Recycling_Average_Amount_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -8933,9 +8663,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 271 — 271
+### Field 271 — 31660_Water_Usage_And_Recycling_Average_Amount_Coverage
 
-Path: `31660_Water_Usage_And_Recycling_Average_Amount_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -8962,9 +8691,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 272 — 272
+### Field 272 — 31670_Water_Usage_And_Recycling_Average_Amount_Eligible_Assets
 
-Path: `31670_Water_Usage_And_Recycling_Average_Amount_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -8991,9 +8719,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 273 — 273
+### Field 273 — 31671_Water_Usage_And_Recycling_Average_Percentage_Value
 
-Path: `31671_Water_Usage_And_Recycling_Average_Percentage_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Weighted average percentage of water recycled and reused by investee companies
@@ -9020,9 +8747,8 @@ Definition: Metric: Weighted average percentage of water recycled and reused by 
 
 ---
 
-### Field 274 — 274
+### Field 274 — 31672_Water_Usage_And_Recycling_Average_Percentage_Considered_In_The_Investment_Strategy
 
-Path: `31672_Water_Usage_And_Recycling_Average_Percentage_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -9049,9 +8775,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 275 — 275
+### Field 275 — 31673_Water_Usage_And_Recycling_Average_Percentage_Coverage
 
-Path: `31673_Water_Usage_And_Recycling_Average_Percentage_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -9078,9 +8803,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 276 — 276
+### Field 276 — 31674_Water_Usage_And_Recycling_Average_Percentage_Eligible_Assets
 
-Path: `31674_Water_Usage_And_Recycling_Average_Percentage_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -9107,9 +8831,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 277 — 277
+### Field 277 — 31680_Investing_In_Companies_Without_Water_Management_Policies_Weight_Value
 
-Path: `31680_Investing_In_Companies_Without_Water_Management_Policies_Weight_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies without water management policies
@@ -9136,9 +8859,8 @@ Definition: Metric: Share of investments in investee companies without water man
 
 ---
 
-### Field 278 — 278
+### Field 278 — 31690_Investing_In_Companies_Without_Water_Management_Policies_Weight_Considered_In_The_Investment_Strategy
 
-Path: `31690_Investing_In_Companies_Without_Water_Management_Policies_Weight_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -9165,9 +8887,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 279 — 279
+### Field 279 — 31700_Investing_In_Companies_Without_Water_Management_Policies_Weight_Coverage
 
-Path: `31700_Investing_In_Companies_Without_Water_Management_Policies_Weight_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -9194,9 +8915,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 280 — 280
+### Field 280 — 31710_Investing_In_Companies_Without_Water_Management_Policies_Weight_Eligible_Assets
 
-Path: `31710_Investing_In_Companies_Without_Water_Management_Policies_Weight_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -9223,9 +8943,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 281 — 281
+### Field 281 — 31720_Exposure_To_Areas_Of_High_Water_Stress_Value
 
-Path: `31720_Exposure_To_Areas_Of_High_Water_Stress_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies with sites located in areas of high water stress without a water management policy
@@ -9252,9 +8971,8 @@ Definition: Metric: Share of investments in investee companies with sites locate
 
 ---
 
-### Field 282 — 282
+### Field 282 — 31730_Exposure_To_Areas_Of_High_Water_Stress_Considered_In_The_Investment_Strategy
 
-Path: `31730_Exposure_To_Areas_Of_High_Water_Stress_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -9281,9 +8999,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 283 — 283
+### Field 283 — 31740_Exposure_To_Areas_Of_High_Water_Stress_Coverage
 
-Path: `31740_Exposure_To_Areas_Of_High_Water_Stress_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -9310,9 +9027,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 284 — 284
+### Field 284 — 31750_Exposure_To_Areas_Of_High_Water_Stress_Eligible_Assets
 
-Path: `31750_Exposure_To_Areas_Of_High_Water_Stress_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -9339,9 +9055,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 285 — 285
+### Field 285 — 31760_Exposure_To_Companies_Producing_Chemicals_Value
 
-Path: `31760_Exposure_To_Companies_Producing_Chemicals_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investment in investee companies the activities of which fall under Division 20.2 of Annex I to Regulation (EC) No 1893/2006
@@ -9368,9 +9083,8 @@ Definition: Metric: Share of investment in investee companies the activities of 
 
 ---
 
-### Field 286 — 286
+### Field 286 — 31770_Exposure_To_Companies_Producing_Chemical_Considered_In_The_Investment_Strategy
 
-Path: `31770_Exposure_To_Companies_Producing_Chemical_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -9397,9 +9111,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 287 — 287
+### Field 287 — 31780_Exposure_To_Companies_Producing_Chemical_Coverage
 
-Path: `31780_Exposure_To_Companies_Producing_Chemical_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -9426,9 +9139,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 288 — 288
+### Field 288 — 31790_Exposure_To_Companies_Producing_Chemical_Eligible_Assets
 
-Path: `31790_Exposure_To_Companies_Producing_Chemical_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -9455,9 +9167,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 289 — 289
+### Field 289 — 31800_Exposure_To_Companies_Causing_Land_Degradation_Desertification_Or_Soil_Sealing_Value
 
-Path: `31800_Exposure_To_Companies_Causing_Land_Degradation_Desertification_Or_Soil_Sealing_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investment in investee companies the activities of which cause land degradation, desertification or soil sealing
@@ -9484,9 +9195,8 @@ Definition: Metric: Share of investment in investee companies the activities of 
 
 ---
 
-### Field 290 — 290
+### Field 290 — 31810_Exposure_To_Companies_Causing_Land_Degradation_Desertification_Or_Soil_Sealing_Considered_In_The_Investment_Strategy
 
-Path: `31810_Exposure_To_Companies_Causing_Land_Degradation_Desertification_Or_Soil_Sealing_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -9513,9 +9223,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 291 — 291
+### Field 291 — 31820_Exposure_To_Companies_Causing_Land_Degradation_Desertification_Or_Soil_Sealing_Coverage
 
-Path: `31820_Exposure_To_Companies_Causing_Land_Degradation_Desertification_Or_Soil_Sealing_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -9542,9 +9251,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 292 — 292
+### Field 292 — 31830_Exposure_To_Companies_Causing_Land_Degradation_Desertification_Or_Soil_Sealing_Eligible_Assets
 
-Path: `31830_Exposure_To_Companies_Causing_Land_Degradation_Desertification_Or_Soil_Sealing_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -9571,9 +9279,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 293 — 293
+### Field 293 — 31840_Exposure_To_Companies_Without_Sustainable_Land_Or_Agriculture_Practices_Policies_Value
 
-Path: `31840_Exposure_To_Companies_Without_Sustainable_Land_Or_Agriculture_Practices_Policies_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies without sustainable land/agriculture practices or policies
@@ -9600,9 +9307,8 @@ Definition: Metric: Share of investments in investee companies without sustainab
 
 ---
 
-### Field 294 — 294
+### Field 294 — 31850_Exposure_To_Companies_Without_Sustainable_Land_Or_Agriculture_Practices_Policies_Considered_In_The_Investment_Strategy
 
-Path: `31850_Exposure_To_Companies_Without_Sustainable_Land_Or_Agriculture_Practices_Policies_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -9629,9 +9335,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 295 — 295
+### Field 295 — 31860_Exposure_To_Companies_Without_Sustainable_Land_Or_Agriculture_Practices_Policies_Coverage
 
-Path: `31860_Exposure_To_Companies_Without_Sustainable_Land_Or_Agriculture_Practices_Policies_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -9658,9 +9363,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 296 — 296
+### Field 296 — 31870_Exposure_To_Companies_Without_Sustainable_Land_Or_Agriculture_Practices_Policies_Eligible_Assets
 
-Path: `31870_Exposure_To_Companies_Without_Sustainable_Land_Or_Agriculture_Practices_Policies_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -9687,9 +9391,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 297 — 297
+### Field 297 — 31871_Share_Of_Investments_In_Companies_Without_Sustainable_Oceans_Or_Seas_Practices_Value
 
-Path: `31871_Share_Of_Investments_In_Companies_Without_Sustainable_Oceans_Or_Seas_Practices_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies without sustainable ocean/seas practices or policies
@@ -9716,9 +9419,8 @@ Definition: Metric: Share of investments in investee companies without sustainab
 
 ---
 
-### Field 298 — 298
+### Field 298 — 31872_Share_Of_Investments_In_Companies_Without_Sustainable_Oceans_Or_Seas_Practices_Considered_In_The_Investment_Strategy
 
-Path: `31872_Share_Of_Investments_In_Companies_Without_Sustainable_Oceans_Or_Seas_Practices_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -9745,9 +9447,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 299 — 299
+### Field 299 — 31873_Share_Of_Investments_In_Companies_Without_Sustainable_Oceans_Or_Seas_Practices_Coverage
 
-Path: `31873_Share_Of_Investments_In_Companies_Without_Sustainable_Oceans_Or_Seas_Practices_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -9774,9 +9475,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 300 — 300
+### Field 300 — 31874_Share_Of_Investments_In_Companies_Without_Sustainable_Oceans_Or_Seas_Practices_Eligible_Assets
 
-Path: `31874_Share_Of_Investments_In_Companies_Without_Sustainable_Oceans_Or_Seas_Practices_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -9803,9 +9503,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 301 — 301
+### Field 301 — 31875_Non_Recycled_Waste_Ratio_Value
 
-Path: `31875_Non_Recycled_Waste_Ratio_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Tonnes of non-recycled waste generated by investee companies per million EUR invested, expressed as a weighted average
@@ -9832,9 +9531,8 @@ Definition: Metric: Tonnes of non-recycled waste generated by investee companies
 
 ---
 
-### Field 302 — 302
+### Field 302 — 31876_Non_Recycled_Waste_Ratio_Considered_In_The_Investment_Strategy
 
-Path: `31876_Non_Recycled_Waste_Ratio_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -9861,9 +9559,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 303 — 303
+### Field 303 — 31877_Non_Recycled_Waste_Ratio_Coverage
 
-Path: `31877_Non_Recycled_Waste_Ratio_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -9890,9 +9587,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 304 — 304
+### Field 304 — 31878_Non_Recycled_Waste_Ratio_Eligible_Assets
 
-Path: `31878_Non_Recycled_Waste_Ratio_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -9919,9 +9615,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 305 — 305
+### Field 305 — 31880_Share_Of_Investments_In_Investee_Companies_Whose_Operations_Affect_Threatened_Species_Value
 
-Path: `31880_Share_Of_Investments_In_Investee_Companies_Whose_Operations_Affect_Threatened_Species_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies whose operations affect threatened species
@@ -9948,9 +9643,8 @@ Definition: Metric: Share of investments in investee companies whose operations 
 
 ---
 
-### Field 306 — 306
+### Field 306 — 31890_Share_Of_Investments_In_Investee_Companies_Whose_Operations_Affect_Threatened_Species_Considered_In_The_Investment_Strategy
 
-Path: `31890_Share_Of_Investments_In_Investee_Companies_Whose_Operations_Affect_Threatened_Species_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -9977,9 +9671,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 307 — 307
+### Field 307 — 31900_Share_Of_Investments_In_Investee_Companies_Whose_Operations_Affect_Threatened_Species_Coverage
 
-Path: `31900_Share_Of_Investments_In_Investee_Companies_Whose_Operations_Affect_Threatened_Species_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -10006,9 +9699,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 308 — 308
+### Field 308 — 31910_Share_Of_Investments_In_Investee_Companies_Whose_Operations_Affect_Threatened_Species_Eligible_Assets
 
-Path: `31910_Share_Of_Investments_In_Investee_Companies_Whose_Operations_Affect_Threatened_Species_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -10035,9 +9727,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 309 — 309
+### Field 309 — 31920_Share_Of_Investments_In_Investee_Companies_Without_A_Biodiversity_Protection_Policy_Covering_Operational_Sites_Owned_Leased_Managed_In_Or_Adjacent_To_A_Protected_Area_Or_An_Area_Of_High_Biodiversity_Value_Outside_Protected_Areas_Value
 
-Path: `31920_Share_Of_Investments_In_Investee_Companies_Without_A_Biodiversity_Protection_Policy_Covering_Operational_Sites_Owned_Leased_Managed_In_Or_Adjacent_To_A_Protected_Area_Or_An_Area_Of_High_Biodiversity_Value_Outside_Protected_Areas_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies without a biodiversity protection policy covering operational sites owned, leased, managed in, or adjacent to, a protected area or an area of high biodiversity value outside protected areas.
@@ -10064,9 +9755,8 @@ Definition: Metric: Share of investments in investee companies without a biodive
 
 ---
 
-### Field 310 — 310
+### Field 310 — 31930_Share_Of_Investments_In_Investee_Companies_Without_A_Biodiversity_Protection_Policy_Covering_Operational_Sites_Owned_Leased_Managed_In_Or_Adjacent_To_A_Protected_Area_Or_An_Area_Of_High_Biodiversity_Value_Outside_Protected_Areas_Considered_In_The_Investment_Strategy
 
-Path: `31930_Share_Of_Investments_In_Investee_Companies_Without_A_Biodiversity_Protection_Policy_Covering_Operational_Sites_Owned_Leased_Managed_In_Or_Adjacent_To_A_Protected_Area_Or_An_Area_Of_High_Biodiversity_Value_Outside_Protected_Areas_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -10093,9 +9783,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 311 — 311
+### Field 311 — 31940_Share_Of_Investments_In_Investee_Companies_Without_A_Biodiversity_Protection_Policy_Covering_Operational_Sites_Owned_Leased_Managed_In_Or_Adjacent_To_A_Protected_Area_Or_An_Area_Of_High_Biodiversity_Value_Outside_Protected_Areas_Coverage
 
-Path: `31940_Share_Of_Investments_In_Investee_Companies_Without_A_Biodiversity_Protection_Policy_Covering_Operational_Sites_Owned_Leased_Managed_In_Or_Adjacent_To_A_Protected_Area_Or_An_Area_Of_High_Biodiversity_Value_Outside_Protected_Areas_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -10122,9 +9811,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 312 — 312
+### Field 312 — 31950_Share_Of_Investments_In_Investee_Companies_Without_A_Biodiversity_Protection_Policy_Covering_Operational_Sites_Owned_Leased_Managed_In_Or_Adjacent_To_A_Protected_Area_Or_An_Area_Of_High_Biodiversity_Value_Outside_Protected_Areas_Eligible_Assets
 
-Path: `31950_Share_Of_Investments_In_Investee_Companies_Without_A_Biodiversity_Protection_Policy_Covering_Operational_Sites_Owned_Leased_Managed_In_Or_Adjacent_To_A_Protected_Area_Or_An_Area_Of_High_Biodiversity_Value_Outside_Protected_Areas_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -10151,9 +9839,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 313 — 313
+### Field 313 — 31960_Share_Of_Investee_Companies_Without_Deforestation_Policy_Value
 
-Path: `31960_Share_Of_Investee_Companies_Without_Deforestation_Policy_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies without a policy to address deforestation
@@ -10180,9 +9867,8 @@ Definition: Metric: Share of investments in investee companies without a policy 
 
 ---
 
-### Field 314 — 314
+### Field 314 — 31970_Share_Of_Investee_Companies_Without_Deforestation_Policy_Considered_In_The_Investment_Strategy
 
-Path: `31970_Share_Of_Investee_Companies_Without_Deforestation_Policy_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -10209,9 +9895,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 315 — 315
+### Field 315 — 31980_Share_Of_Investee_Companies_Without_Deforestation_Policy_Coverage
 
-Path: `31980_Share_Of_Investee_Companies_Without_Deforestation_Policy_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -10238,9 +9923,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 316 — 316
+### Field 316 — 31990_Share_Of_Investee_Companies_Without_Deforestation_Policy_Eligible_Assets
 
-Path: `31990_Share_Of_Investee_Companies_Without_Deforestation_Policy_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -10267,9 +9951,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 317 — 317
+### Field 317 — 32000_Share_Of_Securities_Not_Issued_under_Union_legislation_on_environmentally_sustainable_bonds
 
-Path: `32000_Share_Of_Securities_Not_Issued_under_Union_legislation_on_environmentally_sustainable_bonds`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metic: Share of securities not issued under Union legislation on environmentally sustainable bonds
@@ -10296,9 +9979,8 @@ Definition: Metic: Share of securities not issued under Union legislation on env
 
 ---
 
-### Field 318 — 318
+### Field 318 — 32010_Share_Of_Securities_Not_Issued_under_Union_legislation_on_environmentally_sustainable_bonds_Considered_In_The_Investment_Strategy
 
-Path: `32010_Share_Of_Securities_Not_Issued_under_Union_legislation_on_environmentally_sustainable_bonds_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -10325,9 +10007,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 319 — 319
+### Field 319 — 32020_Share_Of_Securities_Not_Issued_under_Union_legislation_on_environmentally_sustainable_bonds_Coverage
 
-Path: `32020_Share_Of_Securities_Not_Issued_under_Union_legislation_on_environmentally_sustainable_bonds_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -10354,9 +10035,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 320 — 320
+### Field 320 — 32030_Share_Of_Securities_Not_Issued_under_Union_legislation_on_environmentally_sustainable_bonds_Eligible_Assets
 
-Path: `32030_Share_Of_Securities_Not_Issued_under_Union_legislation_on_environmentally_sustainable_bonds_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -10383,9 +10063,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 321 — 321
+### Field 321 — 32040_Share_Of_Bonds_not_issued_under_Union_legislation_on_environmentally_sustainable_bonds
 
-Path: `32040_Share_Of_Bonds_not_issued_under_Union_legislation_on_environmentally_sustainable_bonds`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metic: Share of bonds not issued under Union legislation on environmentally sustainable bonds
@@ -10412,9 +10091,8 @@ Definition: Metic: Share of bonds not issued under Union legislation on environm
 
 ---
 
-### Field 322 — 322
+### Field 322 — 32050_Share_Of_Bonds_not_issued_under_Union_legislation_on_environmentally_sustainable_bonds_Considered_In_The_Investment_Strategy
 
-Path: `32050_Share_Of_Bonds_not_issued_under_Union_legislation_on_environmentally_sustainable_bonds_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -10441,9 +10119,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 323 — 323
+### Field 323 — 32060_Share_Of_Bonds_not_issued_under_Union_legislation_on_environmentally_sustainable_bonds_Coverage
 
-Path: `32060_Share_Of_Bonds_not_issued_under_Union_legislation_on_environmentally_sustainable_bonds_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -10470,9 +10147,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 324 — 324
+### Field 324 — 32070_Share_Of_Bonds_not_issued_under_Union_legislation_on_environmentally_sustainable_bonds_Eligible_Assets
 
-Path: `32070_Share_Of_Bonds_not_issued_under_Union_legislation_on_environmentally_sustainable_bonds_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -10499,9 +10175,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 325 — 325
+### Field 325 — 32080_GHG_Emissions_Real_Estate_Scope_1_Value
 
-Path: `32080_GHG_Emissions_Real_Estate_Scope_1_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Scope 1 emissions generated by real estate assets
@@ -10528,9 +10203,8 @@ Definition: Metric: Scope 1 emissions generated by real estate assets
 
 ---
 
-### Field 326 — 326
+### Field 326 — 32090_GHG_Emissions_Real_Estate_Scope_1_Considered_In_The_Investment_Strategy
 
-Path: `32090_GHG_Emissions_Real_Estate_Scope_1_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -10557,9 +10231,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 327 — 327
+### Field 327 — 32100_GHG_Emissions_Real_Estate_Scope_1_Coverage
 
-Path: `32100_GHG_Emissions_Real_Estate_Scope_1_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -10586,9 +10259,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 328 — 328
+### Field 328 — 32110_GHG_Emissions_Real_Estate_Scope_1_Eligible_Assets
 
-Path: `32110_GHG_Emissions_Real_Estate_Scope_1_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -10615,9 +10287,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 329 — 329
+### Field 329 — 32120_GHG_Emissions_Real_Estate_Scope_2_Value
 
-Path: `32120_GHG_Emissions_Real_Estate_Scope_2_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Scope 2 emissions generated by real estate assets
@@ -10644,9 +10315,8 @@ Definition: Metric: Scope 2 emissions generated by real estate assets
 
 ---
 
-### Field 330 — 330
+### Field 330 — 32130_GHG_Emissions_Real_Estate_Scope_2_Considered_In_The_Investment_Strategy
 
-Path: `32130_GHG_Emissions_Real_Estate_Scope_2_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -10673,9 +10343,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 331 — 331
+### Field 331 — 32140_GHG_Emissions_Real_Estate_Scope_2_Coverage
 
-Path: `32140_GHG_Emissions_Real_Estate_Scope_2_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -10702,9 +10371,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 332 — 332
+### Field 332 — 32150_GHG_Emissions_Real_Estate_Scope_2_Eligible_Assets
 
-Path: `32150_GHG_Emissions_Real_Estate_Scope_2_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -10731,9 +10399,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 333 — 333
+### Field 333 — 32160_GHG_Emissions_Real_Estate_Scope_3_Value
 
-Path: `32160_GHG_Emissions_Real_Estate_Scope_3_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Scope 3 emissions generated by real estate assets
@@ -10760,9 +10427,8 @@ Definition: Metric: Scope 3 emissions generated by real estate assets
 
 ---
 
-### Field 334 — 334
+### Field 334 — 32170_GHG_Emissions_Real_Estate_Scope_3_Considered_In_The_Investment_Strategy
 
-Path: `32170_GHG_Emissions_Real_Estate_Scope_3_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -10789,9 +10455,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 335 — 335
+### Field 335 — 32180_GHG_Emissions_Real_Estate_Scope_3_Coverage
 
-Path: `32180_GHG_Emissions_Real_Estate_Scope_3_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -10818,9 +10483,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 336 — 336
+### Field 336 — 32190_GHG_Emissions_Real_Estate_Scope_3_Eligible_Assets
 
-Path: `32190_GHG_Emissions_Real_Estate_Scope_3_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -10847,9 +10511,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 337 — 337
+### Field 337 — 32200_GHG_Emissions_Real_Estate_Total_Scope12_Value
 
-Path: `32200_GHG_Emissions_Real_Estate_Total_Scope12_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Total scope 1 and scope 2 emissions generated by real estate assets
@@ -10876,9 +10539,8 @@ Definition: Metric: Total scope 1 and scope 2 emissions generated by real estate
 
 ---
 
-### Field 338 — 338
+### Field 338 — 32210_GHG_Emissions_Real_Estate_Total_Scope12_Considered_In_The_Investment_Strategy
 
-Path: `32210_GHG_Emissions_Real_Estate_Total_Scope12_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -10905,9 +10567,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 339 — 339
+### Field 339 — 32220_GHG_Emissions_Real_Estate_Total_Scope12_Coverage
 
-Path: `32220_GHG_Emissions_Real_Estate_Total_Scope12_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -10934,9 +10595,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 340 — 340
+### Field 340 — 32230_GHG_Emissions_Real_Estate_Total_Scope12_Eligible_Assets
 
-Path: `32230_GHG_Emissions_Real_Estate_Total_Scope12_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -10963,9 +10623,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 341 — 341
+### Field 341 — 32240_GHG_Emissions_Real_Estate_Total_Scope123_Value
 
-Path: `32240_GHG_Emissions_Real_Estate_Total_Scope123_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Total scope 1, scope 2 and scope 3 emissions generated by real estate assets
@@ -10992,9 +10651,8 @@ Definition: Metric: Total scope 1, scope 2 and scope 3 emissions generated by re
 
 ---
 
-### Field 342 — 342
+### Field 342 — 32250_GHG_Emissions_Real_Estate_Total_Scope123_Considered_In_The_Investment_Strategy
 
-Path: `32250_GHG_Emissions_Real_Estate_Total_Scope123_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -11021,9 +10679,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 343 — 343
+### Field 343 — 32260_GHG_Emissions_Real_Estate_Total_Scope123_Coverage
 
-Path: `32260_GHG_Emissions_Real_Estate_Total_Scope123_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -11050,9 +10707,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 344 — 344
+### Field 344 — 32270_GHG_Emissions_Real_Estate_Total_Scope123_Eligible_Assets
 
-Path: `32270_GHG_Emissions_Real_Estate_Total_Scope123_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -11079,9 +10735,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 345 — 345
+### Field 345 — 32280_Energy_Consumption_Intensity_Value
 
-Path: `32280_Energy_Consumption_Intensity_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Energy consumption in GWh of owned assets per square meter
@@ -11108,9 +10763,8 @@ Definition: Metric: Energy consumption in GWh of owned assets per square meter
 
 ---
 
-### Field 346 — 346
+### Field 346 — 32290_Energy_Consumption_Intensity_Considered_In_The_Investment_Strategy
 
-Path: `32290_Energy_Consumption_Intensity_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -11137,9 +10791,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 347 — 347
+### Field 347 — 32300_Energy_Consumption_Intensity_Coverage
 
-Path: `32300_Energy_Consumption_Intensity_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -11166,9 +10819,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 348 — 348
+### Field 348 — 32310_Energy_Consumption_Intensity_Eligible_Assets
 
-Path: `32310_Energy_Consumption_Intensity_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -11195,9 +10847,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 349 — 349
+### Field 349 — 32320_Waste_Production_In_Operations_Value
 
-Path: `32320_Waste_Production_In_Operations_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of real estate assets not equipped with facilities for waste sorting and not covered by a waste recovery or recycling contract
@@ -11224,9 +10875,8 @@ Definition: Metric: Share of real estate assets not equipped with facilities for
 
 ---
 
-### Field 350 — 350
+### Field 350 — 32330_Waste_Production_In_Operations_Considered_In_The_Investment_Strategy
 
-Path: `32330_Waste_Production_In_Operations_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -11253,9 +10903,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 351 — 351
+### Field 351 — 32340_Waste_Production_In_Operations_Coverage
 
-Path: `32340_Waste_Production_In_Operations_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -11282,9 +10931,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 352 — 352
+### Field 352 — 32350_Waste_Production_In_Operations_Eligible_Assets
 
-Path: `32350_Waste_Production_In_Operations_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -11311,9 +10959,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 353 — 353
+### Field 353 — 32360_Raw_Material_Consumption_For_New_Construction_And_Major_Renovations_Value
 
-Path: `32360_Raw_Material_Consumption_For_New_Construction_And_Major_Renovations_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of raw buidling materials (excluding recovered, recycled and biosourced) compared to the total weighting of building materials used in new construction and major renovations
@@ -11340,9 +10987,8 @@ Definition: Metric: Share of raw buidling materials (excluding recovered, recycl
 
 ---
 
-### Field 354 — 354
+### Field 354 — 32370_Raw_Material_Consumption_For_New_Construction_And_Major_Renovations_Considered_In_The_Investment_Strategy
 
-Path: `32370_Raw_Material_Consumption_For_New_Construction_And_Major_Renovations_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -11369,9 +11015,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 355 — 355
+### Field 355 — 32380_Raw_Material_Consumption_For_New_Construction_And_Major_Renovations_Coverage
 
-Path: `32380_Raw_Material_Consumption_For_New_Construction_And_Major_Renovations_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -11398,9 +11043,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 356 — 356
+### Field 356 — 32390_Raw_Material_Consumption_For_New_Construction_And_Major_Renovations_Eligible_Assets
 
-Path: `32390_Raw_Material_Consumption_For_New_Construction_And_Major_Renovations_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -11427,9 +11071,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 357 — 357
+### Field 357 — 32400_Land_Artificialisation_Value
 
-Path: `32400_Land_Artificialisation_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of non-vegetated surfaces area (surfaces that have not been vegetated in ground, as well as on roofs, terrace and walls) compared to the total surface area of the plots of all assets
@@ -11456,9 +11099,8 @@ Definition: Metric: Share of non-vegetated surfaces area (surfaces that have not
 
 ---
 
-### Field 358 — 358
+### Field 358 — 32410_Land_Artificialisation_Considered_In_The_Investment_Strategy
 
-Path: `32410_Land_Artificialisation_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -11485,9 +11127,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 359 — 359
+### Field 359 — 32420_Land_Artificialisation_Coverage
 
-Path: `32420_Land_Artificialisation_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -11514,9 +11155,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 360 — 360
+### Field 360 — 32430_Land_Artificialisation_Eligible_Assets
 
-Path: `32430_Land_Artificialisation_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -11543,9 +11183,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 361 — 361
+### Field 361 — 32440_Exposure_To_Companies_Without_Workplace_Accident_Prevention_Policy_Value
 
-Path: `32440_Exposure_To_Companies_Without_Workplace_Accident_Prevention_Policy_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies without a workplace accident prevention policy
@@ -11572,9 +11211,8 @@ Definition: Metric: Share of investments in investee companies without a workpla
 
 ---
 
-### Field 362 — 362
+### Field 362 — 32450_Exposure_To_Companies_Without_Workplace_Accident_Prevention_Policy_Considered_In_The_Investment_Strategy
 
-Path: `32450_Exposure_To_Companies_Without_Workplace_Accident_Prevention_Policy_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -11601,9 +11239,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 363 — 363
+### Field 363 — 32460_Exposure_To_Companies_Without_Workplace_Accident_Prevention_Policy_Coverage
 
-Path: `32460_Exposure_To_Companies_Without_Workplace_Accident_Prevention_Policy_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -11630,9 +11267,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 364 — 364
+### Field 364 — 32470_Exposure_To_Companies_Without_Workplace_Accident_Prevention_Policy_Eligible_Assets
 
-Path: `32470_Exposure_To_Companies_Without_Workplace_Accident_Prevention_Policy_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -11659,9 +11295,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 365 — 365
+### Field 365 — 32480_Rate_Of_Accidents_Value
 
-Path: `32480_Rate_Of_Accidents_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Rate of accidents in investee companies expressed as a weighted average
@@ -11688,9 +11323,8 @@ Definition: Metric: Rate of accidents in investee companies expressed as a weigh
 
 ---
 
-### Field 366 — 366
+### Field 366 — 32490_Rate_Of_Accidents_Considered_In_The_Investment_Strategy
 
-Path: `32490_Rate_Of_Accidents_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -11717,9 +11351,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 367 — 367
+### Field 367 — 32500_Rate_Of_Accidents_Coverage
 
-Path: `32500_Rate_Of_Accidents_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -11746,9 +11379,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 368 — 368
+### Field 368 — 32510_Rate_Of_Accidents_Eligible_Assets
 
-Path: `32510_Rate_Of_Accidents_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -11775,9 +11407,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 369 — 369
+### Field 369 — 32520_Number_Of_Days_Lost_For_Injuries_Accidents_Fatalities_Illness_Value
 
-Path: `32520_Number_Of_Days_Lost_For_Injuries_Accidents_Fatalities_Illness_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Number of workdays lost to injuries, accidents, fatalities or illness of investee companies expressed as a weighted average
@@ -11804,9 +11435,8 @@ Definition: Metric: Number of workdays lost to injuries, accidents, fatalities o
 
 ---
 
-### Field 370 — 370
+### Field 370 — 32530_Number_Of_Days_Lost_For_Injuries_Accidents_Fatalities_Illness_Considered_In_The_Investment_Strategy
 
-Path: `32530_Number_Of_Days_Lost_For_Injuries_Accidents_Fatalities_Illness_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -11833,9 +11463,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 371 — 371
+### Field 371 — 32540_Number_Of_Days_Lost_For_Injuries_Accidents_Fatalities_Illness_Coverage
 
-Path: `32540_Number_Of_Days_Lost_For_Injuries_Accidents_Fatalities_Illness_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -11862,9 +11491,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 372 — 372
+### Field 372 — 32550_Number_Of_Days_Lost_For_Injuries_Accidents_Fatalities_Illness_Assets
 
-Path: `32550_Number_Of_Days_Lost_For_Injuries_Accidents_Fatalities_Illness_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -11891,9 +11519,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 373 — 373
+### Field 373 — 32560_Share_Of_Investments_In_Investee_Companies_Without_Any_Supplier_Code_Of_Conduct_Against_Unsafe_Working_Conditions_Precarious_Work_Child_Labour_And_Forced_Labour_Value
 
-Path: `32560_Share_Of_Investments_In_Investee_Companies_Without_Any_Supplier_Code_Of_Conduct_Against_Unsafe_Working_Conditions_Precarious_Work_Child_Labour_And_Forced_Labour_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies without any supplier code of conduct (against unsafe working conditions, precarious work, child labour and forced labour)
@@ -11920,9 +11547,8 @@ Definition: Metric: Share of investments in investee companies without any suppl
 
 ---
 
-### Field 374 — 374
+### Field 374 — 32570_Share_Of_Investments_In_Investee_Companies_Without_Any_Supplier_Code_Of_Conduct_Against_Unsafe_Working_Conditions_Precarious_Work_Child_Labour_And_Forced_Labour_Considered_In_The_Investment_Strategy
 
-Path: `32570_Share_Of_Investments_In_Investee_Companies_Without_Any_Supplier_Code_Of_Conduct_Against_Unsafe_Working_Conditions_Precarious_Work_Child_Labour_And_Forced_Labour_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -11949,9 +11575,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 375 — 375
+### Field 375 — 32580_Share_Of_Investments_In_Investee_Companies_Without_Any_Supplier_Code_Of_Conduct_Against_Unsafe_Working_Conditions_Precarious_Work_Child_Labour_And_Forced_Labour_Coverage
 
-Path: `32580_Share_Of_Investments_In_Investee_Companies_Without_Any_Supplier_Code_Of_Conduct_Against_Unsafe_Working_Conditions_Precarious_Work_Child_Labour_And_Forced_Labour_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -11978,9 +11603,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 376 — 376
+### Field 376 — 32590_Share_Of_Investments_In_Investee_Companies_Without_Any_Supplier_Code_Of_Conduct_Against_Unsafe_Working_Conditions_Precarious_Work_Child_Labour_And_Forced_Labour_Eligible_Assets
 
-Path: `32590_Share_Of_Investments_In_Investee_Companies_Without_Any_Supplier_Code_Of_Conduct_Against_Unsafe_Working_Conditions_Precarious_Work_Child_Labour_And_Forced_Labour_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -12007,9 +11631,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 377 — 377
+### Field 377 — 32640_Share_Of_Investments_In_Investee_Companies_Without_Any_Grievance_Or_Complaints_Handling_Mechanism_Value
 
-Path: `32640_Share_Of_Investments_In_Investee_Companies_Without_Any_Grievance_Or_Complaints_Handling_Mechanism_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies without any grievance/complaints handling mechanism related to employee matters
@@ -12036,9 +11659,8 @@ Definition: Metric: Share of investments in investee companies without any griev
 
 ---
 
-### Field 378 — 378
+### Field 378 — 32650_Share_Of_Investments_In_Investee_Companies_Without_Any_Grievance_Or_Complaints_Handling_Mechanism_Considered_In_The_Investment_Strategy
 
-Path: `32650_Share_Of_Investments_In_Investee_Companies_Without_Any_Grievance_Or_Complaints_Handling_Mechanism_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -12065,9 +11687,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 379 — 379
+### Field 379 — 32660_Share_Of_Investments_In_Investee_Companies_Without_Any_Grievance_Or_Complaints_Handling_Mechanism_Coverage
 
-Path: `32660_Share_Of_Investments_In_Investee_Companies_Without_Any_Grievance_Or_Complaints_Handling_Mechanism_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -12094,9 +11715,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 380 — 380
+### Field 380 — 32670_Share_Of_Investments_In_Investee_Companies_Without_Any_Grievance_Or_Complaints_Handling_Mechanism_Eligible_Assets
 
-Path: `32670_Share_Of_Investments_In_Investee_Companies_Without_Any_Grievance_Or_Complaints_Handling_Mechanism_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -12123,9 +11743,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 381 — 381
+### Field 381 — 32680_Share_Of_Investee_Companies_With_Insufficient_Whistleblower_Protection_Value
 
-Path: `32680_Share_Of_Investee_Companies_With_Insufficient_Whistleblower_Protection_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in entities without policies on the protection of whistleblowers
@@ -12152,9 +11771,8 @@ Definition: Metric: Share of investments in entities without policies on the pro
 
 ---
 
-### Field 382 — 382
+### Field 382 — 32690_Share_Of_Investee_Companies_With_Insufficient_Whistleblower_Protection_Considered_In_The_Investment_Strategy
 
-Path: `32690_Share_Of_Investee_Companies_With_Insufficient_Whistleblower_Protection_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -12181,9 +11799,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 383 — 383
+### Field 383 — 32700_Share_Of_Investee_Companies_With_Insufficient_Whistleblower_Protection_Coverage
 
-Path: `32700_Share_Of_Investee_Companies_With_Insufficient_Whistleblower_Protection_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -12210,9 +11827,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 384 — 384
+### Field 384 — 32710_Share_Of_Investee_Companies_With_Insufficient_Whistleblower_Protection_Eligible_Assets
 
-Path: `32710_Share_Of_Investee_Companies_With_Insufficient_Whistleblower_Protection_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -12239,9 +11855,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 385 — 385
+### Field 385 — 32720_Number_Of_Incidents_Of_Discrimination_Reported_In_Investee_Companies_Value
 
-Path: `32720_Number_Of_Incidents_Of_Discrimination_Reported_In_Investee_Companies_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Number of incidents of discrimination reported in investee companies expressed as a weighted average
@@ -12268,9 +11883,8 @@ Definition: Metric: Number of incidents of discrimination reported in investee c
 
 ---
 
-### Field 386 — 386
+### Field 386 — 32730_Number_Of_Incidents_Of_Discrimination_Reported_In_Investee_Companies_Considered_In_The_Investment_Strategy
 
-Path: `32730_Number_Of_Incidents_Of_Discrimination_Reported_In_Investee_Companies_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -12297,9 +11911,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 387 — 387
+### Field 387 — 32740_Number_Of_Incidents_Of_Discrimination_Reported_In_Investee_Companies_Coverage
 
-Path: `32740_Number_Of_Incidents_Of_Discrimination_Reported_In_Investee_Companies_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -12326,9 +11939,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 388 — 388
+### Field 388 — 32750_Number_Of_Incidents_Of_Discrimination_Reported_In_Investee_Companies_Eligible_Assets
 
-Path: `32750_Number_Of_Incidents_Of_Discrimination_Reported_In_Investee_Companies_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -12355,9 +11967,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 389 — 389
+### Field 389 — 32760_Number_Of_Incidents_Of_Discrimination_Leading_To_Sanctions_In_Investee_Companies_Value
 
-Path: `32760_Number_Of_Incidents_Of_Discrimination_Leading_To_Sanctions_In_Investee_Companies_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Number of incidents of discrimination leading to sanctions in investee companies expressed as a weighted average
@@ -12384,9 +11995,8 @@ Definition: Metric: Number of incidents of discrimination leading to sanctions i
 
 ---
 
-### Field 390 — 390
+### Field 390 — 32770_Number_Of_Incidents_Of_Discrimination_Leading_To_Sanctions_In_Investee_Companies_Considered_In_The_Investment_Strategy
 
-Path: `32770_Number_Of_Incidents_Of_Discrimination_Leading_To_Sanctions_In_Investee_Companies_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -12413,9 +12023,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 391 — 391
+### Field 391 — 32780_Number_Of_Incidents_Of_Discrimination_Leading_To_Sanctions_In_Investee_Companies_Coverage
 
-Path: `32780_Number_Of_Incidents_Of_Discrimination_Leading_To_Sanctions_In_Investee_Companies_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -12442,9 +12051,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 392 — 392
+### Field 392 — 32790_Number_Of_Incidents_Of_Discrimination_Leading_To_Sanctions_In_Investee_Companies_Eligible_Assets
 
-Path: `32790_Number_Of_Incidents_Of_Discrimination_Leading_To_Sanctions_In_Investee_Companies_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -12471,9 +12079,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 393 — 393
+### Field 393 — 32800_Excessive_CEO_Pay_Ratio_Value
 
-Path: `32800_Excessive_CEO_Pay_Ratio_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Average ratio within investee companies of the annual total compensation for the highest compensated individual to the median annual total compensation for all employees (excluding the highest-compensated individual)
@@ -12500,9 +12107,8 @@ Definition: Metric: Average ratio within investee companies of the annual total 
 
 ---
 
-### Field 394 — 394
+### Field 394 — 32810_Excessive_CEO_Pay_Ratio_Considered_In_The_Investment_Strategy
 
-Path: `32810_Excessive_CEO_Pay_Ratio_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -12529,9 +12135,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 395 — 395
+### Field 395 — 32820_Excessive_CEO_Pay_Ratio_Coverage
 
-Path: `32820_Excessive_CEO_Pay_Ratio_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -12558,9 +12163,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 396 — 396
+### Field 396 — 32830_Excessive_CEO_Pay_Ratio_Eligible_Assets
 
-Path: `32830_Excessive_CEO_Pay_Ratio_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -12587,9 +12191,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 397 — 397
+### Field 397 — 32840_Exposure_To_Companies_Without_Human_Right_Policy_Value
 
-Path: `32840_Exposure_To_Companies_Without_Human_Right_Policy_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in entities without a human right policy
@@ -12616,9 +12219,8 @@ Definition: Metric: Share of investments in entities without a human right polic
 
 ---
 
-### Field 398 — 398
+### Field 398 — 32850_Exposure_To_Companies_Without_Human_Right_Policy_Considered_In_The_Investment_Strategy
 
-Path: `32850_Exposure_To_Companies_Without_Human_Right_Policy_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -12645,9 +12247,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 399 — 399
+### Field 399 — 32860_Exposure_To_Companies_Without_Human_Right_Policy_Coverage
 
-Path: `32860_Exposure_To_Companies_Without_Human_Right_Policy_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -12674,9 +12275,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 400 — 400
+### Field 400 — 32870_Exposure_To_Companies_Without_Human_Right_Policy_Eligible_Assets
 
-Path: `32870_Exposure_To_Companies_Without_Human_Right_Policy_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -12703,9 +12303,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 401 — 401
+### Field 401 — 32880_Exposure_To_Companies_With_Lack_Of_Due_Diligence_Value
 
-Path: `32880_Exposure_To_Companies_With_Lack_Of_Due_Diligence_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investment in entities without a due diligence process to identify, prevent, mitigate and address adverse human rights impacts
@@ -12732,9 +12331,8 @@ Definition: Metric: Share of investment in entities without a due diligence proc
 
 ---
 
-### Field 402 — 402
+### Field 402 — 32890_Exposure_To_Companies_With_Lack_Of_Due_Diligence_Considered_In_The_Investment_Strategy
 
-Path: `32890_Exposure_To_Companies_With_Lack_Of_Due_Diligence_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -12761,9 +12359,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 403 — 403
+### Field 403 — 32900_Exposure_To_Companies_With_Lack_Of_Due_Diligence_Coverage
 
-Path: `32900_Exposure_To_Companies_With_Lack_Of_Due_Diligence_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -12790,9 +12387,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 404 — 404
+### Field 404 — 32910_Exposure_To_Companies_With_Lack_Of_Due_Diligence_Eligible_Assets
 
-Path: `32910_Exposure_To_Companies_With_Lack_Of_Due_Diligence_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -12819,9 +12415,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 405 — 405
+### Field 405 — 32920_Exposure_To_Companies_With_Lack_Of_Processes_And_Measures_For_Preventing_Trafficking_In_Human_Beings_Local_Value
 
-Path: `32920_Exposure_To_Companies_With_Lack_Of_Processes_And_Measures_For_Preventing_Trafficking_In_Human_Beings_Local_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investment in entities without policies against trafficking in human beings
@@ -12848,9 +12443,8 @@ Definition: Metric: Share of investment in entities without policies against tra
 
 ---
 
-### Field 406 — 406
+### Field 406 — 32930_Exposure_To_Companies_With_Lack_Of_Processes_And_Measures_For_Preventing_Trafficking_In_Human_Beings_Local_Considered_In_The_Investment_Strategy
 
-Path: `32930_Exposure_To_Companies_With_Lack_Of_Processes_And_Measures_For_Preventing_Trafficking_In_Human_Beings_Local_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -12877,9 +12471,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 407 — 407
+### Field 407 — 32940_Exposure_To_Companies_With_Lack_Of_Processes_And_Measures_For_Preventing_Trafficking_In_Human_Beings_Local_Coverage
 
-Path: `32940_Exposure_To_Companies_With_Lack_Of_Processes_And_Measures_For_Preventing_Trafficking_In_Human_Beings_Local_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -12906,9 +12499,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 408 — 408
+### Field 408 — 32950_Exposure_To_Companies_With_Lack_Of_Processes_And_Measures_For_Preventing_Trafficking_In_Human_Beings_Local_Eligible_Assets
 
-Path: `32950_Exposure_To_Companies_With_Lack_Of_Processes_And_Measures_For_Preventing_Trafficking_In_Human_Beings_Local_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -12935,9 +12527,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 409 — 409
+### Field 409 — 32960_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Child_Labour_Value
 
-Path: `32960_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Child_Labour_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investment in entities exposed to operations and suppliers at significant risk of incidents of child labour exposed to hazardous work in terms of geographic areas or type of operation
@@ -12964,9 +12555,8 @@ Definition: Metric: Share of investment in entities exposed to operations and su
 
 ---
 
-### Field 410 — 410
+### Field 410 — 32970_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Child_Labour_Considered_In_The_Investment_Strategy
 
-Path: `32970_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Child_Labour_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -12993,9 +12583,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 411 — 411
+### Field 411 — 32980_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Child_Labour_Coverage
 
-Path: `32980_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Child_Labour_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -13022,9 +12611,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 412 — 412
+### Field 412 — 32990_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Child_Labour_Eligible_Assets
 
-Path: `32990_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Child_Labour_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -13051,9 +12639,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 413 — 413
+### Field 413 — 33000_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Forced_Or_Compulsory_Labour_Value
 
-Path: `33000_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Forced_Or_Compulsory_Labour_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investment in entities exposed to operations and suppliers at significant risk of forced or compulsory labour in terms of geographic areas and/or the type of operation
@@ -13080,9 +12667,8 @@ Definition: Metric: Share of investment in entities exposed to operations and su
 
 ---
 
-### Field 414 — 414
+### Field 414 — 33010_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Forced_Or_Compulsory_Labour_Considered_In_The_Investment_Strategy
 
-Path: `33010_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Forced_Or_Compulsory_Labour_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -13109,9 +12695,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 415 — 415
+### Field 415 — 33020_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Forced_Or_Compulsory_Labour_Coverage
 
-Path: `33020_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Forced_Or_Compulsory_Labour_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -13138,9 +12723,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 416 — 416
+### Field 416 — 33030_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Forced_Or_Compulsory_Labour_Eligible_Assets
 
-Path: `33030_Exposure_To_Companies_With_Operations_And_Suppliers_At_Significant_Risk_Of_Incidents_Of_Forced_Or_Compulsory_Labour_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -13167,9 +12751,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 417 — 417
+### Field 417 — 33040_Number_Of_Identified_Cases_of_Severe_Human_Rights_Issues_And_Incidents_Value
 
-Path: `33040_Number_Of_Identified_Cases_of_Severe_Human_Rights_Issues_And_Incidents_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Number of cases of severe human rights issues and incidents connected to investee companies on a weighted average basis
@@ -13196,9 +12779,8 @@ Definition: Metric: Number of cases of severe human rights issues and incidents 
 
 ---
 
-### Field 418 — 418
+### Field 418 — 33050_Number_Of_Identified_Cases_of_Severe_Human_Rights_Issues_And_Incidents_Considered_In_The_Investment_Strategy
 
-Path: `33050_Number_Of_Identified_Cases_of_Severe_Human_Rights_Issues_And_Incidents_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -13225,9 +12807,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 419 — 419
+### Field 419 — 33060_Number_Of_Identified_Cases_of_Severe_Human_Rights_Issues_And_Incidents_Coverage
 
-Path: `33060_Number_Of_Identified_Cases_of_Severe_Human_Rights_Issues_And_Incidents_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -13254,9 +12835,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 420 — 420
+### Field 420 — 33070_Number_Of_Identified_Cases_of_Severe_Human_Rights_Issues_And_Incidents_Eligible_Assets
 
-Path: `33070_Number_Of_Identified_Cases_of_Severe_Human_Rights_Issues_And_Incidents_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -13283,9 +12863,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 421 — 421
+### Field 421 — 33080_Exposure_To_companies_With_A_Lack_Of_Anti_Corruption_And_Anti_Bribery_Policies_Value
 
-Path: `33080_Exposure_To_companies_With_A_Lack_Of_Anti_Corruption_And_Anti_Bribery_Policies_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in entities without policies on anti-corruption and anti-bribery consistent with the United Nations Convention against corruption
@@ -13312,9 +12891,8 @@ Definition: Metric: Share of investments in entities without policies on anti-co
 
 ---
 
-### Field 422 — 422
+### Field 422 — 33090_Exposure_To_companies_With_A_Lack_Of_Anti_Corruption_And_Anti-Bribery_Policies_Considered_In_The_Investment_Strategy
 
-Path: `33090_Exposure_To_companies_With_A_Lack_Of_Anti_Corruption_And_Anti-Bribery_Policies_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -13341,9 +12919,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 423 — 423
+### Field 423 — 33100_Exposure_To_companies_With_A_Lack_Of_Anti_Corruption_And_Anti_Bribery_Policies_Coverage
 
-Path: `33100_Exposure_To_companies_With_A_Lack_Of_Anti_Corruption_And_Anti_Bribery_Policies_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -13370,9 +12947,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 424 — 424
+### Field 424 — 33110_Exposure_To_companies_With_A_Lack_Of_Anti_Corruption_And_Anti_Bribery_Policies_Eligible_Assets
 
-Path: `33110_Exposure_To_companies_With_A_Lack_Of_Anti_Corruption_And_Anti_Bribery_Policies_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -13399,9 +12975,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 425 — 425
+### Field 425 — 33120_Exposure_To_Companies_With_Cases_Of_Insufficient_Action_Taken_To_Address_Breaches_Of_Standards_Of_Anti_Corruption_And_Anti_Bribery_Value
 
-Path: `33120_Exposure_To_Companies_With_Cases_Of_Insufficient_Action_Taken_To_Address_Breaches_Of_Standards_Of_Anti_Corruption_And_Anti_Bribery_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Share of investments in investee companies with identified insufficiencies in actions taken to address breaches in procedures and standards of anti-corruption and anti-bribery
@@ -13428,9 +13003,8 @@ Definition: Metric: Share of investments in investee companies with identified i
 
 ---
 
-### Field 426 — 426
+### Field 426 — 33130_Exposure_To_Companies_With_Cases_Of_Insufficient_Action_Taken_To_Address_Breaches_Of_Standards_Of_Anti-Corruption_And_Anti-Bribery_Considered_In_The_Investment_Strategy
 
-Path: `33130_Exposure_To_Companies_With_Cases_Of_Insufficient_Action_Taken_To_Address_Breaches_Of_Standards_Of_Anti-Corruption_And_Anti-Bribery_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -13457,9 +13031,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 427 — 427
+### Field 427 — 33140_Exposure_To_Companies_With_Cases_Of_Insufficient_Action_Taken_To_Address_Breaches_Of_Standards_Of_Anti_Corruption_And_Anti_Bribery_Coverage
 
-Path: `33140_Exposure_To_Companies_With_Cases_Of_Insufficient_Action_Taken_To_Address_Breaches_Of_Standards_Of_Anti_Corruption_And_Anti_Bribery_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -13486,9 +13059,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 428 — 428
+### Field 428 — 33145_Exposure_To_Companies_With_Cases_Of_Insufficient_Action_Taken_To_Address_Breaches_Of_Standards_Of_Anti_Corruption_And_Anti_Bribery_Eligible_Assets
 
-Path: `33145_Exposure_To_Companies_With_Cases_Of_Insufficient_Action_Taken_To_Address_Breaches_Of_Standards_Of_Anti_Corruption_And_Anti_Bribery_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -13515,9 +13087,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 429 — 429
+### Field 429 — 33150_Number_Of_Convictions_For_Violation_Of_Anti_Corruption_And_Anti_Bribery_Laws_Value
 
-Path: `33150_Number_Of_Convictions_For_Violation_Of_Anti_Corruption_And_Anti_Bribery_Laws_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Metric: Number of convictions and amount of fines for violations of anti-corruption and anti-bribery laws by investee companies
@@ -13544,9 +13115,8 @@ Definition: Metric: Number of convictions and amount of fines for violations of 
 
 ---
 
-### Field 430 — 430
+### Field 430 — 33160_Number_Of_Convictions_For_Violation_Of_Anti_Corruption_And_Anti_Bribery_Laws_Considered_In_The_Investment_Strategy
 
-Path: `33160_Number_Of_Convictions_For_Violation_Of_Anti_Corruption_And_Anti_Bribery_Laws_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -13573,9 +13143,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 431 — 431
+### Field 431 — 33170_Number_Of_Convictions_For_Violation_Of_Anti_Corruption_And_Anti_Bribery_Laws_Coverage
 
-Path: `33170_Number_Of_Convictions_For_Violation_Of_Anti_Corruption_And_Anti_Bribery_Laws_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -13602,9 +13171,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 432 — 432
+### Field 432 — 33180_Number_Of_Convictions_For_Violation_Of_Anti_Corruption_And_Anti_Bribery_Laws_Eligible_Assets
 
-Path: `33180_Number_Of_Convictions_For_Violation_Of_Anti_Corruption_And_Anti_Bribery_Laws_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -13631,9 +13199,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 433 — 433
+### Field 433 — 33190_Average_Income_Inequality_Score_Value
 
-Path: `33190_Average_Income_Inequality_Score_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: The distribution of income and economic inequality among the participants in a particular economy including a quantitative indicator
@@ -13660,9 +13227,8 @@ Definition: The distribution of income and economic inequality among the partici
 
 ---
 
-### Field 434 — 434
+### Field 434 — 33200_Average_Income_Inequality_Score_Considered_In_The_Investment_Strategy
 
-Path: `33200_Average_Income_Inequality_Score_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -13689,9 +13255,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 435 — 435
+### Field 435 — 33210_Average_Income_Inequality_Score_Coverage
 
-Path: `33210_Average_Income_Inequality_Score_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -13718,9 +13283,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 436 — 436
+### Field 436 — 33220_Average_Income_Inequality_Score_Eligible_Assets
 
-Path: `33220_Average_Income_Inequality_Score_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -13747,9 +13311,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 437 — 437
+### Field 437 — 33230_Average_Freedom_of_Expression_Score_Value
 
-Path: `33230_Average_Freedom_of_Expression_Score_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Measuring the extent to which political and civil society organisations can operate freely including a quantitative indicator
@@ -13776,9 +13339,8 @@ Definition: Measuring the extent to which political and civil society organisati
 
 ---
 
-### Field 438 — 438
+### Field 438 — 33240_Average_Freedom_of_Expression_Score_Considered_In_The_Investment_Strategy
 
-Path: `33240_Average_Freedom_of_Expression_Score_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -13805,9 +13367,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 439 — 439
+### Field 439 — 33250_Average_Freedom_of_Expression_Score_Coverage
 
-Path: `33250_Average_Freedom_of_Expression_Score_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -13834,9 +13395,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 440 — 440
+### Field 440 — 33260_Average_Freedom_of_Expression_Score_Eligible_Assets
 
-Path: `33260_Average_Freedom_of_Expression_Score_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -13863,9 +13423,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 441 — 441
+### Field 441 — 33265_Average_Human_Rights_Performance_Value
 
-Path: `33265_Average_Human_Rights_Performance_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Measure of the average human rights performance of investee countries using a quantitative indicator
@@ -13892,9 +13451,8 @@ Definition: Measure of the average human rights performance of investee countrie
 
 ---
 
-### Field 442 — 442
+### Field 442 — 33270_Average_Human_Rights_Performance_Considered_In_The_Investment_Strategy
 
-Path: `33270_Average_Human_Rights_Performance_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -13921,9 +13479,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 443 — 443
+### Field 443 — 33280_Average_Human_Rights_Performance_Coverage
 
-Path: `33280_Average_Human_Rights_Performance_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -13950,9 +13507,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 444 — 444
+### Field 444 — 33290_Average_Human_Rights_Performance_Eligible_Assets
 
-Path: `33290_Average_Human_Rights_Performance_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -13979,9 +13535,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 445 — 445
+### Field 445 — 33295_Average_Corruption_Score_Value
 
-Path: `33295_Average_Corruption_Score_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Measure of the perceived level of public sector corruption using a quantitative indicator
@@ -14008,9 +13563,8 @@ Definition: Measure of the perceived level of public sector corruption using a q
 
 ---
 
-### Field 446 — 446
+### Field 446 — 33300_Average_Corruption_Score_Considered_In_The_Investment_Strategy
 
-Path: `33300_Average_Corruption_Score_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -14037,9 +13591,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 447 — 447
+### Field 447 — 33310_Average_Corruption_Score_Coverage
 
-Path: `33310_Average_Corruption_Score_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -14066,9 +13619,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 448 — 448
+### Field 448 — 33320_Average_Corruption_Score_Eligible_Assets
 
-Path: `33320_Average_Corruption_Score_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -14095,9 +13647,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 449 — 449
+### Field 449 — 33330_Non_Cooperative_Tax_Jurisdictions_Value
 
-Path: `33330_Non_Cooperative_Tax_Jurisdictions_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Investments in jurisdictions on the EU list of non-cooperative jurisdictions for tax purposes
@@ -14124,9 +13675,8 @@ Definition: Investments in jurisdictions on the EU list of non-cooperative juris
 
 ---
 
-### Field 450 — 450
+### Field 450 — 33340_Non_Cooperative_Tax_Jurisdictions_Considered_In_The_Investment_Strategy
 
-Path: `33340_Non_Cooperative_Tax_Jurisdictions_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -14153,9 +13703,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 451 — 451
+### Field 451 — 33350_Non_Cooperative_Tax_Jurisdictions_Coverage
 
-Path: `33350_Non_Cooperative_Tax_Jurisdictions_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -14182,9 +13731,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 452 — 452
+### Field 452 — 33360_Non_Cooperative_Tax_Jurisdictions_Eligible_Assets
 
-Path: `33360_Non_Cooperative_Tax_Jurisdictions_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -14211,9 +13759,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 453 — 453
+### Field 453 — 33370_Average_Political_Stability_Score_Value
 
-Path: `33370_Average_Political_Stability_Score_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Measure of the likelihood that the current regime will be overthrown by the use of force using a quantitative indicator
@@ -14240,9 +13787,8 @@ Definition: Measure of the likelihood that the current regime will be overthrown
 
 ---
 
-### Field 454 — 454
+### Field 454 — 33380_Average_Political_Stability_Score_Considered_In_The_Investment_Strategy
 
-Path: `33380_Average_Political_Stability_Score_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -14269,9 +13815,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 455 — 455
+### Field 455 — 33390_Average_Political_Stability_Score_Coverage
 
-Path: `33390_Average_Political_Stability_Score_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -14298,9 +13843,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 456 — 456
+### Field 456 — 33400_Average_Political_Stability_Score_Eligible_Assets
 
-Path: `33400_Average_Political_Stability_Score_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -14327,9 +13871,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 457 — 457
+### Field 457 — 33410_Average_Rule_Of_Law_Score_Value
 
-Path: `33410_Average_Rule_Of_Law_Score_Value`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Measure of the level of corruption, lack of fundamental rights, and deficiencies in civil and criminal justice using a quantitative indicator
@@ -14356,9 +13899,8 @@ Definition: Measure of the level of corruption, lack of fundamental rights, and 
 
 ---
 
-### Field 458 — 458
+### Field 458 — 33420_Average_Rule_Of_Law_Score_Considered_In_The_Investment_Strategy
 
-Path: `33420_Average_Rule_Of_Law_Score_Considered_In_The_Investment_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes (= commitment of the Financial Instrument to consider the PAI), No
@@ -14385,9 +13927,8 @@ Definition: Yes (= commitment of the Financial Instrument to consider the PAI), 
 
 ---
 
-### Field 459 — 459
+### Field 459 — 33430_Average_Rule_Of_Law_Score_Coverage
 
-Path: `33430_Average_Rule_Of_Law_Score_Coverage`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of the notional / AUM, which provide effectively data, or where data could be estimated
@@ -14414,9 +13955,8 @@ Definition: % of the notional / AUM, which provide effectively data, or where da
 
 ---
 
-### Field 460 — 460
+### Field 460 — 33440_Average_Rule_Of_Law_Score_Eligible_Assets
 
-Path: `33440_Average_Rule_Of_Law_Score_Eligible_Assets`
 Codification: NUMERIC
 Applicability: all rows
 Definition: % of assets (versus notional / AUM), which could provide data
@@ -14443,9 +13983,8 @@ Definition: % of assets (versus notional / AUM), which could provide data
 
 ---
 
-### Field 461 — 461
+### Field 461 — 40000_Financial_Instrument_Existing_Negative_Screening_Strategy
 
-Path: `40000_Financial_Instrument_Existing_Negative_Screening_Strategy`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Does the Financial_Instrument use a negative screening or a standard screening strategy ? Yes / No / PAB / CTB / PAB+ / CTB+ / Z
@@ -14472,9 +14011,8 @@ Definition: Does the Financial_Instrument use a negative screening or a standard
 
 ---
 
-### Field 462 — 462
+### Field 462 — 40010_Financial_Instrument_Link_To_Exclusion_Policy_And_Criteria
 
-Path: `40010_Financial_Instrument_Link_To_Exclusion_Policy_And_Criteria`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Link
@@ -14501,9 +14039,8 @@ Definition: Link
 
 ---
 
-### Field 463 — 463
+### Field 463 — 50100_Financial_Instrument_Pornography_Adult_Entertainment_Services_Exclusion
 
-Path: `50100_Financial_Instrument_Pornography_Adult_Entertainment_Services_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -14530,9 +14067,8 @@ Definition: Yes or No
 
 ---
 
-### Field 464 — 464
+### Field 464 — 50110_Financial_Instrument_Pornography_Adult_Entertainment_Services_Exclusion_Threshold_Type
 
-Path: `50110_Financial_Instrument_Pornography_Adult_Entertainment_Services_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -14559,9 +14095,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 465 — 465
+### Field 465 — 50120_Financial_Instrument_Pornography_Adult_Entertainment_Services_Exclusion_Relative_Threshold
 
-Path: `50120_Financial_Instrument_Pornography_Adult_Entertainment_Services_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -14587,9 +14122,8 @@ Applicability: all rows
 
 ---
 
-### Field 466 — 466
+### Field 466 — 50130_Financial_Instrument_Pornography_Adult_Entertainment_Services_Part_Of_Value_Chain
 
-Path: `50130_Financial_Instrument_Pornography_Adult_Entertainment_Services_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -14616,9 +14150,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 467 — 467
+### Field 467 — 50200_Financial_Instrument_Alcohol_Exclusion
 
-Path: `50200_Financial_Instrument_Alcohol_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -14645,9 +14178,8 @@ Definition: Yes or No
 
 ---
 
-### Field 468 — 468
+### Field 468 — 50210_Financial_Instrument_Alcohol_Exclusion_Threshold_Type
 
-Path: `50210_Financial_Instrument_Alcohol_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -14674,9 +14206,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 469 — 469
+### Field 469 — 50220_Financial_Instrument_Alcohol_Exclusion_Relative_Threshold
 
-Path: `50220_Financial_Instrument_Alcohol_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -14702,9 +14233,8 @@ Applicability: all rows
 
 ---
 
-### Field 470 — 470
+### Field 470 — 50230_Financial_Instrument_Alcohol_Exclusion_Part_Of_Value_Chain
 
-Path: `50230_Financial_Instrument_Alcohol_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -14731,9 +14261,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 471 — 471
+### Field 471 — 50300_Financial_Instrument_Animal_Testing_Exclusion
 
-Path: `50300_Financial_Instrument_Animal_Testing_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -14760,9 +14289,8 @@ Definition: Yes or No
 
 ---
 
-### Field 472 — 472
+### Field 472 — 50310_Financial_Instrument_Animal_Testing_Exclusion_Threshold_Type
 
-Path: `50310_Financial_Instrument_Animal_Testing_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -14789,9 +14317,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 473 — 473
+### Field 473 — 50320_Financial_Instrument_Animal_Testing_Exclusion_Relative_Threshold
 
-Path: `50320_Financial_Instrument_Animal_Testing_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -14817,9 +14344,8 @@ Applicability: all rows
 
 ---
 
-### Field 474 — 474
+### Field 474 — 50330_Financial_Instrument_Animal_Testing_Exclusion_Part_Of_Value_Chain
 
-Path: `50330_Financial_Instrument_Animal_Testing_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -14846,9 +14372,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 475 — 475
+### Field 475 — 50400_Financial_Instrument_Cannabis_Exclusion
 
-Path: `50400_Financial_Instrument_Cannabis_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -14875,9 +14400,8 @@ Definition: Yes or No
 
 ---
 
-### Field 476 — 476
+### Field 476 — 50410_Financial_Instrument_Cannabis_Exclusion_Threshold_Type
 
-Path: `50410_Financial_Instrument_Cannabis_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -14904,9 +14428,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 477 — 477
+### Field 477 — 50420_Financial_Instrument_Cannabis_Exclusion_Relative_Threshold
 
-Path: `50420_Financial_Instrument_Cannabis_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -14932,9 +14455,8 @@ Applicability: all rows
 
 ---
 
-### Field 478 — 478
+### Field 478 — 50430_Financial_Instrument_Cannabis_Exclusion_Part_Of_Value_Chain
 
-Path: `50430_Financial_Instrument_Cannabis_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -14961,9 +14483,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 479 — 479
+### Field 479 — 50500_Financial_Instrument_Conventional_Weapons_Exclusion
 
-Path: `50500_Financial_Instrument_Conventional_Weapons_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -14990,9 +14511,8 @@ Definition: Yes or No
 
 ---
 
-### Field 480 — 480
+### Field 480 — 50510_Financial_Instrument_Conventional_Weapons_Exclusion_Threshold_Type
 
-Path: `50510_Financial_Instrument_Conventional_Weapons_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -15019,9 +14539,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 481 — 481
+### Field 481 — 50520_Financial_Instrument_Conventional_Weapons_Exclusion_Relative_Threshold
 
-Path: `50520_Financial_Instrument_Conventional_Weapons_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -15047,9 +14566,8 @@ Applicability: all rows
 
 ---
 
-### Field 482 — 482
+### Field 482 — 50530_Financial_Instrument_Conventional_Weapons_Exclusion_Part_Of_Value_Chain
 
-Path: `50530_Financial_Instrument_Conventional_Weapons_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -15076,9 +14594,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 483 — 483
+### Field 483 — 50600_Financial_Instrument_Coal_Exclusion
 
-Path: `50600_Financial_Instrument_Coal_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -15105,9 +14622,8 @@ Definition: Yes or No
 
 ---
 
-### Field 484 — 484
+### Field 484 — 50610_Financial_Instrument_Coal_Threshold_Type
 
-Path: `50610_Financial_Instrument_Coal_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -15134,9 +14650,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 485 — 485
+### Field 485 — 50620_Financial_Instrument_Coal_Relative_Threshold
 
-Path: `50620_Financial_Instrument_Coal_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Threshold expressed as the percentage of Threshold Type
@@ -15163,9 +14678,8 @@ Definition: Threshold expressed as the percentage of Threshold Type
 
 ---
 
-### Field 486 — 486
+### Field 486 — 50630_Financial_Instrument_Coal_Part_Of_Value_Chain
 
-Path: `50630_Financial_Instrument_Coal_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -15192,9 +14706,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 487 — 487
+### Field 487 — 50640_Financial_Instrument_Coal_Energy_Mix_Absolute_Cap
 
-Path: `50640_Financial_Instrument_Coal_Energy_Mix_Absolute_Cap`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Absolute number of Mega Tons defined as maximum Cap
@@ -15221,9 +14734,8 @@ Definition: Absolute number of Mega Tons defined as maximum Cap
 
 ---
 
-### Field 488 — 488
+### Field 488 — 50650_Financial_Instrument_Coal_Energy_Mix_Relative_Cap
 
-Path: `50650_Financial_Instrument_Coal_Energy_Mix_Relative_Cap`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum relative share of Coal as part of Energy Mix expressed in percentage
@@ -15250,9 +14762,8 @@ Definition: Maximum relative share of Coal as part of Energy Mix expressed in pe
 
 ---
 
-### Field 489 — 489
+### Field 489 — 50660_Financial_Instrument_Coal_New_Infrastructure
 
-Path: `50660_Financial_Instrument_Coal_New_Infrastructure`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: new development of coal project
@@ -15279,9 +14790,8 @@ Definition: new development of coal project
 
 ---
 
-### Field 490 — 490
+### Field 490 — 50700_Financial_Instrument_Factory_Farming_Exclusion
 
-Path: `50700_Financial_Instrument_Factory_Farming_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -15308,9 +14818,8 @@ Definition: Yes or No
 
 ---
 
-### Field 491 — 491
+### Field 491 — 50710_Financial_Instrument_Factory_Farming_Exclusion_Threshold_Type
 
-Path: `50710_Financial_Instrument_Factory_Farming_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -15337,9 +14846,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 492 — 492
+### Field 492 — 50720_Financial_Instrument_Factory_Farming_Exclusion_Relative_Threshold
 
-Path: `50720_Financial_Instrument_Factory_Farming_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -15365,9 +14873,8 @@ Applicability: all rows
 
 ---
 
-### Field 493 — 493
+### Field 493 — 50730_Financial_Instrument_Factory_Farming_Exclusion_Part_Of_Value_Chain
 
-Path: `50730_Financial_Instrument_Factory_Farming_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -15394,9 +14901,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 494 — 494
+### Field 494 — 50800_Financial_Instrument_FUR_Exclusion
 
-Path: `50800_Financial_Instrument_FUR_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -15423,9 +14929,8 @@ Definition: Yes or No
 
 ---
 
-### Field 495 — 495
+### Field 495 — 50810_Financial_Instrument_FUR_Exclusion_Threshold_Type
 
-Path: `50810_Financial_Instrument_FUR_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -15452,9 +14957,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 496 — 496
+### Field 496 — 50820_Financial_Instrument_FUR_Exclusion_Relative_Threshold
 
-Path: `50820_Financial_Instrument_FUR_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -15480,9 +14984,8 @@ Applicability: all rows
 
 ---
 
-### Field 497 — 497
+### Field 497 — 50830_Financial_Instrument_FUR_Exclusion_Part_Of_Value_Chain
 
-Path: `50830_Financial_Instrument_FUR_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -15509,9 +15012,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 498 — 498
+### Field 498 — 50900_Financial_Instrument_Gambling_Exclusion
 
-Path: `50900_Financial_Instrument_Gambling_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -15538,9 +15040,8 @@ Definition: Yes or No
 
 ---
 
-### Field 499 — 499
+### Field 499 — 50910_Financial_Instrument_Gambling_Exclusion_Threshold_Type
 
-Path: `50910_Financial_Instrument_Gambling_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -15567,9 +15068,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 500 — 500
+### Field 500 — 50920_Financial_Instrument_Gambling_Exclusion_Relative_Threshold
 
-Path: `50920_Financial_Instrument_Gambling_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -15595,9 +15095,8 @@ Applicability: all rows
 
 ---
 
-### Field 501 — 501
+### Field 501 — 50930_Financial_Instrument_Gambling_Exclusion_Part_Of_Value_Chain
 
-Path: `50930_Financial_Instrument_Gambling_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -15624,9 +15123,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 502 — 502
+### Field 502 — 51000_Financial_Instrument_Gas_Exclusion
 
-Path: `51000_Financial_Instrument_Gas_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -15653,9 +15151,8 @@ Definition: Yes or No
 
 ---
 
-### Field 503 — 503
+### Field 503 — 51010_Financial_Instrument_Gas_Threshold_Type
 
-Path: `51010_Financial_Instrument_Gas_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -15682,9 +15179,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 504 — 504
+### Field 504 — 51020_Financial_Instrument_Gas_Relative_Threshold
 
-Path: `51020_Financial_Instrument_Gas_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Threshold expressed as the percentage of Threshold Type
@@ -15711,9 +15207,8 @@ Definition: Threshold expressed as the percentage of Threshold Type
 
 ---
 
-### Field 505 — 505
+### Field 505 — 51030_Financial_Instrument_Gas_Part_Of_Value_Chain
 
-Path: `51030_Financial_Instrument_Gas_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -15740,9 +15235,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 506 — 506
+### Field 506 — 51040_Financial_Instrument_Gas_Energy_Mix_Absolute_Cap
 
-Path: `51040_Financial_Instrument_Gas_Energy_Mix_Absolute_Cap`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Absolute number of Mega Tons defined as maximum Cap
@@ -15769,9 +15263,8 @@ Definition: Absolute number of Mega Tons defined as maximum Cap
 
 ---
 
-### Field 507 — 507
+### Field 507 — 51050_Financial_Instrument_Gas_Energy_Mix_Relative_Cap
 
-Path: `51050_Financial_Instrument_Gas_Energy_Mix_Relative_Cap`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum relative share of Gas as part of Energy Mix expressed in percentage
@@ -15798,9 +15291,8 @@ Definition: Maximum relative share of Gas as part of Energy Mix expressed in per
 
 ---
 
-### Field 508 — 508
+### Field 508 — 51060_Financial_Instrument_Gas_New_Infrastructure
 
-Path: `51060_Financial_Instrument_Gas_New_Infrastructure`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: new development of gas project
@@ -15827,9 +15319,8 @@ Definition: new development of gas project
 
 ---
 
-### Field 509 — 509
+### Field 509 — 51100_Financial_Instrument_Genetic_Engineering_Exclusion
 
-Path: `51100_Financial_Instrument_Genetic_Engineering_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -15856,9 +15347,8 @@ Definition: Yes or No
 
 ---
 
-### Field 510 — 510
+### Field 510 — 51110_Financial_Instrument_Genetic_Engineering_Exclusion_Threshold_Type
 
-Path: `51110_Financial_Instrument_Genetic_Engineering_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -15885,9 +15375,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 511 — 511
+### Field 511 — 51120_Financial_Instrument_Genetic_Engineering_Exclusion_Relative_Threshold
 
-Path: `51120_Financial_Instrument_Genetic_Engineering_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -15913,9 +15402,8 @@ Applicability: all rows
 
 ---
 
-### Field 512 — 512
+### Field 512 — 51130_Financial_Instrument_Genetic_Engineering_Exclusion_Part_Of_Value_Chain
 
-Path: `51130_Financial_Instrument_Genetic_Engineering_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -15942,9 +15430,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 513 — 513
+### Field 513 — 51200_Financial_Instrument_GMO_Exclusion
 
-Path: `51200_Financial_Instrument_GMO_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -15971,9 +15458,8 @@ Definition: Yes or No
 
 ---
 
-### Field 514 — 514
+### Field 514 — 51210_Financial_Instrument_GMO_Exclusion_Threshold_Type
 
-Path: `51210_Financial_Instrument_GMO_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -16000,9 +15486,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 515 — 515
+### Field 515 — 51220_Financial_Instrument_GMO_Exclusion_Relative_Threshold
 
-Path: `51220_Financial_Instrument_GMO_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -16028,9 +15513,8 @@ Applicability: all rows
 
 ---
 
-### Field 516 — 516
+### Field 516 — 51230_Financial_Instrument_GMO_Exclusion_Part_Of_Value_Chain
 
-Path: `51230_Financial_Instrument_GMO_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -16057,9 +15541,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 517 — 517
+### Field 517 — 51300_Financial_Instrument_Nuclear_Energy_Exclusion
 
-Path: `51300_Financial_Instrument_Nuclear_Energy_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: ● Companies that are involved in uranium mining (are excluded if the 5 percent revenue threshold is exceeded at the issuer level) ● Companies that are involved in the electricity generation based on nuclear energy (are excluded if the 5 percent revenue threshold is exceeded at the issuer level.) ● Companies that are involved in the operation of nuclear power plants and/or the manufacturing of essential components for nuclear power plants (are excluded if the 5 percent revenue threshold is exceeded at the issuer level.)
@@ -16086,9 +15569,8 @@ Definition: ● Companies that are involved in uranium mining (are excluded if t
 
 ---
 
-### Field 518 — 518
+### Field 518 — 51310_Financial_Instrument_Nuclear_Energy_Exclusion_Threshold_Type
 
-Path: `51310_Financial_Instrument_Nuclear_Energy_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -16115,9 +15597,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 519 — 519
+### Field 519 — 51320_Financial_Instrument_Nuclear_Energy_Exclusion_Relative_Threshold
 
-Path: `51320_Financial_Instrument_Nuclear_Energy_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -16143,9 +15624,8 @@ Applicability: all rows
 
 ---
 
-### Field 520 — 520
+### Field 520 — 51400_Financial_Instrument_Nuclear_Weapons_Exclusion
 
-Path: `51400_Financial_Instrument_Nuclear_Weapons_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -16171,9 +15651,8 @@ Applicability: all rows
 
 ---
 
-### Field 521 — 521
+### Field 521 — 51410_Financial_Instrument_Nuclear_Weapons_Exclusion_Threshold_Type
 
-Path: `51410_Financial_Instrument_Nuclear_Weapons_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -16200,9 +15679,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 522 — 522
+### Field 522 — 51420_Financial_Instrument_Nuclear_Weapons_Exclusion_Relative_Threshold
 
-Path: `51420_Financial_Instrument_Nuclear_Weapons_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -16228,9 +15706,8 @@ Applicability: all rows
 
 ---
 
-### Field 523 — 523
+### Field 523 — 51430_Financial_Instrument_Nuclear_Weapons_Exclusion_Part_Of_Value_Chain
 
-Path: `51430_Financial_Instrument_Nuclear_Weapons_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -16257,9 +15734,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 524 — 524
+### Field 524 — 51500_Financial_Instrument_Oil_Exclusion
 
-Path: `51500_Financial_Instrument_Oil_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -16286,9 +15762,8 @@ Definition: Yes or No
 
 ---
 
-### Field 525 — 525
+### Field 525 — 51510_Financial_Instrument_Oil_Threshold_Type
 
-Path: `51510_Financial_Instrument_Oil_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -16315,9 +15790,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 526 — 526
+### Field 526 — 51520_Financial_Instrument_Oil_Relative_Threshold
 
-Path: `51520_Financial_Instrument_Oil_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Threshold expressed as the percentage of Threshold Type
@@ -16344,9 +15818,8 @@ Definition: Threshold expressed as the percentage of Threshold Type
 
 ---
 
-### Field 527 — 527
+### Field 527 — 51530_Financial_Instrument_Oil_Part_Of_Value_Chain
 
-Path: `51530_Financial_Instrument_Oil_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -16373,9 +15846,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 528 — 528
+### Field 528 — 51540_Financial_Instrument_Oil_Energy_Mix_Absolute_Cap
 
-Path: `51540_Financial_Instrument_Oil_Energy_Mix_Absolute_Cap`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Absolute number of Mega Tons defined as maximum Cap
@@ -16402,9 +15874,8 @@ Definition: Absolute number of Mega Tons defined as maximum Cap
 
 ---
 
-### Field 529 — 529
+### Field 529 — 51550_Financial_Instrument_Oil_Energy_Mix_Relative_Cap
 
-Path: `51550_Financial_Instrument_Oil_Energy_Mix_Relative_Cap`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum relative share of Oil as part of Energy Mix expressed in percentage
@@ -16431,9 +15902,8 @@ Definition: Maximum relative share of Oil as part of Energy Mix expressed in per
 
 ---
 
-### Field 530 — 530
+### Field 530 — 51560_Financial_Instrument_Oil_New_Infrastructure
 
-Path: `51560_Financial_Instrument_Oil_New_Infrastructure`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: new development of oil project
@@ -16460,9 +15930,8 @@ Definition: new development of oil project
 
 ---
 
-### Field 531 — 531
+### Field 531 — 51600_Financial_Instrument_Other_Fossil_Fuel_Exclusion
 
-Path: `51600_Financial_Instrument_Other_Fossil_Fuel_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Yes or No
@@ -16489,9 +15958,8 @@ Definition: Yes or No
 
 ---
 
-### Field 532 — 532
+### Field 532 — 51610_Financial_Instrument_Other_Fossil_Fuel_Threshold_Type
 
-Path: `51610_Financial_Instrument_Other_Fossil_Fuel_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -16518,9 +15986,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 533 — 533
+### Field 533 — 51620_Financial_Instrument_Other_Fossil_Fuel_Relative_Threshold
 
-Path: `51620_Financial_Instrument_Other_Fossil_Fuel_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Threshold expressed as the percentage of Threshold Type
@@ -16547,9 +16014,8 @@ Definition: Threshold expressed as the percentage of Threshold Type
 
 ---
 
-### Field 534 — 534
+### Field 534 — 51630_Financial_Instrument_Other_Fossil_Fuel_Part_Of_Value_Chain
 
-Path: `51630_Financial_Instrument_Other_Fossil_Fuel_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -16576,9 +16042,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 535 — 535
+### Field 535 — 51640_Financial_Instrument_Other_Fossil_Fuel_Energy_Mix_Absolute_Cap
 
-Path: `51640_Financial_Instrument_Other_Fossil_Fuel_Energy_Mix_Absolute_Cap`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Absolute number of Mega Tons defined as maximum Cap
@@ -16605,9 +16070,8 @@ Definition: Absolute number of Mega Tons defined as maximum Cap
 
 ---
 
-### Field 536 — 536
+### Field 536 — 51650_Financial_Instrument_Other_Fossil_Fuel_Energy_Mix_Relative_Cap
 
-Path: `51650_Financial_Instrument_Other_Fossil_Fuel_Energy_Mix_Relative_Cap`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Maximum relative share of other fossil fuel as part of Energy Mix expressed in percentage
@@ -16634,9 +16098,8 @@ Definition: Maximum relative share of other fossil fuel as part of Energy Mix ex
 
 ---
 
-### Field 537 — 537
+### Field 537 — 51660_Financial_Instrument_Other_Fossil_Fuel_New_Infrastructure
 
-Path: `51660_Financial_Instrument_Other_Fossil_Fuel_New_Infrastructure`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: new development of other fossil fuel project
@@ -16663,9 +16126,8 @@ Definition: new development of other fossil fuel project
 
 ---
 
-### Field 538 — 538
+### Field 538 — 51700_Financial_Instrument_Palm_Oil_Exclusion
 
-Path: `51700_Financial_Instrument_Palm_Oil_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -16691,9 +16153,8 @@ Applicability: all rows
 
 ---
 
-### Field 539 — 539
+### Field 539 — 51710_Financial_Instrument_Palm_Oil_Exclusion_Threshold_Type
 
-Path: `51710_Financial_Instrument_Palm_Oil_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -16720,9 +16181,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 540 — 540
+### Field 540 — 51720_Financial_Instrument_Palm_Oil_Exclusion_Relative_Threshold
 
-Path: `51720_Financial_Instrument_Palm_Oil_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -16748,9 +16208,8 @@ Applicability: all rows
 
 ---
 
-### Field 541 — 541
+### Field 541 — 51730_Financial_Instrument_Palm_Oil_Exclusion_Part_Of_Value_Chain
 
-Path: `51730_Financial_Instrument_Palm_Oil_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -16777,9 +16236,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 542 — 542
+### Field 542 — 51800_Financial_Instrument_Pesticides_Exclusion
 
-Path: `51800_Financial_Instrument_Pesticides_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -16805,9 +16263,8 @@ Applicability: all rows
 
 ---
 
-### Field 543 — 543
+### Field 543 — 51810_Financial_Instrument_Pesticides_Exclusion_Threshold_Type
 
-Path: `51810_Financial_Instrument_Pesticides_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -16834,9 +16291,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 544 — 544
+### Field 544 — 51820_Financial_Instrument_Pesticides_Exclusion_Relative_Threshold
 
-Path: `51820_Financial_Instrument_Pesticides_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -16862,9 +16318,8 @@ Applicability: all rows
 
 ---
 
-### Field 545 — 545
+### Field 545 — 51830_Financial_Instrument_Pesticides_Exclusion_Part_Of_Value_Chain
 
-Path: `51830_Financial_Instrument_Pesticides_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -16891,9 +16346,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 546 — 546
+### Field 546 — 51900_Financial_Instrument_Research_On_Human_Embryos_Exclusion
 
-Path: `51900_Financial_Instrument_Research_On_Human_Embryos_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -16919,9 +16373,8 @@ Applicability: all rows
 
 ---
 
-### Field 547 — 547
+### Field 547 — 51910_Financial_Instrument_Research_On_Human_Embryos_Exclusion_Threshold_Type
 
-Path: `51910_Financial_Instrument_Research_On_Human_Embryos_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -16948,9 +16401,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 548 — 548
+### Field 548 — 51920_Financial_Instrument_Research_On_Human_Embryos_Exclusion_Relative_Threshold
 
-Path: `51920_Financial_Instrument_Research_On_Human_Embryos_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -16976,9 +16428,8 @@ Applicability: all rows
 
 ---
 
-### Field 549 — 549
+### Field 549 — 51930_Financial_Instrument_Research_On_Human_Embryos_Exclusion_Part_Of_Value_Chain
 
-Path: `51930_Financial_Instrument_Research_On_Human_Embryos_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -17005,9 +16456,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 550 — 550
+### Field 550 — 52000_Financial_Instrument_Tobacco_Exclusion
 
-Path: `52000_Financial_Instrument_Tobacco_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17033,9 +16483,8 @@ Applicability: all rows
 
 ---
 
-### Field 551 — 551
+### Field 551 — 52010_Financial_Instrument_Tobacco_Exclusion_Threshold_Type
 
-Path: `52010_Financial_Instrument_Tobacco_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -17062,9 +16511,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 552 — 552
+### Field 552 — 52020_Financial_Instrument_Tobacco_Exclusion_Relative_Threshold
 
-Path: `52020_Financial_Instrument_Tobacco_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -17090,9 +16538,8 @@ Applicability: all rows
 
 ---
 
-### Field 553 — 553
+### Field 553 — 52030_Financial_Instrument_Tobacco_Exclusion_Part_Of_Value_Chain
 
-Path: `52030_Financial_Instrument_Tobacco_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -17119,9 +16566,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 554 — 554
+### Field 554 — 52100_Financial_Instrument_Unconventional_Weapons_Exclusion
 
-Path: `52100_Financial_Instrument_Unconventional_Weapons_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17147,9 +16593,8 @@ Applicability: all rows
 
 ---
 
-### Field 555 — 555
+### Field 555 — 52110_Financial_Instrument_Unconventional_Weapons_Exclusion_Threshold_Type
 
-Path: `52110_Financial_Instrument_Unconventional_Weapons_Exclusion_Threshold_Type`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Revenue or CaPEX or Opex
@@ -17176,9 +16621,8 @@ Definition: Revenue or CaPEX or Opex
 
 ---
 
-### Field 556 — 556
+### Field 556 — 52120_Financial_Instrument_Unconventional_Weapons_Exclusion_Relative_Threshold
 
-Path: `52120_Financial_Instrument_Unconventional_Weapons_Exclusion_Relative_Threshold`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -17204,9 +16648,8 @@ Applicability: all rows
 
 ---
 
-### Field 557 — 557
+### Field 557 — 52130_Financial_Instrument_Unconventional_Weapons_Exclusion_Part_Of_Value_Chain
 
-Path: `52130_Financial_Instrument_Unconventional_Weapons_Exclusion_Part_Of_Value_Chain`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Upstream/Production/Downstream
@@ -17233,9 +16676,8 @@ Definition: Upstream/Production/Downstream
 
 ---
 
-### Field 558 — 558
+### Field 558 — 52200_Financial_Instrument_UNGC_Exclusion
 
-Path: `52200_Financial_Instrument_UNGC_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17261,9 +16703,8 @@ Applicability: all rows
 
 ---
 
-### Field 559 — 559
+### Field 559 — 52210_Financial_Instrument_OECD_Guidelines_Exclusion
 
-Path: `52210_Financial_Instrument_OECD_Guidelines_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17289,9 +16730,8 @@ Applicability: all rows
 
 ---
 
-### Field 560 — 560
+### Field 560 — 52220_Financial_Instrument_ILO_Exclusion
 
-Path: `52220_Financial_Instrument_ILO_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17317,9 +16757,8 @@ Applicability: all rows
 
 ---
 
-### Field 561 — 561
+### Field 561 — 53000_Financial_Instrument_Nuclear_Weapons_Exclusion
 
-Path: `53000_Financial_Instrument_Nuclear_Weapons_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17345,9 +16784,8 @@ Applicability: all rows
 
 ---
 
-### Field 562 — 562
+### Field 562 — 53010_Financial_Instrument_Non-proliferation_Treaty_Of_Nuclear_Weapons
 
-Path: `53010_Financial_Instrument_Non-proliferation_Treaty_Of_Nuclear_Weapons`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17373,9 +16811,8 @@ Applicability: all rows
 
 ---
 
-### Field 563 — 563
+### Field 563 — 53020_Financial_Instrument_Qualitative_Exclusion_Of_Countries
 
-Path: `53020_Financial_Instrument_Qualitative_Exclusion_Of_Countries`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: A- Freedomhouse I - Internal method N - None
@@ -17402,9 +16839,8 @@ Definition: A- Freedomhouse I - Internal method N - None
 
 ---
 
-### Field 564 — 564
+### Field 564 — 53030_Financial_Instrument_Corruption_Exclusion
 
-Path: `53030_Financial_Instrument_Corruption_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17430,9 +16866,8 @@ Applicability: all rows
 
 ---
 
-### Field 565 — 565
+### Field 565 — 53040_Financial_Instrument_Death_Sentence_Exclusion
 
-Path: `53040_Financial_Instrument_Death_Sentence_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17458,9 +16893,8 @@ Applicability: all rows
 
 ---
 
-### Field 566 — 566
+### Field 566 — 53050_Financial_Instrument_War_Exclusion
 
-Path: `53050_Financial_Instrument_War_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17486,9 +16920,8 @@ Applicability: all rows
 
 ---
 
-### Field 567 — 567
+### Field 567 — 53060_Financial_Instrument_Non_Ratification_Of_Paris_Agreement_Exclusion
 
-Path: `53060_Financial_Instrument_Non_Ratification_Of_Paris_Agreement_Exclusion`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -17514,9 +16947,8 @@ Applicability: all rows
 
 ---
 
-### Field 568 — 568
+### Field 568 — 54000_Financial_Instrument_ESG_Energy_Consumption_Monitoring
 
-Path: `54000_Financial_Instrument_ESG_Energy_Consumption_Monitoring`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Existing energy monitoring & improvement process ?
@@ -17543,9 +16975,8 @@ Definition: Existing energy monitoring & improvement process ?
 
 ---
 
-### Field 569 — 569
+### Field 569 — 54010_Financial_Instrument_ESG_GHG_Emission_Monitoring
 
-Path: `54010_Financial_Instrument_ESG_GHG_Emission_Monitoring`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Existing GHG consumption monitoring and improvement process ?
@@ -17572,9 +17003,8 @@ Definition: Existing GHG consumption monitoring and improvement process ?
 
 ---
 
-### Field 570 — 570
+### Field 570 — 54020_Financial_Instrument_ESG_Water_Consumption_Monitoring
 
-Path: `54020_Financial_Instrument_ESG_Water_Consumption_Monitoring`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Existing Water consumption monitoring and improvement process ?
@@ -17601,9 +17031,8 @@ Definition: Existing Water consumption monitoring and improvement process ?
 
 ---
 
-### Field 571 — 571
+### Field 571 — 54030_Financial_Instrument_ESG_Waste_Financial_Instrument_Monitoring
 
-Path: `54030_Financial_Instrument_ESG_Waste_Financial_Instrument_Monitoring`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Existing Waste Financial_Instrument monitoring and improvement process ?
@@ -17630,9 +17059,8 @@ Definition: Existing Waste Financial_Instrument monitoring and improvement proce
 
 ---
 
-### Field 572 — 572
+### Field 572 — 54040_Financial_Instrument_ESG_Environmental_Health_Monitoring
 
-Path: `54040_Financial_Instrument_ESG_Environmental_Health_Monitoring`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Existing environmental health monitoring & improvement process ?
@@ -17659,9 +17087,8 @@ Definition: Existing environmental health monitoring & improvement process ?
 
 ---
 
-### Field 573 — 573
+### Field 573 — 54050_Financial_Instrument_ESG_Supplier_Monitoring
 
-Path: `54050_Financial_Instrument_ESG_Supplier_Monitoring`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Existing esg policy of the supplier monitoring & improvement process ?
@@ -17688,9 +17115,8 @@ Definition: Existing esg policy of the supplier monitoring & improvement process
 
 ---
 
-### Field 574 — 574
+### Field 574 — 54060_Financial_Instrument_ESG_Safety_Monitoring
 
-Path: `54060_Financial_Instrument_ESG_Safety_Monitoring`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Existing safety monitoring & improvement process ?
@@ -17717,9 +17143,8 @@ Definition: Existing safety monitoring & improvement process ?
 
 ---
 
-### Field 575 — 575
+### Field 575 — 54070_Financial_Instrument_ESG_Biodiversity_Monitoring
 
-Path: `54070_Financial_Instrument_ESG_Biodiversity_Monitoring`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Existing process to monitor impact of the buidling on biodiversity monitoring & improvement process ?
@@ -17746,9 +17171,8 @@ Definition: Existing process to monitor impact of the buidling on biodiversity m
 
 ---
 
-### Field 576 — 576
+### Field 576 — 60400_French_AMF_Doctrine_Approach
 
-Path: `60400_French_AMF_Doctrine_Approach`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Which approach of the AMF position/recommendation 2020-03 does your fund comply with? 1: Approach based on a significantly engaging methodology 2: Non-significantly engaging methodology approach 3: Approach not meeting central or limited communication standards
@@ -17775,9 +17199,8 @@ Definition: Which approach of the AMF position/recommendation 2020-03 does your 
 
 ---
 
-### Field 577 — 577
+### Field 577 — 60410_Financial_Instrument_Environmental_Topic_Or_Considered_Indicators_For_French_MiFID_Market
 
-Path: `60410_Financial_Instrument_Environmental_Topic_Or_Considered_Indicators_For_French_MiFID_Market`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Description of the Environmental topics integrated in the investment process of the fund, Multiple answers field. A - Transition to low carbon economy B - Natural resources preservation or consumption C - Land & Ocean preservation D - Waste E - Biodiversity preservation F - none
@@ -17804,9 +17227,8 @@ Definition: Description of the Environmental topics integrated in the investment
 
 ---
 
-### Field 578 — 578
+### Field 578 — 60420_Financial_Instrument_Social_Topic_Or_Considered_Indicators_For_French_MiFID_Market
 
-Path: `60420_Financial_Instrument_Social_Topic_Or_Considered_Indicators_For_French_MiFID_Market`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Description of the social topics integrated in the investment strategy, Multiple answers fields. A - Social & human rights B - labour relations C - investment in human capital (including health) D - none
@@ -17833,9 +17255,8 @@ Definition: Description of the social topics integrated in the investment strate
 
 ---
 
-### Field 579 — 579
+### Field 579 — 60430_Financial_Instrument_Governance_Topic_Or_Considered_Indicators_For_French_MiFID_Market
 
-Path: `60430_Financial_Instrument_Governance_Topic_Or_Considered_Indicators_For_French_MiFID_Market`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Description of the governance topic integrated in the investment strategy, Multiple answers field A - anti bribery & corruption B - governance other C - none
@@ -17862,9 +17283,8 @@ Definition: Description of the governance topic integrated in the investment str
 
 ---
 
-### Field 580 — 580
+### Field 580 — 60440_Financial_Instrument_Sustainable_Indicators_For_German_MiFID_Market
 
-Path: `60440_Financial_Instrument_Sustainable_Indicators_For_German_MiFID_Market`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: This field contains information on the sustainability characteristics of the financial instrument as communicated by the manufacturer and provides information on whether it is part of the sustainability preferences in accordance with MiFID II Delegated Regulation (EU) 2017/565 (specification P-V) or not (specification O-E). Note: For funds, the keys P and V are not to be selected, as a fund that is classified as characteristic P always automatically fulfils characteristic Q. Decode: O = No information/data or declared as non-sustainable (by the manufacturer) B = Basic = Financial instrument complies with recognised transparency and industry standard E = ESG product applies a dedicated ESG strategy and manufacturer takes into account recognised industry standard P = Financial instrument according to Article 2 No. 7a of MiFID II Delegated Regulation (EU) 2017/565 with a dedicated ESG strategy, no serious violations of UNGC or democracy/human rights (if applicable), manufacturer takes into account recognised industry standard Q = Financial instrument according to Article 2 No. 7b pursuant to MiFID II Delegated Regulation (EU) 2017/565 with a dedicated ESG strategy, no serious violations of UNGC or democracy/human rights (if applicable), manufacturer takes into account recognised industry standard R = Financial instrument according to Article 2 No. 7c pursuant to MiFID II Delegated Regulation (EU) 2017/565 with a dedicated ESG strategy and compliance with minimum exclusions, manufacturer takes into account recognised industry standard S = Financial instrument according to Article 2 No. 7a, 7b & 7c pursuant to MiFID II Delegated Regulation (EU) 2017/565, criteria for P, Q and R met T = Financial instrument according to Article 2 No. 7a, 7b pursuant to MiFID II Delegated Regulation (EU) 2017/565, criteria for P and Q met U = Financial instrument according to Article 2 No. 7b & 7c as per MiFID II Delegated Regulation (EU) 2017/565, criteria for Q and R met V = Financial instrument according to Article 2 No. 7a & 7c pursuant to MiFID II Delegated Regulation (EU) 2017/565, criteria for P and R met N = Not suitable for clients with sustainability preferences (Negative Target Market )
@@ -17891,9 +17311,8 @@ Definition: This field contains information on the sustainability characteristic
 
 ---
 
-### Field 581 — 581
+### Field 581 — 70000_Financial_Instrument_Sustainability_Risk_Is_Deemed_To_Be_Relevant
 
-Path: `70000_Financial_Instrument_Sustainability_Risk_Is_Deemed_To_Be_Relevant`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: SFDR art 6.1 Yes / No
@@ -17925,9 +17344,8 @@ Definition: SFDR art 6.1 Yes / No
 
 ---
 
-### Field 582 — 582
+### Field 582 — 70010_Financial_Instrument_Total_Fund_NAV_Or_Notional
 
-Path: `70010_Financial_Instrument_Total_Fund_NAV_Or_Notional`
 Codification: NUMERIC
 Applicability: all rows
 Definition: NAV for a fund and Notional for structured products at PAI_Reference_Date in EUR
@@ -17955,9 +17373,8 @@ Definition: NAV for a fund and Notional for structured products at PAI_Reference
 
 ---
 
-### Field 583 — 583
+### Field 583 — 80000_Use_Of_Proceeds_Asset_Pooling
 
-Path: `80000_Use_Of_Proceeds_Asset_Pooling`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Defines if use of proceeds constitute S - Segregated Sustainable Asset Pool (SAP) U - Unsegregated Sustainable Asset Pool (USAP) N - Not a pooled approach (N) and therefore a general part of the balance sheet of the Issuer/Manufacturer
@@ -17990,9 +17407,8 @@ Definition: Defines if use of proceeds constitute S - Segregated Sustainable Ass
 
 ---
 
-### Field 584 — 584
+### Field 584 — 80010_Use_Of_Derivative_Exposure_In_Taxonomy_And_SFDR_Alignment
 
-Path: `80010_Use_Of_Derivative_Exposure_In_Taxonomy_And_SFDR_Alignment`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Defines if the derivative exposure of a Structured Product is considered part of the assessed Taxonomy Alignment and Minimum Proportion of Sustainable Investment reported.
@@ -18025,9 +17441,8 @@ Definition: Defines if the derivative exposure of a Structured Product is consid
 
 ---
 
-### Field 585 — 585
+### Field 585 — 80020_Structured_Product_Funding_Related_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments
 
-Path: `80020_Structured_Product_Funding_Related_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -18060,9 +17475,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 586 — 586
+### Field 586 — 80030_Structured_Product_Derivate_Exposure_Related_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments
 
-Path: `80030_Structured_Product_Derivate_Exposure_Related_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -18095,9 +17509,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 587 — 587
+### Field 587 — 80040_Structured_Product_Funding_Related_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Taxonomy_Aligned
 
-Path: `80040_Structured_Product_Funding_Related_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Taxonomy_Aligned`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -18130,9 +17543,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 588 — 588
+### Field 588 — 80050_Structured_Product_Derivate_Exposure_Related_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Taxonomy_Aligned
 
-Path: `80050_Structured_Product_Derivate_Exposure_Related_EU_SFDR_Minimum_Or_Planned_Investments_Sustainable_Investments_Taxonomy_Aligned`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Please refer to Pre Contractual Report in the RTS
@@ -18165,9 +17577,8 @@ Definition: Please refer to Pre Contractual Report in the RTS
 
 ---
 
-### Field 589 — 589
+### Field 589 — 90000_Financial_Instrument_Investing_In_EU_Taxonomy_Aligned_Fossil_Gas_Activities
 
-Path: `90000_Financial_Instrument_Investing_In_EU_Taxonomy_Aligned_Fossil_Gas_Activities`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -18194,9 +17605,8 @@ Applicability: all rows
 
 ---
 
-### Field 590 — 590
+### Field 590 — 90010_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Incl_Sovereign_Bonds
 
-Path: `90010_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Incl_Sovereign_Bonds`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18223,9 +17633,8 @@ Applicability: all rows
 
 ---
 
-### Field 591 — 591
+### Field 591 — 90020_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Excl_Sovereign_Bonds
 
-Path: `90020_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Excl_Sovereign_Bonds`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18252,9 +17661,8 @@ Applicability: all rows
 
 ---
 
-### Field 592 — 592
+### Field 592 — 90030_Financial_Instrument_Investing_In_EU_Taxonomy_Aligned_Nuclear_Activities
 
-Path: `90030_Financial_Instrument_Investing_In_EU_Taxonomy_Aligned_Nuclear_Activities`
 Codification: FREE_TEXT
 Applicability: all rows
 
@@ -18281,9 +17689,8 @@ Applicability: all rows
 
 ---
 
-### Field 593 — 593
+### Field 593 — 90040_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Incl_Sovereign_Bonds
 
-Path: `90040_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Incl_Sovereign_Bonds`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18310,9 +17717,8 @@ Applicability: all rows
 
 ---
 
-### Field 594 — 594
+### Field 594 — 90050_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Excl_Sovereign_Bonds
 
-Path: `90050_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Excl_Sovereign_Bonds`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18339,9 +17745,8 @@ Applicability: all rows
 
 ---
 
-### Field 595 — 595
+### Field 595 — 90060_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Incl_Sovereign_Bonds
 
-Path: `90060_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Incl_Sovereign_Bonds`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18368,9 +17773,8 @@ Applicability: all rows
 
 ---
 
-### Field 596 — 596
+### Field 596 — 90070_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Excl_Sovereign_Bonds
 
-Path: `90070_Financial_Instrument_Minimum_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Excl_Sovereign_Bonds`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18397,9 +17801,8 @@ Applicability: all rows
 
 ---
 
-### Field 597 — 597
+### Field 597 — 90080_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Incl_Sovereign_Bonds_Turnover
 
-Path: `90080_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Incl_Sovereign_Bonds_Turnover`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18426,9 +17829,8 @@ Applicability: all rows
 
 ---
 
-### Field 598 — 598
+### Field 598 — 90090_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Excl_Sovereign_Bonds_Turnover
 
-Path: `90090_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Excl_Sovereign_Bonds_Turnover`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18455,9 +17857,8 @@ Applicability: all rows
 
 ---
 
-### Field 599 — 599
+### Field 599 — 90100_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Incl_Sovereign_Bonds_Turnover
 
-Path: `90100_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Incl_Sovereign_Bonds_Turnover`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18484,9 +17885,8 @@ Applicability: all rows
 
 ---
 
-### Field 600 — 600
+### Field 600 — 90110_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Excl_Sovereign_Bonds_Turnover
 
-Path: `90110_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Excl_Sovereign_Bonds_Turnover`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18513,9 +17913,8 @@ Applicability: all rows
 
 ---
 
-### Field 601 — 601
+### Field 601 — 90120_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Incl_Sovereign_Bonds_Turnover
 
-Path: `90120_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Incl_Sovereign_Bonds_Turnover`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18542,9 +17941,8 @@ Applicability: all rows
 
 ---
 
-### Field 602 — 602
+### Field 602 — 90130_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Excl_Sovereign_Bonds_Turnover
 
-Path: `90130_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Excl_Sovereign_Bonds_Turnover`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18571,9 +17969,8 @@ Applicability: all rows
 
 ---
 
-### Field 603 — 603
+### Field 603 — 90140_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Incl_Sovereign_Bonds_Capex
 
-Path: `90140_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Incl_Sovereign_Bonds_Capex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18600,9 +17997,8 @@ Applicability: all rows
 
 ---
 
-### Field 604 — 604
+### Field 604 — 90150_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Excl_Sovereign_Bonds_Capex
 
-Path: `90150_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Excl_Sovereign_Bonds_Capex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18629,9 +18025,8 @@ Applicability: all rows
 
 ---
 
-### Field 605 — 605
+### Field 605 — 90160_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Incl_Sovereign_Bonds_Capex
 
-Path: `90160_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Incl_Sovereign_Bonds_Capex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18658,9 +18053,8 @@ Applicability: all rows
 
 ---
 
-### Field 606 — 606
+### Field 606 — 90170_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Excl_Sovereign_Bonds_Capex
 
-Path: `90170_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Excl_Sovereign_Bonds_Capex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18687,9 +18081,8 @@ Applicability: all rows
 
 ---
 
-### Field 607 — 607
+### Field 607 — 90180_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Incl_Sovereign_Bonds_Capex
 
-Path: `90180_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Incl_Sovereign_Bonds_Capex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18716,9 +18109,8 @@ Applicability: all rows
 
 ---
 
-### Field 608 — 608
+### Field 608 — 90190_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Excl_Sovereign_Bonds_Capex
 
-Path: `90190_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Excl_Sovereign_Bonds_Capex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18745,9 +18137,8 @@ Applicability: all rows
 
 ---
 
-### Field 609 — 609
+### Field 609 — 90200_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Incl_Sovereign_Bonds_Opex
 
-Path: `90200_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Incl_Sovereign_Bonds_Opex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18774,9 +18165,8 @@ Applicability: all rows
 
 ---
 
-### Field 610 — 610
+### Field 610 — 90210_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Excl_Sovereign_Bonds_Opex
 
-Path: `90210_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Fossil_Gas_Excl_Sovereign_Bonds_Opex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18803,9 +18193,8 @@ Applicability: all rows
 
 ---
 
-### Field 611 — 611
+### Field 611 — 90220_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Incl_Sovereign_Bonds_Opex
 
-Path: `90220_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Incl_Sovereign_Bonds_Opex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18832,9 +18221,8 @@ Applicability: all rows
 
 ---
 
-### Field 612 — 612
+### Field 612 — 90230_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Excl_Sovereign_Bonds_Opex
 
-Path: `90230_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_Nuclear_Excl_Sovereign_Bonds_Opex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18861,9 +18249,8 @@ Applicability: all rows
 
 ---
 
-### Field 613 — 613
+### Field 613 — 90240_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Incl_Sovereign_Bonds_Opex
 
-Path: `90240_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Incl_Sovereign_Bonds_Opex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18890,9 +18277,8 @@ Applicability: all rows
 
 ---
 
-### Field 614 — 614
+### Field 614 — 90250_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Excl_Sovereign_Bonds_Opex
 
-Path: `90250_Financial_Instrument_Current_Percentage_Investments_Aligned_EU_Taxonomy_No_Fossil_Gas_and_Nuclear_Excl_Sovereign_Bonds_Opex`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -18919,9 +18305,8 @@ Applicability: all rows
 
 ---
 
-### Field 615 — 615
+### Field 615 — 100000_List_Of_Countries_Subject_To_Social_Violations
 
-Path: `100000_List_Of_Countries_Subject_To_Social_Violations`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: ISO 3166-1 alpha 2 of countries where social violations are triggered.
@@ -18949,9 +18334,8 @@ Definition: ISO 3166-1 alpha 2 of countries where social violations are triggere
 
 ---
 
-### Field 616 — 616
+### Field 616 — 100010_List_Of_Invested_Countries
 
-Path: `100010_List_Of_Invested_Countries`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: ISO 3166-1 alpha 2 of countries

@@ -21,10 +21,20 @@ public record SpecManifest(
         ApplicabilityColumns applicabilityColumns,
         List<ProfileColumn> profileColumns) {
 
+    /**
+     * Spec-sheet column layout. All indices are 1-based.
+     *
+     * <p>{@code numData} (col A) is always present — it holds either the descriptive label (TPT V7)
+     * or the bare sequence number (EMT/EET/EPT). {@code name} is optional and points to the column
+     * containing the field's display label when {@code numData} is just a number (EMT/EET/EPT use
+     * col B for this); omitting it means the loader falls back to {@code numData}. {@code path} is
+     * optional and points to the FundsXML element path when one exists (TPT only).
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Columns(
             int numData,
-            int path,
+            Integer name,
+            Integer path,
             int definition,
             int codification,
             int comment,

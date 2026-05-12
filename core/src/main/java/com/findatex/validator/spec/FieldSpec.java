@@ -11,6 +11,7 @@ public final class FieldSpec {
 
     private final String numData;
     private final String numKey;
+    private final String name;
     private final String fundXmlPath;
     private final String definition;
     private final String comment;
@@ -31,7 +32,7 @@ public final class FieldSpec {
                      Map<ProfileKey, Flag> profileFlags,
                      Set<String> applicableCic,
                      int sourceRow) {
-        this(numData, fundXmlPath, definition, comment, codificationRaw, codification,
+        this(numData, /*name*/ null, fundXmlPath, definition, comment, codificationRaw, codification,
                 profileFlags, applicableCic, Map.of(), sourceRow);
     }
 
@@ -46,7 +47,27 @@ public final class FieldSpec {
                      Set<String> applicableCic,
                      Map<String, Set<String>> applicableSubcategories,
                      int sourceRow) {
-        this(numData, fundXmlPath, definition, comment, codificationRaw, codification,
+        this(numData, /*name*/ null, fundXmlPath, definition, comment, codificationRaw, codification,
+                profileFlags, applicableCic, applicableSubcategories, sourceRow);
+    }
+
+    /**
+     * Loader-facing constructor that accepts an explicit display {@code name}. When {@code name}
+     * is null or blank it falls back to {@code numData} (preserves TPT V7 behaviour where column A
+     * already holds a label like {@code "1_Portfolio_identifying_data"}).
+     */
+    public FieldSpec(String numData,
+                     String name,
+                     String fundXmlPath,
+                     String definition,
+                     String comment,
+                     String codificationRaw,
+                     CodificationDescriptor codification,
+                     Map<ProfileKey, Flag> profileFlags,
+                     Set<String> applicableCic,
+                     Map<String, Set<String>> applicableSubcategories,
+                     int sourceRow) {
+        this(numData, name, fundXmlPath, definition, comment, codificationRaw, codification,
                 profileKeyedToCodes(profileFlags),
                 (applicableCic == null || applicableCic.isEmpty())
                         && (applicableSubcategories == null || applicableSubcategories.isEmpty())
@@ -73,8 +94,24 @@ public final class FieldSpec {
                      Map<String, Flag> codeKeyedFlags,
                      ApplicabilityScope applicabilityScope,
                      int sourceRow) {
+        this(numData, /*name*/ null, fundXmlPath, definition, comment, codificationRaw, codification,
+                codeKeyedFlags, applicabilityScope, sourceRow);
+    }
+
+    /** Direct constructor that also accepts an explicit display {@code name}. */
+    public FieldSpec(String numData,
+                     String name,
+                     String fundXmlPath,
+                     String definition,
+                     String comment,
+                     String codificationRaw,
+                     CodificationDescriptor codification,
+                     Map<String, Flag> codeKeyedFlags,
+                     ApplicabilityScope applicabilityScope,
+                     int sourceRow) {
         this.numData = numData;
         this.numKey = extractNumKey(numData);
+        this.name = (name == null || name.isBlank()) ? numData : name;
         this.fundXmlPath = fundXmlPath;
         this.definition = definition;
         this.comment = comment;
@@ -87,6 +124,18 @@ public final class FieldSpec {
 
     public String numData() { return numData; }
     public String numKey()  { return numKey; }
+    /**
+     * Human-readable field name. Reads from the spec sheet's name column (column B for manifest-driven
+     * templates EMT/EET/EPT, where it holds labels like {@code "00010_EET_Version"}). For TPT V7,
+     * column A already carries the labelled name (e.g. {@code "1_Portfolio_identifying_data"}) so
+     * this returns the same string as {@link #numData()}.
+     */
+    public String name() { return name; }
+    /**
+     * FundsXML element path. Only meaningful for TPT (whose spec sheet column B is the FundsXML
+     * path, e.g. {@code "Portfolio / PortfolioID / Code"}). EMT/EET/EPT have no FundsXML mapping
+     * so this returns {@code null} for those templates — use {@link #name()} for the descriptive label.
+     */
     public String fundXmlPath() { return fundXmlPath; }
     public String definition() { return definition; }
     public String comment() { return comment; }

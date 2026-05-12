@@ -32,7 +32,7 @@ public final class ConditionalFieldPresenceRule implements Rule {
     public List<Finding> evaluate(ValidationContext ctx) {
         List<Finding> out = new ArrayList<>();
         String fieldName = ctx.catalog().byNumKey(req.targetFieldNum())
-                .map(FieldSpec::numData)
+                .map(FieldSpec::name)
                 .orElse("Field " + req.targetFieldNum());
 
         for (TptRow row : ctx.file().rows()) {

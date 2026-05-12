@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class EetExternalValidationFieldNumStabilityTest {
 
-    private static final Map<String, String> EXPECTED_NUM_TO_PATH_PREFIX = Map.of(
+    private static final Map<String, String> EXPECTED_NUM_TO_NAME_PREFIX = Map.of(
             "3",  "00030_EET_Producer_LEI",
             "12", "10010_Manufacturer_Code_Type",
             "13", "10020_Manufacturer_Code",
@@ -34,15 +34,15 @@ class EetExternalValidationFieldNumStabilityTest {
 
     @ParameterizedTest
     @MethodSource("versions")
-    void externalValidationFieldNumsResolveToExpectedPaths(TemplateVersion v) {
+    void externalValidationFieldNumsResolveToExpectedNames(TemplateVersion v) {
         SpecCatalog catalog = new EetTemplate().specLoaderFor(v).load();
 
-        for (Map.Entry<String, String> e : EXPECTED_NUM_TO_PATH_PREFIX.entrySet()) {
+        for (Map.Entry<String, String> e : EXPECTED_NUM_TO_NAME_PREFIX.entrySet()) {
             FieldSpec field = catalog.byNumKey(e.getKey())
                     .orElseThrow(() -> new AssertionError(
                             "EET " + v.version() + " missing NUM=" + e.getKey()));
-            assertThat(field.fundXmlPath())
-                    .as("EET %s NUM=%s expected fundXmlPath to start with %s",
+            assertThat(field.name())
+                    .as("EET %s NUM=%s expected name to start with %s",
                             v.version(), e.getKey(), e.getValue())
                     .startsWith(e.getValue());
         }

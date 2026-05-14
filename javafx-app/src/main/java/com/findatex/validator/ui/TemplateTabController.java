@@ -135,6 +135,10 @@ public final class TemplateTabController {
 
     private final ObservableList<FindingRow> allFindings = FXCollections.observableArrayList();
     private FilteredList<FindingRow> filteredFindings;
+    private final ObservableList<FindingRow> groupedFindings = FXCollections.observableArrayList();
+    private FilteredList<FindingRow> filteredGrouped;
+    // Full (uncapped) findings, kept around so we can re-bucket on grouping toggle.
+    private List<Finding> currentFindings = List.of();
     private final ObservableList<FileRow> fileRows = FXCollections.observableArrayList();
     private final Map<ProfileKey, CheckBox> profileCheckBoxes = new LinkedHashMap<>();
     // Set when allFindings was clipped by FLAT_FINDINGS_DISPLAY_CAP, so applyFilters() can surface
@@ -179,6 +183,7 @@ public final class TemplateTabController {
     @FXML private CheckBox filterErrors;
     @FXML private CheckBox filterWarnings;
     @FXML private CheckBox filterInfo;
+    @FXML private CheckBox groupByError;
     @FXML private Label findingCountLabel;
     @FXML private TableView<FindingRow> findingsTable;
     @FXML private TableColumn<FindingRow, String> colSeverity;
@@ -193,6 +198,7 @@ public final class TemplateTabController {
     @FXML private TableColumn<FindingRow, String> colRule;
     @FXML private TableColumn<FindingRow, String> colField;
     @FXML private TableColumn<FindingRow, String> colFieldName;
+    @FXML private TableColumn<FindingRow, String> colCount;
     @FXML private TableColumn<FindingRow, String> colMessage;
 
     public TemplateTabController(TemplateDefinition template) {
@@ -289,7 +295,9 @@ public final class TemplateTabController {
         colRule.setCellValueFactory(new PropertyValueFactory<>("rule"));
         colField.setCellValueFactory(new PropertyValueFactory<>("field"));
         colFieldName.setCellValueFactory(new PropertyValueFactory<>("fieldName"));
+        colCount.setCellValueFactory(new PropertyValueFactory<>("count"));
         colMessage.setCellValueFactory(new PropertyValueFactory<>("message"));
+        colCount.setComparator(NUMERIC_STRING);
 
         // Cells render formatted strings ("100%", "1.5s", "—") but the underlying values are
         // numeric — sort by parsed value, not lexicographically.
@@ -298,11 +306,13 @@ public final class TemplateTabController {
         colWeight.setComparator(NUMERIC_STRING);
 
         filteredFindings = new FilteredList<>(allFindings, fr -> true);
+        filteredGrouped = new FilteredList<>(groupedFindings, fr -> true);
         findingsTable.setItems(filteredFindings);
 
         filterErrors.selectedProperty().addListener((o, a, b) -> applyFilters());
         filterWarnings.selectedProperty().addListener((o, a, b) -> applyFilters());
         filterInfo.selectedProperty().addListener((o, a, b) -> applyFilters());
+        groupByError.selectedProperty().addListener((o, a, b) -> applyGrouping(b));
 
         filePathField.textProperty().addListener((o, a, b) ->
                 validateButton.setDisable(b == null || b.trim().isEmpty()));
@@ -997,9 +1007,11 @@ public final class TemplateTabController {
             scorePane.getChildren().add(buildScoreCard(label, v));
         }
 
-        DisplayBatch batch = prepareDisplayBatch(report.findings());
+        currentFindings = report.findings();
+        DisplayBatch batch = prepareDisplayBatch(currentFindings);
         totalFindingsBeforeCap = batch.totalBeforeCap;
         allFindings.setAll(batch.rows.stream().map(FindingRow::of).toList());
+        groupedFindings.setAll(buildGroupRows(currentFindings));
         applyFilters();
     }
 
@@ -1041,20 +1053,87 @@ public final class TemplateTabController {
         boolean showE = filterErrors.isSelected();
         boolean showW = filterWarnings.isSelected();
         boolean showI = filterInfo.isSelected();
-        filteredFindings.setPredicate(fr -> {
+        java.util.function.Predicate<FindingRow> sev = fr -> {
             String s = fr.getSeverity();
             if ("ERROR".equals(s))   return showE;
             if ("WARNING".equals(s)) return showW;
             if ("INFO".equals(s))    return showI;
             return true;
-        });
+        };
+        filteredFindings.setPredicate(sev);
+        filteredGrouped.setPredicate(sev);
         if (findingCountLabel != null) {
-            String text = filteredFindings.size() + " of " + allFindings.size() + " shown";
-            if (totalFindingsBeforeCap > 0) {
-                text += " (truncated from " + totalFindingsBeforeCap + " — use Excel export for full list)";
+            boolean grouped = groupByError != null && groupByError.isSelected();
+            String text;
+            if (grouped) {
+                text = filteredGrouped.size() + " groups shown ("
+                        + currentFindings.size() + " findings total)";
+            } else {
+                text = filteredFindings.size() + " of " + allFindings.size() + " shown";
+                if (totalFindingsBeforeCap > 0) {
+                    text += " (truncated from " + totalFindingsBeforeCap + " — use Excel export for full list)";
+                }
             }
             findingCountLabel.setText(text);
         }
+    }
+
+    /**
+     * Toggles between the flat findings view and the by-error grouped view. Context columns
+     * (Profile, Fund ID, Fund name, Valuation date, Row, Instrument code, Instrument, Weight)
+     * are blank in grouped mode — hide them and reveal the {@code Vorkommen} count column so the
+     * user sees only the columns that carry signal for a bucket.
+     */
+    private void applyGrouping(boolean grouped) {
+        if (grouped) {
+            findingsTable.setItems(filteredGrouped);
+        } else {
+            findingsTable.setItems(filteredFindings);
+        }
+        colProfile.setVisible(!grouped);
+        colFundId.setVisible(!grouped);
+        colFundName.setVisible(!grouped);
+        colDate.setVisible(!grouped);
+        colRow.setVisible(!grouped);
+        colInstCode.setVisible(!grouped);
+        colInstName.setVisible(!grouped);
+        colWeight.setVisible(!grouped);
+        colCount.setVisible(grouped);
+        applyFilters();
+    }
+
+    /**
+     * Aggregates findings into one row per (severity, ruleId, fieldNum) bucket. The bucket's
+     * message is the first encountered finding's message (the rest are duplicate noise the user
+     * was trying to escape by switching modes). Sorted ERROR-first, then by count descending so
+     * the highest-impact groups are at the top.
+     */
+    static List<FindingRow> buildGroupRows(List<Finding> findings) {
+        // LinkedHashMap preserves first-seen order; we re-sort at the end anyway.
+        Map<String, GroupAccumulator> buckets = new java.util.LinkedHashMap<>();
+        for (Finding f : findings) {
+            String key = f.severity().name() + '|' + f.ruleId() + '|'
+                    + (f.fieldNum() == null ? "" : f.fieldNum());
+            GroupAccumulator acc = buckets.get(key);
+            if (acc == null) {
+                buckets.put(key, new GroupAccumulator(f));
+            } else {
+                acc.count++;
+            }
+        }
+        return buckets.values().stream()
+                .sorted(Comparator
+                        .comparing((GroupAccumulator g) -> g.first.severity())
+                        .thenComparing((GroupAccumulator g) -> -g.count))
+                .map(g -> FindingRow.group(g.first, g.count))
+                .toList();
+    }
+
+    /** Mutable accumulator used while bucketing findings — kept package-private for testing. */
+    static final class GroupAccumulator {
+        final Finding first;
+        int count;
+        GroupAccumulator(Finding first) { this.first = first; this.count = 1; }
     }
 
     /** Master row in the files TableView. Backed either by a single-file QualityReport or by a BatchResult. */
@@ -1148,6 +1227,7 @@ public final class TemplateTabController {
         private final String rule;
         private final String field;
         private final String fieldName;
+        private final String count;
         private final String message;
 
         private FindingRow(Finding f) {
@@ -1165,7 +1245,25 @@ public final class TemplateTabController {
             this.rule           = f.ruleId();
             this.field          = nz(f.fieldNum());
             this.fieldName      = nz(f.fieldName());
+            this.count          = "";
             this.message        = nz(f.message());
+        }
+
+        private FindingRow(Finding first, int bucketCount) {
+            this.severity       = first.severity().name();
+            this.profile        = "";
+            this.fundId         = "";
+            this.fundName       = "";
+            this.valuationDate  = "";
+            this.rowIndex       = "";
+            this.instrumentCode = "";
+            this.instrumentName = "";
+            this.weight         = "";
+            this.rule           = first.ruleId();
+            this.field          = nz(first.fieldNum());
+            this.fieldName      = nz(first.fieldName());
+            this.count          = Integer.toString(bucketCount);
+            this.message        = nz(first.message());
         }
 
         private static String nz(String s) { return s == null ? "" : s; }
@@ -1181,6 +1279,9 @@ public final class TemplateTabController {
         }
 
         public static FindingRow of(Finding f) { return new FindingRow(f); }
+        public static FindingRow group(Finding first, int bucketCount) {
+            return new FindingRow(first, bucketCount);
+        }
         public String getSeverity()       { return severity; }
         public String getProfile()        { return profile; }
         public String getFundId()         { return fundId; }
@@ -1193,6 +1294,7 @@ public final class TemplateTabController {
         public String getRule()           { return rule; }
         public String getField()          { return field; }
         public String getFieldName()      { return fieldName; }
+        public String getCount()          { return count; }
         public String getMessage()        { return message; }
     }
 }

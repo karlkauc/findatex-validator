@@ -7,11 +7,51 @@ interface Props {
 
 const SEVERITIES: Severity[] = ['ERROR', 'WARNING', 'INFO'];
 
-const COLUMN_COUNT = 13;
+const FLAT_COLUMN_COUNT = 13;
+const GROUPED_COLUMN_COUNT = 6;
+
+interface FindingGroup {
+  severity: Severity;
+  ruleId: string;
+  fieldNum: string | null;
+  fieldName: string | null;
+  count: number;
+  sampleMessage: string;
+}
+
+function groupKey(f: FindingDto): string {
+  return `${f.severity}|${f.ruleId}|${f.fieldNum ?? ''}`;
+}
+
+function buildGroups(findings: FindingDto[]): FindingGroup[] {
+  const buckets = new Map<string, FindingGroup>();
+  for (const f of findings) {
+    const k = groupKey(f);
+    const existing = buckets.get(k);
+    if (existing) {
+      existing.count++;
+    } else {
+      buckets.set(k, {
+        severity: f.severity,
+        ruleId: f.ruleId,
+        fieldNum: f.fieldNum,
+        fieldName: f.fieldName,
+        count: 1,
+        sampleMessage: f.message,
+      });
+    }
+  }
+  // Sort: severity (ERROR first), then by count desc — biggest pain points float up.
+  const order: Record<Severity, number> = { ERROR: 0, WARNING: 1, INFO: 2 };
+  return Array.from(buckets.values()).sort(
+    (a, b) => order[a.severity] - order[b.severity] || b.count - a.count,
+  );
+}
 
 export function FindingsTable({ findings }: Props) {
   const [enabled, setEnabled] = useState<Set<Severity>>(new Set(SEVERITIES));
   const [query, setQuery] = useState('');
+  const [grouped, setGrouped] = useState(false);
 
   // Double-scrollbar pattern: a thin scroll strip above the table mirrors the
   // table's natural width, so users at the top of the page can see (and use)
@@ -48,6 +88,8 @@ export function FindingsTable({ findings }: Props) {
     });
   }, [findings, enabled, query]);
 
+  const groups = useMemo(() => (grouped ? buildGroups(filtered) : []), [grouped, filtered]);
+
   const toggle = (s: Severity) => {
     const next = new Set(enabled);
     if (next.has(s)) next.delete(s);
@@ -65,7 +107,7 @@ export function FindingsTable({ findings }: Props) {
     // Children width changes (filter, severity toggle) also affect scrollWidth.
     if (el.firstElementChild) ro.observe(el.firstElementChild);
     return () => ro.disconnect();
-  }, [filtered.length]);
+  }, [filtered.length, grouped, groups.length]);
 
   const onTopScroll = () => {
     if (syncing.current) return;
@@ -87,8 +129,25 @@ export function FindingsTable({ findings }: Props) {
   return (
     <div className="card">
       <div className="card-header flex flex-wrap items-center justify-between gap-3">
-        <span>Findings ({findings.length})</span>
+        <span>
+          Findings ({findings.length}
+          {grouped ? `, ${groups.length} groups` : ''})
+        </span>
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setGrouped((g) => !g)}
+            aria-pressed={grouped}
+            className={
+              'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ' +
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-navy-500 ' +
+              (grouped
+                ? 'border-navy-300 bg-navy-50 text-navy-700'
+                : 'border-slate-300 bg-white text-slate-500 hover:bg-slate-100')
+            }
+          >
+            Group by error
+          </button>
           {SEVERITIES.map((s) => (
             <button
               key={s}
@@ -125,71 +184,113 @@ export function FindingsTable({ findings }: Props) {
         <div style={{ width: innerWidth, height: 1 }} />
       </div>
       <div ref={tableScrollRef} onScroll={onTableScroll} className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Severity</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Profile</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Fund ID</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Fund name</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Valuation date</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Row</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Instrument code</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Instrument</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Weight</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Rule</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Field</th>
-              <th className="whitespace-nowrap px-3 py-2 font-medium">Field name</th>
-              <th className="px-3 py-2 font-medium">Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((f, idx) => (
-              <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                <td className="whitespace-nowrap px-3 py-2 align-top">
-                  <span className={severityBadge(f.severity)}>{f.severity}</span>
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
-                  {f.profileDisplayName ?? f.profileCode ?? ''}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">
-                  {f.portfolioId ?? ''}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
-                  {f.portfolioName ?? ''}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top text-xs text-slate-600">
-                  {f.valuationDate ?? ''}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top text-right text-xs text-slate-600">
-                  {f.rowIndex != null ? f.rowIndex : ''}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">
-                  {f.instrumentCode ?? ''}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
-                  {f.instrumentName ?? ''}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top text-right text-xs text-slate-600">
-                  {formatWeight(f.valuationWeight)}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">{f.ruleId}</td>
-                <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-500">
-                  {f.fieldNum ?? ''}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">{f.fieldName ?? ''}</td>
-                <td className="whitespace-normal break-words px-3 py-2 align-top text-slate-700">{f.message}</td>
+        {grouped ? (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Severity</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Rule</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Field</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Field name</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium text-right">Occurrences</th>
+                <th className="px-3 py-2 font-medium">Sample message</th>
               </tr>
-            ))}
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={COLUMN_COUNT} className="px-4 py-6 text-center text-sm text-slate-500">
-                  No findings for the current selection.
-                </td>
+            </thead>
+            <tbody>
+              {groups.map((g, idx) => (
+                <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                  <td className="whitespace-nowrap px-3 py-2 align-top">
+                    <span className={severityBadge(g.severity)}>{g.severity}</span>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">{g.ruleId}</td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-500">
+                    {g.fieldNum ?? ''}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">{g.fieldName ?? ''}</td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-right font-mono text-xs text-slate-700">
+                    {g.count}
+                  </td>
+                  <td className="whitespace-normal break-words px-3 py-2 align-top text-slate-700">
+                    {g.sampleMessage}
+                  </td>
+                </tr>
+              ))}
+              {groups.length === 0 && (
+                <tr>
+                  <td colSpan={GROUPED_COLUMN_COUNT} className="px-4 py-6 text-center text-sm text-slate-500">
+                    No findings for the current selection.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Severity</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Profile</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Fund ID</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Fund name</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Valuation date</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Row</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Instrument code</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Instrument</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Weight</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Rule</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Field</th>
+                <th className="whitespace-nowrap px-3 py-2 font-medium">Field name</th>
+                <th className="px-3 py-2 font-medium">Message</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((f, idx) => (
+                <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                  <td className="whitespace-nowrap px-3 py-2 align-top">
+                    <span className={severityBadge(f.severity)}>{f.severity}</span>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
+                    {f.profileDisplayName ?? f.profileCode ?? ''}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">
+                    {f.portfolioId ?? ''}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
+                    {f.portfolioName ?? ''}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-xs text-slate-600">
+                    {f.valuationDate ?? ''}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-right text-xs text-slate-600">
+                    {f.rowIndex != null ? f.rowIndex : ''}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">
+                    {f.instrumentCode ?? ''}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
+                    {f.instrumentName ?? ''}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-right text-xs text-slate-600">
+                    {formatWeight(f.valuationWeight)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-600">{f.ruleId}</td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-slate-500">
+                    {f.fieldNum ?? ''}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">{f.fieldName ?? ''}</td>
+                  <td className="whitespace-normal break-words px-3 py-2 align-top text-slate-700">{f.message}</td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={FLAT_COLUMN_COUNT} className="px-4 py-6 text-center text-sm text-slate-500">
+                    No findings for the current selection.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

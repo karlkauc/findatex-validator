@@ -105,6 +105,46 @@ describe('FindingsTable', () => {
     expect(screen.getByText('PRESENCE/5')).toBeInTheDocument();
   });
 
+  describe('group by error', () => {
+    const repeated: FindingDto[] = [
+      f({ severity: 'ERROR', ruleId: 'PRESENCE/5', fieldNum: '123', fieldName: 'TotalNetAssets', message: 'Row 1 missing', rowIndex: 1 }),
+      f({ severity: 'ERROR', ruleId: 'PRESENCE/5', fieldNum: '123', fieldName: 'TotalNetAssets', message: 'Row 2 missing', rowIndex: 2 }),
+      f({ severity: 'ERROR', ruleId: 'PRESENCE/5', fieldNum: '123', fieldName: 'TotalNetAssets', message: 'Row 3 missing', rowIndex: 3 }),
+      f({ severity: 'WARNING', ruleId: 'XF-12', fieldNum: '40', fieldName: 'CouponFrequency', message: 'Unusual', rowIndex: 4 }),
+    ];
+
+    it('collapses identical (severity, rule, field) findings into a single group row with count', async () => {
+      const user = userEvent.setup();
+      render(<FindingsTable findings={repeated} />);
+
+      await user.click(screen.getByRole('button', { name: /Group by error/ }));
+
+      // PRESENCE/5 should appear only once with occurrence count 3.
+      const rule = screen.getAllByText('PRESENCE/5');
+      expect(rule).toHaveLength(1);
+      expect(screen.getByText('3')).toBeInTheDocument();
+      // Header switches to the grouped layout.
+      expect(screen.getByText(/Occurrences/i)).toBeInTheDocument();
+    });
+
+    it('shows group count in the header', async () => {
+      const user = userEvent.setup();
+      render(<FindingsTable findings={repeated} />);
+      await user.click(screen.getByRole('button', { name: /Group by error/ }));
+      expect(screen.getByText(/Findings \(4, 2 groups\)/)).toBeInTheDocument();
+    });
+
+    it('respects severity filter before grouping', async () => {
+      const user = userEvent.setup();
+      render(<FindingsTable findings={repeated} />);
+      await user.click(screen.getByRole('button', { name: /Group by error/ }));
+      // Disable ERRORs — the PRESENCE/5 group should disappear.
+      await user.click(screen.getByRole('button', { name: 'ERROR (3)' }));
+      expect(screen.queryByText('PRESENCE/5')).not.toBeInTheDocument();
+      expect(screen.getByText('XF-12')).toBeInTheDocument();
+    });
+  });
+
   // Sanity: the severity badge renders inside the row.
   it('puts the severity tag in the same row as the rule id', () => {
     const { container } = render(<FindingsTable findings={[fixtures[0]]} />);

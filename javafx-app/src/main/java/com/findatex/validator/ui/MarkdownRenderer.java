@@ -250,6 +250,12 @@ public final class MarkdownRenderer {
                             "-fx-border-color: #d6dde6;"
                             + "-fx-border-width: 0 1 1 0;"
                             + (isHeader ? "-fx-background-color: #f4f6f9;" : ""));
+                    if (isHeader) {
+                        // Header stays single-line; its preferred width becomes the column's
+                        // minimum so a long body cell can't squeeze this column to a
+                        // character-per-line wrap.
+                        cellWrap.setMinWidth(Region.USE_PREF_SIZE);
+                    }
                     GridPane.setHgrow(cellWrap, Priority.ALWAYS);
                     GridPane.setHalignment(cellWrap, HPos.LEFT);
                     grid.add(cellWrap, colIdx, rowIdx);

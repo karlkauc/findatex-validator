@@ -1081,7 +1081,7 @@ public final class TemplateTabController {
     /**
      * Toggles between the flat findings view and the by-error grouped view. Context columns
      * (Profile, Fund ID, Fund name, Valuation date, Row, Instrument code, Instrument, Weight)
-     * are blank in grouped mode — hide them and reveal the {@code Vorkommen} count column so the
+     * are blank in grouped mode — hide them and reveal the {@code Occurrences} count column so the
      * user sees only the columns that carry signal for a bucket.
      */
     private void applyGrouping(boolean grouped) {

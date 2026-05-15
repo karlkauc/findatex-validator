@@ -9,7 +9,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifies the by-error grouping used by the optional "Gruppieren nach Fehler" toggle:
+ * Verifies the by-error grouping used by the optional "Group by error" toggle:
  * one row per (severity, ruleId, fieldNum) bucket with the bucket size in the count column.
  */
 class TemplateTabControllerGroupingTest {

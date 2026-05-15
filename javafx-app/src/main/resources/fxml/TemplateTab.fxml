@@ -88,7 +88,7 @@
             <CheckBox fx:id="filterErrors" text="Errors" selected="true"/>
             <CheckBox fx:id="filterWarnings" text="Warnings" selected="true"/>
             <CheckBox fx:id="filterInfo" text="Info" selected="true"/>
-            <CheckBox fx:id="groupByError" text="Gruppieren nach Fehler"/>
+            <CheckBox fx:id="groupByError" text="Group by error"/>
             <Label fx:id="findingCountLabel"/>
         </HBox>
 
@@ -106,7 +106,7 @@
                 <TableColumn fx:id="colRule"       text="Rule"            prefWidth="180"/>
                 <TableColumn fx:id="colField"      text="Field"           prefWidth="80"/>
                 <TableColumn fx:id="colFieldName"  text="Field name"      prefWidth="220"/>
-                <TableColumn fx:id="colCount"      text="Vorkommen"       prefWidth="90" visible="false"/>
+                <TableColumn fx:id="colCount"      text="Occurrences"     prefWidth="90" visible="false"/>
                 <TableColumn fx:id="colMessage"    text="Message"         prefWidth="380"/>
             </columns>
         </TableView>

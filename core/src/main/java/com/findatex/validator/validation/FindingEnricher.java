@@ -4,6 +4,7 @@ import com.findatex.validator.domain.FundGroup;
 import com.findatex.validator.domain.FundGrouper;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.domain.TptRow;
+import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.template.api.FindingContextSpec;
 import com.findatex.validator.template.tpt.TptTemplate;
 
@@ -36,6 +37,23 @@ public final class FindingEnricher {
     @Deprecated
     public static List<Finding> enrich(TptFile file, List<Finding> findings) {
         return enrich(file, findings, TptTemplate.FINDING_CONTEXT);
+    }
+
+    /**
+     * Enrichment + uniform {@code "Field N (Description)"} fieldName normalization.
+     * Prefer this overload over {@link #enrich(TptFile, List, FindingContextSpec)} so that
+     * fieldName labels are consistent regardless of which rule produced the finding.
+     */
+    public static List<Finding> enrich(TptFile file, List<Finding> findings,
+                                       FindingContextSpec spec, SpecCatalog catalog) {
+        List<Finding> enriched = enrich(file, findings, spec);
+        if (catalog == null) return enriched;
+        List<Finding> out = new ArrayList<>(enriched.size());
+        for (Finding f : enriched) {
+            out.add(f.withFieldName(
+                    FieldNameFormatter.format(f.fieldNum(), f.fieldName(), catalog)));
+        }
+        return out;
     }
 
     public static List<Finding> enrich(TptFile file, List<Finding> findings, FindingContextSpec spec) {

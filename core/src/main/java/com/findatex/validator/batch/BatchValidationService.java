@@ -125,7 +125,7 @@ public final class BatchValidationService {
                     List<Finding> online = FindingEnricher.enrich(tptFile,
                             externalService.run(tptFile, externalConfig,
                                     options.appSettings(), cancel, sink),
-                            contextSpec);
+                            contextSpec, catalog);
                     List<Finding> all = new ArrayList<>(findings.size() + online.size());
                     all.addAll(findings);
                     all.addAll(online);

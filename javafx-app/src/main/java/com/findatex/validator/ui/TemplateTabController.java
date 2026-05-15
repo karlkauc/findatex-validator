@@ -587,7 +587,7 @@ public final class TemplateTabController {
                     ExternalValidationService.ProgressSink sink = buildSink(pCtrl);
                     List<Finding> online = FindingEnricher.enrich(
                             file, svc.run(file, externalConfig, settings, cancelled, sink),
-                            contextSpec);
+                            contextSpec, cat);
                     List<Finding> all = new ArrayList<>(findings);
                     all.addAll(online);
                     findings = all;

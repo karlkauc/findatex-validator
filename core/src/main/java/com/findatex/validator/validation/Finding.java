@@ -37,4 +37,9 @@ public record Finding(
     public Finding withContext(FindingContext ctx) {
         return new Finding(severity, ruleId, profile, fieldNum, fieldName, rowIndex, value, message, ctx);
     }
+
+    /** Returns a new Finding with the given fieldName (immutable). */
+    public Finding withFieldName(String newFieldName) {
+        return new Finding(severity, ruleId, profile, fieldNum, newFieldName, rowIndex, value, message, context);
+    }
 }

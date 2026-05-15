@@ -199,7 +199,7 @@ public class ValidationOrchestrator {
                     List<Finding> online = FindingEnricher.enrich(file,
                             svc.run(file, externalCfg, settings, () -> false,
                                     ExternalValidationService.ProgressSink.NOOP),
-                            def.findingContextSpec());
+                            def.findingContextSpec(), bundle.catalog);
                     List<Finding> merged = new ArrayList<>(findings);
                     merged.addAll(online);
                     findings = merged;

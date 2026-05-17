@@ -30,11 +30,15 @@ public class RateLimitFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext ctx) {
         String path = ctx.getUriInfo().getPath();
         if (path == null) return;
-        // Only throttle the heavy work (file upload + validation).
-        if (!path.startsWith("api/validate") && !path.startsWith("/api/validate")) return;
         if (!"POST".equalsIgnoreCase(ctx.getMethod())) return;
 
-        ConsumptionProbe probe = rateLimits.consume(clientIp());
+        boolean isValidate = path.startsWith("api/validate") || path.startsWith("/api/validate");
+        boolean isUsage = path.startsWith("api/usage-stats") || path.startsWith("/api/usage-stats");
+        if (!isValidate && !isUsage) return;
+
+        ConsumptionProbe probe = isUsage
+                ? rateLimits.consumeUsage(clientIp())
+                : rateLimits.consume(clientIp());
         if (!probe.isConsumed()) {
             long retryAfterSeconds = Math.max(1, probe.getNanosToWaitForRefill() / 1_000_000_000L);
             ctx.abortWith(

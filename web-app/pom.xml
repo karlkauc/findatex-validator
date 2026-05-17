@@ -82,6 +82,23 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
+        <!-- Anonymous usage stats: plain Agroal + JDBC (no Hibernate/Panache),
+             stays fully inert when no datasource URL is configured. -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-agroal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-postgresql</artifactId>
+        </dependency>
+        <!-- Offline IP→country lookup (no third-party call, IP never stored). -->
+        <dependency>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+
         <!-- Tests. -->
         <dependency>
             <groupId>io.quarkus</groupId>

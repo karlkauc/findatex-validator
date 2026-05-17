@@ -41,7 +41,7 @@ the full one-row-per-finding detail.
 Bundled templates: **TPT V7.0 + V6.0**, **EET V1.1.3 + V1.1.2**,
 **EMT V4.3 + V4.2**, **EPT V2.1 + V2.0**.
 
-![Screenshot of the web app showing upload form, validation summary, and quality scores](docs/screenshots/web-app.png)
+![Animated walkthrough: pick template and profile, upload a file, validate, then group the findings by error](docs/screenshots/web-app-demo.gif)
 
 ---
 
@@ -60,8 +60,6 @@ validation engine is exactly the same.
    (max 25 MB).
 4. Click **Validieren**. You get findings on screen and a download
    link for the Excel report.
-
-![Animated walkthrough: pick template and profile, upload a file, validate, then group the findings by error](docs/screenshots/web-app-demo.gif)
 
 The hosted instance has no login. Files are processed in memory and
 discarded the moment the response is sent; the report download link

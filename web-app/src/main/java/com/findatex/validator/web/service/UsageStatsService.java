@@ -137,6 +137,9 @@ public class UsageStatsService {
             ps.executeUpdate();
             profiles.free();
             rules.free();
+            // Re-arm the WARN: a fresh failure after a recovered DB should be
+            // visible again, while a continuous failure streak stays quiet.
+            warnedOnce = false;
         } catch (Exception e) {
             // DB down / schema missing / bad row — drop silently, never disturb
             // the request path. Rate-limit the WARN so a dead DB can't flood logs.

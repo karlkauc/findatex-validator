@@ -32,6 +32,12 @@ invalid codes, broken cross-field rules, and so on. You get a quality
 score (0–100) and a downloadable Excel report with one row per finding
 so you can fix things in your source system.
 
+On screen the findings are **grouped by rule** (e.g. "mandatory field
+missing", "invalid ISIN", a specific cross-field check) with a count
+and an expandable list, so a recurring problem across thousands of
+rows reads as one entry instead of thousands. The Excel report keeps
+the full one-row-per-finding detail.
+
 Bundled templates: **TPT V7.0 + V6.0**, **EET V1.1.3 + V1.1.2**,
 **EMT V4.3 + V4.2**, **EPT V2.1 + V2.0**.
 
@@ -59,12 +65,32 @@ The hosted instance has no login. Files are processed in memory and
 discarded the moment the response is sent; the report download link
 is single-use and expires after 5 minutes.
 
+**Limits on the hosted web app.** Because it is a public, unauthenticated
+service, the web app is throttled to keep it usable for everyone (the
+maintainer can tune these per deployment via `FINDATEX_WEB_*` env vars —
+the defaults are):
+
+| Limit | Default | What you see when you hit it |
+|-------|---------|------------------------------|
+| Uploads per IP per hour | 10 | HTTP 429 — try again later |
+| Concurrent validations (whole instance) | 4 | HTTP 429 — retry shortly |
+| Max upload size | 25 MB | HTTP 413 — file too large |
+| Report download lifetime | 5 min, single use | link expires, re-validate |
+
+If these limits get in your way — large files, bulk runs, confidential
+data — use the desktop app instead: **it has no rate limit, no
+concurrency cap, no file-size cap and no upload at all** (see Option B).
+
 ### Option B — Desktop app (recommended for confidential data)
 
 The desktop app reads files from your local disk, validates them
 locally, and writes the report locally. No upload, no network traffic
 except an optional GLEIF / OpenFIGI lookup that you opt in to in the
 settings dialog.
+
+There are **no limits in the desktop app**: no rate limit, no
+concurrency cap, no 25 MB file-size ceiling, no expiring report links.
+Validate as many files as you like, as large as you like.
 
 Pre-built native installers for every release are attached to the
 [GitHub Releases page](https://github.com/karlkauc/findatex-validator/releases).
@@ -95,6 +121,54 @@ No Java install needed — the installers ship a bundled runtime.
 | **Hosted web app** | Files are processed in memory and discarded immediately after the response. Reports live for 5 minutes via a single-use URL, then are deleted. No login, no per-file logging. External validation off by default. |
 
 For confidential fund data, prefer the desktop app.
+
+---
+
+## Reporting a wrong finding
+
+The validator can be wrong — a false positive, a missing check, a rule
+that is too strict for a legitimate edge case. Both UIs have a **Report
+a false positive** action on a finding that opens a *pre-filled GitHub
+issue* in your browser. You review the exact text and submit it
+yourself; nothing is sent automatically, no account data leaves your
+machine beyond the GitHub issue you choose to post.
+
+This is the fastest way to get a rule fixed. General bug reports and
+feature requests are equally welcome on the
+[issue tracker](https://github.com/karlkauc/findatex-validator/issues)
+(see [`CONTRIBUTING.md`](CONTRIBUTING.md)). Security issues go through
+the private process in [`SECURITY.md`](SECURITY.md) instead.
+
+---
+
+## Anonymous usage statistics (opt-out)
+
+To understand which templates and versions are actually used, the tool
+records **aggregate-only** run statistics (template, version, finding
+counts, a server-derived country code). It **never** records your
+files, fund names, ISINs/LEIs, cell or finding content, or your IP
+address. The raw IP is never stored or logged.
+
+This is **on by default and easy to switch off**:
+
+- **Desktop app:** Settings → *Statistik* → uncheck. The opt-out is
+  persisted per install.
+- **Self-hosted web app:** statistics are inert unless the operator
+  configures a database (`FINDATEX_WEB_USAGE_DB_URL`); the public
+  hosted instance has it enabled. Details and the full schema are in
+  [`docs/USAGE_STATS.md`](docs/USAGE_STATS.md).
+
+---
+
+## Newsletter (optional)
+
+If you want to hear about new releases and template-version updates,
+both UIs offer an optional newsletter sign-up. Your e-mail is
+**forwarded to an external newsletter provider** (which handles
+double-opt-in, unsubscribe and deletion) and is **never stored in this
+project's database or logs**. Sign-up is entirely opt-in; the form is
+only shown when the maintainer has configured a provider. Setup and
+GDPR notes: [`docs/NEWSLETTER.md`](docs/NEWSLETTER.md).
 
 ---
 

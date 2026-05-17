@@ -475,10 +475,10 @@ public final class TemplateTabController {
                 statusLabel.setText("");
                 return true;
             }
-            statusLabel.setText("Drop ignoriert: '" + f.getName() + "' ist weder Datei noch Verzeichnis.");
+            statusLabel.setText("Drop ignored: '" + f.getName() + "' is neither a file nor a directory.");
             return false;
         }
-        statusLabel.setText("Bitte eine einzelne Datei oder ein einzelnes Verzeichnis droppen.");
+        statusLabel.setText("Please drop a single file or a single directory.");
         return false;
     }
 
@@ -492,7 +492,7 @@ public final class TemplateTabController {
         totalFindingsBeforeCap = 0;
         scorePane.getChildren().clear();
         filePathField.setText(folder.toString());
-        batchModeLabel.setText("Batch-Modus: alle unterstützten Dateien in '" + folder.getFileName() + "'");
+        batchModeLabel.setText("Batch mode: all supported files in '" + folder.getFileName() + "'");
         batchModeLabel.setManaged(true);
         batchModeLabel.setVisible(true);
         validateButton.setDisable(false);

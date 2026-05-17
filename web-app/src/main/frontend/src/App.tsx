@@ -4,6 +4,7 @@ import { HelpCircle, Info, Loader2, ShieldCheck } from 'lucide-react';
 import {
   fetchBuildInfo,
   fetchFeedbackConfig,
+  fetchNewsletterConfig,
   fetchRateLimitStatus,
   fetchTemplates,
   validateUpload,
@@ -18,6 +19,7 @@ import { HelpModal } from './components/HelpModal';
 import { AboutModal } from './components/AboutModal';
 import { RATE_LIMIT_QUERY_KEY, RateLimitBadge } from './components/RateLimitBadge';
 import { QuotaExhaustedNotice } from './components/QuotaExhaustedNotice';
+import { NewsletterSignup } from './components/NewsletterSignup';
 import { RateLimitStatus, ValidationResponse } from './types/api';
 
 export default function App() {
@@ -40,6 +42,13 @@ export default function App() {
   const feedbackConfigQuery = useQuery({
     queryKey: ['feedback-config'],
     queryFn: fetchFeedbackConfig,
+    staleTime: Infinity,
+    retry: false,
+  });
+
+  const newsletterConfigQuery = useQuery({
+    queryKey: ['newsletter-config'],
+    queryFn: fetchNewsletterConfig,
     staleTime: Infinity,
     retry: false,
   });
@@ -292,6 +301,7 @@ export default function App() {
             — Source &amp; Desktop-Build:&nbsp;
             <span className="font-mono">com.findatex/findatex-validator</span>
           </div>
+          {newsletterConfigQuery.data?.enabled && <NewsletterSignup />}
         </div>
       </footer>
     </div>

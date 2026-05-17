@@ -85,6 +85,23 @@ export interface FeedbackConfig {
   githubRepo: string | null;
 }
 
+// Mirrors com.findatex.validator.newsletter.NewsletterStatus (lowercase wire).
+export type NewsletterStatusWire =
+  | 'pending'
+  | 'subscribed'
+  | 'already_subscribed'
+  | 'already_pending'
+  | 'invalid_email'
+  | 'unavailable';
+
+export interface NewsletterResult {
+  status: NewsletterStatusWire;
+}
+
+export interface NewsletterConfig {
+  enabled: boolean;
+}
+
 export interface BuildInfo {
   version: string;
   commit: string;

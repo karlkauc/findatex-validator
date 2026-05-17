@@ -2,6 +2,8 @@ import {
   ApiError,
   BuildInfo,
   FeedbackConfig,
+  NewsletterConfig,
+  NewsletterResult,
   RateLimitStatus,
   TemplateInfo,
   ValidationResponse,
@@ -36,6 +38,24 @@ export async function fetchBuildInfo(): Promise<BuildInfo> {
 export async function fetchFeedbackConfig(): Promise<FeedbackConfig> {
   const res = await fetch('/api/feedback-config');
   return handle<FeedbackConfig>(res);
+}
+
+export async function fetchNewsletterConfig(): Promise<NewsletterConfig> {
+  const res = await fetch('/api/newsletter-config');
+  return handle<NewsletterConfig>(res);
+}
+
+export async function subscribeNewsletter(email: string): Promise<NewsletterResult> {
+  const res = await fetch('/api/newsletter/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  // The endpoint returns a JSON {status} body even on 400 (invalid_email) and
+  // 503 (unavailable) — those are expected outcomes the UI must show, not
+  // errors to throw. Fall back to "unavailable" if the body is unparseable.
+  const data = (await res.json().catch(() => null)) as NewsletterResult | null;
+  return data && data.status ? data : { status: 'unavailable' };
 }
 
 export interface ValidateArgs {

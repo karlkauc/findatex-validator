@@ -177,7 +177,7 @@ public final class SettingsService {
         AppSettings.External e = s.external();
         return new AppSettings(
                 new AppSettings.External(e.enabled(), e.lei(), newIsin, e.cache()),
-                s.proxy(), s.feedback(), s.usageStats());
+                s.proxy(), s.feedback(), s.usageStats(), s.newsletter());
     }
 
     private static Path defaultPath() {

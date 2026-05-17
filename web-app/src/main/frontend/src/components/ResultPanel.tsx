@@ -8,9 +8,11 @@ import { PerFundScores } from './PerFundScores';
 
 interface Props {
   result: ValidationResponse;
+  githubRepo?: string | null;
+  appVersion: string;
 }
 
-export function ResultPanel({ result }: Props) {
+export function ResultPanel({ result, githubRepo, appVersion }: Props) {
   const overall = result.scores.find((s) => s.dimension === 'OVERALL');
   const others = result.scores.filter((s) => s.dimension !== 'OVERALL');
   const [scoresOpen, setScoresOpen] = useState(true);
@@ -64,7 +66,13 @@ export function ResultPanel({ result }: Props) {
 
       <PerFundScores perFundScores={result.perFundScores ?? []} />
 
-      <FindingsTable findings={result.findings} />
+      <FindingsTable
+        findings={result.findings}
+        githubRepo={githubRepo}
+        templateId={result.summary.templateId}
+        templateVersion={result.summary.templateVersion}
+        appVersion={appVersion}
+      />
     </div>
   );
 }

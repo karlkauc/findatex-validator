@@ -58,6 +58,9 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.desktop-download-url")
     Optional<String> desktopDownloadUrl;
 
+    @ConfigProperty(name = "findatex.web.feedback.github-repo")
+    Optional<String> feedbackGithubRepo;
+
     public RateLimit rateLimit() {
         return new RateLimit(rateLimitPerIpPerHour);
     }
@@ -81,6 +84,14 @@ public class WebConfig {
      */
     public Optional<String> desktopDownloadUrl() {
         return desktopDownloadUrl.map(String::trim).filter(s -> !s.isEmpty());
+    }
+
+    /**
+     * {@code owner/repo} slug that "report a false positive" opens a pre-filled
+     * GitHub issue against. Empty when unset — the UI then hides the action.
+     */
+    public Optional<String> feedbackGithubRepo() {
+        return feedbackGithubRepo.map(String::trim).filter(s -> !s.isEmpty());
     }
 
     public External external() {

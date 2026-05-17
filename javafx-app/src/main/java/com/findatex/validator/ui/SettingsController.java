@@ -33,6 +33,8 @@ public final class SettingsController {
     @FXML private TextField pxHost, pxPort, pxUser, pxBypass;
     @FXML private PasswordField pxPass;
 
+    @FXML private TextField feedbackRepo;
+
     @FXML
     public void initialize() {
         ToggleGroup g = new ToggleGroup();
@@ -63,6 +65,8 @@ public final class SettingsController {
         pxPass.setText(PasswordCipher.decrypt(s.proxy().manual().passwordEncrypted()));
         pxBypass.setText(s.proxy().manual().nonProxyHosts());
 
+        feedbackRepo.setText(s.feedback().githubRepo());
+
         diagnosticsLabel.setText(SystemProxyDetector.getCurrentConfig()
                 .map(c -> "Detected proxy: " + c)
                 .orElse("No system proxy detected"));
@@ -91,7 +95,8 @@ public final class SettingsController {
                                 isinEnabled.isSelected(), figiKey.getText().trim(),
                                 isinCcy.isSelected(), isinCic.isSelected()),
                         new AppSettings.Cache(ttlDays.getValue(), prev.external().cache().directory())),
-                new AppSettings.Proxy(mode, mp));
+                new AppSettings.Proxy(mode, mp),
+                new AppSettings.Feedback(feedbackRepo.getText().trim()));
     }
 
     @FXML

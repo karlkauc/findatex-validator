@@ -46,6 +46,27 @@ class SettingsServiceTest {
     }
 
     @Test
+    void legacyFileWithoutFeedbackBlockLoadsWithEmptyRepo(@TempDir Path tmp) throws Exception {
+        Path file = tmp.resolve("settings.json");
+        // A settings.json written by a pre-feedback release: no "feedback" key.
+        Files.writeString(file, "{\"external\":{\"enabled\":false},"
+                + "\"proxy\":{\"mode\":\"SYSTEM\"}}");
+        SettingsService svc = new SettingsService(file);
+        assertThat(svc.getCurrent().feedback()).isNotNull();
+        assertThat(svc.getCurrent().feedback().githubRepo()).isEmpty();
+    }
+
+    @Test
+    void feedbackRepoSurvivesRoundTrip(@TempDir Path tmp) {
+        Path file = tmp.resolve("settings.json");
+        SettingsService a = new SettingsService(file);
+        a.update(a.getCurrent().withFeedbackRepo("karlkauc/findatex-validator"));
+        SettingsService b = new SettingsService(file);
+        assertThat(b.getCurrent().feedback().githubRepo())
+                .isEqualTo("karlkauc/findatex-validator");
+    }
+
+    @Test
     void updateThrowsOnUnwritableTarget(@TempDir Path tmp) throws Exception {
         // Use a path whose parent directory we just created and made read-only.
         Path readOnlyDir = Files.createDirectory(tmp.resolve("readonly"));

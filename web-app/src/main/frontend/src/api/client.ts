@@ -1,4 +1,11 @@
-import { ApiError, BuildInfo, RateLimitStatus, TemplateInfo, ValidationResponse } from '../types/api';
+import {
+  ApiError,
+  BuildInfo,
+  FeedbackConfig,
+  RateLimitStatus,
+  TemplateInfo,
+  ValidationResponse,
+} from '../types/api';
 
 async function handle<T>(res: Response): Promise<T> {
   if (res.ok) return res.json() as Promise<T>;
@@ -24,6 +31,11 @@ export async function fetchRateLimitStatus(): Promise<RateLimitStatus> {
 export async function fetchBuildInfo(): Promise<BuildInfo> {
   const res = await fetch('/api/build-info');
   return handle<BuildInfo>(res);
+}
+
+export async function fetchFeedbackConfig(): Promise<FeedbackConfig> {
+  const res = await fetch('/api/feedback-config');
+  return handle<FeedbackConfig>(res);
 }
 
 export interface ValidateArgs {

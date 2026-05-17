@@ -1,9 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FindingDto, Severity } from '../types/api';
+import { FalsePositiveReport, isValidRepoSlug } from '../feedback/githubIssue';
+import { FeedbackModal } from './FeedbackModal';
 
 interface Props {
   findings: FindingDto[];
+  githubRepo?: string | null;
+  templateId?: string;
+  templateVersion?: string;
+  appVersion?: string;
 }
+
+type ReportContext = Omit<FalsePositiveReport, 'userComment'>;
 
 const SEVERITIES: Severity[] = ['ERROR', 'WARNING', 'INFO'];
 
@@ -48,10 +56,70 @@ function buildGroups(findings: FindingDto[]): FindingGroup[] {
   );
 }
 
-export function FindingsTable({ findings }: Props) {
+export function FindingsTable({
+  findings,
+  githubRepo,
+  templateId = '',
+  templateVersion = '',
+  appVersion = 'web',
+}: Props) {
   const [enabled, setEnabled] = useState<Set<Severity>>(new Set(SEVERITIES));
   const [query, setQuery] = useState('');
   const [grouped, setGrouped] = useState(false);
+  const [reportCtx, setReportCtx] = useState<ReportContext | null>(null);
+
+  const feedbackEnabled = isValidRepoSlug(githubRepo);
+  const extraCol = feedbackEnabled ? 1 : 0;
+
+  const reportFromFinding = (f: FindingDto): ReportContext => ({
+    templateId,
+    templateVersion,
+    severity: f.severity,
+    ruleId: f.ruleId,
+    profile: f.profileDisplayName ?? f.profileCode,
+    fieldNum: f.fieldNum,
+    fieldName: f.fieldName,
+    value: f.value,
+    message: f.message,
+    portfolioId: f.portfolioId,
+    portfolioName: f.portfolioName,
+    valuationDate: f.valuationDate,
+    instrumentCode: f.instrumentCode,
+    instrumentName: f.instrumentName,
+    valuationWeight: f.valuationWeight,
+    appVersion,
+  });
+
+  const reportFromGroup = (g: FindingGroup): ReportContext => ({
+    templateId,
+    templateVersion,
+    severity: g.severity,
+    ruleId: g.ruleId,
+    profile: null,
+    fieldNum: g.fieldNum,
+    fieldName: g.fieldName,
+    value: null,
+    message: g.sampleMessage,
+    portfolioId: null,
+    portfolioName: null,
+    valuationDate: null,
+    instrumentCode: null,
+    instrumentName: null,
+    valuationWeight: null,
+    appVersion,
+  });
+
+  const ReportCell = ({ ctx }: { ctx: ReportContext }) => (
+    <td className="whitespace-nowrap px-3 py-2 align-top">
+      <button
+        type="button"
+        onClick={() => setReportCtx(ctx)}
+        className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500"
+      >
+        Report
+      </button>
+    </td>
+  );
 
   // Double-scrollbar pattern: a thin scroll strip above the table mirrors the
   // table's natural width, so users at the top of the page can see (and use)
@@ -194,6 +262,7 @@ export function FindingsTable({ findings }: Props) {
                 <th className="whitespace-nowrap px-3 py-2 font-medium">Field name</th>
                 <th className="whitespace-nowrap px-3 py-2 font-medium text-right">Occurrences</th>
                 <th className="px-3 py-2 font-medium">Sample message</th>
+                {feedbackEnabled && <th className="px-3 py-2 font-medium">Report</th>}
               </tr>
             </thead>
             <tbody>
@@ -213,11 +282,12 @@ export function FindingsTable({ findings }: Props) {
                   <td className="whitespace-normal break-words px-3 py-2 align-top text-slate-700">
                     {g.sampleMessage}
                   </td>
+                  {feedbackEnabled && <ReportCell ctx={reportFromGroup(g)} />}
                 </tr>
               ))}
               {groups.length === 0 && (
                 <tr>
-                  <td colSpan={GROUPED_COLUMN_COUNT} className="px-4 py-6 text-center text-sm text-slate-500">
+                  <td colSpan={GROUPED_COLUMN_COUNT + extraCol} className="px-4 py-6 text-center text-sm text-slate-500">
                     No findings for the current selection.
                   </td>
                 </tr>
@@ -241,6 +311,7 @@ export function FindingsTable({ findings }: Props) {
                 <th className="whitespace-nowrap px-3 py-2 font-medium">Field</th>
                 <th className="whitespace-nowrap px-3 py-2 font-medium">Field name</th>
                 <th className="px-3 py-2 font-medium">Message</th>
+                {feedbackEnabled && <th className="px-3 py-2 font-medium">Report</th>}
               </tr>
             </thead>
             <tbody>
@@ -279,11 +350,12 @@ export function FindingsTable({ findings }: Props) {
                   </td>
                   <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">{f.fieldName ?? ''}</td>
                   <td className="whitespace-normal break-words px-3 py-2 align-top text-slate-700">{f.message}</td>
+                  {feedbackEnabled && <ReportCell ctx={reportFromFinding(f)} />}
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={FLAT_COLUMN_COUNT} className="px-4 py-6 text-center text-sm text-slate-500">
+                  <td colSpan={FLAT_COLUMN_COUNT + extraCol} className="px-4 py-6 text-center text-sm text-slate-500">
                     No findings for the current selection.
                   </td>
                 </tr>
@@ -292,6 +364,14 @@ export function FindingsTable({ findings }: Props) {
           </table>
         )}
       </div>
+      {feedbackEnabled && (
+        <FeedbackModal
+          open={reportCtx !== null}
+          onClose={() => setReportCtx(null)}
+          githubRepo={(githubRepo as string)?.trim()}
+          report={reportCtx}
+        />
+      )}
     </div>
   );
 }

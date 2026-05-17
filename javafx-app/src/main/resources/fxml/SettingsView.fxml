@@ -77,5 +77,20 @@
         </VBox>
       </content>
     </Tab>
+
+    <Tab text="Feedback">
+      <content>
+        <VBox spacing="10">
+          <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+          <TitledPane text="Report a false positive" collapsible="false">
+            <VBox spacing="6">
+              <Label text="GitHub repository (owner/repo) that false-positive reports open an issue against:"/>
+              <TextField fx:id="feedbackRepo" promptText="e.g. karlkauc/findatex-validator" prefColumnCount="40"/>
+              <Label text="Leave empty to hide the report action. No data is sent automatically — &#10;the issue opens pre-filled in your browser and you submit it yourself." wrapText="true"/>
+            </VBox>
+          </TitledPane>
+        </VBox>
+      </content>
+    </Tab>
   </tabs>
 </TabPane>

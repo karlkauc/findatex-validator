@@ -10,6 +10,7 @@ import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.config.SettingsService;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.external.ExternalValidationConfig;
+import com.findatex.validator.feedback.GitHubIssueLink;
 import com.findatex.validator.external.ExternalValidationService;
 import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.report.CombinedXlsxReportWriter;
@@ -26,6 +27,7 @@ import com.findatex.validator.template.api.TemplateVersion;
 import com.findatex.validator.ui.notification.Toast;
 import com.findatex.validator.ui.notification.ToastInfo;
 import com.findatex.validator.validation.Finding;
+import com.findatex.validator.validation.FindingContext;
 import com.findatex.validator.validation.FindingEnricher;
 import com.findatex.validator.validation.Severity;
 import com.findatex.validator.validation.ValidationEngine;
@@ -184,6 +186,8 @@ public final class TemplateTabController {
     @FXML private CheckBox filterWarnings;
     @FXML private CheckBox filterInfo;
     @FXML private CheckBox groupByError;
+    @FXML private Button reportFpButton;
+    @FXML private MenuItem reportFpMenuItem;
     @FXML private Label findingCountLabel;
     @FXML private TableView<FindingRow> findingsTable;
     @FXML private TableColumn<FindingRow, String> colSeverity;
@@ -313,6 +317,12 @@ public final class TemplateTabController {
         filterWarnings.selectedProperty().addListener((o, a, b) -> applyFilters());
         filterInfo.selectedProperty().addListener((o, a, b) -> applyFilters());
         groupByError.selectedProperty().addListener((o, a, b) -> applyGrouping(b));
+
+        // "Report a false positive" acts on the selected findings row; it stays disabled
+        // until a row is picked. Repo-not-configured is handled at click time with a hint.
+        findingsTable.getSelectionModel().selectedItemProperty()
+                .addListener((o, was, is) -> updateReportFpState(is));
+        updateReportFpState(null);
 
         filePathField.textProperty().addListener((o, a, b) ->
                 validateButton.setDisable(b == null || b.trim().isEmpty()));
@@ -1102,6 +1112,58 @@ public final class TemplateTabController {
         applyFilters();
     }
 
+    // ===== Report a false positive ==========================================
+
+    private void updateReportFpState(FindingRow sel) {
+        boolean enabled = sel != null;
+        if (reportFpButton != null) reportFpButton.setDisable(!enabled);
+        if (reportFpMenuItem != null) reportFpMenuItem.setDisable(!enabled);
+    }
+
+    @FXML
+    private void onReportFalsePositive(ActionEvent e) {
+        FindingRow sel = findingsTable.getSelectionModel().getSelectedItem();
+        if (sel == null || sel.source() == null) return;
+        String repo = SettingsService.getInstance().getCurrent().feedback().githubRepo();
+        if (!GitHubIssueLink.isValidRepoSlug(repo)) {
+            Alert a = new Alert(Alert.AlertType.INFORMATION,
+                    "No GitHub repository is configured for feedback.\n\n"
+                    + "Open Settings → Feedback and enter an \"owner/repo\" slug "
+                    + "(e.g. karlkauc/findatex-validator) to enable reporting.");
+            a.setHeaderText("Feedback not configured");
+            a.showAndWait();
+            return;
+        }
+        FeedbackDialog.show(stage, repo, buildReport(sel.source(), ""));
+    }
+
+    private GitHubIssueLink.FalsePositiveReport buildReport(Finding f, String comment) {
+        FindingContext c = f.context() == null ? FindingContext.EMPTY : f.context();
+        return new GitHubIssueLink.FalsePositiveReport(
+                template.id().name(),
+                selectedVersion.version(),
+                f.severity().name(),
+                f.ruleId(),
+                f.profile() == null ? "" : f.profile().displayName(),
+                f.fieldNum(),
+                f.fieldName(),
+                f.value(),
+                f.message(),
+                c.portfolioId(),
+                c.portfolioName(),
+                c.valuationDate(),
+                c.instrumentCode(),
+                c.instrumentName(),
+                c.valuationWeight(),
+                appVersion(),
+                comment);
+    }
+
+    private static String appVersion() {
+        String v = com.findatex.validator.App.class.getPackage().getImplementationVersion();
+        return v == null || v.isBlank() ? "desktop (dev build)" : v;
+    }
+
     /**
      * Aggregates findings into one row per (severity, ruleId, fieldNum) bucket. The bucket's
      * message is the first encountered finding's message (the rest are duplicate noise the user
@@ -1229,8 +1291,11 @@ public final class TemplateTabController {
         private final String fieldName;
         private final String count;
         private final String message;
+        /** Originating finding, kept so "Report a false positive" can rebuild full context. */
+        private final Finding source;
 
         private FindingRow(Finding f) {
+            this.source = f;
             com.findatex.validator.validation.FindingContext c =
                     f.context() == null ? com.findatex.validator.validation.FindingContext.EMPTY : f.context();
             this.severity       = f.severity().name();
@@ -1250,6 +1315,7 @@ public final class TemplateTabController {
         }
 
         private FindingRow(Finding first, int bucketCount) {
+            this.source         = first;
             this.severity       = first.severity().name();
             this.profile        = "";
             this.fundId         = "";
@@ -1296,5 +1362,6 @@ public final class TemplateTabController {
         public String getFieldName()      { return fieldName; }
         public String getCount()          { return count; }
         public String getMessage()        { return message; }
+        Finding source()                  { return source; }
     }
 }

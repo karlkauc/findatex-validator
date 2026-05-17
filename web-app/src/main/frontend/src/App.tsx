@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HelpCircle, Info, Loader2, ShieldCheck } from 'lucide-react';
-import { fetchBuildInfo, fetchRateLimitStatus, fetchTemplates, validateUpload } from './api/client';
+import {
+  fetchBuildInfo,
+  fetchFeedbackConfig,
+  fetchRateLimitStatus,
+  fetchTemplates,
+  validateUpload,
+} from './api/client';
 import { TemplatePicker } from './components/TemplatePicker';
 import { ProfileSelector } from './components/ProfileSelector';
 import { FileUpload } from './components/FileUpload';
@@ -27,6 +33,13 @@ export default function App() {
   const buildInfoQuery = useQuery({
     queryKey: ['build-info'],
     queryFn: fetchBuildInfo,
+    staleTime: Infinity,
+    retry: false,
+  });
+
+  const feedbackConfigQuery = useQuery({
+    queryKey: ['feedback-config'],
+    queryFn: fetchFeedbackConfig,
     staleTime: Infinity,
     retry: false,
   });
@@ -230,7 +243,15 @@ export default function App() {
               <QuotaExhaustedNotice />
               {validateMutation.isError && <ErrorBanner error={validateMutation.error} />}
               {result ? (
-                <ResultPanel result={result} />
+                <ResultPanel
+                  result={result}
+                  githubRepo={feedbackConfigQuery.data?.githubRepo ?? null}
+                  appVersion={
+                    buildInfoQuery.data?.version
+                      ? `web v${buildInfoQuery.data.version}`
+                      : 'web'
+                  }
+                />
               ) : (
                 <div className="card">
                   <div className="card-body text-center text-sm text-slate-500">

@@ -61,6 +61,8 @@ validation engine is exactly the same.
 4. Click **Validieren**. You get findings on screen and a download
    link for the Excel report.
 
+![Animated walkthrough: pick template and profile, upload a file, validate, then group the findings by error](docs/screenshots/web-app-demo.gif)
+
 The hosted instance has no login. Files are processed in memory and
 discarded the moment the response is sent; the report download link
 is single-use and expires after 5 minutes.

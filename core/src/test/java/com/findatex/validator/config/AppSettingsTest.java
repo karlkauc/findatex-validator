@@ -28,4 +28,30 @@ class AppSettingsTest {
         assertThat(s.external().enabled()).isFalse();
         assertThat(s2.external().enabled()).isTrue();
     }
+
+    @Test
+    void newsletterDefaultsToEmptyEndpoint() {
+        assertThat(AppSettings.defaults().newsletter().endpointUrl()).isEmpty();
+    }
+
+    @Test
+    void legacyConstructorsLeaveNewsletterNonNull() {
+        AppSettings s = new AppSettings(
+                AppSettings.defaults().external(), AppSettings.defaults().proxy());
+        assertThat(s.newsletter()).isNotNull();
+        assertThat(s.newsletter().endpointUrl()).isEmpty();
+    }
+
+    @Test
+    void withersPreserveNewsletterEndpoint() {
+        AppSettings s = AppSettings.defaults()
+                .withNewsletterEndpoint("https://validator.example.org");
+        // The other withers must not drop the newsletter block.
+        assertThat(s.withExternalEnabled(true).newsletter().endpointUrl())
+                .isEqualTo("https://validator.example.org");
+        assertThat(s.withFeedbackRepo("a/b").newsletter().endpointUrl())
+                .isEqualTo("https://validator.example.org");
+        assertThat(s.withUsageStatsEnabled(false).newsletter().endpointUrl())
+                .isEqualTo("https://validator.example.org");
+    }
 }

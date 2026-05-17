@@ -93,15 +93,37 @@
       </content>
     </Tab>
 
-    <Tab text="Statistik">
+    <Tab text="Newsletter">
       <content>
         <VBox spacing="10">
           <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
-          <TitledPane text="Anonyme Nutzungsstatistik" collapsible="false">
+          <TitledPane text="Subscribe to the newsletter" collapsible="false">
             <VBox spacing="6">
-              <CheckBox fx:id="usageEnabled" text="Anonyme Nutzungsstatistik senden (keine Daten/Dateien)"/>
-              <Label text="Es werden ausschließlich aggregierte Lauf-Zahlen übertragen (Template/Version, &#10;Anzahl Findings nach Schweregrad, Score, Dauer). Niemals Dateien, Dateinamen, &#10;Zellinhalte, Fonds-/Instrument-Kennungen oder Ihre IP-Adresse. Deaktivieren &#10;stoppt jede Übertragung. Details: docs/USAGE_STATS.md" wrapText="true"/>
-              <Label text="Anonyme Installations-ID (kein Personen-/Maschinenbezug):"/>
+              <Label text="Email address:"/>
+              <HBox spacing="6">
+                <TextField fx:id="newsletterEmail" promptText="name@example.com" prefColumnCount="32"/>
+                <Button fx:id="newsletterSubscribe" text="Subscribe" onAction="#onSubscribeNewsletter"/>
+              </HBox>
+              <Label fx:id="newsletterResult" wrapText="true"/>
+              <Label text="Double opt-in: you will receive a confirmation email. Your address is &#10;forwarded only to our newsletter provider (not stored in this app). &#10;Unsubscribe anytime via the link in every email." wrapText="true"/>
+              <Separator/>
+              <Label text="Web app endpoint URL (empty = feature disabled):"/>
+              <TextField fx:id="newsletterEndpoint" promptText="https://validator.example.org" prefColumnCount="40"/>
+            </VBox>
+          </TitledPane>
+        </VBox>
+      </content>
+    </Tab>
+
+    <Tab text="Statistics">
+      <content>
+        <VBox spacing="10">
+          <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+          <TitledPane text="Anonymous usage statistics" collapsible="false">
+            <VBox spacing="6">
+              <CheckBox fx:id="usageEnabled" text="Send anonymous usage statistics (no data/files)"/>
+              <Label text="Only aggregate run figures are transmitted (template/version, finding &#10;counts by severity, score, duration). Never files, file names, cell &#10;contents, fund/instrument identifiers, or your IP address. Disabling &#10;stops all transmission. Details: docs/USAGE_STATS.md" wrapText="true"/>
+              <Label text="Anonymous installation ID (no personal/machine binding):"/>
               <TextField fx:id="usageInstallId" editable="false" focusTraversable="false" prefColumnCount="40"/>
             </VBox>
           </TitledPane>

@@ -190,6 +190,8 @@ REST endpoints (all under `/api`):
 - `GET  /api/report/{uuid}` — streams the XLSX once, then evicts the temp file
 - `GET  /api/feedback-config` — `{githubRepo}` (null when unset); drives the
   "Report a false positive" action
+- `POST /api/newsletter/subscribe` — `{email}` → `{status}`; `GET
+  /api/newsletter-config` — `{enabled}` (drives whether the SPA shows the form)
 
 **Misbrauch-Schutz** (configurable via `FINDATEX_WEB_*` env vars; defaults in
 `web-app/src/main/resources/application.properties`):
@@ -231,6 +233,19 @@ still boot). `country_code` is derived server-side from the request IP
 Opt-out: desktop Settings → Statistik (`AppSettings.UsageStats`); the install
 id is generated and persisted by `SettingsService`. Full schema, env vars and
 psql ops in `docs/USAGE_STATS.md`. Never add instance data to `UsageEvent`.
+
+**Newsletter sign-up (external provider)** — user-initiated, so **synchronous
+with a clear result** (not fire-and-forget). The e-mail is **never stored in
+our DB or logs**: it is forwarded to an external provider (MailerLite default;
+`NewsletterProvider` seam, EmailOctopus documented) which owns double-opt-in,
+unsubscribe and deletion. Desktop never holds the API key — `core/.../newsletter/
+NewsletterClient` (proxy/NTLM-aware, shares `NewsletterStatus`/`EmailAddress`
+with the web layer) POSTs to `POST /api/newsletter/subscribe`; the web
+`NewsletterService`→provider is the only API-key holder. **Inert with no
+`FINDATEX_WEB_NEWSLETTER_API_KEY`** (POST → 503, SPA hides the form via
+`GET /api/newsletter-config`). Strict per-IP rate limit (anti e-mail-bombing).
+Desktop endpoint URL: Settings → Newsletter (`AppSettings.Newsletter`). Full
+setup, GDPR/DPA notes and the EmailOctopus variant in `docs/NEWSLETTER.md`.
 
 The React frontend lives in `web-app/src/main/frontend/`. Vite writes the
 production bundle into `web-app/target/classes/META-INF/resources/`, which

@@ -49,11 +49,14 @@ public class RateLimitService {
 
     private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Bucket> usageBuckets = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Bucket> newsletterBuckets = new ConcurrentHashMap<>();
     private final AtomicBoolean unknownWarned = new AtomicBoolean(false);
     private int capacityPerHour;
     private Duration refillInterval;
     private int usageCapacityPerHour;
     private Duration usageRefillInterval;
+    private int newsletterCapacityPerHour;
+    private Duration newsletterRefillInterval;
 
     @PostConstruct
     void init() {
@@ -63,9 +66,13 @@ public class RateLimitService {
         usageCapacityPerHour = Math.max(1, config.usageStats().ratePerIpPerHour());
         long usageRefillSeconds = Math.max(1, 3600L / usageCapacityPerHour);
         usageRefillInterval = Duration.ofSeconds(usageRefillSeconds);
+        newsletterCapacityPerHour = Math.max(1, config.newsletter().ratePerIpPerHour());
+        long newsletterRefillSeconds = Math.max(1, 3600L / newsletterCapacityPerHour);
+        newsletterRefillInterval = Duration.ofSeconds(newsletterRefillSeconds);
         log.info("Rate limit configured: {} req/hour per IP for /api/validate, "
-                        + "{} req/hour per IP for /api/usage-stats",
-                capacityPerHour, usageCapacityPerHour);
+                        + "{} req/hour per IP for /api/usage-stats, "
+                        + "{} req/hour per IP for /api/newsletter",
+                capacityPerHour, usageCapacityPerHour, newsletterCapacityPerHour);
     }
 
     /** Separate, more generous bucket for the lightweight usage-stats ingest. */
@@ -74,6 +81,15 @@ public class RateLimitService {
                 k -> Bucket.builder().addLimit(Bandwidth.classic(
                         usageCapacityPerHour,
                         Refill.intervally(1, usageRefillInterval))).build())
+                .tryConsumeAndReturnRemaining(1);
+    }
+
+    /** Separate, strict bucket for newsletter sign-up (anti e-mail-bombing). */
+    public ConsumptionProbe consumeNewsletter(String clientIp) {
+        return newsletterBuckets.computeIfAbsent(normaliseKey(clientIp),
+                k -> Bucket.builder().addLimit(Bandwidth.classic(
+                        newsletterCapacityPerHour,
+                        Refill.intervally(1, newsletterRefillInterval))).build())
                 .tryConsumeAndReturnRemaining(1);
     }
 

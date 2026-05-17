@@ -73,6 +73,18 @@ public class WebConfig {
     @ConfigProperty(name = "quarkus.datasource.jdbc.url")
     Optional<String> usageDbUrl;
 
+    @ConfigProperty(name = "findatex.web.newsletter.provider", defaultValue = "mailerlite")
+    String newsletterProvider;
+
+    @ConfigProperty(name = "findatex.web.newsletter.api-key")
+    Optional<String> newsletterApiKey;
+
+    @ConfigProperty(name = "findatex.web.newsletter.group-id")
+    Optional<String> newsletterGroupId;
+
+    @ConfigProperty(name = "findatex.web.newsletter.rate-per-ip-per-hour", defaultValue = "5")
+    int newsletterRatePerIpPerHour;
+
     public RateLimit rateLimit() {
         return new RateLimit(rateLimitPerIpPerHour);
     }
@@ -119,6 +131,20 @@ public class WebConfig {
                 usageDbUrl.map(String::trim).filter(s -> !s.isEmpty()).isPresent());
     }
 
+    /**
+     * Newsletter sign-up config. {@code apiKey} empty ⇒ feature inert (endpoint
+     * 503, SPA hides the form). The address is forwarded to the provider and
+     * never persisted here.
+     */
+    public Newsletter newsletter() {
+        return new Newsletter(
+                newsletterProvider == null || newsletterProvider.isBlank()
+                        ? "mailerlite" : newsletterProvider.trim().toLowerCase(),
+                newsletterApiKey.map(String::trim).filter(s -> !s.isEmpty()),
+                newsletterGroupId.map(String::trim).filter(s -> !s.isEmpty()),
+                Math.max(1, newsletterRatePerIpPerHour));
+    }
+
     public External external() {
         return new External(
                 externalEnabled,
@@ -143,6 +169,12 @@ public class WebConfig {
     }
 
     public record Report(int ttlMinutes) {
+    }
+
+    public record Newsletter(String provider,
+                             Optional<String> apiKey,
+                             Optional<String> groupId,
+                             int ratePerIpPerHour) {
     }
 
     public record External(

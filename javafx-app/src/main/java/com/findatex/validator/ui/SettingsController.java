@@ -8,6 +8,9 @@ import com.findatex.validator.external.openfigi.OpenFigiClient;
 import com.findatex.validator.external.proxy.ProxyConfig;
 import com.findatex.validator.external.proxy.ProxyService;
 import com.findatex.validator.external.proxy.SystemProxyDetector;
+import com.findatex.validator.newsletter.NewsletterClient;
+import com.findatex.validator.newsletter.NewsletterStatus;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -37,6 +40,10 @@ public final class SettingsController {
 
     @FXML private CheckBox usageEnabled;
     @FXML private TextField usageInstallId;
+
+    @FXML private TextField newsletterEmail, newsletterEndpoint;
+    @FXML private Button newsletterSubscribe;
+    @FXML private Label newsletterResult;
 
     @FXML
     public void initialize() {
@@ -73,6 +80,8 @@ public final class SettingsController {
         usageEnabled.setSelected(s.usageStats().enabled());
         usageInstallId.setText(s.usageStats().installId());
 
+        newsletterEndpoint.setText(s.newsletter().endpointUrl());
+
         diagnosticsLabel.setText(SystemProxyDetector.getCurrentConfig()
                 .map(c -> "Detected proxy: " + c)
                 .orElse("No system proxy detected"));
@@ -107,7 +116,47 @@ public final class SettingsController {
                 new AppSettings.UsageStats(
                         usageEnabled.isSelected(),
                         prevUsage.installId(),
-                        prevUsage.endpointUrl()));
+                        prevUsage.endpointUrl()),
+                new AppSettings.Newsletter(newsletterEndpoint.getText().trim()));
+    }
+
+    @FXML
+    private void onSubscribeNewsletter() {
+        String endpoint = newsletterEndpoint.getText().trim();
+        String email = newsletterEmail.getText().trim();
+        newsletterResult.setText("");
+        newsletterSubscribe.setDisable(true);
+
+        Task<NewsletterStatus> task = new Task<>() {
+            @Override
+            protected NewsletterStatus call() {
+                return new NewsletterClient().subscribe(endpoint, email);
+            }
+        };
+        task.setOnSucceeded(ev -> {
+            newsletterSubscribe.setDisable(false);
+            newsletterResult.setText(newsletterMessage(task.getValue()));
+        });
+        task.setOnFailed(ev -> {
+            // NewsletterClient never throws, but be defensive about the Task itself.
+            newsletterSubscribe.setDisable(false);
+            newsletterResult.setText(newsletterMessage(NewsletterStatus.UNAVAILABLE));
+        });
+        Thread t = new Thread(task, "newsletter-subscribe");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private static String newsletterMessage(NewsletterStatus status) {
+        return switch (status) {
+            case PENDING, ALREADY_PENDING ->
+                    "Almost done — please confirm the link in the email we sent.";
+            case SUBSCRIBED -> "You are subscribed. Thank you!";
+            case ALREADY_SUBSCRIBED -> "You are already subscribed.";
+            case INVALID_EMAIL -> "Please enter a valid email address.";
+            case UNAVAILABLE ->
+                    "Sign-up is not possible right now. Please try again later.";
+        };
     }
 
     @FXML

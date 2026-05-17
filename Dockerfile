@@ -52,13 +52,15 @@ FROM eclipse-temurin:25-jdk-alpine AS jre-build
 #   java.net.http          j.n.h.HttpClient (used by Quarkus internals)
 #   java.security.jgss/sasl, jdk.crypto.cryptoki/.ec   TLS
 #   java.sql               required by transitively-loaded JDBC stubs even when unused
+#   java.rmi               Agroal/SmallRye Context Propagation reference
+#                          java.rmi.RemoteException at boot (usage-stats DB stack)
 #   java.xml/.crypto       POI XML
 #   jdk.unsupported        Netty needs sun.misc.Unsafe
 #   jdk.zipfs              POI's OPC packages
 #   jdk.management/.jfr    JMX + Flight Recorder
 #   java.instrument        Quarkus class transformation
 RUN $JAVA_HOME/bin/jlink \
-    --add-modules java.base,java.logging,java.desktop,java.management,java.naming,java.net.http,java.security.jgss,java.security.sasl,java.sql,java.xml,java.xml.crypto,java.instrument,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.unsupported,jdk.zipfs,jdk.management,jdk.naming.dns,jdk.jfr,jdk.localedata \
+    --add-modules java.base,java.logging,java.desktop,java.management,java.naming,java.net.http,java.rmi,java.security.jgss,java.security.sasl,java.sql,java.xml,java.xml.crypto,java.instrument,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.unsupported,jdk.zipfs,jdk.management,jdk.naming.dns,jdk.jfr,jdk.localedata \
     --include-locales=en,de \
     --strip-debug --no-man-pages --no-header-files \
     --compress=zip-6 \

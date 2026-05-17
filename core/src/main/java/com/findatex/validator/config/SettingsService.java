@@ -36,19 +36,33 @@ public final class SettingsService {
         // non-deterministic — random IV per call).
         boolean migrated = legacyMigrationDetected;
         legacyMigrationDetected = false;
+        boolean installGenerated = usageInstallGenerated;
+        usageInstallGenerated = false;
         this.current = loaded;
-        if (migrated && loaded != null) {
+        // Persist eagerly when either (a) a legacy plaintext OpenFIGI key was
+        // found (rewrite so plaintext stops sitting on disk), or (b) the
+        // anonymous usage-stats install id was just generated (so it stays
+        // stable across runs instead of changing every launch).
+        if ((migrated || installGenerated) && loaded != null) {
             try {
                 update(loaded);
-                log.info("Migrated legacy plaintext OpenFIGI key to encrypted form in {}", file);
+                if (migrated) {
+                    log.info("Migrated legacy plaintext OpenFIGI key to encrypted form in {}", file);
+                }
+                if (installGenerated) {
+                    log.info("Generated and persisted anonymous usage-stats install id in {}", file);
+                }
             } catch (RuntimeException e) {
-                log.warn("Could not auto-rewrite settings after legacy-key migration: {}", e.toString());
+                log.warn("Could not auto-rewrite settings after migration: {}", e.toString());
             }
         }
     }
 
     /** Set transiently by {@link #decryptOpenFigiKey(AppSettings)} when a legacy plaintext key was observed. */
     private volatile boolean legacyMigrationDetected;
+
+    /** Set transiently by {@link #load()} when the usage-stats install id had to be generated. */
+    private volatile boolean usageInstallGenerated;
 
     public static SettingsService getInstance() {
         SettingsService local = instance;
@@ -95,9 +109,26 @@ public final class SettingsService {
     }
 
     private AppSettings load() {
-        if (!Files.exists(file)) return AppSettings.defaults();
+        if (!Files.exists(file)) {
+            // First run: defaults() mints a fresh install id — persist it so the
+            // anonymous id stays stable across launches.
+            usageInstallGenerated = true;
+            return AppSettings.defaults();
+        }
         try {
-            AppSettings raw = MAPPER.readValue(file.toFile(), AppSettings.class);
+            com.fasterxml.jackson.databind.JsonNode tree = MAPPER.readTree(file.toFile());
+            if (tree == null || tree.isNull()) {
+                usageInstallGenerated = true;
+                return AppSettings.defaults();
+            }
+            // Detect a missing/blank install id BEFORE AppSettings' compact ctor
+            // regenerates it, so we know to persist the freshly minted value.
+            com.fasterxml.jackson.databind.JsonNode idNode =
+                    tree.path("usageStats").path("installId");
+            if (idNode.isMissingNode() || idNode.isNull() || idNode.asText("").isBlank()) {
+                usageInstallGenerated = true;
+            }
+            AppSettings raw = MAPPER.treeToValue(tree, AppSettings.class);
             return raw == null ? AppSettings.defaults() : decryptOpenFigiKey(raw);
         } catch (IOException e) {
             log.warn("Could not read settings from {} ({}); using defaults", file, e.getMessage());
@@ -146,7 +177,7 @@ public final class SettingsService {
         AppSettings.External e = s.external();
         return new AppSettings(
                 new AppSettings.External(e.enabled(), e.lei(), newIsin, e.cache()),
-                s.proxy(), s.feedback());
+                s.proxy(), s.feedback(), s.usageStats());
     }
 
     private static Path defaultPath() {

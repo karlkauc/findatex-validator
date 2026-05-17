@@ -35,6 +35,9 @@ public final class SettingsController {
 
     @FXML private TextField feedbackRepo;
 
+    @FXML private CheckBox usageEnabled;
+    @FXML private TextField usageInstallId;
+
     @FXML
     public void initialize() {
         ToggleGroup g = new ToggleGroup();
@@ -67,6 +70,9 @@ public final class SettingsController {
 
         feedbackRepo.setText(s.feedback().githubRepo());
 
+        usageEnabled.setSelected(s.usageStats().enabled());
+        usageInstallId.setText(s.usageStats().installId());
+
         diagnosticsLabel.setText(SystemProxyDetector.getCurrentConfig()
                 .map(c -> "Detected proxy: " + c)
                 .orElse("No system proxy detected"));
@@ -85,6 +91,7 @@ public final class SettingsController {
                 pxBypass.getText().trim());
 
         AppSettings prev = SettingsService.getInstance().getCurrent();
+        AppSettings.UsageStats prevUsage = prev.usageStats();
         return new AppSettings(
                 new AppSettings.External(
                         prev.external().enabled(),
@@ -96,7 +103,11 @@ public final class SettingsController {
                                 isinCcy.isSelected(), isinCic.isSelected()),
                         new AppSettings.Cache(ttlDays.getValue(), prev.external().cache().directory())),
                 new AppSettings.Proxy(mode, mp),
-                new AppSettings.Feedback(feedbackRepo.getText().trim()));
+                new AppSettings.Feedback(feedbackRepo.getText().trim()),
+                new AppSettings.UsageStats(
+                        usageEnabled.isSelected(),
+                        prevUsage.installId(),
+                        prevUsage.endpointUrl()));
     }
 
     @FXML

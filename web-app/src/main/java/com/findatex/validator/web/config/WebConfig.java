@@ -61,6 +61,18 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.feedback.github-repo")
     Optional<String> feedbackGithubRepo;
 
+    @ConfigProperty(name = "findatex.web.usage-stats.ingest-token")
+    Optional<String> usageStatsIngestToken;
+
+    @ConfigProperty(name = "findatex.web.usage-stats.rate-per-ip-per-hour", defaultValue = "60")
+    int usageStatsRatePerIpPerHour;
+
+    @ConfigProperty(name = "findatex.web.usage-stats.geoip-db")
+    Optional<String> usageStatsGeoipDb;
+
+    @ConfigProperty(name = "quarkus.datasource.jdbc.url")
+    Optional<String> usageDbUrl;
+
     public RateLimit rateLimit() {
         return new RateLimit(rateLimitPerIpPerHour);
     }
@@ -94,6 +106,19 @@ public class WebConfig {
         return feedbackGithubRepo.map(String::trim).filter(s -> !s.isEmpty());
     }
 
+    /**
+     * Anonymous usage-stats config. {@code ingestToken} empty => endpoint
+     * accepts-and-discards (feature off). {@code dbConfigured} reflects whether
+     * a JDBC URL is present at all (drives the inert-when-unconfigured path).
+     */
+    public UsageStats usageStats() {
+        return new UsageStats(
+                usageStatsIngestToken.map(String::trim).filter(s -> !s.isEmpty()),
+                Math.max(1, usageStatsRatePerIpPerHour),
+                usageStatsGeoipDb.map(String::trim).filter(s -> !s.isEmpty()),
+                usageDbUrl.map(String::trim).filter(s -> !s.isEmpty()).isPresent());
+    }
+
     public External external() {
         return new External(
                 externalEnabled,
@@ -109,6 +134,12 @@ public class WebConfig {
     }
 
     public record RateLimit(int perIpPerHour) {
+    }
+
+    public record UsageStats(Optional<String> ingestToken,
+                             int ratePerIpPerHour,
+                             Optional<String> geoipDbPath,
+                             boolean dbConfigured) {
     }
 
     public record Report(int ttlMinutes) {

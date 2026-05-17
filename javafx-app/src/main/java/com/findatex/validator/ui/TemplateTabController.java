@@ -20,6 +20,8 @@ import com.findatex.validator.report.QualityScorer;
 import com.findatex.validator.report.ScoreCategory;
 import com.findatex.validator.report.XlsxReportWriter;
 import com.findatex.validator.spec.SpecCatalog;
+import com.findatex.validator.stats.UsageEvent;
+import com.findatex.validator.stats.UsageStatsReporter;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.TemplateDefinition;
 import com.findatex.validator.template.api.TemplateRuleSet;
@@ -606,6 +608,7 @@ public final class TemplateTabController {
                 return new QualityScorer(cat).score(file, gatedProfiles, findings);
             }
         };
+        final long t0 = System.nanoTime();
         task.setOnSucceeded(ev -> {
             if (pCtrl != null) pCtrl.close();
             QualityReport report = task.getValue();
@@ -614,6 +617,9 @@ public final class TemplateTabController {
             fileRows.setAll(FileRow.fromSingleReport(path, report));
             filesTable.getSelectionModel().select(0);
             renderReport(report);
+            UsageStatsReporter.getInstance().report(UsageEvent.from(
+                    report, template, selectedVersion, settings, "single",
+                    Duration.ofNanos(System.nanoTime() - t0).toMillis()));
             long extIssues = report.findings().stream()
                     .filter(f -> f.ruleId().startsWith("EXTERNAL/")).count();
             if (extIssues > 0) {
@@ -729,6 +735,9 @@ public final class TemplateTabController {
             exportCombinedItem.setDisable(false);
             exportCombinedWithSourceItem.setDisable(!hasOk);
             renderBatchHeader(summary);
+            UsageStatsReporter.getInstance().report(UsageEvent.fromBatch(
+                    summary, template, selectedVersion, settings,
+                    summary.totalElapsed().toMillis()));
             // Auto-select first OK row to populate the detail panes; leaving the table
             // selection-less also leaves scorePane and findings empty, which is confusing.
             int firstOk = -1;

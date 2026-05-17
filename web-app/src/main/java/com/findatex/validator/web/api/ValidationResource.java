@@ -2,13 +2,16 @@ package com.findatex.validator.web.api;
 
 import com.findatex.validator.web.dto.ExternalOptions;
 import com.findatex.validator.web.dto.ValidationResponse;
+import com.findatex.validator.web.service.GeoIpService;
 import com.findatex.validator.web.service.ValidationOrchestrator;
+import io.vertx.core.http.HttpServerRequest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.reactive.RestForm;
@@ -25,6 +28,12 @@ public class ValidationResource {
 
     @Inject
     ValidationOrchestrator orchestrator;
+
+    @Inject
+    GeoIpService geoIp;
+
+    @Context
+    HttpServerRequest request;
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -68,8 +77,18 @@ public class ValidationResource {
                         .map(String::trim)
                         .filter(s -> !s.isEmpty()));
 
+        String country = null;
+        try {
+            if (request != null && request.remoteAddress() != null) {
+                country = geoIp.countryFor(request.remoteAddress().host());
+            }
+        } catch (RuntimeException ignored) {
+            // Geo lookup must never fail a validation request.
+        }
+
         try (InputStream in = Files.newInputStream(file.uploadedFile())) {
-            return orchestrator.validate(templateId, templateVersion, profiles, in, filename, opts);
+            return orchestrator.validate(templateId, templateVersion, profiles, in,
+                    filename, opts, country);
         } catch (IOException e) {
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)

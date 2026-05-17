@@ -76,6 +76,9 @@ public class ValidationOrchestrator {
     @Inject
     ExternalValidationFactory externalFactory;
 
+    @Inject
+    UsageStatsService usageStatsService;
+
     private Semaphore concurrencyGate;
 
     /** Cache parsed spec catalogs per (template, version) so we don't re-parse XLSX on every request. */
@@ -93,7 +96,8 @@ public class ValidationOrchestrator {
                                        List<String> profileCodes,
                                        InputStream upload,
                                        String filename,
-                                       ExternalOptions externalOptions) {
+                                       ExternalOptions externalOptions,
+                                       String clientCountry) {
         boolean acquired;
         try {
             acquired = concurrencyGate.tryAcquire(config.acquireTimeoutMillis(), TimeUnit.MILLISECONDS);
@@ -109,7 +113,8 @@ public class ValidationOrchestrator {
                             .build());
         }
         try {
-            return doValidate(templateId, templateVersion, profileCodes, upload, filename, externalOptions);
+            return doValidate(templateId, templateVersion, profileCodes, upload,
+                    filename, externalOptions, clientCountry);
         } finally {
             concurrencyGate.release();
         }
@@ -120,7 +125,9 @@ public class ValidationOrchestrator {
                                           List<String> profileCodes,
                                           InputStream upload,
                                           String filename,
-                                          ExternalOptions externalOptions) {
+                                          ExternalOptions externalOptions,
+                                          String clientCountry) {
+        long t0 = System.nanoTime();
         TemplateDefinition def = resolveTemplate(templateId);
         TemplateVersion version = resolveVersion(def, templateVersion);
         ProfileSet profileSet = def.profilesFor(version);
@@ -228,6 +235,19 @@ public class ValidationOrchestrator {
                     Response.serverError().entity("Could not write report.").build());
         }
         UUID reportId = reportStore.store(xlsxPath);
+
+        try {
+            boolean ext = externalOptions != null && externalOptions.enabled()
+                    && config.external().enabled();
+            usageStatsService.record(
+                    com.findatex.validator.stats.UsageEvent.forWeb(
+                            report, def, version, ext,
+                            java.time.Duration.ofNanos(System.nanoTime() - t0).toMillis()),
+                    "web", clientCountry);
+        } catch (RuntimeException e) {
+            // Stats are best-effort and must never affect the validation response.
+            log.debug("Usage-stats recording skipped: {}", e.toString());
+        }
 
         return assembleResponse(def, version, file, report, findings, reportId);
     }

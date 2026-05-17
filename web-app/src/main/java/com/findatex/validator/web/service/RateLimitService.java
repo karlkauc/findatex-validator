@@ -48,17 +48,33 @@ public class RateLimitService {
     WebConfig config;
 
     private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Bucket> usageBuckets = new ConcurrentHashMap<>();
     private final AtomicBoolean unknownWarned = new AtomicBoolean(false);
     private int capacityPerHour;
     private Duration refillInterval;
+    private int usageCapacityPerHour;
+    private Duration usageRefillInterval;
 
     @PostConstruct
     void init() {
         capacityPerHour = Math.max(1, config.rateLimit().perIpPerHour());
         long refillSeconds = Math.max(1, 3600L / capacityPerHour);
         refillInterval = Duration.ofSeconds(refillSeconds);
-        log.info("Rate limit configured: {} req/hour per IP (1 token every {}s)",
-                capacityPerHour, refillSeconds);
+        usageCapacityPerHour = Math.max(1, config.usageStats().ratePerIpPerHour());
+        long usageRefillSeconds = Math.max(1, 3600L / usageCapacityPerHour);
+        usageRefillInterval = Duration.ofSeconds(usageRefillSeconds);
+        log.info("Rate limit configured: {} req/hour per IP for /api/validate, "
+                        + "{} req/hour per IP for /api/usage-stats",
+                capacityPerHour, usageCapacityPerHour);
+    }
+
+    /** Separate, more generous bucket for the lightweight usage-stats ingest. */
+    public ConsumptionProbe consumeUsage(String clientIp) {
+        return usageBuckets.computeIfAbsent(normaliseKey(clientIp),
+                k -> Bucket.builder().addLimit(Bandwidth.classic(
+                        usageCapacityPerHour,
+                        Refill.intervally(1, usageRefillInterval))).build())
+                .tryConsumeAndReturnRemaining(1);
     }
 
     public int limit() {

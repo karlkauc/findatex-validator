@@ -218,6 +218,20 @@ persisted in `settings.json`); web via `FINDATEX_WEB_FEEDBACK_GITHUB_REPO`
 surfaced through `GET /api/feedback-config`. The desktop opens the URL via the
 existing `SafeLinkOpener` (scheme-allowlisted `Desktop.browse`).
 
+**Usage statistics (opt-out)** — aggregate-only run stats, default on, per
+install. Desktop never writes the DB: `core/.../stats/UsageStatsReporter`
+fire-and-forgets a `UsageEvent` (aggregate counts only — never files, names,
+codes, cell/finding content, or IP) to `POST /api/usage-stats`
+(`X-Usage-Token`); failures are silently dropped (DEBUG), the run is never
+disturbed. Web runs self-record from `ValidationOrchestrator` (sentinel
+install id). The web layer is the sole DB writer via plain Agroal/JDBC
+(`UsageStatsService`) — **inert with no `FINDATEX_WEB_USAGE_DB_URL`** (app/tests
+still boot). `country_code` is derived server-side from the request IP
+(`GeoIpService`, offline GeoLite2); the **raw IP is never stored or logged**.
+Opt-out: desktop Settings → Statistik (`AppSettings.UsageStats`); the install
+id is generated and persisted by `SettingsService`. Full schema, env vars and
+psql ops in `docs/USAGE_STATS.md`. Never add instance data to `UsageEvent`.
+
 The React frontend lives in `web-app/src/main/frontend/`. Vite writes the
 production bundle into `web-app/target/classes/META-INF/resources/`, which
 Quarkus serves as the SPA root. `frontend-maven-plugin` runs `npm install`

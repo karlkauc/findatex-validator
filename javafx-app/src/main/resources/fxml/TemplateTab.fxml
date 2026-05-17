@@ -89,10 +89,20 @@
             <CheckBox fx:id="filterWarnings" text="Warnings" selected="true"/>
             <CheckBox fx:id="filterInfo" text="Info" selected="true"/>
             <CheckBox fx:id="groupByError" text="Group by error"/>
+            <Button fx:id="reportFpButton" text="Report a false positive…"
+                    onAction="#onReportFalsePositive" disable="true"/>
             <Label fx:id="findingCountLabel"/>
         </HBox>
 
         <TableView fx:id="findingsTable" prefHeight="320">
+            <contextMenu>
+                <ContextMenu>
+                    <items>
+                        <MenuItem fx:id="reportFpMenuItem" text="Report a false positive…"
+                                  onAction="#onReportFalsePositive" disable="true"/>
+                    </items>
+                </ContextMenu>
+            </contextMenu>
             <columns>
                 <TableColumn fx:id="colSeverity"   text="Severity"        prefWidth="90"/>
                 <TableColumn fx:id="colProfile"    text="Profile"         prefWidth="140"/>

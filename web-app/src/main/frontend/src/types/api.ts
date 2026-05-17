@@ -81,6 +81,10 @@ export interface RateLimitStatus {
   desktopDownloadUrl?: string | null;
 }
 
+export interface FeedbackConfig {
+  githubRepo: string | null;
+}
+
 export interface BuildInfo {
   version: string;
   commit: string;

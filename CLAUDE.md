@@ -188,6 +188,8 @@ REST endpoints (all under `/api`):
 - `GET  /api/templates` — TemplateInfo[] (id, displayName, versions[], profiles[])
 - `POST /api/validate`  — multipart (templateId, templateVersion, profiles[], file) → ValidationResponse JSON
 - `GET  /api/report/{uuid}` — streams the XLSX once, then evicts the temp file
+- `GET  /api/feedback-config` — `{githubRepo}` (null when unset); drives the
+  "Report a false positive" action
 
 **Misbrauch-Schutz** (configurable via `FINDATEX_WEB_*` env vars; defaults in
 `web-app/src/main/resources/application.properties`):
@@ -204,6 +206,17 @@ surfaces `externalAvailable=true` for every template that declares an
 `ExternalValidationConfig` (currently all four), and `ValidationOrchestrator`
 runs the GLEIF/OpenFIGI pipeline through that config when the per-request
 `externalEnabled=true` flag is set.
+
+**Report a false positive** — both UIs let the user open a *pre-filled* GitHub
+issue for a wrong finding. No token, no SMTP, no server-side issue creation:
+the shared builder `core/.../feedback/GitHubIssueLink` (TS mirror at
+`web-app/.../frontend/src/feedback/githubIssue.ts`) produces the issue URL; the
+user reviews the exact body in a confirm dialog/modal and submits it on GitHub
+themselves. Target repo is configurable and **empty by default** (action hidden
+when unset): desktop via Settings → Feedback (`AppSettings.Feedback.githubRepo`,
+persisted in `settings.json`); web via `FINDATEX_WEB_FEEDBACK_GITHUB_REPO`
+surfaced through `GET /api/feedback-config`. The desktop opens the URL via the
+existing `SafeLinkOpener` (scheme-allowlisted `Desktop.browse`).
 
 The React frontend lives in `web-app/src/main/frontend/`. Vite writes the
 production bundle into `web-app/target/classes/META-INF/resources/`, which

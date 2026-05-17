@@ -92,5 +92,21 @@
         </VBox>
       </content>
     </Tab>
+
+    <Tab text="Statistik">
+      <content>
+        <VBox spacing="10">
+          <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+          <TitledPane text="Anonyme Nutzungsstatistik" collapsible="false">
+            <VBox spacing="6">
+              <CheckBox fx:id="usageEnabled" text="Anonyme Nutzungsstatistik senden (keine Daten/Dateien)"/>
+              <Label text="Es werden ausschließlich aggregierte Lauf-Zahlen übertragen (Template/Version, &#10;Anzahl Findings nach Schweregrad, Score, Dauer). Niemals Dateien, Dateinamen, &#10;Zellinhalte, Fonds-/Instrument-Kennungen oder Ihre IP-Adresse. Deaktivieren &#10;stoppt jede Übertragung. Details: docs/USAGE_STATS.md" wrapText="true"/>
+              <Label text="Anonyme Installations-ID (kein Personen-/Maschinenbezug):"/>
+              <TextField fx:id="usageInstallId" editable="false" focusTraversable="false" prefColumnCount="40"/>
+            </VBox>
+          </TitledPane>
+        </VBox>
+      </content>
+    </Tab>
   </tabs>
 </TabPane>

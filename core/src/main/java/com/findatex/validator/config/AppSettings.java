@@ -1,19 +1,30 @@
 package com.findatex.validator.config;
 
-public record AppSettings(External external, Proxy proxy, Feedback feedback) {
+import java.util.UUID;
+
+public record AppSettings(External external, Proxy proxy, Feedback feedback,
+                          UsageStats usageStats) {
 
     /**
-     * Normalises a missing {@code feedback} block. Settings files written by
-     * pre-feedback releases have no {@code feedback} key, so Jackson passes
-     * {@code null} into the canonical constructor — keep old configs loadable.
+     * Normalises missing blocks. Settings files written by older releases have
+     * no {@code feedback}/{@code usageStats} key, so Jackson passes {@code null}
+     * into the canonical constructor — keep old configs loadable. A blank
+     * {@code installId} is regenerated here; {@link SettingsService} detects the
+     * generated value and persists it so the id stays stable across runs.
      */
     public AppSettings {
         if (feedback == null) feedback = new Feedback("");
+        if (usageStats == null) usageStats = new UsageStats(true, "", "");
     }
 
     /** Back-compat convenience for the many call sites that predate the feedback block. */
     public AppSettings(External external, Proxy proxy) {
-        this(external, proxy, new Feedback(""));
+        this(external, proxy, new Feedback(""), null);
+    }
+
+    /** Back-compat convenience for call sites that predate the usage-stats block. */
+    public AppSettings(External external, Proxy proxy, Feedback feedback) {
+        this(external, proxy, feedback, null);
     }
 
     public enum ProxyMode { SYSTEM, MANUAL, NONE }
@@ -39,6 +50,21 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback) {
         }
     }
 
+    /**
+     * Anonymous usage-statistics opt-out block. {@code enabled} defaults to
+     * true. {@code installId} is a random UUID generated once and persisted
+     * (no PII / machine binding). {@code endpointUrl} is the web-app ingest
+     * URL; blank disables the background sender.
+     */
+    public record UsageStats(boolean enabled, String installId, String endpointUrl) {
+        public UsageStats {
+            if (installId == null || installId.isBlank()) {
+                installId = UUID.randomUUID().toString();
+            }
+            if (endpointUrl == null) endpointUrl = "";
+        }
+    }
+
     public static AppSettings defaults() {
         return new AppSettings(
                 new External(
@@ -49,16 +75,22 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback) {
                 new Proxy(
                         ProxyMode.SYSTEM,
                         new ManualProxy("", 0, "", "", "localhost|127.0.0.1")),
-                new Feedback(""));
+                new Feedback(""),
+                new UsageStats(true, "", ""));
     }
 
     public AppSettings withExternalEnabled(boolean v) {
         return new AppSettings(
                 new External(v, external.lei(), external.isin(), external.cache()),
-                proxy, feedback);
+                proxy, feedback, usageStats);
     }
 
     public AppSettings withFeedbackRepo(String githubRepo) {
-        return new AppSettings(external, proxy, new Feedback(githubRepo));
+        return new AppSettings(external, proxy, new Feedback(githubRepo), usageStats);
+    }
+
+    public AppSettings withUsageStatsEnabled(boolean v) {
+        return new AppSettings(external, proxy, feedback,
+                new UsageStats(v, usageStats.installId(), usageStats.endpointUrl()));
     }
 }

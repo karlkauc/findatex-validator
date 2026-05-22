@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>findatex-validator.eu &middot; Custom-Domain-Setup für Cloud Run</title>
+<style>
+  :root {
+    --fg: #1a1d23;
+    --fg-muted: #5b6470;
+    --bg: #fbfaf7;
+    --panel: #ffffff;
+    --border: #e6e3dc;
+    --accent: #2d4a6e;
+    --accent-soft: #eef2f8;
+    --warn-bg: #fff7e6;
+    --warn-border: #f0c674;
+    --code-bg: #f4f1ea;
+    --code-fg: #2d2a26;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.55;
+    margin: 0;
+    padding: 0;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 28px 96px;
+  }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    margin-bottom: 36px;
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin: 0 0 8px;
+  }
+  h1 {
+    font-size: 30px;
+    line-height: 1.2;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  .lede {
+    font-size: 17px;
+    color: var(--fg-muted);
+    margin: 0;
+    max-width: 60ch;
+  }
+  h2 {
+    font-size: 20px;
+    margin: 48px 0 14px;
+    padding-top: 8px;
+    letter-spacing: -0.005em;
+  }
+  h2 .step {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    background: var(--accent);
+    color: white;
+    font-size: 13px;
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: 2px;
+    font-weight: 600;
+  }
+  h3 {
+    font-size: 15px;
+    margin: 24px 0 8px;
+    color: var(--fg);
+    letter-spacing: 0.01em;
+  }
+  p { margin: 0 0 14px; }
+  ol, ul { padding-left: 22px; margin: 0 0 16px; }
+  li { margin: 6px 0; }
+  code {
+    font-family: var(--mono);
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    word-break: break-word;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 14px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0 0 18px;
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 20px;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+  tbody tr:nth-child(odd) td { background: #fcfbf8; }
+  td code { font-size: 12.5px; }
+  .callout {
+    background: var(--warn-bg);
+    border-left: 3px solid var(--warn-border);
+    padding: 14px 18px;
+    border-radius: 0 4px 4px 0;
+    margin: 18px 0;
+  }
+  .callout strong { color: #8a5a00; }
+  .callout p:last-child { margin-bottom: 0; }
+  .note {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    border-radius: 0 4px 4px 0;
+    margin: 18px 0;
+    color: var(--fg);
+  }
+  .note p:last-child { margin-bottom: 0; }
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    vertical-align: 2px;
+    margin-left: 6px;
+  }
+  @media (max-width: 600px) {
+    .wrap { padding: 28px 18px 64px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 18px; }
+    table { font-size: 13px; }
+    th, td { padding: 7px 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FinDatEx Validator &middot; Operations</p>
+  <h1>Eigene Domain für die Web-App: <code>findatex-validator.eu</code></h1>
+  <p class="lede">
+    Anleitung, um die in Cloud Run laufende Web-App (Region <code>europe-west4</code>)
+    unter <code>findatex-validator.eu</code> und <code>www.findatex-validator.eu</code>
+    erreichbar zu machen. DNS-Verwaltung erfolgt bei <strong>domaintechnik.at</strong>.
+  </p>
+</header>
+
+<section>
+  <h2><span class="step">1</span>Domain-Eigentum bei Google nachweisen <span class="pill">einmalig</span></h2>
+  <ol>
+    <li>
+      <a href="https://search.google.com/search-console">Google Search Console</a> öffnen.
+    </li>
+    <li>
+      <strong>„Property hinzufügen"</strong> &rarr; Typ <strong>„Domain"</strong> &rarr;
+      <code>findatex-validator.eu</code> eingeben.
+    </li>
+    <li>
+      Google zeigt einen TXT-Record an, z.&nbsp;B.:
+      <pre><code>google-site-verification=abcdef12345...</code></pre>
+    </li>
+    <li>
+      Bei <strong>domaintechnik im DNS-Editor</strong>:
+      <ul>
+        <li>Typ <code>TXT</code>, Host/Name <code>@</code> (oder leer = Apex), Wert exakt wie angezeigt.</li>
+      </ul>
+    </li>
+    <li>
+      Zurück in Search Console &rarr; <strong>„Bestätigen"</strong>. DNS-Propagation 1–10 Minuten.
+    </li>
+  </ol>
+  <div class="note">
+    <p>Erst wenn das Häkchen grün ist, geht es mit Schritt&nbsp;2 weiter.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="step">2</span>Custom Domain in der Google Cloud Console anlegen</h2>
+  <ol>
+    <li>Cloud Console &rarr; <strong>Cloud Run</strong> &rarr; Region <code>europe-west4</code> &rarr; Service <code>findatex-validator-web</code>.</li>
+    <li>Tab <strong>„Custom Domains"</strong> (oder oben <strong>„Manage Custom Domains" &rarr; „Add Mapping"</strong>).</li>
+    <li>Service auswählen: <code>findatex-validator-web</code>.</li>
+    <li>
+      <strong>Zwei Mappings nacheinander anlegen:</strong>
+      <ul>
+        <li>erst <code>www.findatex-validator.eu</code></li>
+        <li>dann <code>findatex-validator.eu</code> (Apex)</li>
+      </ul>
+    </li>
+    <li>
+      Google zeigt pro Mapping eine Liste von DNS-Records, die du eintragen sollst —
+      <strong>genau diese Werte verwenden</strong>, nicht die unten als Beispiel.
+    </li>
+  </ol>
+  <p>
+    Für die Subdomain bekommst du typischerweise <strong>einen CNAME</strong>,
+    für den Apex <strong>4&times;&nbsp;A + 4&times;&nbsp;AAAA</strong>.
+  </p>
+</section>
+
+<section>
+  <h2><span class="step">3</span>DNS-Records bei domaintechnik.at eintragen</h2>
+  <p>
+    Im DNS-Editor der Domain <code>findatex-validator.eu</code>:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Typ</th>
+        <th>Host/Name</th>
+        <th>Wert (Beispiel — übernimm den aus GCP-Console)</th>
+        <th>TTL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>TXT</code></td>
+        <td><code>@</code></td>
+        <td><code>google-site-verification=…</code> (aus Schritt&nbsp;1)</td>
+        <td>3600</td>
+      </tr>
+      <tr>
+        <td><code>CNAME</code></td>
+        <td><code>www</code></td>
+        <td><code>ghs.googlehosted.com.</code> <em>(Punkt am Ende!)</em></td>
+        <td>3600</td>
+      </tr>
+      <tr><td><code>A</code></td><td><code>@</code></td><td><code>216.239.32.21</code></td><td>3600</td></tr>
+      <tr><td><code>A</code></td><td><code>@</code></td><td><code>216.239.34.21</code></td><td>3600</td></tr>
+      <tr><td><code>A</code></td><td><code>@</code></td><td><code>216.239.36.21</code></td><td>3600</td></tr>
+      <tr><td><code>A</code></td><td><code>@</code></td><td><code>216.239.38.21</code></td><td>3600</td></tr>
+      <tr><td><code>AAAA</code></td><td><code>@</code></td><td><code>2001:4860:4802:32::15</code></td><td>3600</td></tr>
+      <tr><td><code>AAAA</code></td><td><code>@</code></td><td><code>2001:4860:4802:34::15</code></td><td>3600</td></tr>
+      <tr><td><code>AAAA</code></td><td><code>@</code></td><td><code>2001:4860:4802:36::15</code></td><td>3600</td></tr>
+      <tr><td><code>AAAA</code></td><td><code>@</code></td><td><code>2001:4860:4802:38::15</code></td><td>3600</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p><strong>Wichtig:</strong></p>
+    <ul>
+      <li>
+        Bei <code>CNAME www</code>: Wert <strong>mit Punkt am Ende</strong> — sonst hängt
+        domaintechnik die eigene Domain nochmal dran
+        (<code>ghs.googlehosted.com.findatex-validator.eu</code> = kaputt).
+      </li>
+      <li>
+        Falls domaintechnik bereits A-Records für <code>@</code> mit einer Parking-Page hat —
+        <strong>diese löschen</strong>. Sonst zeigt der Apex auf zwei Ziele und es ist Zufall,
+        was kommt.
+      </li>
+      <li>
+        Falls du E-Mail-Aliase nutzt (z.&nbsp;B. <code>office@findatex-validator.eu</code>):
+        die existierenden <code>MX</code>-Records von domaintechnik <strong>nicht anfassen</strong>.
+      </li>
+      <li>TTL niedrig lassen (300–3600), bis alles steht — danach hochsetzen.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2><span class="step">4</span>Auf Cloud Run zurückgehen &amp; Cert abwarten</h2>
+  <ol>
+    <li>
+      Cloud Run &rarr; Custom Domains: Status startet bei <strong>„Pending"</strong>
+      &rarr; <strong>„Certificate provisioning"</strong> &rarr; <strong>„Active"</strong>.
+    </li>
+    <li>Dauer: meist ~15&nbsp;Minuten, in Ausnahmefällen bis zu 24&nbsp;Stunden.</li>
+    <li>
+      Google stellt das TLS-Zertifikat automatisch aus (Google-Trust-Services / Let's&nbsp;Encrypt),
+      kostet nichts.
+    </li>
+    <li>
+      Sobald grün: <code>https://www.findatex-validator.eu</code> und
+      <code>https://findatex-validator.eu</code> liefern beide die App, beide mit HTTPS.
+    </li>
+  </ol>
+</section>
+
+<section>
+  <h2><span class="step">5</span>Validierung</h2>
+  <pre><code># DNS-Propagation prüfen
+dig +short www.findatex-validator.eu CNAME
+dig +short findatex-validator.eu A
+dig +short findatex-validator.eu AAAA
+
+# App-Zugriff
+curl -I https://www.findatex-validator.eu
+curl -I https://findatex-validator.eu</code></pre>
+  <p>
+    Beide <code>curl</code>-Aufrufe sollten <code>HTTP/2 200</code> liefern und ein gültiges
+    Google-Trust-Services-Zertifikat vorzeigen.
+  </p>
+</section>
+
+<section>
+  <h2>Was du in der App selbst <em>nicht</em> ändern musst</h2>
+  <ul>
+    <li>
+      Quarkus-Konfiguration, CORS, <code>docker-compose.yml</code> — alles unverändert.
+      Cloud Run terminiert TLS und proxied weiter an den Container auf Port 8080.
+    </li>
+    <li>
+      <code>application.properties</code>-<code>quarkus.http.host</code>/Port bleibt wie er ist.
+    </li>
+    <li>
+      Usage-Stats-Endpoint, Ingest-Token, Neon-Anbindung — alles unverändert.
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h2>Offene Punkte &amp; Hinweise</h2>
+  <ul>
+    <li>
+      <strong>Cloud-Run-Service-URL bleibt parallel erreichbar</strong> (<code>*.run.app</code>).
+      Optional in Cloud Run &rarr; „Networking" den direkten URL-Zugriff deaktivieren —
+      aber dann muss das Custom-Domain-Mapping zwingend funktionieren.
+    </li>
+    <li>
+      <strong>HTTP&rarr;HTTPS-Redirect</strong>: Cloud Run macht das automatisch.
+    </li>
+    <li>
+      <strong>Apex-Mapping dauert oft länger</strong> als die Subdomain — wenn <code>www</code>
+      schon grün ist und Apex noch nicht, Geduld bis 24&nbsp;h, nicht neu anlegen.
+    </li>
+    <li>
+      <strong>GitHub-Feedback-URL</strong> (<code>FINDATEX_WEB_FEEDBACK_GITHUB_REPO</code>)
+      und Desktop-<code>endpointUrl</code> ggf. auf die neue Domain aktualisieren.
+    </li>
+    <li>
+      <strong>MX-Records</strong> für <code>office@findatex-validator.eu</code> sind unabhängig
+      vom Cloud-Run-Mapping — beim DNS-Bearbeiten nicht versehentlich löschen.
+    </li>
+  </ul>
+</section>
+
+<footer>
+  Stand: 2026-05-21 &middot; siehe auch <code>docs/DEPLOY_CLOUDRUN.md</code> und
+  <code>docs/USAGE_STATS.md</code> im Repo.
+</footer>
+
+</div>
+</body>
+</html>

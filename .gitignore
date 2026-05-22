@@ -31,6 +31,10 @@ Thumbs.db
 # Logs
 *.log
 
+# docker compose secrets (real values live in .env; template is .env.example)
+.env
+!.env.example
+
 # Claude Code scratch / per-project data
 .claude/
 

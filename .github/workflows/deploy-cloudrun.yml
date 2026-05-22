@@ -1,4 +1,6 @@
-# Deploys the web-app container to Google Cloud Run (europe-west3).
+# Deploys the web-app container to Google Cloud Run (europe-west4).
+# Region pinned to west4 because Cloud Run direct Domain Mappings are only
+# available in a subset of regions (west1/west4 in the EU, not west3).
 #
 # Triggers:
 #   - workflow_dispatch: manual run with the image tag to deploy
@@ -44,7 +46,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  GCP_REGION: europe-west3
+  GCP_REGION: europe-west4
   AR_REPO: findatex
   IMAGE_NAME: findatex-validator-web
   SERVICE_NAME: findatex-validator-web
@@ -144,7 +146,8 @@ jobs:
             --max-instances=10 \
             --min-instances=0 \
             --timeout=300 \
-            --set-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=false \
+            --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=false,FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://ep-crimson-meadow-albz1x37.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=neondb_owner \
+            --update-secrets=FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest \
             --quiet
 
       - name: Show service URL

@@ -53,6 +53,21 @@ services:
       # FINDATEX_WEB_EXTERNAL_PROXY_PASSWORD: "your-password"
       # FINDATEX_WEB_EXTERNAL_PROXY_NON_PROXY_HOSTS: "localhost,*.internal"
 
+      # --- Anonymous usage statistics (Neon Postgres) ------------------------
+      # Schema must be created once in Neon (see docs/USAGE_STATS.md).
+      # Secrets are pulled from .env (gitignored). Empty .env values ⇒ the
+      # datasource stays inert and the app still boots normally.
+      FINDATEX_WEB_USAGE_DB_URL: "${FINDATEX_WEB_USAGE_DB_URL:-}"
+      FINDATEX_WEB_USAGE_DB_USER: "${FINDATEX_WEB_USAGE_DB_USER:-}"
+      FINDATEX_WEB_USAGE_DB_PASSWORD: "${FINDATEX_WEB_USAGE_DB_PASSWORD:-}"
+      FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN: "${FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN:-}"
+      # Optional: per-IP rate limit on /api/usage-stats (default 60/h).
+      # FINDATEX_WEB_USAGE_STATS_RATE: "60"
+      # Optional: MaxMind GeoLite2-Country.mmdb for country_code derivation.
+      # Mount the file as a read-only volume and point this at it. Empty ⇒
+      # country_code stays NULL (app still boots).
+      # FINDATEX_WEB_GEOIP_DB: "/data/geoip/GeoLite2-Country.mmdb"
+
     volumes:
       # GLEIF/OpenFIGI lookup cache. Persisting it across restarts avoids
       # re-fetching every LEI/ISIN every time the container is recreated.

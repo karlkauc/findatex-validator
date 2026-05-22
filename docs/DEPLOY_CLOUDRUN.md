@@ -17,7 +17,7 @@ are stored in the repo or in GitHub Secrets.
 
 | Setting               | Value                              |
 | --------------------- | ---------------------------------- |
-| Region                | `europe-west3` (Frankfurt)         |
+| Region                | `europe-west4` (Eemshaven, NL)     |
 | Service name          | `findatex-validator-web`           |
 | Auth                  | `--allow-unauthenticated` (public) |
 | Memory / CPU          | 2 GiB / 1 vCPU + CPU-boost         |
@@ -25,6 +25,13 @@ are stored in the repo or in GitHub Secrets.
 | Min / max instances   | 0 / 1                              |
 | Request timeout       | 300 s                              |
 | External validation   | off (`FINDATEX_WEB_EXTERNAL_ENABLED=false`) |
+| Usage statistics      | on (Neon Postgres; password + ingest token via Secret Manager — see [Usage stats bootstrap](#usage-statistics-bootstrap)) |
+
+The region is pinned to `europe-west4` because Cloud Run **direct Domain
+Mappings** are only available in a subset of regions (in the EU: `europe-west1`
+and `europe-west4`; **not** `europe-west3`). Switching to a different region
+later means redeploying the service and re-spiegeling the Artifact Registry
+image — both cheap operations, but easier to get right from the start.
 
 `max-instances=1` is intentional: `Bucket4j` (rate limit) and `ReportStore`
 (post-validate XLSX cache) live in JVM memory per instance. Multiple
@@ -40,7 +47,7 @@ Adjust `PROJECT` if you want a different project id.
 ```bash
 PROJECT=findatex-validator           # GCP project id (must be globally unique)
 REPO=karlkauc/findatex-validator     # GitHub <owner>/<repo>
-REGION=europe-west3
+REGION=europe-west4
 
 # 1) Project + APIs
 gcloud projects create "$PROJECT" --name="FinDatEx Validator"   # skip if it already exists
@@ -176,7 +183,7 @@ enter the tag → *Run workflow*.
 gh run watch "$(gh run list --workflow=deploy-cloudrun.yml --limit=1 --json databaseId --jq '.[0].databaseId')"
 
 # After completion, confirm the live service identity
-curl -fsS https://findatex-validator-web-274755042473.europe-west3.run.app/api/build-info
+curl -fsS https://findatex-validator-web-274755042473.europe-west4.run.app/api/build-info
 # {"version":"1.0.4","commit":"<sha>","dirty":false,"buildTime":"…"}
 ```
 
@@ -204,6 +211,47 @@ Cloud Run keeps the previous revision around and routes 100% of traffic
 to the new one only after the new revision passes its readiness probe,
 so a rollback is non-disruptive.
 
+## Usage statistics bootstrap
+
+Aggregate-only run statistics are persisted to a **Neon Postgres** database
+(serverless, free tier sufficient for normal traffic). The architecture is
+documented in `docs/USAGE_STATS.md`; this section covers only the GCP
+side — how to wire the DB password and the desktop-→web ingest token into
+Cloud Run via Secret Manager. The DDL for the `usage_event` table has to be
+run once in Neon (see `docs/USAGE_STATS.md`); the app never issues DDL.
+
+```bash
+PROJECT=findatex-validator
+REGION=europe-west4
+SERVICE=findatex-validator-web
+
+# 1) Secrets — paste the values via stdin, not on the command line, so they
+#    do not land in shell history.
+printf '<neon-db-password>' | gcloud secrets create findatex-usage-db-password \
+  --replication-policy=automatic --data-file=-
+
+printf '<openssl-rand-hex-32-token>' | gcloud secrets create findatex-usage-ingest-token \
+  --replication-policy=automatic --data-file=-
+
+# 2) Grant the Cloud Run runtime SA read access to both secrets
+RUNTIME_SA=$(gcloud run services describe "$SERVICE" --region="$REGION" \
+  --format='value(spec.template.spec.serviceAccountName)')
+for s in findatex-usage-db-password findatex-usage-ingest-token; do
+  gcloud secrets add-iam-policy-binding "$s" \
+    --member="serviceAccount:$RUNTIME_SA" \
+    --role=roles/secretmanager.secretAccessor
+done
+
+# 3) Mount the secrets and add the non-secret DB config as env vars
+gcloud run services update "$SERVICE" --region="$REGION" \
+  --update-env-vars=FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://<host>.neon.tech/<db>?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=<user> \
+  --update-secrets=FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest
+```
+
+The deploy workflow (`.github/workflows/deploy-cloudrun.yml`) uses
+`--update-env-vars` / `--update-secrets` (additive, not replace) so the
+above bootstrap survives every subsequent CI deploy without re-applying.
+
 ## Enabling external validation later
 
 External validation (GLEIF + OpenFIGI) is off by default in the deployed
@@ -211,7 +259,7 @@ service. To turn it on without baking secrets into the image:
 
 ```bash
 PROJECT=findatex-validator
-REGION=europe-west3
+REGION=europe-west4
 SERVICE=findatex-validator-web
 
 # Store the OpenFIGI key in Secret Manager (one-time)
@@ -343,7 +391,7 @@ covers all subdomains).
 ```bash
 DOMAIN=validator.example.com
 PROJECT=findatex-validator
-REGION=europe-west3
+REGION=europe-west4
 SERVICE=findatex-validator-web
 
 gcloud beta run domain-mappings create \
@@ -353,7 +401,8 @@ gcloud beta run domain-mappings create \
 
 If the command errors with *"region not supported"*, see
 [Alternative: HTTPS Load Balancer](#alternative-https-load-balancer) below.
-At time of writing `europe-west3` is supported.
+At time of writing `europe-west4` is supported; `europe-west3` (Frankfurt)
+is **not** — that is the reason this service runs in west4.
 
 ### Step 3 — Enter the DNS records at your registrar
 
@@ -437,8 +486,8 @@ mapping is not an option.
 
 ```bash
 gcloud beta run domain-mappings delete \
-  --domain=validator.example.com --region=europe-west3   # if a domain was mapped
-gcloud run services delete findatex-validator-web --region=europe-west3
-gcloud artifacts repositories delete findatex --location=europe-west3
+  --domain=validator.example.com --region=europe-west4   # if a domain was mapped
+gcloud run services delete findatex-validator-web --region=europe-west4
+gcloud artifacts repositories delete findatex --location=europe-west4
 # (optional) drop the WIF setup and SA if you're done with the project entirely
 ```

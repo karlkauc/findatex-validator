@@ -362,7 +362,7 @@ else
   # .cfg (including the archive reference). For installer types we feed that
   # bundle back through jpackage with --app-image; the second pass only adds
   # the installer wrapper, it doesn't rebuild the runtime.
-  echo "Wrapping app-image into final $PACKAGE_TYPE…"
+  echo "Wrapping app-image into final ${PACKAGE_TYPE}..."
   jpackage \
     --type "$PACKAGE_TYPE" \
     --name "$APP_NAME" \

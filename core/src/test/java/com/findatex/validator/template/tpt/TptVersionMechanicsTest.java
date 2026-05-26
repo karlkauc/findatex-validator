@@ -1,6 +1,7 @@
 package com.findatex.validator.template.tpt;
 
 import com.findatex.validator.domain.TptFile;
+import com.findatex.validator.spec.FieldSpec;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.template.api.TemplateRuleSet;
 import com.findatex.validator.template.api.TemplateVersion;
@@ -17,39 +18,45 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifies the multi-version plumbing for TPT: V6 manifest loads, the version-aware rule wiring
- * propagates the expected token to {@code TptVersionRule}, and {@code TptTemplate} reports both
- * versions. Cross-field rules and presence checks are template-agnostic and exercised by other
- * suites; this one focuses on the seam introduced for version selection.
+ * Verifies the multi-version plumbing for TPT: the V8 manifest loads, the version-aware rule
+ * wiring propagates the expected token to {@code TptVersionRule}, and {@code TptTemplate} reports
+ * both bundled versions. Cross-field rules and presence checks are template-agnostic and exercised
+ * by other suites; this one focuses on the seam introduced for version selection.
  */
 class TptVersionMechanicsTest {
 
     private final TptTemplate tpt = new TptTemplate();
 
     @Test
-    void tptOffersV7AndV6() {
+    void tptOffersV8AndV7() {
         assertThat(tpt.versions())
                 .extracting(TemplateVersion::version)
-                .containsExactly("V7.0", "V6.0");
+                .containsExactly("V8.0", "V7.0");
     }
 
     @Test
-    void v6SpecLoaderLoadsAtLeast130Fields() {
-        SpecCatalog catalog = tpt.specLoaderFor(TptTemplate.V6_0).load();
-        assertThat(catalog.fields().size()).isGreaterThanOrEqualTo(130);
+    void v8SpecLoaderLoadsAtLeast140Fields() {
+        SpecCatalog catalog = tpt.specLoaderFor(TptTemplate.V8_0).load();
+        assertThat(catalog.fields().size()).isGreaterThanOrEqualTo(140);
     }
 
     @Test
-    void v6SpecCarriesSolvencyIIFlag() {
-        SpecCatalog catalog = tpt.specLoaderFor(TptTemplate.V6_0).load();
+    void v8SpecCarriesTheTwoNewConditionalFields() {
+        SpecCatalog catalog = tpt.specLoaderFor(TptTemplate.V8_0).load();
+        assertThat(catalog.fields()).extracting(FieldSpec::numKey).contains("150", "151");
+    }
+
+    @Test
+    void v8SpecCarriesSolvencyIIFlag() {
+        SpecCatalog catalog = tpt.specLoaderFor(TptTemplate.V8_0).load();
         assertThat(catalog.fields()).anySatisfy(field ->
                 assertThat(field.flag(TptProfiles.SOLVENCY_II)).isNotNull());
     }
 
     @Test
-    void v6RuleSetEmitsVersionMismatchOnV7Header() {
-        SpecCatalog catalog = tpt.specLoaderFor(TptTemplate.V6_0).load();
-        TemplateRuleSet rs = tpt.ruleSetFor(TptTemplate.V6_0);
+    void v8RuleSetEmitsVersionMismatchOnV7Header() {
+        SpecCatalog catalog = tpt.specLoaderFor(TptTemplate.V8_0).load();
+        TemplateRuleSet rs = tpt.ruleSetFor(TptTemplate.V8_0);
         TptFile file = new TestFileBuilder()
                 .row(TestFileBuilder.values("1000", "V7.0 (official) dated 25 November 2024"))
                 .build();
@@ -58,7 +65,7 @@ class TptVersionMechanicsTest {
 
         assertThat(findings).extracting(Finding::severity).contains(Severity.ERROR);
         assertThat(findings).extracting(Finding::message)
-                .anyMatch(m -> m.contains("V6.0"));
+                .anyMatch(m -> m.contains("V8.0"));
     }
 
     @Test

@@ -43,7 +43,7 @@ reports.
 
 | Template | Bundled versions          | Spec owner   |
 |----------|---------------------------|--------------|
-| **TPT** — Tripartite Template     | V7.0 (2024-11-25), V6.0 (2022-03-14) | FinDatEx     |
+| **TPT** — Tripartite Template     | V8.0 (2026-05-26), V7.0 (2024-11-25) | FinDatEx     |
 | **EET** — European ESG Template   | V1.1.3 (2024-10-04), V1.1.2 (2023-12-05) | FinDatEx     |
 | **EMT** — European MiFID Template | V4.3 (2025-12-17), V4.2 (2024-04-22) | FinDatEx     |
 | **EPT** — European PRIIPs Template| V2.1 (2022-10-12), V2.0 (2022-02-15) | FinDatEx     |
@@ -331,9 +331,9 @@ failures.
 The validator reads identifiers from the columns the spec assigns to
 them, per template and version:
 
-- **TPT V7** — ISIN: fields 14, 68 (when type-flag = `"1"`). LEI:
-  fields 47/48, 50/51, 81/82, 84/85, 115/116, 119/120, 140/141.
-- **TPT V6** — same as V7 minus the custodian LEI columns 140/141.
+- **TPT V7 / V8** — ISIN: fields 14, 68 (when type-flag = `"1"`). LEI:
+  fields 47/48, 50/51, 81/82, 84/85, 115/116, 119/120, 140/141. (V8 adds
+  conditional fields 150/151 but no new ISIN/LEI columns.)
 - **EET** — polymorphic identifier field 23 with type-flag 24 (`"1"` =
   ISIN, `"10"` = LEI). Manufacturer LEI in field 13 with flag in 12.
   EET producer LEI in field 3.

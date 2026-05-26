@@ -159,11 +159,11 @@ class CrossFieldRulesTest {
     // ------------------------------------------------------ XF-15: TPT version
 
     @Test
-    void tptVersionV6IsError() {
+    void tptVersionMismatchIsError() {
         TptFile file = new TestFileBuilder()
-                .row(values("1000", "V6.0 (official) dated 10 January 2022"))
+                .row(values("1000", "V7.0 (official) dated 25 November 2024"))
                 .build();
-        List<Finding> findings = new TptVersionRule("V7.0").evaluate(ctx(file));
+        List<Finding> findings = new TptVersionRule("V8.0").evaluate(ctx(file));
         assertThat(findings).extracting(Finding::severity).contains(Severity.ERROR);
         assertThat(findings).extracting(Finding::fieldNum).contains("1000");
     }
@@ -173,7 +173,7 @@ class CrossFieldRulesTest {
         TptFile file = new TestFileBuilder()
                 .row(values("12", "FR12"))
                 .build();
-        List<Finding> findings = new TptVersionRule("V7.0").evaluate(ctx(file));
+        List<Finding> findings = new TptVersionRule("V8.0").evaluate(ctx(file));
         assertThat(findings).extracting(Finding::severity).containsOnly(Severity.INFO);
     }
 

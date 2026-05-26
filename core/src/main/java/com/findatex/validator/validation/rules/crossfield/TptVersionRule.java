@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 
 /**
  * XF-15: field 1000 (TPT version) must indicate the expected template version. Parametrised
- * over {@code expectedVersion} so the same rule type works for V7.0 ("V7" / "7.0") and V6.0
- * ("V6" / "6.0") without code duplication.
+ * over {@code expectedVersion} so the same rule type works for V8.0 ("V8" / "8.0") and V7.0
+ * ("V7" / "7.0") without code duplication.
  */
 public final class TptVersionRule implements Rule {
 

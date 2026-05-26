@@ -25,9 +25,9 @@ class TemplateRegistryTest {
     }
 
     @Test
-    void tptLatestIsV7_0() {
+    void tptLatestIsV8_0() {
         TemplateDefinition tpt = TemplateRegistry.of(TemplateId.TPT);
-        assertThat(tpt.latest().version()).isEqualTo("V7.0");
+        assertThat(tpt.latest().version()).isEqualTo("V8.0");
     }
 
     @Test

@@ -4,8 +4,8 @@ One file per (template, version) bundled with the validator. Generated from the 
 
 ## Documents
 
+- [TPT V8.0](tpt-v8-0.md) — TPT V8.0 — 2026-05-26
 - [TPT V7.0](tpt-v7-0.md) — TPT V7.0 — 2024-11-25
-- [TPT V6.0](tpt-v6-0.md) — TPT V6.0 — 2022-03-14
 - [EET V1.1.3](eet-v1-1-3.md) — EET V1.1.3 — 2024-10-04
 - [EET V1.1.2](eet-v1-1-2.md) — EET V1.1.2 — 2023-12-05
 - [EMT V4.3](emt-v4-3.md) — EMT V4.3 — 2025-12-17

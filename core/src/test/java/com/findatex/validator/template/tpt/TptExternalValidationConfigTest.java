@@ -20,13 +20,13 @@ class TptExternalValidationConfigTest {
     }
 
     @Test
-    void v6OmitsTheCustodianLeiPairAddedInV7() {
-        ExternalValidationConfig cfg = tpt.externalValidationConfigFor(TptTemplate.V6_0);
+    void v8SharesV7sIsinAndLeiLayout() {
+        ExternalValidationConfig cfg = tpt.externalValidationConfigFor(TptTemplate.V8_0);
         assertThat(cfg.isEmpty()).isFalse();
         assertThat(cfg.isinFields()).hasSize(2);
-        assertThat(cfg.leiFields()).hasSize(6);
+        assertThat(cfg.leiFields()).hasSize(7);
         assertThat(cfg.leiFields()).extracting(ExternalValidationConfig.IdentifierRef::codeKey)
-                .doesNotContain("140");
+                .contains("140");
     }
 
     @Test

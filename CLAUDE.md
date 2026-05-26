@@ -170,8 +170,9 @@ ISIN/LEI columns via `externalValidationConfigFor(version)` returning an
 `ExternalValidationConfig` (per-template constants live in `TptTemplate`,
 `EetTemplate`, `EmtTemplate`, `EptTemplate`). To extend: drop new column
 references into the constant; never add hardcoded field codes back into
-`ExternalValidationService`. Per-version drift is supported (TPT V6 omits the
-custodian LEI columns introduced in V7).
+`ExternalValidationService`. Per-version drift is supported via a
+per-version `ExternalValidationConfig` (e.g. the custodian LEI columns
+140/141 were introduced in TPT V7; V8 reuses V7's identifier layout).
 
 ### UI shell (JavaFX)
 

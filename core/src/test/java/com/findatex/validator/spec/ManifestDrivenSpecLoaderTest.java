@@ -132,8 +132,10 @@ class ManifestDrivenSpecLoaderTest {
         // and the same per-field flag values for the bundled TPT V7 spec.
         TemplateRegistry.init();
         SpecCatalog viaLegacy = SpecLoader.loadBundled();
+        // The legacy hand-written loader targets TPT V7, so pin the manifest loader to V7 too
+        // (TemplateRegistry.latest() is now V8.0, which adds fields 150/151).
         SpecCatalog viaManifest = TemplateRegistry.of(TemplateId.TPT)
-                .specLoaderFor(TemplateRegistry.of(TemplateId.TPT).latest())
+                .specLoaderFor(com.findatex.validator.template.tpt.TptTemplate.V7_0)
                 .load();
 
         assertThat(viaManifest.fields()).hasSameSizeAs(viaLegacy.fields());

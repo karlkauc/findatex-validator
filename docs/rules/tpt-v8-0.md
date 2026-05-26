@@ -1,8 +1,8 @@
-# FinDatEx TPT Validation Reference (V6.0)
+# FinDatEx TPT Validation Reference (V8.0)
 
-Spec: `/spec/tpt/TPT_V6_20220314.xlsx`
-Manifest: `/spec/tpt/tpt-v6-info.json`
-Released: 2022-03-14  ·  Sheet: `TPT V6.0`
+Spec: `/spec/tpt/TPT_V8_20260526.xlsx`
+Manifest: `/spec/tpt/tpt-v8-info.json`
+Released: 2026-05-26  ·  Sheet: `TPT V8.0`
 Profiles: Solvency II (`SOLVENCY_II`), IORP / EIOPA / ECB (`IORP_EIOPA_ECB`), NW 675 (`NW_675`), SST (FINMA) (`SST`)
 
 > Generated file — do not edit by hand. Regenerate via `mvn -pl core -Pdocs exec:java -Dexec.args="docs/rules"`.
@@ -39,10 +39,10 @@ Selecting a profile in the UI tells the validator to enforce the M (mandatory) a
 
 | Code | Display name | Mandatory fields | Conditional fields |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | 36 | 57 |
+| `SOLVENCY_II` | Solvency II | 36 | 60 |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | 31 | 0 |
-| `NW_675` | NW 675 | 7 | 6 |
-| `SST` | SST (FINMA) | 24 | 44 |
+| `NW_675` | NW 675 | 7 | 7 |
+| `SST` | SST (FINMA) | 24 | 45 |
 
 ## 3. General rules
 
@@ -52,7 +52,7 @@ The engines below run on every applicable field/row independently of the templat
 
 - **Rule ID:** `XF-15/TPT_VERSION`
 - **Severity:** ERROR (INFO if the version cell is absent)
-- **Expected token:** `V6.0`
+- **Expected token:** `V8.0`
 - **Trigger:** the version cell of the file does not contain the expected token.
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
 
@@ -68,14 +68,14 @@ The engines below run on every applicable field/row independently of the templat
 - **What it checks:** for every `FieldSpec` flagged C for an active profile and whose CIC applicability matches the row's CIC, the cell value must be non-empty.
 - **Severity:** WARNING.
 - **Score impact:** Each missing cell lowers PROFILE_COMPLETENESS (10 %, C-weighted 0.3) by 1 / total conditional slots. Severity = WARNING — does not affect MANDATORY_COMPLETENESS or FORMAT_CONFORMANCE.
-- **Active rule instances:** 79 (one per CIC-restricted field × profile).
+- **Active rule instances:** 84 (one per CIC-restricted field × profile).
 
 ### Format engine (`FORMAT/{numKey}`)
 
 - **What it checks:** every populated cell is validated against its codification kind: ISO 4217 currency, ISO 3166-A2 country, ISO 8601 date, NACE, CIC 4-char, alphanumeric length, numeric, closed-list membership.
 - **Severity:** ERROR.
 - **Score impact:** Each ERROR lowers FORMAT_CONFORMANCE (20 %) by 1 / non-empty cells. Closed-list mismatches (message contains "closed list") instead lower CLOSED_LIST_CONFORMANCE (15 %) by 1 / populated closed-list cells.
-- **Active rule instances:** 143 (one per field).
+- **Active rule instances:** 154 (one per field).
 
 ### ISIN engine (`ISIN/{code}/{type}`)
 
@@ -102,7 +102,7 @@ The engines below run on every applicable field/row independently of the templat
 
 - **Off by default.** Operators enable it via the Settings dialog (desktop) or the `FINDATEX_WEB_EXTERNAL_ENABLED` env var (web).
 - **ISIN lookup (OpenFIGI):** field `14` (when type field `15` = `1`); field `68` (when type field `69` = `1`)
-- **LEI lookup (GLEIF):** field `47` (when type field `48` = `1`); field `50` (when type field `51` = `1`); field `81` (when type field `82` = `1`); field `84` (when type field `85` = `1`); field `115` (when type field `116` = `1`); field `119` (when type field `120` = `1`)
+- **LEI lookup (GLEIF):** field `47` (when type field `48` = `1`); field `50` (when type field `51` = `1`); field `81` (when type field `82` = `1`); field `84` (when type field `85` = `1`); field `115` (when type field `116` = `1`); field `119` (when type field `120` = `1`); field `140` (when type field `141` = `1`)
 - **Score impact:** External-validation findings are advisory and do not affect any score dimension.
 
 ## 4. Cross-field rules
@@ -1253,7 +1253,7 @@ Definition: Exposure valuation for leg 2 in portfolio currency / total net asset
 FundsXML path: `Position / BondCharacteristics / RateType`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]; CICE sub-categories [1]; CICD sub-categories [1, 3]
-Definition: * Fixed - plain vanilla fixed coupon rate * Floating - plain vanilla floating coupon rates (for all interest rates, which refer to a reference interest rate like EONIA or Libor or Libor + margin in BP) * Variable - all other variable interest rates like step-up or step-down or fixed-to-float bonds. The variable feature is the (credit) margin or the change between fixed and float. * Infation_linked for inflation linked bonds in order to identify them.
+Definition: * Fixed - plain vanilla fixed coupon rate * Floating - plain vanilla floating coupon rates (for all interest rates, which refer to a reference interest rate like EONIA or EURIBOR + margin in BP) * Variable - all other variable interest rates like step-up or step-down or fixed-to-float bonds. The variable feature is the (credit) margin or the change between fixed and float. * Infation_linked for inflation linked bonds in order to identify them.
 
 #### Flag per profile
 
@@ -1865,7 +1865,7 @@ Definition: Economic sector
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | C | Conditional — required when the spec's applicability/condition holds. |
 | `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
@@ -1874,7 +1874,6 @@ Definition: Economic sector
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `COND_PRESENCE/54/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
 | `COND_PRESENCE/54/NW_675` | NW 675 | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
 | `COND_PRESENCE/54/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
 | `FORMAT/54` | (all) | ERROR | Populated cell does not match the codification (NACE) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
@@ -1911,7 +1910,7 @@ Applicability: CIC categories CIC1, CIC2
 ### Field 56 — 56_Securitisation
 
 FundsXML path: `Position / Securitisation / Securitised`
-Codification: CLOSED_LIST, closed list of 11 entries
+Codification: CLOSED_LIST, closed list of 13 entries
 Applicability: CIC categories CIC5, CIC6
 Definition: Securitisation typology
 
@@ -2095,7 +2094,8 @@ Definition: Strike price expressed as the quotation of the underlying asset
 
 FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / ConversionRatio`
 Codification: NUMERIC
-Applicability: CIC categories CIC2, CICA, CICB, CICC; CIC2 sub-categories [2]
+Applicability: CIC categories CIC2; CIC2 sub-categories [2]
+Definition: Conversion factor for convertible
 
 #### Flag per profile
 
@@ -3469,7 +3469,7 @@ Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
 FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / Code / Code`
 Codification: FREE_TEXT
 Applicability: all rows
-Definition: LEI when available, otherwise not reported
+Definition: LEI
 
 #### Flag per profile
 
@@ -3578,7 +3578,7 @@ Definition: NACE code of Issuer of Fund or Share Class
 FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Code / Code`
 Codification: FREE_TEXT
 Applicability: all rows
-Definition: LEI of ultimate parent when available, otherwise not reported
+Definition: LEI of ultimate parent
 
 #### Flag per profile
 
@@ -3742,7 +3742,7 @@ Definition: First level of Custody - Fund or seggregated account Custodian
 FundsXML path: `Portfolio / QRTPortfolioInformation / PortfolioModifiedDuration`
 Codification: UNKNOWN
 Applicability: all rows
-Definition: mainly invested in bonds (>50%) - Fund modified Duration (Residual modified duration)
+Definition: For funds or portfolios mainly invested in debt instruments (>50%) - Fund modified Duration (Residual modified duration)
 
 #### Flag per profile
 
@@ -4114,6 +4114,286 @@ Definition: Market valuation of the collateral in portfolio currency
 |---|---|---|---|---|---|
 | `FORMAT/139` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 | `XF-25/COLLATERAL_VALUE` | (all) | ERROR | Field `138` ∈ [1, 2, 3] | Field `139` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+
+
+---
+
+### Field 140 — 140_Custodian_identification_code
+
+FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / InstrumentIssuer / Code / Code`
+Codification: FREE_TEXT
+Applicability: all rows
+Definition: identification code of the custodian
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `FORMAT/140` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `LEI/140/141` | (all) | ERROR | Type field `141` = `1` and this cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
+| `XF-09/CUSTODIAN_PAIR` | (all) | ERROR | Field 140 or field 141 is populated | Both fields 140 and 141 must be populated as a pair. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+
+**Referenced as source by:** `XF-09/CUSTODIAN_PAIR`
+**External validation:** GLEIF LEI lookup (active when field `141` = `1`)
+
+---
+
+### Field 141 — 141_Type_of_custodian_identification_code
+
+FundsXML path: `Position / UnderlyingInstrument / Issuer / InstrumentIssuer / Identification / Code`
+Codification: CLOSED_LIST, closed list of 2 entries
+Applicability: all rows
+Definition: C0220 1-LEI, 9-None or internal
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `FORMAT/141` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `XF-09/CUSTODIAN_PAIR` | (all) | ERROR | Field 140 or field 141 is populated | Both fields 140 and 141 must be populated as a pair. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+
+**Referenced as source by:** `XF-09/CUSTODIAN_PAIR`
+
+---
+
+### Field 142 — 142_Bail-in_Rule
+
+Codification: CLOSED_LIST, closed list of 4 entries
+Applicability: CIC categories CIC2, CIC5
+Definition: Indicate if there is a "Bail-in" Rule applicable for debt instrument
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `COND_PRESENCE/142/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `FORMAT/142` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+
+
+---
+
+### Field 143 — 143_Maturity_date_expected
+
+FundsXML path: `Expected redemption date after considering an expected prepayment / extension of the contractual terms based on the options in the instrument`
+Codification: DATE
+Applicability: all rows
+Definition: Expected redemption date after considering an expected prepayment / extension of the contractual terms based on the options in the instrument
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `FORMAT/143` | (all) | ERROR | Populated cell does not match the codification (DATE) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+
+
+---
+
+### Field 144 — 144_Modified_duration_to_maturity_date_expected
+
+Codification: NUMERIC
+Applicability: all rows
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `FORMAT/144` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+
+
+---
+
+### Field 145 — 145_Credit_sensitivity_expected
+
+Codification: NUMERIC
+Applicability: all rows
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `FORMAT/145` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+
+
+---
+
+### Field 146 — 146_PIK
+
+Codification: CLOSED_LIST, closed list of 5 entries
+Applicability: all rows
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `FORMAT/146` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `XF-13/PIK` | (all) | ERROR | Field 146 (PIK) is populated | Value must be one of {0,1,2,3,4} and case-specific fields must be present. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+
+**Referenced as source by:** `XF-13/PIK`
+
+---
+
+### Field 147 — 147_Infrastructure_investment_additional_QRT
+
+FundsXML path: `To be defined with Fundxml`
+Codification: CLOSED_LIST, closed list of 10 entries
+Applicability: all rows
+Definition: (for mandate or segregated account especially) Identify if the asset is an infrastructure investment as defined in Article 1(55a) and (55b) of Delegated Regulation (EU) 2015/35. One of the options in the following closed list shall be used:
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | I | Informational — populate if available, no enforcement. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `FORMAT/147` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+
+
+---
+
+### Field 148 — 148_Economic_sector_NACE
+
+FundsXML path: `Position / CreditRiskData / EconomicSector`
+Codification: NACE
+Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
+Definition: Economic sector
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | C | Conditional — required when the spec's applicability/condition holds. |
+| `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `COND_PRESENCE/148/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `COND_PRESENCE/148/NW_675` | NW 675 | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `COND_PRESENCE/148/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `FORMAT/148` | (all) | ERROR | Populated cell does not match the codification (NACE) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+
+
+---
+
+### Field 150 — 150_LTEI_Fund_Elligibility
+
+Codification: CLOSED_LIST, closed list of 3 entries
+Applicability: CIC categories CIC3, CIC4
+Definition: Elligibility of the held fund to LTEI dispositions according to regulation
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `COND_PRESENCE/150/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `FORMAT/150` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+
+
+---
+
+### Field 151 — 151_Legislative_program_investment
+
+Codification: CLOSED_LIST, closed list of 3 entries
+Applicability: CIC categories CIC3
+Definition: Elligibility of the held equities to legislative programmes dispositions
+
+#### Flag per profile
+
+| Code | Display name | Flag | Meaning |
+|---|---|---|---|
+| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
+
+#### Checks
+
+| Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
+|---|---|---|---|---|---|
+| `COND_PRESENCE/151/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `FORMAT/151` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---

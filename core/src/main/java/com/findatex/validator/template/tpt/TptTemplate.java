@@ -16,10 +16,20 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * {@link TemplateDefinition} for the FinDatEx Tripartite Template (TPT). Phase 0 wraps the
- * existing {@link SpecLoader} for V7; later phases add V6 and the manifest-driven loader.
+ * {@link TemplateDefinition} for the FinDatEx Tripartite Template (TPT). Versions are loaded
+ * through the manifest-driven {@link ManifestDrivenSpecLoader}; the two most recent versions
+ * (V8.0, V7.0) are bundled.
  */
 public final class TptTemplate implements TemplateDefinition {
+
+    public static final TemplateVersion V8_0 = new TemplateVersion(
+            TemplateId.TPT,
+            "V8.0",
+            "TPT V8.0 — 2026-05-26",
+            "/spec/tpt/TPT_V8_20260526.xlsx",
+            "TPT V8.0",
+            LocalDate.of(2026, 5, 26),
+            "/spec/tpt/tpt-v8-info.json");
 
     public static final TemplateVersion V7_0 = new TemplateVersion(
             TemplateId.TPT,
@@ -30,21 +40,13 @@ public final class TptTemplate implements TemplateDefinition {
             LocalDate.of(2024, 11, 25),
             "/spec/tpt/tpt-v7-info.json");
 
-    public static final TemplateVersion V6_0 = new TemplateVersion(
-            TemplateId.TPT,
-            "V6.0",
-            "TPT V6.0 — 2022-03-14",
-            "/spec/tpt/TPT_V6_20220314.xlsx",
-            "TPT V6.0",
-            LocalDate.of(2022, 3, 14),
-            "/spec/tpt/tpt-v6-info.json");
-
-    private static final List<TemplateVersion> VERSIONS = List.of(V7_0, V6_0);
+    private static final List<TemplateVersion> VERSIONS = List.of(V8_0, V7_0);
 
     /**
-     * TPT V7 column numbering for ISIN/LEI candidates and contextual cross-checks.
+     * TPT V7/V8 column numbering for ISIN/LEI candidates and contextual cross-checks.
      * Type-of-code flag {@code "1"} maps to ISIN (fields 14/68 with their sibling type
-     * columns 15/69) and to LEI (seven LEI/type column pairs).
+     * columns 15/69) and to LEI (seven LEI/type column pairs). V8 added two conditional
+     * fields (150/151) but did not change any ISIN/LEI columns, so it shares this config.
      */
     public static final ExternalValidationConfig EXTERNAL_VALIDATION_V7 = new ExternalValidationConfig(
             List.of(
@@ -60,19 +62,8 @@ public final class TptTemplate implements TemplateDefinition {
                     new IdentifierRef("140", "141", "1")),
             "21", "11", "46", "52");
 
-    /** V6 lacks the custodian LEI columns 140/141 introduced in V7; otherwise identical. */
-    public static final ExternalValidationConfig EXTERNAL_VALIDATION_V6 = new ExternalValidationConfig(
-            List.of(
-                    new IdentifierRef("14", "15", "1"),
-                    new IdentifierRef("68", "69", "1")),
-            List.of(
-                    new IdentifierRef("47", "48", "1"),
-                    new IdentifierRef("50", "51", "1"),
-                    new IdentifierRef("81", "82", "1"),
-                    new IdentifierRef("84", "85", "1"),
-                    new IdentifierRef("115", "116", "1"),
-                    new IdentifierRef("119", "120", "1")),
-            "21", "11", "46", "52");
+    /** V8 shares V7's ISIN/LEI column layout (no identifier columns changed in V8). */
+    public static final ExternalValidationConfig EXTERNAL_VALIDATION_V8 = EXTERNAL_VALIDATION_V7;
 
     /** Default-pointing constant for callers that don't care about version drift (tests, etc.). */
     public static final ExternalValidationConfig EXTERNAL_VALIDATION = EXTERNAL_VALIDATION_V7;
@@ -115,8 +106,8 @@ public final class TptTemplate implements TemplateDefinition {
 
     @Override
     public ExternalValidationConfig externalValidationConfigFor(TemplateVersion version) {
+        if (version == V8_0) return EXTERNAL_VALIDATION_V8;
         if (version == V7_0) return EXTERNAL_VALIDATION_V7;
-        if (version == V6_0) return EXTERNAL_VALIDATION_V6;
         throw new NoSuchElementException("TPT does not support version " + version.version());
     }
 

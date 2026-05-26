@@ -38,7 +38,7 @@ and an expandable list, so a recurring problem across thousands of
 rows reads as one entry instead of thousands. The Excel report keeps
 the full one-row-per-finding detail.
 
-Bundled templates: **TPT V7.0 + V6.0**, **EET V1.1.3 + V1.1.2**,
+Bundled templates: **TPT V8.0 + V7.0**, **EET V1.1.3 + V1.1.2**,
 **EMT V4.3 + V4.2**, **EPT V2.1 + V2.0**.
 
 ![Animated walkthrough: pick template and profile, upload a file, validate, then group the findings by error](docs/screenshots/web-app-demo.gif)

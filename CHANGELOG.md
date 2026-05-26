@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **TPT V8.0** (2026-05-26) bundled as the latest TPT version. V8 reuses V7's
+  column layout and ISIN/LEI config; the only content changes are field 148
+  renamed `Economic_sector_NACE2.1` → `Economic_sector_NACE` and two new
+  conditional fields, `150_LTEI_Fund_Elligibility` and
+  `151_Legislative_program_investment` (validated mechanically only).
 - Native desktop installers (`.deb`, `.dmg`, `.msi`) plus no-admin portable
   bundles (`.zip`, `.tar.gz`) built automatically for Linux x64, Windows x64,
   macOS Intel and macOS Apple Silicon on every `v*` tag push, attached to
@@ -21,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `PACKAGE_TYPE=app-image` produces the portable layout used by the
   no-admin archives. Required JDK modules are computed from the shaded
   jar via `jdeps` so the runtime image stays minimal.
+
+### Removed
+- **TPT V6.0** (2022-03-14) is no longer bundled — superseded by V7.0/V8.0.
+  Its spec, manifest and generated rule reference were dropped.
 
 ### Fixed
 - _Nothing yet._

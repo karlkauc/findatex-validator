@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- _Nothing yet._
+
+### Changed
+- _Nothing yet._
+
+### Fixed
+- _Nothing yet._
+
+## [1.0.5] — 2026-05-26
+
+### Added
 - **TPT V8.0** (2026-05-26) bundled as the latest TPT version. V8 reuses V7's
   column layout and ISIN/LEI config; the only content changes are field 148
   renamed `Economic_sector_NACE2.1` → `Economic_sector_NACE` and two new

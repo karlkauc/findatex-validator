@@ -24,7 +24,9 @@ services:
     # escalation, and no writes outside /tmp + the mounted cache volume.
     read_only: true
     tmpfs:
-      - /tmp:exec,nosuid,nodev,size=64m
+      # Holds Quarkus upload tempfiles, POI scratch (poifiles) and the report
+      # XLSX simultaneously — 64m overflows (ENOSPC) on large real-world funds.
+      - /tmp:exec,nosuid,nodev,size=512m
     cap_drop:
       - ALL
     security_opt:

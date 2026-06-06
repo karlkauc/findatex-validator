@@ -91,6 +91,12 @@ Desktop (`settings.json` → `usageStats`, plus env):
 Web (`application.properties` / env):
 - `FINDATEX_WEB_USAGE_DB_URL` / `_USER` / `_PASSWORD` — Neon JDBC
   (`...?sslmode=require`). **Empty ⇒ feature inert, app still boots.**
+- `FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT` — Agroal connection-acquisition
+  timeout (default `30s`). Neon (serverless) suspends compute when idle; the
+  first connection after an idle period must wait for the wake, which exceeds
+  Agroal's 5s default and would otherwise silently drop the insert.
+  `UsageStatsService` additionally retries the insert (3 attempts, linear
+  backoff), so cold-start runs are no longer lost.
 - `FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN` — required for ingest; empty ⇒
   endpoint accepts-and-discards (logged once at startup)
 - `FINDATEX_WEB_USAGE_STATS_RATE` — per-IP `/api/usage-stats` limit (default 60/h)

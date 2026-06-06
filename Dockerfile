@@ -78,8 +78,16 @@ RUN $JAVA_HOME/bin/jlink \
 # MaxMind, available from https://www.maxmind.com."
 FROM alpine:3.23 AS geoip
 RUN apk add --no-cache curl tar
+# Cache-bust: BuildKit does NOT include secret *content* in a RUN's cache key,
+# so a layer built once without the license key (skip branch) would otherwise be
+# reused forever even after the key is added — leaving the DB missing. Tying the
+# cache key to GIT_COMMIT forces the download to re-run every commit, which also
+# keeps the GeoLite2 data fresh. CI additionally sets `no-cache-filters: geoip`
+# as a belt-and-suspenders guarantee (see release.yml).
+ARG GIT_COMMIT=
 RUN --mount=type=secret,id=maxmind_license_key \
     set -eu; \
+    echo "GeoIP stage for commit '${GIT_COMMIT:-local}'"; \
     mkdir -p /geoip; \
     if [ -s /run/secrets/maxmind_license_key ]; then \
       key="$(cat /run/secrets/maxmind_license_key)"; \

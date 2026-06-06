@@ -242,6 +242,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # Never reuse a cached GeoIP layer: BuildKit excludes secret content
+          # from the cache key, so a layer built once without the license key
+          # would otherwise stick and ship an image with no DB. Always re-run
+          # this stage (also keeps the GeoLite2 data fresh per release).
+          no-cache-filters: geoip
           build-args: |
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.event.head_commit.timestamp }}

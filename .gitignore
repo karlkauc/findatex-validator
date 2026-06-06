@@ -35,6 +35,10 @@ Thumbs.db
 .env
 !.env.example
 
+# MaxMind GeoLite2 DB — never commit (EULA forbids redistribution; the image
+# downloads it at build time from the MAXMIND_LICENSE_KEY in .env).
+*.mmdb
+
 # Claude Code scratch / per-project data
 .claude/
 

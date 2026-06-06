@@ -66,7 +66,38 @@ RUN $JAVA_HOME/bin/jlink \
     --compress=zip-6 \
     --output /custom-jre
 
-# ---- Stage 3: Runtime (Alpine + Custom-JRE) ---------------------------------
+# ---- Stage 3: GeoIP database download (build-secret gated) ------------------
+# Downloads the MaxMind GeoLite2-Country.mmdb at build time. The DB is NOT
+# committed (MaxMind GeoLite2 EULA forbids unattributed redistribution) and is
+# never baked into a layer as plaintext credentials — the license key is a
+# BuildKit secret (id=maxmind_license_key), mounted only for this RUN.
+#
+# No secret ⇒ empty /geoip dir; the runtime then finds no file, GeoIpService
+# logs a warning and returns null (country_code stays NULL), app still boots.
+# Attribution (MaxMind EULA): "This product includes GeoLite2 data created by
+# MaxMind, available from https://www.maxmind.com."
+FROM alpine:3.23 AS geoip
+RUN apk add --no-cache curl tar
+RUN --mount=type=secret,id=maxmind_license_key \
+    set -eu; \
+    mkdir -p /geoip; \
+    if [ -s /run/secrets/maxmind_license_key ]; then \
+      key="$(cat /run/secrets/maxmind_license_key)"; \
+      echo "GeoIP: downloading GeoLite2-Country.mmdb from MaxMind"; \
+      curl -fsSL --retry 3 --retry-delay 2 \
+        "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${key}&suffix=tar.gz" \
+        -o /tmp/geoip.tar.gz; \
+      tar -xzf /tmp/geoip.tar.gz -C /tmp; \
+      mmdb="$(find /tmp -name 'GeoLite2-Country.mmdb' | head -n 1)"; \
+      [ -n "$mmdb" ] || { echo "GeoIP: .mmdb not found in archive" >&2; exit 1; }; \
+      cp "$mmdb" /geoip/GeoLite2-Country.mmdb; \
+      rm -f /tmp/geoip.tar.gz; \
+      echo "GeoIP: staged $(du -h /geoip/GeoLite2-Country.mmdb | cut -f1) database"; \
+    else \
+      echo "GeoIP: no maxmind_license_key build secret — skipping download (country_code will be NULL)"; \
+    fi
+
+# ---- Stage 4: Runtime (Alpine + Custom-JRE) ---------------------------------
 FROM alpine:3.23
 
 # fontconfig + ttf-dejavu: Apache POI's autoSizeColumn calls into AWT, which
@@ -83,6 +114,13 @@ COPY --from=jre-build /custom-jre $JAVA_HOME
 # volume is bound to /data/cache, Docker copies these perms into the fresh
 # volume on first start so the container can write GLEIF/OpenFIGI lookup data.
 RUN mkdir -p /data/cache && chown -R app:app /data
+
+# GeoIP country DB for usage-stats country_code derivation (read-only at
+# runtime). An empty dir here (no maxmind_license_key build secret) leaves
+# FINDATEX_WEB_GEOIP_DB pointing at a missing file — GeoIpService logs a
+# warning and returns null, the app still boots normally.
+COPY --from=geoip --chown=app:app /geoip /data/geoip
+ENV FINDATEX_WEB_GEOIP_DB=/data/geoip/GeoLite2-Country.mmdb
 
 WORKDIR /app
 COPY --from=build --chown=app:app /src/web-app/target/quarkus-app/ ./

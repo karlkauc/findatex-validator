@@ -245,3 +245,10 @@ jobs:
           build-args: |
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.event.head_commit.timestamp }}
+          # MaxMind GeoLite2 license key for the build-time DB download (see
+          # Dockerfile "geoip" stage). Add it under Settings → Secrets and
+          # variables → Actions → Secrets as MAXMIND_LICENSE_KEY. If unset the
+          # secret is empty, the download is skipped, and country_code stays
+          # NULL — the image still builds and boots.
+          secrets: |
+            maxmind_license_key=${{ secrets.MAXMIND_LICENSE_KEY }}

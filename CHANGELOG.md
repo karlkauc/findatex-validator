@@ -16,6 +16,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - _Nothing yet._
 
+## [1.0.6] — 2026-06-06
+
+### Added
+- **Usage-stats country derivation (GeoIP).** The web image now bakes the
+  MaxMind **GeoLite2-Country** database in at build time (downloaded via a
+  BuildKit secret `maxmind_license_key`; the licence key is never committed),
+  and sets `FINDATEX_WEB_GEOIP_DB` so `country_code` resolves from the request
+  IP. No key ⇒ download skipped and the image still builds/boots with
+  `country_code` NULL. Wired through `release.yml` (GitHub secret
+  `MAXMIND_LICENSE_KEY`) and `docker-compose` (`.env`).
+
+### Changed
+- **Cloud Run deploy** now sets `PROXY_ADDRESS_FORWARDING=true` and
+  `PROXY_ALLOW_X_FORWARDED=true` so the GeoIP lookup sees the real client IP
+  from `X-Forwarded-For` instead of Google's internal front-end address.
+  Trade-off (no `PROXY_TRUSTED_PROXIES` allowlist) documented in
+  `docs/DEPLOY_CLOUDRUN.md` / `docs/USAGE_STATS.md`.
+
 ## [1.0.5] — 2026-05-26
 
 ### Added
@@ -78,5 +96,6 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.6...HEAD
+[1.0.6]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.6
 [1.0.0]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.0

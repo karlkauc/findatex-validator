@@ -130,6 +130,15 @@ jobs:
         # blast radius without adding Cloud Armor. Min-instances=0 keeps the
         # idle bill at zero; cold starts hit only the first request after a
         # quiet period.
+        #
+        # PROXY_ADDRESS_FORWARDING + PROXY_ALLOW_X_FORWARDED make Quarkus derive
+        # the source IP from X-Forwarded-For (set by Google's front end), so the
+        # usage-stats GeoIP lookup gets a real client IP instead of an internal
+        # Google address (else country_code stays NULL). The GeoLite2 DB itself
+        # is baked into the image (FINDATEX_WEB_GEOIP_DB), so no env var is
+        # needed here. Trade-off: with no trusted-proxies allowlist a client can
+        # spoof X-Forwarded-For to mint fresh per-IP rate-limit buckets; the
+        # --concurrency / --max-instances caps above bound the resulting abuse.
         run: |
           set -euo pipefail
           gcloud run deploy "${SERVICE_NAME}" \
@@ -146,7 +155,7 @@ jobs:
             --max-instances=10 \
             --min-instances=0 \
             --timeout=300 \
-            --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=false,FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://ep-crimson-meadow-albz1x37.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=neondb_owner \
+            --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=false,FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://ep-crimson-meadow-albz1x37.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=neondb_owner,PROXY_ADDRESS_FORWARDING=true,PROXY_ALLOW_X_FORWARDED=true \
             --update-secrets=FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest \
             --quiet
 

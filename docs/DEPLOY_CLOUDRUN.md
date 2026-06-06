@@ -252,6 +252,30 @@ The deploy workflow (`.github/workflows/deploy-cloudrun.yml`) uses
 `--update-env-vars` / `--update-secrets` (additive, not replace) so the
 above bootstrap survives every subsequent CI deploy without re-applying.
 
+### Country derivation (GeoIP)
+
+`country_code` is derived server-side from the request IP via an offline
+MaxMind **GeoLite2-Country** database (`docs/USAGE_STATS.md`). Two things must
+be in place for it to resolve on Cloud Run:
+
+1. **The DB in the image.** It is downloaded at image build time, gated on a
+   GitHub Actions **secret** `MAXMIND_LICENSE_KEY` (free key from
+   <https://www.maxmind.com>). Add it under *Settings → Secrets and variables →
+   Actions → Secrets*; `release.yml` forwards it to the Docker build as the
+   `maxmind_license_key` BuildKit secret. No secret ⇒ no DB ⇒ `country_code`
+   stays NULL (the image still builds and boots).
+2. **The real client IP.** Cloud Run sits behind Google's front end, so the
+   deploy workflow sets `PROXY_ADDRESS_FORWARDING=true` and
+   `PROXY_ALLOW_X_FORWARDED=true` so Quarkus reads the client IP from
+   `X-Forwarded-For`. Without these the lookup sees an internal Google address
+   and `country_code` stays NULL. Trade-off: with no `PROXY_TRUSTED_PROXIES`
+   allowlist a client can spoof `X-Forwarded-For` to mint fresh per-IP
+   rate-limit buckets; the `--concurrency` / `--max-instances` caps bound the
+   abuse (see the proxy block in `application.properties`).
+
+Both apply only to **new** runs — the IP is never stored, so historical
+`usage_event` rows keep `country_code = NULL`.
+
 ## Enabling external validation later
 
 External validation (GLEIF + OpenFIGI) is off by default in the deployed

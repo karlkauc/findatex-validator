@@ -100,8 +100,29 @@ Web (`application.properties` / env):
 ### GeoLite2 database
 
 The MMDB is **not** committed (MaxMind GeoLite2 EULA forbids unattributed
-redistribution). Obtain it with a free MaxMind licence key, place it on the
-container (e.g. via the image build), and point `FINDATEX_WEB_GEOIP_DB` at it.
+redistribution). It is downloaded **at image build time** by the Dockerfile
+`geoip` stage, gated on a BuildKit secret (`maxmind_license_key`), and copied
+into the image at `/data/geoip/GeoLite2-Country.mmdb`; the image already sets
+`FINDATEX_WEB_GEOIP_DB` to that path. No secret ⇒ download skipped, the path is
+empty, and `country_code` stays NULL (the app still boots).
+
+Get a free licence key at <https://www.maxmind.com> (Account → Manage License
+Keys), then wire it per environment:
+
+- **`docker compose`** — put `MAXMIND_LICENSE_KEY=…` in `.env`, then
+  `docker compose build && docker compose up -d`. (The key is consumed only at
+  build time; it never lands in a layer or the running container.)
+- **CI / production image** — add a GitHub Actions **secret**
+  `MAXMIND_LICENSE_KEY`; `release.yml` passes it to the build as the
+  `maxmind_license_key` BuildKit secret.
+
+> **Behind a proxy/LB (e.g. Cloud Run):** the DB alone is not enough — the app
+> must also see the real client IP. Set `PROXY_ADDRESS_FORWARDING=true` and
+> `PROXY_ALLOW_X_FORWARDED=true` (the Cloud Run deploy workflow already does).
+> Without it the lookup gets the proxy's internal address and `country_code`
+> stays NULL. See the proxy block in `application.properties` for the
+> rate-limit-spoofing trade-off when no `PROXY_TRUSTED_PROXIES` allowlist is set.
+
 Attribution: *“This product includes GeoLite2 data created by MaxMind,
 available from https://www.maxmind.com.”*
 

@@ -13,6 +13,12 @@ services:
       args:
         GIT_COMMIT: ${GIT_COMMIT:-}
         BUILD_TIME: ${BUILD_TIME:-}
+      # MaxMind GeoLite2 license key for the build-time GeoIP DB download (see
+      # the Dockerfile "geoip" stage). Sourced from MAXMIND_LICENSE_KEY in the
+      # environment / .env. Unset ⇒ download skipped, country_code stays NULL,
+      # image still builds. Requires BuildKit (default in modern Docker).
+      secrets:
+        - maxmind_license_key
     image: findatex-validator-web:1.0.0
     container_name: findatex-validator-web
     ports:
@@ -65,10 +71,14 @@ services:
       FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN: "${FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN:-}"
       # Optional: per-IP rate limit on /api/usage-stats (default 60/h).
       # FINDATEX_WEB_USAGE_STATS_RATE: "60"
-      # Optional: MaxMind GeoLite2-Country.mmdb for country_code derivation.
-      # Mount the file as a read-only volume and point this at it. Empty ⇒
-      # country_code stays NULL (app still boots).
-      # FINDATEX_WEB_GEOIP_DB: "/data/geoip/GeoLite2-Country.mmdb"
+      # GeoIP country derivation: the GeoLite2-Country.mmdb is baked into the
+      # image at /data/geoip by the Dockerfile "geoip" stage (gated on the
+      # maxmind_license_key build secret), and FINDATEX_WEB_GEOIP_DB is already
+      # set in the image — no override needed here. NOTE: behind a real reverse
+      # proxy, also set PROXY_ADDRESS_FORWARDING=true and PROXY_ALLOW_X_FORWARDED=true
+      # so the lookup sees the client IP rather than the proxy's (see
+      # application.properties proxy block). This compose stack talks to the
+      # container directly, so they stay off here.
 
     volumes:
       # GLEIF/OpenFIGI lookup cache. Persisting it across restarts avoids
@@ -94,3 +104,11 @@ services:
 
 volumes:
   findatex-cache:
+
+secrets:
+  # MaxMind GeoLite2 license key, read from the MAXMIND_LICENSE_KEY env var
+  # (set it in .env, which is gitignored). Only consumed at image build time by
+  # the Dockerfile "geoip" stage; never written into a layer or the running
+  # container. Absent/empty ⇒ GeoIP DB download is skipped.
+  maxmind_license_key:
+    environment: MAXMIND_LICENSE_KEY

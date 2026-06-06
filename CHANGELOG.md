@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - _Nothing yet._
 
+## [1.0.7] — 2026-06-06
+
+### Fixed
+- **GeoIP DB was missing from the 1.0.6 image.** BuildKit excludes secret
+  *content* from a layer's cache key, so the `geoip` stage built once without
+  the licence key (skip branch) was reused even after `MAXMIND_LICENSE_KEY` was
+  added — shipping an image with an empty `/data/geoip` and `country_code`
+  staying NULL. The stage's cache key is now tied to `GIT_COMMIT` and CI sets
+  `no-cache-filters: geoip`, so the DB is (re-)downloaded on every build.
+
 ## [1.0.6] — 2026-06-06
 
 ### Added
@@ -96,6 +106,7 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.6...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.7...HEAD
+[1.0.7]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.7
 [1.0.6]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.6
 [1.0.0]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.0

@@ -16,6 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - _Nothing yet._
 
+## [1.0.8] — 2026-06-07
+
+### Fixed
+- **Usage-stats runs were silently dropped on Neon cold start.** Neon
+  (serverless) suspends compute when idle, so the first connection after an
+  idle period exceeded Agroal's 5 s default acquisition timeout — the
+  fire-and-forget `usage_event` insert failed and the run (and its
+  `country_code`) was lost, leaving `tools/usage_report.py` totals frozen.
+  `UsageStatsService` now retries the insert (3 attempts, linear backoff) and
+  the acquisition timeout is raised to 30 s (override
+  `FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT`).
+
 ## [1.0.7] — 2026-06-06
 
 ### Fixed
@@ -106,7 +118,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.7...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.8...HEAD
+[1.0.8]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.8
 [1.0.7]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.7
 [1.0.6]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.6
 [1.0.0]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.0

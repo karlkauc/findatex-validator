@@ -57,6 +57,23 @@ public class UsageStatsService {
     private ExecutorService worker;
     private volatile boolean warnedOnce;
 
+    /**
+     * Cold-start resilience: Neon (serverless) suspends its compute when idle,
+     * so the first connection after a quiet period must wait for the wake. Even
+     * with a generous {@code acquisition-timeout} a single attempt can still
+     * fail (fast-fail during wake); a couple of retries let the first attempt
+     * warm Neon and a later one land the row. Package-private so the retry
+     * behaviour is unit-testable without a DB.
+     */
+    int maxInsertAttempts = 3;
+    long retryBackoffMs = 1500;
+
+    /** One insert attempt; throws so {@link #insertWithRetry} can retry it. */
+    @FunctionalInterface
+    interface SqlOp {
+        void run() throws Exception;
+    }
+
     public boolean enabled() {
         return config.usageStats().dbConfigured() && dataSource.isResolvable();
     }
@@ -107,6 +124,54 @@ public class UsageStatsService {
     }
 
     private void insert(Row r) {
+        insertWithRetry(() -> doInsert(r));
+    }
+
+    /**
+     * Runs {@code op}, retrying up to {@link #maxInsertAttempts} times with a
+     * linear backoff so a cold-Neon wake on the first attempt doesn't lose the
+     * row. Never rethrows — a persistently failing DB drops the event with a
+     * rate-limited WARN, exactly as before. Package-private for testing.
+     */
+    void insertWithRetry(SqlOp op) {
+        for (int attempt = 1; ; attempt++) {
+            try {
+                op.run();
+                // Success: re-arm the WARN so a later failure after a recovered
+                // DB is visible again, while a continuous streak stays quiet.
+                warnedOnce = false;
+                return;
+            } catch (Exception e) {
+                if (attempt >= maxInsertAttempts) {
+                    if (!warnedOnce) {
+                        warnedOnce = true;
+                        log.warn("Usage-stats insert failed after {} attempt(s) "
+                                + "(further failures suppressed): {}", attempt, e.toString());
+                    } else {
+                        log.debug("Usage-stats insert failed after {} attempt(s) (ignored): {}",
+                                attempt, e.toString());
+                    }
+                    return;
+                }
+                if (!backoff(attempt)) return; // interrupted (shutdown) — abandon
+            }
+        }
+    }
+
+    /** Linear backoff between retries; returns false if interrupted. */
+    private boolean backoff(int attempt) {
+        long ms = retryBackoffMs * attempt;
+        if (ms <= 0) return true;
+        try {
+            Thread.sleep(ms);
+            return true;
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    private void doInsert(Row r) throws Exception {
         try (Connection c = dataSource.get().getConnection();
              PreparedStatement ps = c.prepareStatement(INSERT)) {
 
@@ -137,19 +202,9 @@ public class UsageStatsService {
             ps.executeUpdate();
             profiles.free();
             rules.free();
-            // Re-arm the WARN: a fresh failure after a recovered DB should be
-            // visible again, while a continuous failure streak stays quiet.
-            warnedOnce = false;
-        } catch (Exception e) {
-            // DB down / schema missing / bad row — drop silently, never disturb
-            // the request path. Rate-limit the WARN so a dead DB can't flood logs.
-            if (!warnedOnce) {
-                warnedOnce = true;
-                log.warn("Usage-stats insert failed (further failures suppressed): {}", e.toString());
-            } else {
-                log.debug("Usage-stats insert failed (ignored): {}", e.toString());
-            }
         }
+        // Failures propagate to insertWithRetry, which retries then drops the
+        // event with a rate-limited WARN — never disturbing the request path.
     }
 
     private static Object[] toArray(List<String> xs) {

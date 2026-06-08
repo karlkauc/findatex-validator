@@ -57,13 +57,13 @@
         <poi.version>5.5.1</poi.version>
         <commons.csv.version>1.14.1</commons.csv.version>
         <slf4j.version>2.0.18</slf4j.version>
-        <logback.version>1.5.32</logback.version>
+        <logback.version>1.5.34</logback.version>
         <junit.version>6.1.0</junit.version>
         <assertj.version>3.27.7</assertj.version>
-        <jackson.version>2.21.3</jackson.version>
+        <jackson.version>2.22.0</jackson.version>
         <commonmark.version>0.28.0</commonmark.version>
 
-        <quarkus.platform.version>3.35.4</quarkus.platform.version>
+        <quarkus.platform.version>3.36.1</quarkus.platform.version>
         <bucket4j.version>8.10.1</bucket4j.version>
         <caffeine.version>3.2.4</caffeine.version>
         <rest-assured.version>6.0.0</rest-assured.version>
@@ -185,7 +185,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.5</version>
+                    <version>3.5.6</version>
                     <configuration>
                         <argLine>@{argLine} --enable-native-access=ALL-UNNAMED</argLine>
                     </configuration>
@@ -200,7 +200,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.14</version>
+                    <version>0.8.15</version>
                     <executions>
                         <execution>
                             <id>prepare-agent</id>

@@ -60,7 +60,7 @@
         <logback.version>1.5.32</logback.version>
         <junit.version>6.1.0</junit.version>
         <assertj.version>3.27.7</assertj.version>
-        <jackson.version>2.21.3</jackson.version>
+        <jackson.version>2.21.5</jackson.version>
         <commonmark.version>0.28.0</commonmark.version>
 
         <quarkus.platform.version>3.35.4</quarkus.platform.version>

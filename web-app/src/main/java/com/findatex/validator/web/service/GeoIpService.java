@@ -67,7 +67,7 @@ public class GeoIpService {
         try {
             InetAddress addr = InetAddress.getByName(ip.trim());
             CountryResponse resp = r.country(addr);
-            String iso = resp.getCountry() == null ? null : resp.getCountry().getIsoCode();
+            String iso = resp.country() == null ? null : resp.country().isoCode();
             return (iso == null || iso.isBlank()) ? null : iso;
         } catch (Exception e) {
             // Private/loopback ranges and not-found entries land here; never log the IP.

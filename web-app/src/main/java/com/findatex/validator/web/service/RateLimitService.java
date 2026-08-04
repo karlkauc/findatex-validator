@@ -4,7 +4,6 @@ import com.findatex.validator.web.config.WebConfig;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
-import io.github.bucket4j.Refill;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -78,18 +77,20 @@ public class RateLimitService {
     /** Separate, more generous bucket for the lightweight usage-stats ingest. */
     public ConsumptionProbe consumeUsage(String clientIp) {
         return usageBuckets.computeIfAbsent(normaliseKey(clientIp),
-                k -> Bucket.builder().addLimit(Bandwidth.classic(
-                        usageCapacityPerHour,
-                        Refill.intervally(1, usageRefillInterval))).build())
+                k -> Bucket.builder().addLimit(Bandwidth.builder()
+                        .capacity(usageCapacityPerHour)
+                        .refillIntervally(1, usageRefillInterval)
+                        .build()).build())
                 .tryConsumeAndReturnRemaining(1);
     }
 
     /** Separate, strict bucket for newsletter sign-up (anti e-mail-bombing). */
     public ConsumptionProbe consumeNewsletter(String clientIp) {
         return newsletterBuckets.computeIfAbsent(normaliseKey(clientIp),
-                k -> Bucket.builder().addLimit(Bandwidth.classic(
-                        newsletterCapacityPerHour,
-                        Refill.intervally(1, newsletterRefillInterval))).build())
+                k -> Bucket.builder().addLimit(Bandwidth.builder()
+                        .capacity(newsletterCapacityPerHour)
+                        .refillIntervally(1, newsletterRefillInterval)
+                        .build()).build())
                 .tryConsumeAndReturnRemaining(1);
     }
 
@@ -122,9 +123,10 @@ public class RateLimitService {
     }
 
     private Bucket newBucket() {
-        Bandwidth limit = Bandwidth.classic(
-                capacityPerHour,
-                Refill.intervally(1, refillInterval));
+        Bandwidth limit = Bandwidth.builder()
+                .capacity(capacityPerHour)
+                .refillIntervally(1, refillInterval)
+                .build();
         return Bucket.builder().addLimit(limit).build();
     }
 

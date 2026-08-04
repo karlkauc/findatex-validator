@@ -61,7 +61,7 @@ public final class CsvLoader {
                 .setTrim(true);
         if (delimiter != '|') b.setQuote('"');
         else b.setQuote(null);
-        CSVFormat format = b.build();
+        CSVFormat format = b.get();
 
         try (Reader r = new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8);
              CSVParser parser = format.parse(r)) {

@@ -3,6 +3,7 @@ package com.findatex.validator.validation;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
+import com.findatex.validator.template.tpt.TptTemplate;
 import com.findatex.validator.template.tpt.TptRuleSet;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.spec.SpecLoader;
@@ -32,7 +33,7 @@ class FindingEnricherTest {
                 .build();
 
         Finding raw = Finding.error("FORMAT/21", null, "21", "Currency", 1, "ZZZ", "bad");
-        List<Finding> enriched = FindingEnricher.enrich(file, List.of(raw));
+        List<Finding> enriched = FindingEnricher.enrich(file, List.of(raw), TptTemplate.FINDING_CONTEXT);
 
         FindingContext ctx = enriched.get(0).context();
         assertThat(ctx).isNotNull();
@@ -52,7 +53,7 @@ class FindingEnricherTest {
 
         Finding global = Finding.warn("XF-04/POSITION_WEIGHT_SUM", null, "26", "Σ weight",
                 null, "0.7", "off");
-        List<Finding> enriched = FindingEnricher.enrich(file, List.of(global));
+        List<Finding> enriched = FindingEnricher.enrich(file, List.of(global), TptTemplate.FINDING_CONTEXT);
 
         FindingContext ctx = enriched.get(0).context();
         assertThat(ctx.portfolioId()).isEqualTo("ABC123");
@@ -73,7 +74,7 @@ class FindingEnricherTest {
 
         Finding f1 = Finding.error("X", null, "21", "x", 1, "v", "msg");
         Finding f2 = Finding.error("Y", null, "21", "x", 2, "v", "msg");
-        List<Finding> enriched = FindingEnricher.enrich(file, List.of(f1, f2));
+        List<Finding> enriched = FindingEnricher.enrich(file, List.of(f1, f2), TptTemplate.FINDING_CONTEXT);
 
         assertThat(enriched.get(0).context().instrumentCode()).isEqualTo("AAA");
         assertThat(enriched.get(0).context().instrumentName()).isEqualTo("First");
@@ -89,7 +90,7 @@ class FindingEnricherTest {
                 .build();
 
         Finding orphan = Finding.error("X", null, "21", "x", 999, "v", "msg");
-        FindingContext ctx = FindingEnricher.enrich(file, List.of(orphan)).get(0).context();
+        FindingContext ctx = FindingEnricher.enrich(file, List.of(orphan), TptTemplate.FINDING_CONTEXT).get(0).context();
         assertThat(ctx.portfolioId()).isEqualTo("X");
         assertThat(ctx.instrumentCode()).isNull();
     }
@@ -98,7 +99,7 @@ class FindingEnricherTest {
     void emptyFileProducesEmptyButNonNullContext() {
         TptFile file = new TestFileBuilder().build();
         Finding f = Finding.error("X", null, "1", "x", null, null, "msg");
-        FindingContext ctx = FindingEnricher.enrich(file, List.of(f)).get(0).context();
+        FindingContext ctx = FindingEnricher.enrich(file, List.of(f), TptTemplate.FINDING_CONTEXT).get(0).context();
         assertThat(ctx).isNotNull();
         assertThat(ctx.portfolioId()).isNull();
         assertThat(ctx.portfolioName()).isNull();

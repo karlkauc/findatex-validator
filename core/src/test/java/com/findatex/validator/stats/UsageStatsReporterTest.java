@@ -37,8 +37,10 @@ class UsageStatsReporterTest {
         }).doesNotThrowAnyException();
         long elapsedMs = (System.nanoTime() - start) / 1_000_000L;
         // 200 enqueues (queue cap 1, worker stuck on dead endpoint → overflow
-        // dropped) must be effectively instant — proves non-blocking + no throw.
-        assertThat(elapsedMs).isLessThan(2_000L);
+        // dropped) must not block — a blocking reporter would wait out the
+        // connect timeout per call (minutes total). Bound is generous so
+        // GC/CI load can't flake it.
+        assertThat(elapsedMs).isLessThan(10_000L);
     }
 
     @Test

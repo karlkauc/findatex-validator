@@ -22,7 +22,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up JDK 21 (Temurin)
         uses: actions/setup-java@v5
@@ -67,7 +67,7 @@ jobs:
           # being phased out. Intel Mac users can run the shaded JAR directly.
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up JDK 21 (Temurin)
         uses: actions/setup-java@v5
@@ -182,7 +182,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Download all native artifacts
         uses: actions/download-artifact@v8
@@ -209,7 +209,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4

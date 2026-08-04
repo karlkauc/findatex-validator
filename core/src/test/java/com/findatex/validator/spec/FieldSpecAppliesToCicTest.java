@@ -1,13 +1,11 @@
 package com.findatex.validator.spec;
 
 import com.findatex.validator.template.api.ProfileKey;
-import com.findatex.validator.template.tpt.TptProfiles;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

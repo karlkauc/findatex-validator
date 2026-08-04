@@ -1,7 +1,6 @@
 package com.findatex.validator.validation;
 
 import com.findatex.validator.domain.TptFile;
-import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.tpt.TptProfiles;
 import com.findatex.validator.template.tpt.TptTemplate;
 import com.findatex.validator.template.tpt.TptRuleSet;

@@ -16,6 +16,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - _Nothing yet._
 
+## [1.0.9] — 2026-08-04
+
+### Changed
+- **Dependency refresh — zero open Dependabot alerts.** All pending Dependabot
+  updates merged: jackson-databind 2.21.5 (closes 10 advisories, incl. two
+  high-severity `PolymorphicTypeValidator` bypasses), undici 7.29.0, vite
+  8.0.16 and postcss 8.5.25 (all npm advisories were build-toolchain-only),
+  the grouped Maven/npm minor+patch updates, alpine 3.24 base image,
+  actions/checkout v7 and setup-crane 0.7.
+- **Migrated off APIs deprecated by those upgrades:** GeoIP2 5.x record
+  accessors (`country()`/`isoCode()`) in `GeoIpService`, `Bandwidth.builder()`
+  instead of `Bandwidth.classic`/`Refill` in `RateLimitService`,
+  `CSVFormat.Builder.get()` in `CsvLoader`/`SourceMirror`. The unused
+  deprecated `FindingEnricher.enrich(TptFile, List)` overload was removed —
+  callers pass an explicit `FindingContextSpec`.
+
+### Fixed
+- **Flaky `UsageStatsReporterTest`.** The non-blocking assertion's timing
+  bound was widened 2 s → 10 s: a blocking reporter would take minutes, so
+  the bound still discriminates, but GC/CI load can no longer flake it.
+- **Vite `configLoader: 'native'` warning** — `vite.config.ts` uses
+  `import.meta.dirname` instead of the unsupported `__dirname`.
+
 ## [1.0.8] — 2026-06-07
 
 ### Fixed
@@ -118,7 +141,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.8...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.9...HEAD
+[1.0.9]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.9
 [1.0.8]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.8
 [1.0.7]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.7
 [1.0.6]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.6

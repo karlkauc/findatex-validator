@@ -7,7 +7,7 @@ import path from 'node:path';
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: path.resolve(__dirname, '../../../target/classes/META-INF/resources'),
+    outDir: path.resolve(import.meta.dirname, '../../../target/classes/META-INF/resources'),
     emptyOutDir: true,
     sourcemap: false,
   },

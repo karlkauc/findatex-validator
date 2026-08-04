@@ -126,7 +126,7 @@ final class SourceMirror {
                 .setQuote('"')
                 .setIgnoreEmptyLines(true)
                 .setTrim(true)
-                .build();
+                .get();
         try (Reader r = new java.io.InputStreamReader(
                         new java.io.ByteArrayInputStream(bytes), StandardCharsets.UTF_8);
              CSVParser parser = format.parse(r)) {

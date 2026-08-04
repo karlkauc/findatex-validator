@@ -6,7 +6,6 @@ import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.template.api.FindingContextSpec;
-import com.findatex.validator.template.tpt.TptTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,16 +27,6 @@ import java.util.Map;
 public final class FindingEnricher {
 
     private FindingEnricher() {}
-
-    /**
-     * Backwards-compatible TPT-shaped enrichment.
-     * @deprecated Pass an explicit {@link FindingContextSpec} so non-TPT findings get the right
-     *             field mapping. Kept for tests and existing call sites that still default to TPT.
-     */
-    @Deprecated
-    public static List<Finding> enrich(TptFile file, List<Finding> findings) {
-        return enrich(file, findings, TptTemplate.FINDING_CONTEXT);
-    }
 
     /**
      * Enrichment + uniform {@code "Field N (Description)"} fieldName normalization.

@@ -148,7 +148,7 @@ public final class GitHubIssueLink {
 
     private static void row(StringBuilder b, String label, String value) {
         b.append("| ").append(label).append(" | ")
-                .append(blankToDash(value).replace("|", "\\|").replace("\n", " "))
+                .append(blankToDash(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", " "))
                 .append(" |\n");
     }
 

@@ -60,7 +60,7 @@ export function issueTitle(r: FalsePositiveReport): string {
 }
 
 function row(label: string, value: string | null | undefined): string {
-  return `| ${label} | ${blankToDash(value).replace(/\|/g, '\\|').replace(/\n/g, ' ')} |\n`;
+  return `| ${label} | ${blankToDash(value).replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\n/g, ' ')} |\n`;
 }
 
 export function issueBody(r: FalsePositiveReport): string {

@@ -81,6 +81,14 @@ class GitHubIssueLinkTest {
     }
 
     @Test
+    void body_escapesBackslashesSoTheyCannotNeutralisePipeEscaping() {
+        // "C:\temp|x" must render as "C:\\temp\|x" — a raw backslash left
+        // unescaped would turn the following escaped pipe back into a cell break.
+        String body = GitHubIssueLink.issueBody(sample("c", "C:\\temp|x"));
+        assertThat(body).contains("| Message | C:\\\\temp\\|x |");
+    }
+
+    @Test
     void nullFieldsRenderAsDash() {
         FalsePositiveReport r = new FalsePositiveReport(
                 "EET", "V1.1.3", "WARNING", "FORMAT/EET-F2", null,

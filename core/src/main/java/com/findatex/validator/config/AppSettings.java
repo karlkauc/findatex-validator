@@ -3,13 +3,14 @@ package com.findatex.validator.config;
 import java.util.UUID;
 
 public record AppSettings(External external, Proxy proxy, Feedback feedback,
-                          UsageStats usageStats, Newsletter newsletter) {
+                          UsageStats usageStats, Newsletter newsletter,
+                          QuickFeedback quickFeedback) {
 
     /**
      * Normalises missing blocks. Settings files written by older releases have
-     * no {@code feedback}/{@code usageStats}/{@code newsletter} key, so Jackson
-     * passes {@code null} into the canonical constructor — keep old configs
-     * loadable. A blank {@code installId} is regenerated here;
+     * no {@code feedback}/{@code usageStats}/{@code newsletter}/{@code quickFeedback}
+     * key, so Jackson passes {@code null} into the canonical constructor — keep
+     * old configs loadable. A blank {@code installId} is regenerated here;
      * {@link SettingsService} detects the generated value and persists it so
      * the id stays stable across runs.
      */
@@ -17,21 +18,28 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback,
         if (feedback == null) feedback = new Feedback("");
         if (usageStats == null) usageStats = new UsageStats(true, "", "");
         if (newsletter == null) newsletter = new Newsletter("");
+        if (quickFeedback == null) quickFeedback = new QuickFeedback(null);
     }
 
     /** Back-compat convenience for the many call sites that predate the feedback block. */
     public AppSettings(External external, Proxy proxy) {
-        this(external, proxy, new Feedback(""), null, null);
+        this(external, proxy, new Feedback(""), null, null, null);
     }
 
     /** Back-compat convenience for call sites that predate the usage-stats block. */
     public AppSettings(External external, Proxy proxy, Feedback feedback) {
-        this(external, proxy, feedback, null, null);
+        this(external, proxy, feedback, null, null, null);
     }
 
     /** Back-compat convenience for call sites that predate the newsletter block. */
     public AppSettings(External external, Proxy proxy, Feedback feedback, UsageStats usageStats) {
-        this(external, proxy, feedback, usageStats, null);
+        this(external, proxy, feedback, usageStats, null, null);
+    }
+
+    /** Back-compat convenience for call sites that predate the quick-feedback block. */
+    public AppSettings(External external, Proxy proxy, Feedback feedback,
+                       UsageStats usageStats, Newsletter newsletter) {
+        this(external, proxy, feedback, usageStats, newsletter, null);
     }
 
     public enum ProxyMode { SYSTEM, MANUAL, NONE }
@@ -84,6 +92,21 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback,
         }
     }
 
+    /**
+     * Quick-feedback (star rating) configuration. {@code endpointUrl} is the
+     * web-app base URL the desktop posts to (same trust model as
+     * {@link Newsletter}). Unlike the other blocks the default is non-blank so
+     * the feature works out of the box; an explicit empty string means the
+     * user disabled it and is preserved.
+     */
+    public record QuickFeedback(String endpointUrl) {
+        public static final String DEFAULT_ENDPOINT = "https://www.findatex-validator.eu";
+
+        public QuickFeedback {
+            if (endpointUrl == null) endpointUrl = DEFAULT_ENDPOINT;
+        }
+    }
+
     public static AppSettings defaults() {
         return new AppSettings(
                 new External(
@@ -96,25 +119,31 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback,
                         new ManualProxy("", 0, "", "", "localhost|127.0.0.1")),
                 new Feedback(""),
                 new UsageStats(true, "", ""),
-                new Newsletter(""));
+                new Newsletter(""),
+                new QuickFeedback(null));
     }
 
     public AppSettings withExternalEnabled(boolean v) {
         return new AppSettings(
                 new External(v, external.lei(), external.isin(), external.cache()),
-                proxy, feedback, usageStats, newsletter);
+                proxy, feedback, usageStats, newsletter, quickFeedback);
     }
 
     public AppSettings withFeedbackRepo(String githubRepo) {
-        return new AppSettings(external, proxy, new Feedback(githubRepo), usageStats, newsletter);
+        return new AppSettings(external, proxy, new Feedback(githubRepo), usageStats, newsletter, quickFeedback);
     }
 
     public AppSettings withUsageStatsEnabled(boolean v) {
         return new AppSettings(external, proxy, feedback,
-                new UsageStats(v, usageStats.installId(), usageStats.endpointUrl()), newsletter);
+                new UsageStats(v, usageStats.installId(), usageStats.endpointUrl()), newsletter, quickFeedback);
     }
 
     public AppSettings withNewsletterEndpoint(String endpointUrl) {
-        return new AppSettings(external, proxy, feedback, usageStats, new Newsletter(endpointUrl));
+        return new AppSettings(external, proxy, feedback, usageStats, new Newsletter(endpointUrl), quickFeedback);
+    }
+
+    public AppSettings withQuickFeedbackEndpoint(String endpointUrl) {
+        return new AppSettings(external, proxy, feedback, usageStats, newsletter,
+                new QuickFeedback(endpointUrl));
     }
 }

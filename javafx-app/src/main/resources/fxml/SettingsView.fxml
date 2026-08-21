@@ -89,6 +89,13 @@
               <Label text="Leave empty to hide the report action. No data is sent automatically — &#10;the issue opens pre-filled in your browser and you submit it yourself." wrapText="true"/>
             </VBox>
           </TitledPane>
+          <TitledPane text="App rating / quick feedback" collapsible="false">
+            <VBox spacing="6">
+              <Label text="Endpoint the star-rating dialog (&#8220;Rate this app&#8221;) posts to:"/>
+              <TextField fx:id="quickFeedbackEndpoint" promptText="https://www.findatex-validator.eu" prefColumnCount="40"/>
+              <Label text="Leave empty to disable the feature. Only rating, optional comment, app version &#10;and template type are sent — never file contents or personal data." wrapText="true"/>
+            </VBox>
+          </TitledPane>
         </VBox>
       </content>
     </Tab>

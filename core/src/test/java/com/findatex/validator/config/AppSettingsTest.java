@@ -43,6 +43,39 @@ class AppSettingsTest {
     }
 
     @Test
+    void quickFeedbackDefaultsToPublicEndpoint() {
+        assertThat(AppSettings.defaults().quickFeedback().endpointUrl())
+                .isEqualTo(AppSettings.QuickFeedback.DEFAULT_ENDPOINT);
+    }
+
+    @Test
+    void legacyConstructorsLeaveQuickFeedbackNonNull() {
+        AppSettings s = new AppSettings(
+                AppSettings.defaults().external(), AppSettings.defaults().proxy());
+        assertThat(s.quickFeedback()).isNotNull();
+        assertThat(s.quickFeedback().endpointUrl())
+                .isEqualTo(AppSettings.QuickFeedback.DEFAULT_ENDPOINT);
+    }
+
+    @Test
+    void explicitEmptyQuickFeedbackEndpointIsPreserved() {
+        // "" means the user disabled the feature — must not snap back to the default.
+        AppSettings s = AppSettings.defaults().withQuickFeedbackEndpoint("");
+        assertThat(s.quickFeedback().endpointUrl()).isEmpty();
+        assertThat(s.withExternalEnabled(true).quickFeedback().endpointUrl()).isEmpty();
+    }
+
+    @Test
+    void withersPreserveQuickFeedbackEndpoint() {
+        AppSettings s = AppSettings.defaults()
+                .withQuickFeedbackEndpoint("https://validator.example.org");
+        assertThat(s.withExternalEnabled(true).quickFeedback().endpointUrl())
+                .isEqualTo("https://validator.example.org");
+        assertThat(s.withNewsletterEndpoint("x").quickFeedback().endpointUrl())
+                .isEqualTo("https://validator.example.org");
+    }
+
+    @Test
     void withersPreserveNewsletterEndpoint() {
         AppSettings s = AppSettings.defaults()
                 .withNewsletterEndpoint("https://validator.example.org");

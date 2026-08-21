@@ -8,6 +8,7 @@ public final class AppInfo {
 
     private static final String RESOURCE = "META-INF/findatex-validator.properties";
     private static final String APPLICATION_NAME = "FinDatEx Validator";
+    private static final String GITHUB_URL = "https://github.com/karlkauc/findatex-validator";
 
     private static final Properties PROPS = load();
 
@@ -27,6 +28,10 @@ public final class AppInfo {
 
     public static String applicationWithVersion() {
         return APPLICATION_NAME + " " + version();
+    }
+
+    public static String githubUrl() {
+        return GITHUB_URL;
     }
 
     private static String resolved(String key, String fallback) {

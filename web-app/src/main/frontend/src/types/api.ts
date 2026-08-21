@@ -102,6 +102,17 @@ export interface NewsletterConfig {
   enabled: boolean;
 }
 
+// Mirrors com.findatex.validator.quickfeedback.QuickFeedbackStatus (lowercase wire).
+export type QuickFeedbackStatusWire = 'ok' | 'invalid' | 'rate_limited' | 'unavailable';
+
+export interface QuickFeedbackResult {
+  status: QuickFeedbackStatusWire;
+}
+
+export interface QuickFeedbackConfig {
+  enabled: boolean;
+}
+
 export interface BuildInfo {
   version: string;
   commit: string;

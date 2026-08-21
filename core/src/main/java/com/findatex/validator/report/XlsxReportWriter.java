@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public final class XlsxReportWriter {
 
     static final int REPORT_SCHEMA_VERSION = 1;
-    static final String GITHUB_URL = "https://github.com/karlkauc/findatex-validator";
+    static final String GITHUB_URL = AppInfo.githubUrl();
 
     private final SpecCatalog catalog;
     private final ProfileSet profileSet;

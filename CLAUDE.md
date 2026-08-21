@@ -205,6 +205,10 @@ REST endpoints (all under `/api`):
   "Report a false positive" action
 - `POST /api/newsletter/subscribe` — `{email}` → `{status}`; `GET
   /api/newsletter-config` — `{enabled}` (drives whether the SPA shows the form)
+- `POST /api/quick-feedback` — `{rating 1..5, comment?, source, appVersion?,
+  templateId?}` → `{status}` (star-rating feedback; async insert into the
+  usage-stats DB, inert without it); `GET /api/quick-feedback-config` —
+  `{enabled}` (drives whether the SPA shows the footer widget)
 - `GET  /api/help` + `GET /api/help/rules/{slug}` — bundled help text and the
   generated per-rule Markdown docs (same content as the desktop Help dialog)
 - `GET  /api/limits/status` — current rate-limit/quota status for the caller
@@ -238,6 +242,19 @@ when unset): desktop via Settings → Feedback (`AppSettings.Feedback.githubRepo
 persisted in `settings.json`); web via `FINDATEX_WEB_FEEDBACK_GITHUB_REPO`
 surfaced through `GET /api/feedback-config`. The desktop opens the URL via the
 existing `SafeLinkOpener` (scheme-allowlisted `Desktop.browse`).
+
+**Quick feedback (star rating)** — low-barrier 1–5-star rating + optional
+comment on both UIs. Naming split: `feedback` (package/endpoints) = the
+false-positive GitHub-issue feature above; `quickfeedback` = this star rating —
+don't mix them. Desktop (`core/.../quickfeedback/QuickFeedbackClient`, header
+button "★ Rate this app") POSTs to the web endpoint configured in Settings →
+Feedback (default `https://www.findatex-validator.eu`, blank = disabled);
+web posts from the footer widget (`QuickFeedback.tsx`). Storage:
+`quick_feedback` table in the usage-stats DB (`QuickFeedbackService`, async +
+retry, **inert with no `FINDATEX_WEB_USAGE_DB_URL`**); no install id, no IP.
+Rate-limited via `FINDATEX_WEB_QUICK_FEEDBACK_RATE` (default 5/h per IP).
+Details in `docs/QUICK_FEEDBACK.md`. The GitHub repo link shown in both UI
+headers comes from `AppInfo.githubUrl()` — the single source for the repo URL.
 
 **Usage statistics (opt-out)** — aggregate-only run stats, default on, per
 install. Desktop never writes the DB: `core/.../stats/UsageStatsReporter`

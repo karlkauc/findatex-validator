@@ -37,6 +37,7 @@ public final class SettingsController {
     @FXML private PasswordField pxPass;
 
     @FXML private TextField feedbackRepo;
+    @FXML private TextField quickFeedbackEndpoint;
 
     @FXML private CheckBox usageEnabled;
     @FXML private TextField usageInstallId;
@@ -76,6 +77,7 @@ public final class SettingsController {
         pxBypass.setText(s.proxy().manual().nonProxyHosts());
 
         feedbackRepo.setText(s.feedback().githubRepo());
+        quickFeedbackEndpoint.setText(s.quickFeedback().endpointUrl());
 
         usageEnabled.setSelected(s.usageStats().enabled());
         usageInstallId.setText(s.usageStats().installId());
@@ -117,7 +119,8 @@ public final class SettingsController {
                         usageEnabled.isSelected(),
                         prevUsage.installId(),
                         prevUsage.endpointUrl()),
-                new AppSettings.Newsletter(newsletterEndpoint.getText().trim()));
+                new AppSettings.Newsletter(newsletterEndpoint.getText().trim()),
+                new AppSettings.QuickFeedback(quickFeedbackEndpoint.getText().trim()));
     }
 
     @FXML

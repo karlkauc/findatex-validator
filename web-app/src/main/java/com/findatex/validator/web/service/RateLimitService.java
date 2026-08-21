@@ -49,6 +49,7 @@ public class RateLimitService {
     private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Bucket> usageBuckets = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Bucket> newsletterBuckets = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Bucket> quickFeedbackBuckets = new ConcurrentHashMap<>();
     private final AtomicBoolean unknownWarned = new AtomicBoolean(false);
     private int capacityPerHour;
     private Duration refillInterval;
@@ -56,6 +57,8 @@ public class RateLimitService {
     private Duration usageRefillInterval;
     private int newsletterCapacityPerHour;
     private Duration newsletterRefillInterval;
+    private int quickFeedbackCapacityPerHour;
+    private Duration quickFeedbackRefillInterval;
 
     @PostConstruct
     void init() {
@@ -68,10 +71,15 @@ public class RateLimitService {
         newsletterCapacityPerHour = Math.max(1, config.newsletter().ratePerIpPerHour());
         long newsletterRefillSeconds = Math.max(1, 3600L / newsletterCapacityPerHour);
         newsletterRefillInterval = Duration.ofSeconds(newsletterRefillSeconds);
+        quickFeedbackCapacityPerHour = Math.max(1, config.quickFeedback().ratePerIpPerHour());
+        long quickFeedbackRefillSeconds = Math.max(1, 3600L / quickFeedbackCapacityPerHour);
+        quickFeedbackRefillInterval = Duration.ofSeconds(quickFeedbackRefillSeconds);
         log.info("Rate limit configured: {} req/hour per IP for /api/validate, "
                         + "{} req/hour per IP for /api/usage-stats, "
-                        + "{} req/hour per IP for /api/newsletter",
-                capacityPerHour, usageCapacityPerHour, newsletterCapacityPerHour);
+                        + "{} req/hour per IP for /api/newsletter, "
+                        + "{} req/hour per IP for /api/quick-feedback",
+                capacityPerHour, usageCapacityPerHour, newsletterCapacityPerHour,
+                quickFeedbackCapacityPerHour);
     }
 
     /** Separate, more generous bucket for the lightweight usage-stats ingest. */
@@ -90,6 +98,16 @@ public class RateLimitService {
                 k -> Bucket.builder().addLimit(Bandwidth.builder()
                         .capacity(newsletterCapacityPerHour)
                         .refillIntervally(1, newsletterRefillInterval)
+                        .build()).build())
+                .tryConsumeAndReturnRemaining(1);
+    }
+
+    /** Separate, strict bucket for quick-feedback submissions (anti-spam). */
+    public ConsumptionProbe consumeQuickFeedback(String clientIp) {
+        return quickFeedbackBuckets.computeIfAbsent(normaliseKey(clientIp),
+                k -> Bucket.builder().addLimit(Bandwidth.builder()
+                        .capacity(quickFeedbackCapacityPerHour)
+                        .refillIntervally(1, quickFeedbackRefillInterval)
                         .build()).build())
                 .tryConsumeAndReturnRemaining(1);
     }

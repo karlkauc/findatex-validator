@@ -15,6 +15,8 @@
                     <font><Font name="System Bold" size="22"/></font>
                 </Label>
                 <Pane HBox.hgrow="ALWAYS"/>
+                <Button fx:id="githubButton" text="⭐ GitHub" onAction="#onGitHub"/>
+                <Button fx:id="quickFeedbackButton" text="★ Rate this app" onAction="#onQuickFeedback"/>
                 <Button fx:id="helpButton" text="? Help" onAction="#onHelp"/>
                 <Button fx:id="aboutButton" text="ⓘ About" onAction="#onAbout"/>
                 <Button fx:id="settingsButton" text="⚙ Settings…" onAction="#onSettings"/>

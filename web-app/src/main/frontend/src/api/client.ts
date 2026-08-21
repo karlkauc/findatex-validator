@@ -4,6 +4,8 @@ import {
   FeedbackConfig,
   NewsletterConfig,
   NewsletterResult,
+  QuickFeedbackConfig,
+  QuickFeedbackResult,
   RateLimitStatus,
   TemplateInfo,
   ValidationResponse,
@@ -55,6 +57,36 @@ export async function subscribeNewsletter(email: string): Promise<NewsletterResu
   // 503 (unavailable) — those are expected outcomes the UI must show, not
   // errors to throw. Fall back to "unavailable" if the body is unparseable.
   const data = (await res.json().catch(() => null)) as NewsletterResult | null;
+  return data && data.status ? data : { status: 'unavailable' };
+}
+
+export async function fetchQuickFeedbackConfig(): Promise<QuickFeedbackConfig> {
+  const res = await fetch('/api/quick-feedback-config');
+  return handle<QuickFeedbackConfig>(res);
+}
+
+export interface QuickFeedbackArgs {
+  rating: number;
+  comment?: string;
+  templateId?: string;
+}
+
+export async function submitQuickFeedback(args: QuickFeedbackArgs): Promise<QuickFeedbackResult> {
+  const res = await fetch('/api/quick-feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      rating: args.rating,
+      comment: args.comment || undefined,
+      source: 'web',
+      templateId: args.templateId,
+    }),
+  });
+  // The rate-limit filter answers 429 with a plain-text body, not JSON.
+  if (res.status === 429) return { status: 'rate_limited' };
+  // Like the newsletter endpoint, 400 (invalid) and 503 (unavailable) carry a
+  // JSON {status} body — expected outcomes the UI must show, not errors.
+  const data = (await res.json().catch(() => null)) as QuickFeedbackResult | null;
   return data && data.status ? data : { status: 'unavailable' };
 }
 

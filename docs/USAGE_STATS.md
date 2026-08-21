@@ -208,3 +208,8 @@ Only aggregate counts and a server-derived country are stored; no personal
 data, no raw IP. The Settings dialog states what is/isn't sent and links here.
 The DSGVO wording in the Settings tab and this document should be reviewed by
 legal/SME before public deployment.
+
+## Related
+
+The `quick_feedback` table (star ratings) shares this database and datasource —
+see [QUICK_FEEDBACK.md](QUICK_FEEDBACK.md).

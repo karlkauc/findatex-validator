@@ -1,5 +1,6 @@
 package com.findatex.validator.ui;
 
+import com.findatex.validator.AppInfo;
 import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.config.PasswordCipher;
 import com.findatex.validator.config.SettingsService;
@@ -88,6 +89,38 @@ public final class MainController {
         VBox box = new VBox(notice);
         box.setPadding(new Insets(40));
         return box;
+    }
+
+    @FXML
+    private void onGitHub() {
+        SafeLinkOpener.open(AppInfo.githubUrl());
+    }
+
+    @FXML
+    private void onQuickFeedback() {
+        try {
+            QuickFeedbackDialog.show(stage, selectedTemplateId());
+        } catch (Exception e) {
+            log.warn("Quick-feedback dialog failed: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Template id of the currently selected tab, as optional feedback context.
+     * Tabs are created in {@link TemplateRegistry#all()} order (including
+     * placeholder tabs), so the selection index maps 1:1 onto the registry.
+     */
+    private String selectedTemplateId() {
+        try {
+            int idx = templateTabs.getSelectionModel().getSelectedIndex();
+            List<TemplateDefinition> all = TemplateRegistry.all();
+            if (idx >= 0 && idx < all.size()) {
+                return all.get(idx).id().name();
+            }
+        } catch (RuntimeException ignored) {
+            // Purely optional context — never let it break the dialog.
+        }
+        return null;
     }
 
     @FXML

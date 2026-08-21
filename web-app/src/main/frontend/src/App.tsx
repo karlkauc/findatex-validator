@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { HelpCircle, Info, Loader2, ShieldCheck } from 'lucide-react';
+import { GitFork, HelpCircle, Info, Loader2, ShieldCheck } from 'lucide-react';
 import {
   fetchBuildInfo,
   fetchFeedbackConfig,
   fetchNewsletterConfig,
+  fetchQuickFeedbackConfig,
   fetchRateLimitStatus,
   fetchTemplates,
   validateUpload,
@@ -20,7 +21,10 @@ import { AboutModal } from './components/AboutModal';
 import { RATE_LIMIT_QUERY_KEY, RateLimitBadge } from './components/RateLimitBadge';
 import { QuotaExhaustedNotice } from './components/QuotaExhaustedNotice';
 import { NewsletterSignup } from './components/NewsletterSignup';
+import { QuickFeedback } from './components/QuickFeedback';
 import { RateLimitStatus, ValidationResponse } from './types/api';
+
+const GITHUB_URL = 'https://github.com/karlkauc/findatex-validator';
 
 export default function App() {
   const queryClient = useQueryClient();
@@ -49,6 +53,13 @@ export default function App() {
   const newsletterConfigQuery = useQuery({
     queryKey: ['newsletter-config'],
     queryFn: fetchNewsletterConfig,
+    staleTime: Infinity,
+    retry: false,
+  });
+
+  const quickFeedbackConfigQuery = useQuery({
+    queryKey: ['quick-feedback-config'],
+    queryFn: fetchQuickFeedbackConfig,
     staleTime: Infinity,
     retry: false,
   });
@@ -140,6 +151,15 @@ export default function App() {
             </p>
           </div>
           <RateLimitBadge />
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+          >
+            <GitFork className="h-4 w-4" aria-hidden="true" />
+            GitHub
+          </a>
           <button
             type="button"
             onClick={() => setHelpOpen(true)}
@@ -299,8 +319,16 @@ export default function App() {
           )}
           <div>
             — Source &amp; Desktop-Build:&nbsp;
-            <span className="font-mono">com.findatex/findatex-validator</span>
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono underline hover:text-slate-700"
+            >
+              com.findatex/findatex-validator
+            </a>
           </div>
+          {quickFeedbackConfigQuery.data?.enabled && <QuickFeedback templateId={templateId} />}
           {newsletterConfigQuery.data?.enabled && <NewsletterSignup />}
         </div>
       </footer>

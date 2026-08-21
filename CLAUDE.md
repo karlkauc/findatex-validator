@@ -8,8 +8,10 @@ FinDatEx data-template validator with two distinct UIs sharing one validation
 core: a **JavaFX desktop app** (files never leave the user's machine) and a
 **Quarkus + React web app** (Docker-deployable, no login, throttled). Four
 templates are wired in: **TPT, EET, EMT, EPT** — each with the last two
-versions bundled. Maven groupId is `com.findatex` and the package root is
-`com.findatex.validator` — do **not** rename packages back to `com.tpt`.
+versions bundled. The public web instance is
+<https://www.findatex-validator.eu>. Maven groupId is `com.findatex` and the
+package root is `com.findatex.validator` — do **not** rename packages back to
+`com.tpt`.
 
 ## Repo layout (multi-module Maven)
 
@@ -36,7 +38,7 @@ mvn clean verify                               # full regression + JaCoCo report
 
 # --- JavaFX desktop ----------------------------------------------------------
 mvn -pl javafx-app javafx:run                  # run the desktop UI
-mvn -pl javafx-app -am -DskipTests package     # → javafx-app/target/findatex-validator-javafx-1.0.0-shaded.jar
+mvn -pl javafx-app -am -DskipTests package     # → javafx-app/target/findatex-validator-javafx-<version>-shaded.jar
 xvfb-run mvn -pl javafx-app javafx:run         # headless smoke test (no DISPLAY)
 
 # --- Web (Quarkus + React) ---------------------------------------------------
@@ -59,7 +61,8 @@ OUT_DIR=… PACKAGE_TYPE=app-image bash package/jpackage.sh   # custom output di
 ```
 
 Java 21, JavaFX 21, POI 5.x, Commons CSV, Jackson, JUnit 5, AssertJ; web-app
-adds Quarkus 3.17.x, RESTEasy Reactive, Bucket4j, Caffeine, RestAssured.
+adds Quarkus 3.x (platform BOM version pinned in the root pom), RESTEasy
+Reactive, Bucket4j, Caffeine, RestAssured.
 Surefire passes `--enable-native-access=ALL-UNNAMED` (POI on Java 21).
 
 ## Architecture (template-agnostic core + per-template plugins)
@@ -90,6 +93,14 @@ core/  (com.findatex.validator)
 │                            FindingEnricher, refdata/, rules/ (presence,
 │                            format, ISIN, LEI, conditional + crossfield/*)
 ├── report/                  QualityScorer, QualityReport, XlsxReportWriter (5 sheets)
+├── batch/                   BatchValidationService + FolderScanner — validate a whole
+│                            folder in one run (desktop-only; driven by TemplateTabController)
+├── docs/                    RuleDocGenerator → docs/rules/*.md (run via `mvn -pl core -Pdocs
+│                            exec:java`); the output is bundled into both apps and served by
+│                            the desktop Help dialog and GET /api/help/rules/{slug}
+├── feedback/                GitHubIssueLink (pre-filled false-positive issue URL)
+├── stats/                   UsageStatsReporter (opt-out aggregate usage events)
+├── newsletter/              NewsletterClient (desktop → web relay, never holds the API key)
 ├── config/                  AppSettings (json), SettingsService, PasswordCipher (encrypted proxy creds)
 └── external/                ExternalValidationService + GLEIF / OpenFIGI clients,
                              cache/, http/, proxy/ (system + manual NTLM)
@@ -97,7 +108,8 @@ core/  (com.findatex.validator)
 javafx-app/  (com.findatex.validator)
 ├── App / AppLauncher        JavaFX entry; calls TemplateRegistry.init()
 └── ui/                      MainController (TabPane shell), TemplateTabController
-                             (one per template), SettingsController, LookupProgressController
+                             (one per template), SettingsController, LookupProgressController,
+                             Help/About/Feedback dialogs (MarkdownRenderer), SafeLinkOpener
 
 web-app/  (com.findatex.validator.web)
 ├── Application              @Startup hook → TemplateRegistry.init()
@@ -193,6 +205,12 @@ REST endpoints (all under `/api`):
   "Report a false positive" action
 - `POST /api/newsletter/subscribe` — `{email}` → `{status}`; `GET
   /api/newsletter-config` — `{enabled}` (drives whether the SPA shows the form)
+- `GET  /api/help` + `GET /api/help/rules/{slug}` — bundled help text and the
+  generated per-rule Markdown docs (same content as the desktop Help dialog)
+- `GET  /api/limits/status` — current rate-limit/quota status for the caller
+- `GET  /api/about`, `GET /api/build-info` — About markdown (web-bundle-specific
+  third-party list) and Maven version + git metadata of the running container
+- `POST /api/usage-stats` — aggregate usage events from desktop installs (see below)
 
 **Misbrauch-Schutz** (configurable via `FINDATEX_WEB_*` env vars; defaults in
 `web-app/src/main/resources/application.properties`):
@@ -266,6 +284,16 @@ and `npm run build` during Maven's `generate-resources` phase. Dev mode:
   filenames, .DS_Store noise). Files get **copied** into
   `core/src/main/resources/spec/<t>/` with normalised names — never reference
   `specs/` paths from production code.
+
+## Local-only dev tooling (gitignored, may be absent in other clones)
+
+- `dirtyTests/` + `validate_dirty_tests.py` — real-world vendor files (UBS,
+  Amundi, WisdomTree …) smoke-tested against a running container
+  (`docker compose up -d`, API on :18082); summary lands in
+  `dirtyTests_results.json`. These are **real fund files — never commit them**.
+- `scraper/` — Playwright-based vendor-file scraper with its own
+  `node_modules/` and `runs/` output; the root `package.json` only pins
+  Playwright for it.
 
 ## Spec acquisition
 

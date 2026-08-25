@@ -16,6 +16,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - _Nothing yet._
 
+## [1.0.10] — 2026-08-25
+
+### Added
+- **GitHub repo link + 1–5-star quick feedback in both UIs.** Header link
+  (desktop button / SPA pill) via the single `AppInfo.githubUrl()` source;
+  low-barrier star rating with optional comment — desktop "Rate this app"
+  dialog relayed to `POST /api/quick-feedback`, SPA footer widget. Stored in
+  the usage-stats DB (inert without `FINDATEX_WEB_USAGE_DB_URL`), no IP, no
+  install id, own rate limit (`FINDATEX_WEB_QUICK_FEEDBACK_RATE`). See
+  `docs/QUICK_FEEDBACK.md`.
+
+### Fixed
+- **Desktop version dropdown was unreadable — TPT V8.0 looked missing.** The
+  ComboBox had no `StringConverter`, so it rendered the `TemplateVersion`
+  record's `toString()` (truncated after `version=V…`, with spec file paths
+  like `…20260526…` in the list). It now shows the label, e.g.
+  "TPT V8.0 — 2026-05-26".
+- Backslashes in finding values are escaped in the pre-filled GitHub issue
+  table (Java builder + TS mirror), closing a CodeQL incomplete-sanitization
+  finding.
+
 ## [1.0.9] — 2026-08-04
 
 ### Changed
@@ -141,7 +162,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.9...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.10...HEAD
+[1.0.10]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.10
 [1.0.9]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.9
 [1.0.8]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.8
 [1.0.7]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.7

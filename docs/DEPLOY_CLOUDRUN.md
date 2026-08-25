@@ -25,7 +25,7 @@ are stored in the repo or in GitHub Secrets.
 | Min / max instances   | 0 / 1                              |
 | Request timeout       | 300 s                              |
 | External validation   | off (`FINDATEX_WEB_EXTERNAL_ENABLED=false`) |
-| Usage statistics      | on (Neon Postgres; password + ingest token via Secret Manager — see [Usage stats bootstrap](#usage-statistics-bootstrap)) |
+| Usage statistics      | on (Postgres on the Hetzner VPS; password + ingest token via Secret Manager — see [Usage stats bootstrap](#usage-statistics-bootstrap)) |
 
 The region is pinned to `europe-west4` because Cloud Run **direct Domain
 Mappings** are only available in a subset of regions (in the EU: `europe-west1`
@@ -213,12 +213,11 @@ so a rollback is non-disruptive.
 
 ## Usage statistics bootstrap
 
-Aggregate-only run statistics are persisted to a **Neon Postgres** database
-(serverless, free tier sufficient for normal traffic). The architecture is
-documented in `docs/USAGE_STATS.md`; this section covers only the GCP
+Aggregate-only run statistics are persisted to the **Postgres on the Hetzner VPS `tanzapp-prod`** (DB `findatex_stats`, TLS-only). The architecture is documented in
+`docs/USAGE_STATS.md`; this section covers only the GCP
 side — how to wire the DB password and the desktop-→web ingest token into
 Cloud Run via Secret Manager. The DDL for the `usage_event` table has to be
-run once in Neon (see `docs/USAGE_STATS.md`); the app never issues DDL.
+run once in that DB (see `docs/USAGE_STATS.md`); the app never issues DDL.
 
 ```bash
 PROJECT=findatex-validator
@@ -227,7 +226,7 @@ SERVICE=findatex-validator-web
 
 # 1) Secrets — paste the values via stdin, not on the command line, so they
 #    do not land in shell history.
-printf '<neon-db-password>' | gcloud secrets create findatex-usage-db-password \
+printf '<db-password>' | gcloud secrets create findatex-usage-db-password \
   --replication-policy=automatic --data-file=-
 
 printf '<openssl-rand-hex-32-token>' | gcloud secrets create findatex-usage-ingest-token \
@@ -244,7 +243,7 @@ done
 
 # 3) Mount the secrets and add the non-secret DB config as env vars
 gcloud run services update "$SERVICE" --region="$REGION" \
-  --update-env-vars=FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://<host>.neon.tech/<db>?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=<user> \
+  --update-env-vars=FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=findatex \
   --update-secrets=FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest
 ```
 

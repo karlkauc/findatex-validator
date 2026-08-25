@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Print an aggregate usage overview from the production Neon Postgres.
+"""Print an aggregate usage overview from the production Postgres (Hetzner VPS tanzapp-prod).
 
 Reads the `usage_event` table (anonymous opt-out telemetry — see
 docs/USAGE_STATS.md) and prints a compact, read-only summary: totals, per
@@ -8,9 +8,9 @@ size. Issues **no DDL or writes**.
 
 Connection (all env-overridable; defaults match the Cloud Run deploy):
 
-    FINDATEX_WEB_USAGE_DB_HOST  (default: the prod Neon host)
-    FINDATEX_WEB_USAGE_DB_NAME  (default: neondb)
-    FINDATEX_WEB_USAGE_DB_USER  (default: neondb_owner)
+    FINDATEX_WEB_USAGE_DB_HOST  (default: the Hetzner VPS IP)
+    FINDATEX_WEB_USAGE_DB_NAME  (default: findatex_stats)
+    FINDATEX_WEB_USAGE_DB_USER  (default: findatex)
 
 Password resolution order:
     1. $FINDATEX_WEB_USAGE_DB_PASSWORD  (or $PGPASSWORD)
@@ -35,9 +35,9 @@ try:
 except ImportError:
     sys.exit('psycopg not installed. Run:  pip install --user "psycopg[binary]"')
 
-DEFAULT_HOST = "ep-crimson-meadow-albz1x37.c-3.eu-central-1.aws.neon.tech"
-DEFAULT_NAME = "neondb"
-DEFAULT_USER = "neondb_owner"
+DEFAULT_HOST = "62.238.116.11"
+DEFAULT_NAME = "findatex_stats"
+DEFAULT_USER = "findatex"
 PW_SECRET = "findatex-usage-db-password"
 
 

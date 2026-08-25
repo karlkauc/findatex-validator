@@ -61,8 +61,8 @@ services:
       # FINDATEX_WEB_EXTERNAL_PROXY_PASSWORD: "your-password"
       # FINDATEX_WEB_EXTERNAL_PROXY_NON_PROXY_HOSTS: "localhost,*.internal"
 
-      # --- Anonymous usage statistics (Neon Postgres) ------------------------
-      # Schema must be created once in Neon (see docs/USAGE_STATS.md).
+      # --- Anonymous usage statistics (Postgres) -----------------------------
+      # Schema must be created once in the DB (see docs/USAGE_STATS.md).
       # Secrets are pulled from .env (gitignored). Empty .env values ⇒ the
       # datasource stays inert and the app still boots normally.
       FINDATEX_WEB_USAGE_DB_URL: "${FINDATEX_WEB_USAGE_DB_URL:-}"

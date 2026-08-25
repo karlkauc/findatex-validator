@@ -11,7 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - _Nothing yet._
 
 ### Changed
-- _Nothing yet._
+- **Usage-stats / quick-feedback database moved from Neon to the Postgres on the
+  Hetzner VPS** (`findatex_stats`, TLS-only `hostssl` access for the `findatex`
+  role, fail2ban jail). Started empty — no Neon rows were migrated. Cloud Run
+  deploy workflow, `tools/usage_report.py` defaults and docs updated;
+  acquisition timeout in prod lowered to 10 s (no serverless cold start any more).
 
 ### Fixed
 - _Nothing yet._

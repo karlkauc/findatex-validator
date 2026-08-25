@@ -14,7 +14,7 @@ or logged** — the server derives only an ISO country code from it.
 Desktop:  validation done → UsageStatsReporter.report()  (enqueue, returns at once)
             → daemon thread → POST /api/usage-stats  (X-Usage-Token)
 Web:      ValidationOrchestrator end → UsageStatsService.record(source=web)
-Both:     → single-thread JDBC INSERT into Neon Postgres
+Both:     → single-thread JDBC INSERT into Postgres (Hetzner VPS)
 Any failure/timeout → silently dropped (DEBUG log); the user never notices.
 ```
 
@@ -46,7 +46,7 @@ One row per validation run (single file or one folder-batch):
 values, `Finding.message()/value()`, raw IP, user/host name, MAC, exact OS
 version.
 
-## Schema (run once in Neon — the app never issues DDL)
+## Schema (run once in the target Postgres — the app never issues DDL)
 
 ```sql
 CREATE TABLE usage_event (
@@ -78,7 +78,7 @@ CREATE INDEX idx_usage_install     ON usage_event (install_id);
 CREATE INDEX idx_usage_country     ON usage_event (country_code);
 ```
 
-`gen_random_uuid()` is built in on Postgres ≥ 13 (Neon).
+`gen_random_uuid()` is built in on Postgres ≥ 13.
 
 ## Configuration (all env-overridable; feature off until set)
 
@@ -89,14 +89,15 @@ Desktop (`settings.json` → `usageStats`, plus env):
 - `FINDATEX_USAGE_TOKEN` — embedded ingest token; blank disables the sender
 
 Web (`application.properties` / env):
-- `FINDATEX_WEB_USAGE_DB_URL` / `_USER` / `_PASSWORD` — Neon JDBC
-  (`...?sslmode=require`). **Empty ⇒ feature inert, app still boots.**
+- `FINDATEX_WEB_USAGE_DB_URL` / `_USER` / `_PASSWORD` — JDBC URL of the
+  stats DB (`...?sslmode=require`; prod: `findatex_stats` on the Hetzner VPS
+  `tanzapp-prod`, see [Production database](#production-database)).
+  **Empty ⇒ feature inert, app still boots.**
 - `FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT` — Agroal connection-acquisition
-  timeout (default `30s`). Neon (serverless) suspends compute when idle; the
-  first connection after an idle period must wait for the wake, which exceeds
-  Agroal's 5s default and would otherwise silently drop the insert.
-  `UsageStatsService` additionally retries the insert (3 attempts, linear
-  backoff), so cold-start runs are no longer lost.
+  timeout (default `30s`, prod sets `10s`). Historically needed for Neon's
+  serverless cold start; kept because `UsageStatsService` retries the insert
+  (3 attempts, linear backoff) and Cloud Run throttles CPU after the response,
+  so the async insert may only complete on the next request.
 - `FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN` — required for ingest; empty ⇒
   endpoint accepts-and-discards (logged once at startup)
 - `FINDATEX_WEB_USAGE_STATS_RATE` — per-IP `/api/usage-stats` limit (default 60/h)
@@ -142,7 +143,8 @@ available from https://www.maxmind.com.”*
 
 ## Operations (project-independent — SQL + psql)
 
-Connect: `psql "postgresql://…neon…/db?sslmode=require"`.
+Connect (from the VPS): `psql "postgresql://findatex:$(cat /home/deploy/findatex-db-password.txt)@127.0.0.1/findatex_stats"`
+— or remotely with `…@62.238.116.11:5432/findatex_stats?sslmode=require`.
 
 ```sql
 -- Runs per day & template
@@ -178,7 +180,7 @@ SELECT pg_size_pretty(pg_database_size(current_database())) db_size,
        count(*) rows, min(received_at), max(received_at) FROM usage_event;
 ```
 
-Cleanup (free-tier 500 MB cap):
+Cleanup (keep the table lean):
 
 ```sql
 DELETE FROM usage_event WHERE received_at < now() - interval '12 months';
@@ -189,18 +191,34 @@ VACUUM (FULL, ANALYZE) usage_event;   -- brief lock
 Export to a local Postgres before deleting:
 
 ```bash
-pg_dump "postgresql://…neon…/db?sslmode=require" \
+pg_dump "postgresql://findatex:…@62.238.116.11:5432/findatex_stats?sslmode=require" \
         -t usage_event --no-owner --no-acl -Fc -f usage_event.dump
 pg_restore -d "postgresql://localhost/findatex_stats" usage_event.dump
 
 # Incremental CSV
-psql "postgresql://…neon…/?sslmode=require" -c \
+psql "postgresql://findatex:…@62.238.116.11:5432/findatex_stats?sslmode=require" -c \
  "\copy (SELECT * FROM usage_event WHERE received_at > '2026-01-01') TO 'inc.csv' CSV HEADER"
 psql "postgresql://localhost/findatex_stats" -c \
  "\copy usage_event FROM 'inc.csv' CSV HEADER"
 ```
 
 Recommended rhythm: check size monthly → export if needed → delete old rows.
+
+## Production database
+
+Since 2026-08-25 the stats DB lives on the shared **PostgreSQL 18** of the
+Hetzner VPS `tanzapp-prod` (62.238.116.11) — migrated from Neon (free-tier
+compute quota exhausted). Started **empty**; no Neon rows were carried over.
+
+- DB `findatex_stats`, role `findatex` (owner); password in
+  `/home/deploy/findatex-db-password.txt` on the server and as
+  Secret Manager `findatex-usage-db-password` (used by Cloud Run).
+- Cloud Run has no fixed egress IP, so `pg_hba.conf` allows **only**
+  `hostssl findatex_stats findatex 0.0.0.0/0 scram-sha-256` (TLS-only, this
+  DB/role only); ufw opens 5432/tcp; fail2ban jail `postgresql` (5 failed
+  logins / 10 min ⇒ 1 h ban; filter `/etc/fail2ban/filter.d/postgresql.conf`,
+  relies on `log_line_prefix` containing `%h`).
+- Backups: Hetzner VM snapshots (daily, 7 rolling) — no logical dump yet.
 
 ## Privacy / GDPR
 

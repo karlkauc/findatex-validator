@@ -47,6 +47,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.util.StringConverter;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -270,6 +271,7 @@ public final class TemplateTabController {
     @FXML
     public void initialize() {
         // Version selector populated from the template definition.
+        versionCombo.setConverter(versionConverter());
         versionCombo.getItems().setAll(template.versions());
         versionCombo.setValue(selectedVersion);
         versionCombo.valueProperty().addListener((o, was, is) -> {
@@ -368,6 +370,26 @@ public final class TemplateTabController {
         // Combined export only makes sense in batch mode; per-file works in both.
         exportCombinedItem.setDisable(true);
         exportCombinedWithSourceItem.setDisable(true);
+    }
+
+    /**
+     * Renders a {@link TemplateVersion} by its human-readable {@code label()} (e.g. "TPT V8.0 —
+     * 2026-05-26"). Without a converter the ComboBox falls back to the record's {@code toString()},
+     * which starts with {@code TemplateVersion[templateId=…} and gets truncated so the version
+     * itself is no longer visible.
+     */
+    static StringConverter<TemplateVersion> versionConverter() {
+        return new StringConverter<>() {
+            @Override
+            public String toString(TemplateVersion v) {
+                return v == null ? "" : v.label();
+            }
+
+            @Override
+            public TemplateVersion fromString(String s) {
+                throw new UnsupportedOperationException("version combo is not editable");
+            }
+        };
     }
 
     private void updateVersionDateLabel() {

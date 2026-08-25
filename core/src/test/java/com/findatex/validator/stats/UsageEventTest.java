@@ -1,6 +1,7 @@
 package com.findatex.validator.stats;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.findatex.validator.AppInfo;
 import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.report.QualityReport;
@@ -112,5 +113,14 @@ class UsageEventTest {
                 "single", 1L).withSource("web");
         assertThat(ev.installId()).isEqualTo(UsageEvent.WEB_INSTALL_ID);
         assertThat(ev.source()).isEqualTo("web");
+    }
+
+    @Test
+    void appVersionComesFromAppInfoNotJarManifest() {
+        // The Quarkus fast-jar / plain core jar carry no Implementation-Version in
+        // the manifest, so the Maven-filtered AppInfo.version() must win — otherwise
+        // production web runs are recorded as "dev".
+        assertThat(UsageEvent.detectAppVersion()).isEqualTo(AppInfo.version());
+        assertThat(AppInfo.version()).isNotEqualTo("dev");
     }
 }

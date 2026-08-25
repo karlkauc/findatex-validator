@@ -18,7 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   acquisition timeout in prod lowered to 10 s (no serverless cold start any more).
 
 ### Fixed
-- _Nothing yet._
+- **Usage stats recorded `app_version = "dev"` for every web run** — `UsageEvent.detectAppVersion()`
+  relied on the jar manifest's `Implementation-Version`, which neither the Quarkus fast-jar
+  nor the core jar sets. Now resolves via `AppInfo.version()` (Maven-filtered properties,
+  same source as the About dialog) with the manifest as fallback. Affects desktop too.
 
 ## [1.0.11] — 2026-08-25
 

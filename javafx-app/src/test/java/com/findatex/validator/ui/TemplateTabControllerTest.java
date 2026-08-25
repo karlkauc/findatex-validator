@@ -42,6 +42,16 @@ class TemplateTabControllerTest {
     }
 
     @Test
+    void versionComboShowsHumanReadableLabelNotRecordToString() {
+        TemplateDefinition tpt = TemplateRegistry.of(TemplateId.TPT);
+        for (TemplateVersion v : tpt.versions()) {
+            String shown = TemplateTabController.versionConverter().toString(v);
+            assertThat(shown).isEqualTo(v.label()).doesNotContain("TemplateVersion[");
+        }
+        assertThat(TemplateTabController.versionConverter().toString(null)).isEmpty();
+    }
+
+    @Test
     void nullTemplateRejected() {
         assertThatThrownBy(() -> new TemplateTabController(null))
                 .isInstanceOf(NullPointerException.class);

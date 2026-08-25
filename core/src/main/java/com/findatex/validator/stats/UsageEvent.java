@@ -1,5 +1,7 @@
 package com.findatex.validator.stats;
 
+import com.findatex.validator.AppInfo;
+
 import com.findatex.validator.batch.BatchResult;
 import com.findatex.validator.batch.BatchSummary;
 import com.findatex.validator.config.AppSettings;
@@ -205,8 +207,16 @@ public record UsageEvent(
         return "Other";
     }
 
+    /**
+     * Resolves the running app version: {@link AppInfo#version()} (Maven-filtered
+     * {@code META-INF/findatex-validator.properties}, works in the shaded desktop
+     * jar and the Quarkus fast-jar alike) first, then the jar manifest's
+     * {@code Implementation-Version}, else {@code "dev"}.
+     */
     static String detectAppVersion() {
-        String v = UsageEvent.class.getPackage().getImplementationVersion();
+        String v = AppInfo.version();
+        if (v != null && !v.isBlank() && !"dev".equals(v)) return v;
+        v = UsageEvent.class.getPackage().getImplementationVersion();
         return (v == null || v.isBlank()) ? "dev" : v;
     }
 }

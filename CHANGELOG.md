@@ -14,7 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - _Nothing yet._
 
 ### Fixed
-- _Nothing yet._
+- **About dialog (web + desktop) showed a hardcoded "Version 1.0.0".** `ABOUT.md`
+  now carries a `{{version}}` placeholder that is filled at runtime from the
+  Maven version (`quarkus.application.version` / `AppInfo.version()`).
 
 ## [1.0.10] — 2026-08-25
 

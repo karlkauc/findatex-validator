@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - _Nothing yet._
 
 ### Fixed
+- _Nothing yet._
+
+## [1.0.11] — 2026-08-25
+
+### Fixed
 - **About dialog (web + desktop) showed a hardcoded "Version 1.0.0".** `ABOUT.md`
   now carries a `{{version}}` placeholder that is filled at runtime from the
   Maven version (`quarkus.application.version` / `AppInfo.version()`).
@@ -164,7 +169,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.10...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.11...HEAD
+[1.0.11]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.11
 [1.0.10]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.10
 [1.0.9]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.9
 [1.0.8]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.8

@@ -7,6 +7,7 @@ import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,12 @@ public class AboutResource {
 
     private static final String RESOURCE_PATH = "/about/ABOUT.md";
 
+    /** Placeholder in ABOUT.md replaced with the Maven version at startup. */
+    static final String VERSION_TOKEN = "{{version}}";
+
+    @ConfigProperty(name = "quarkus.application.version", defaultValue = "dev")
+    String version;
+
     private String body;
 
     @PostConstruct
@@ -32,7 +39,8 @@ public class AboutResource {
             if (in == null) {
                 throw new IllegalStateException("Missing classpath resource " + RESOURCE_PATH);
             }
-            body = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            body = new String(in.readAllBytes(), StandardCharsets.UTF_8)
+                    .replace(VERSION_TOKEN, version == null || version.isBlank() ? "dev" : version);
         } catch (IOException e) {
             throw new IllegalStateException("Could not read " + RESOURCE_PATH, e);
         }

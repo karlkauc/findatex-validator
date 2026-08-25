@@ -1,5 +1,7 @@
 package com.findatex.validator.ui;
 
+import com.findatex.validator.AppInfo;
+
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -73,11 +75,16 @@ public final class AboutDialog {
                 log.warn("Missing classpath resource {}", RESOURCE_PATH);
                 return "# About unavailable\n\nThe bundled ABOUT.md resource was not found.";
             }
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            return substituteVersion(new String(in.readAllBytes(), StandardCharsets.UTF_8));
         } catch (Exception e) {
             log.warn("Failed to load {}: {}", RESOURCE_PATH, e.toString());
             return "# About unavailable\n\nCould not load ABOUT.md: " + e.getMessage();
         }
+    }
+
+    /** Replaces the {@code {{version}}} placeholder in ABOUT.md with the running app version. */
+    static String substituteVersion(String markdown) {
+        return markdown.replace("{{version}}", AppInfo.version());
     }
 
     private static void openLink(String url) {

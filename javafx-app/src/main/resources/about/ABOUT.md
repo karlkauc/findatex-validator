@@ -1,6 +1,6 @@
 # FinDatEx Validator — Desktop
 
-**Version 1.0.0** · Karl Kauc · Apache License 2.0
+**Version {{version}}** · Karl Kauc · Apache License 2.0
 
 Source code: <https://github.com/karlkauc/findatex-validator>
 

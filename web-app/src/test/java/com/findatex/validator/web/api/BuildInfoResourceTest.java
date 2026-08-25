@@ -20,7 +20,7 @@ class BuildInfoResourceTest {
                 .then()
                 .statusCode(200)
                 // Version comes from Maven (quarkus.application.version). For this repo
-                // it's currently "1.0.0"; allow any semver-ish string so a future bump
+                // allow any semver-ish string so a version bump
                 // doesn't break the test.
                 .body("version", matchesPattern("^\\d+\\.\\d+\\.\\d+(-SNAPSHOT)?$"))
                 // commit is empty when the plugin couldn't read .git (e.g. shallow CI

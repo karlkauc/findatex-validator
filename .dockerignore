@@ -7,6 +7,11 @@ specs/
 
 # Tooling/scripts not needed at build time
 samples/
+# Exception: the four demo files behind "Try an example" are mounted onto the
+# web-app classpath by its <resources> block (see SampleFiles), so they must
+# reach the build context. Without this the image builds fine and the feature
+# is silently absent — which is exactly what shipped once.
+!samples/*/03_bad_formats.xlsx
 docs/
 # Exception: the per-template rules reference is bundled into the core JAR
 # (see core/pom.xml's <resource> for ../docs/rules) and surfaced in the in-app

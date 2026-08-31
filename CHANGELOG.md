@@ -98,9 +98,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   before/after fix); hitting the wall mid-evaluation was a conversion loss, not
   abuse. The concurrency cap and the 25 MB body limit are what actually bound a
   hostile client.
-- **The desktop download is a real link now.** The Notes panel said the desktop
-  app "is available for download" without linking it; the link only appeared
-  once the quota was already exhausted.
+- **The desktop download is a real link now**, and points at the releases page
+  (`…/releases`) rather than the repository root. The Notes panel used to say
+  the desktop app "is available for download" without linking it, and the link
+  only appeared once the quota was already exhausted.
 - **CSP `script-src` gained a `sha256-` hash** for the single inline JSON-LD
   block. `'unsafe-inline'` was not an option and structured data cannot be
   loaded from an external file — search engines only read it inline.
@@ -114,6 +115,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Retry counts, backoff and timeouts are unchanged.
 
 ### Fixed
+- **The demo files never reached the container image.** `.dockerignore` excludes
+  `samples/`, so the classpath mount added with "Try an example" found nothing,
+  Maven skipped the missing resource directory without a word, and the image
+  built green with the feature silently absent — `/api/samples/TPT` answered 404
+  in production while every test passed locally. Fixed with a `.dockerignore`
+  exception plus the matching `COPY`, and the app now logs a warning at startup
+  when a declared demo file is not on the classpath, so the next silent loss is
+  not silent.
 - **`/robots.txt` and `/sitemap.xml` answered 200 with the SPA's HTML.**
   `SpaFallbackResource` swallowed every unmatched path, so crawlers got an
   invalid robots.txt and an unparseable sitemap. File-like paths (a last segment

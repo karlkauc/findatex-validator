@@ -37,6 +37,17 @@ class CanonicalHostMatchTest {
                 .statusCode(200);
     }
 
+    @Test
+    void theGeneratedSitemapUsesTheCanonicalHostNotTheRequestHost() {
+        // The request arrives on localhost:<random port>; a sitemap that echoed
+        // that back would list URLs nobody can crawl.
+        given().redirects().follow(false)
+                .when().get("/sitemap.xml")
+                .then()
+                .statusCode(200)
+                .body(org.hamcrest.Matchers.containsString("<loc>https://localhost/</loc>"));
+    }
+
     public static final class MatchingHost implements QuarkusTestProfile {
         @Override
         public Map<String, String> getConfigOverrides() {

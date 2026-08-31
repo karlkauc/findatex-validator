@@ -4,6 +4,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 
@@ -31,13 +32,37 @@ class SeoResourcesTest {
     }
 
     @Test
-    void sitemapIsServedAsXmlListingTheCanonicalHomepage() {
+    void sitemapIsGeneratedAndListsTheAppAndTheRulePages() {
+        // Generated, not a static file: there are ~2000 rule pages and they
+        // change with every spec version, so a hand-written list would be
+        // stale within one release.
         given()
                 .when().get("/sitemap.xml")
                 .then()
                 .statusCode(200)
                 .contentType(containsString("xml"))
-                .body(containsString("<loc>https://www.findatex-validator.eu/</loc>"));
+                .body(containsString("<urlset"))
+                .body(containsString("/rules</loc>"))
+                .body(containsString("/rules/tpt-v8-0</loc>"))
+                .body(containsString("/rules/tpt-v8-0/field/26</loc>"));
+    }
+
+    @Test
+    void supersededSpecVersionsRankBelowCurrentOnesInTheSitemap() {
+        // A superseded version's field pages are near-identical to their
+        // successors'; promoting both equally makes them compete.
+        String sitemap = given().when().get("/sitemap.xml")
+                .then().statusCode(200).extract().body().asString();
+
+        assertThat(lineFor(sitemap, "/rules/tpt-v8-0/field/26<"))
+                .contains("<priority>0.5<");
+        assertThat(lineFor(sitemap, "/rules/tpt-v7-0/field/26<"))
+                .contains("<priority>0.3<");
+    }
+
+    private static String lineFor(String sitemap, String needle) {
+        return sitemap.lines().filter(l -> l.contains(needle)).findFirst()
+                .orElseThrow(() -> new AssertionError("no sitemap entry for " + needle));
     }
 
     @Test

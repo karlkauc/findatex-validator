@@ -217,6 +217,15 @@ REST endpoints (all under `/api`):
   third-party list) and Maven version + git metadata of the running container
 - `POST /api/usage-stats` — aggregate usage events from desktop installs (see below)
 - `POST /api/page-view` — SPA page-load beacon, always 204 (see below)
+- `GET  /api/samples/{templateId}` — the demo file behind "Try an example"
+  (`SampleFiles`; the version it was generated for is advertised in
+  `GET /api/templates`)
+
+Outside `/api` the web layer also serves **server-rendered HTML pages**:
+`GET /rules`, `/rules/{slug}` and `/rules/{slug}/field/{num}`
+(`RulesPageResource` + `RuleDocs` + `RulesPageRenderer`), plus the generated
+`GET /sitemap.xml` (`SitemapResource`). These deliberately carry no React
+bundle — see the SEO block below.
 
 **SEO / link previews** — four files must agree on one canonical host
 (`www.findatex-validator.eu`): the `<link rel="canonical">`, OG and JSON-LD tags
@@ -232,7 +241,19 @@ they drift. Two traps: the inline JSON-LD is allow-listed in CSP by a
 `SpaFallbackResource` must keep 404-ing file-like paths, otherwise every
 unmatched `*.txt`/`*.xml`/`*.js` URL becomes a soft-404 serving the SPA shell.
 The link-preview card is generated (`tools/generate_og_image.py`), never
-hand-edited. Full picture incl. the manual Search-Console steps: `docs/SEO.md`.
+hand-edited. The landing copy (what the templates are, privacy, scoring, FAQ,
+disclaimer) is plain HTML **in `index.html` below `<div id="root">`**, not a
+React component, so it ships in the initial payload; `SeoMetadataTest` also
+asserts it names the latest version of every template.
+
+**The rule reference is public** — `/rules`, `/rules/{slug}`,
+`/rules/{slug}/field/{num}`. `RuleDocs` splits the generated Markdown on the
+generator's own structure (`## 5. Per-field catalog`, then `### Field N — name`),
+so a change to `RuleDocGenerator`'s output shape breaks `RuleDocsTest` rather
+than silently emptying ~2000 pages. `sitemap.xml` is generated
+(`SitemapResource`) — **never re-add a static `sitemap.xml`**, the static
+handler wins over the resource. Full picture incl. the manual Search-Console
+steps: `docs/SEO.md`.
 
 **Misbrauch-Schutz** (configurable via `FINDATEX_WEB_*` env vars; defaults in
 `web-app/src/main/resources/application.properties`):

@@ -34,6 +34,7 @@ Apache License 2.0 — full text at
 | Logback Classic | 1.5.32 | EPL-1.0 / LGPL-2.1 |
 | Bucket4j Core | 8.10.1 | Apache-2.0 |
 | Caffeine | 3.2.3 | Apache-2.0 |
+| commonmark-java (`commonmark`, `commonmark-ext-gfm-tables`) | 0.30.0 | BSD-2-Clause |
 
 ## Third-party libraries — Runtime (Frontend, npm)
 

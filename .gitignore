@@ -60,3 +60,6 @@ validate_dirty_tests.py
 core/src/test/java/com/findatex/validator/validation/DirtyTestsValidationTest.java
 /Screenshot *.png
 /quota-exhausted.png
+# Playwright MCP writes full-page screenshots into the repo root by default.
+/landing-full.png
+/page-*.png

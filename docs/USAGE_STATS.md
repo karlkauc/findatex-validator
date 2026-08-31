@@ -133,6 +133,55 @@ Keys), then wire it per environment:
 Attribution: *“This product includes GeoLite2 data created by MaxMind,
 available from https://www.maxmind.com.”*
 
+## Page views (visitors vs. validations)
+
+`usage_event` counts validation **runs**. On its own a quiet week is ambiguous:
+nobody found the site, or people arrived and left without uploading anything —
+two problems with opposite fixes (promotion vs. a better landing page).
+`page_view` supplies the other half of that ratio.
+
+One row per page load, written by `PageViewService` from the beacon the SPA
+fires in `main.tsx` (`POST /api/page-view`, always answers **204**).
+
+| Field | Meaning |
+|---|---|
+| `view_id`, `received_at` | server-assigned (PK, `now()`) |
+| `path` | SPA route; query string and fragment are **cut off** before storing |
+| `referrer_host` | **host only** of `document.referrer` (`www.` stripped, http/https only); `NULL` for direct traffic and for same-origin navigation |
+| `campaign` | `?utm_source=` / `?ref=`, reduced to a `[a-z0-9._-]` slug — tells a LinkedIn post apart from organic traffic |
+| `country_code` | ISO-3166-1 alpha-2, derived server-side from the request IP (same `GeoIpService` as usage stats) |
+
+**Never collected:** no cookie, no localStorage, no visitor or session id, no
+fingerprint, no raw IP, no full referrer URL, no query strings. The rows cannot
+be tied to a person or linked to each other — which is also why the counter
+needs no consent banner. Client-side counting (rather than counting HTML
+requests server-side) is deliberate: it keeps crawlers and uptime probes out of
+a number that would otherwise be mostly bots at this traffic level. Bot user
+agents that do execute JavaScript are dropped by `BotDetector`.
+
+```sql
+CREATE TABLE page_view (
+  view_id       bigserial   PRIMARY KEY,
+  received_at   timestamptz NOT NULL DEFAULT now(),
+  path          text        NOT NULL,
+  referrer_host text,
+  campaign      text,
+  country_code  text
+);
+CREATE INDEX idx_page_view_received_at ON page_view (received_at);
+CREATE INDEX idx_page_view_referrer    ON page_view (referrer_host);
+CREATE INDEX idx_page_view_campaign    ON page_view (campaign);
+```
+
+Config: no separate switch — the feature follows `FINDATEX_WEB_USAGE_DB_URL`
+(empty ⇒ inert, endpoint still answers 204). `FINDATEX_WEB_PAGE_VIEW_RATE`
+tunes the per-IP limit (default 120/h; deliberately generous — a real visitor
+reloading must never be throttled).
+
+`tools/usage_report.py` prints the funnel under **Traffic**: views and web runs
+per day with a `pct_validated` column, plus referrers, campaigns, pages and
+countries.
+
 ## Abuse protection
 
 - Static shared `X-Usage-Token` (constant-time compared) — wrong/missing ⇒ 401.
@@ -223,7 +272,9 @@ compute quota exhausted). Started **empty**; no Neon rows were carried over.
 ## Privacy / GDPR
 
 Only aggregate counts and a server-derived country are stored; no personal
-data, no raw IP. The Settings dialog states what is/isn't sent and links here.
+data, no raw IP. This covers `page_view` too: it holds no id of any kind, so
+one row cannot be linked to another or to a person. The Settings dialog states
+what is/isn't sent and links here.
 The DSGVO wording in the Settings tab and this document should be reviewed by
 legal/SME before public deployment.
 

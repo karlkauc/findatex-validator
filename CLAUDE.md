@@ -216,6 +216,7 @@ REST endpoints (all under `/api`):
 - `GET  /api/about`, `GET /api/build-info` — About markdown (web-bundle-specific
   third-party list) and Maven version + git metadata of the running container
 - `POST /api/usage-stats` — aggregate usage events from desktop installs (see below)
+- `POST /api/page-view` — SPA page-load beacon, always 204 (see below)
 
 **SEO / link previews** — four files must agree on one canonical host
 (`www.findatex-validator.eu`): the `<link rel="canonical">`, OG and JSON-LD tags
@@ -231,7 +232,7 @@ they drift. Two traps: the inline JSON-LD is allow-listed in CSP by a
 `SpaFallbackResource` must keep 404-ing file-like paths, otherwise every
 unmatched `*.txt`/`*.xml`/`*.js` URL becomes a soft-404 serving the SPA shell.
 The link-preview card is generated (`tools/generate_og_image.py`), never
-hand-edited.
+hand-edited. Full picture incl. the manual Search-Console steps: `docs/SEO.md`.
 
 **Misbrauch-Schutz** (configurable via `FINDATEX_WEB_*` env vars; defaults in
 `web-app/src/main/resources/application.properties`):
@@ -286,6 +287,17 @@ still boot). `country_code` is derived server-side from the request IP
 Opt-out: desktop Settings → Statistik (`AppSettings.UsageStats`); the install
 id is generated and persisted by `SettingsService`. Full schema, env vars and
 psql ops in `docs/USAGE_STATS.md`. Never add instance data to `UsageEvent`.
+
+**Page views** — `usage_event` counts runs, which alone cannot say whether a
+quiet week means nobody came or everybody left without uploading. The SPA fires
+one beacon per page load from `main.tsx` (`POST /api/page-view`, **always 204**)
+into the `page_view` table via `PageViewService` (same DB, same inert-without-DB
+rule, same async+retry shape as `QuickFeedbackService`). Client-side on purpose:
+server-side counting would count crawlers, which at this traffic level would
+dominate. No cookie, no id, no IP, no full referrer URL, no query strings — only
+path, referrer **host**, campaign slug (`?utm_source=`/`?ref=`) and country; bot
+UAs are dropped by `BotDetector`. The funnel is in `tools/usage_report.py` under
+**Traffic** (`pct_validated`).
 
 **Newsletter sign-up (external provider)** — user-initiated, so **synchronous
 with a clear result** (not fire-and-forget). The e-mail is **never stored in

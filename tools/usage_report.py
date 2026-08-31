@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Print a read-only usage overview of the FinDatEx Validator from the stats Postgres.
 
-Reads `usage_event` and `quick_feedback` (docs/USAGE_STATS.md, docs/QUICK_FEEDBACK.md)
-on the Hetzner VPS and prints aggregates: runs per day, desktop vs web, active
-installs, templates/versions, profiles, scores, error rates, durations,
-most-triggered rules, countries, OS/app versions, star ratings, DB size. No writes.
+Reads `usage_event`, `page_view` and `quick_feedback` (docs/USAGE_STATS.md,
+docs/QUICK_FEEDBACK.md) on the Hetzner VPS and prints aggregates: runs per day,
+desktop vs web, active installs, templates/versions, profiles, scores, error
+rates, durations, most-triggered rules, countries, OS/app versions, visitors vs.
+validations (the conversion funnel), traffic sources, star ratings, DB size.
+No writes.
 
 Connection (env-overridable; defaults match the Cloud Run deploy):
     USAGE_DB_HOST  (default 62.238.116.11)
@@ -138,6 +140,43 @@ def main() -> None:
             SELECT source, coalesce(app_version,'?') app_version, coalesce(os_name,'?') os,
                    count(*) runs, count(DISTINCT install_id) installs, max(received_at)::date last_seen
             FROM usage_event {where} GROUP BY 1,2,3 ORDER BY 1, 6 DESC, 4 DESC LIMIT 20;"""),
+        # --- Traffic (page_view) ------------------------------------------
+        # usage_event answers "how many runs"; page_view answers "how many
+        # people saw the page". Only together do they say whether a quiet week
+        # means nobody came or everybody left without uploading.
+        ("Traffic — totals", f"""
+            SELECT (SELECT count(*) FROM page_view {where}) views,
+                   (SELECT count(*) FROM usage_event WHERE source='web' {and_}) web_runs,
+                   (SELECT CASE WHEN count(*) > 0 THEN round(
+                        (SELECT count(*) FROM usage_event WHERE source='web' {and_})
+                        * 100.0 / count(*), 1) END FROM page_view {where}) pct_validated,
+                   (SELECT min(received_at)::date FROM page_view {where}) first_view,
+                   (SELECT max(received_at)::date FROM page_view {where}) last_view;"""),
+        ("Traffic — per day (max. 14)", f"""
+            WITH v AS (SELECT received_at::date d, count(*) views
+                       FROM page_view {where} GROUP BY 1),
+                 r AS (SELECT received_at::date d, count(*) runs
+                       FROM usage_event WHERE source='web' {and_} GROUP BY 1)
+            SELECT coalesce(v.d, r.d) d, coalesce(v.views,0) views,
+                   coalesce(r.runs,0) web_runs,
+                   CASE WHEN coalesce(v.views,0) > 0
+                        THEN round(coalesce(r.runs,0)*100.0/v.views,1) END pct_validated
+            FROM v FULL OUTER JOIN r ON v.d = r.d
+            ORDER BY 1 DESC LIMIT 14;"""),
+        ("Traffic — sources (referrer host)", f"""
+            SELECT coalesce(referrer_host,'(direct / none)') referrer, count(*) views,
+                   max(received_at)::date last_seen
+            FROM page_view {where} GROUP BY 1 ORDER BY 2 DESC LIMIT 20;"""),
+        ("Traffic — campaigns (?utm_source= / ?ref=)", f"""
+            SELECT coalesce(campaign,'(organic / none)') campaign, count(*) views,
+                   min(received_at)::date first_seen, max(received_at)::date last_seen
+            FROM page_view {where} GROUP BY 1 ORDER BY 2 DESC LIMIT 20;"""),
+        ("Traffic — pages", f"""
+            SELECT path, count(*) views FROM page_view {where}
+            GROUP BY 1 ORDER BY 2 DESC LIMIT 20;"""),
+        ("Traffic — countries", f"""
+            SELECT coalesce(country_code,'?') cc, count(*) views
+            FROM page_view {where} GROUP BY 1 ORDER BY 2 DESC LIMIT 20;"""),
         ("Quick feedback — ratings", f"""
             SELECT source, count(*) n, round(avg(rating),2) avg_rating,
                    count(*) FILTER (WHERE rating=5) five, count(*) FILTER (WHERE rating<=2) low,
@@ -149,9 +188,11 @@ def main() -> None:
             FROM quick_feedback {where} ORDER BY received_at DESC LIMIT 20;"""),
         ("DB size", """
             SELECT pg_size_pretty(pg_total_relation_size('usage_event')) usage_event_size,
+                   pg_size_pretty(pg_total_relation_size('page_view')) page_view_size,
                    pg_size_pretty(pg_total_relation_size('quick_feedback')) feedback_size,
                    pg_size_pretty(pg_database_size(current_database())) db_size,
                    (SELECT count(*) FROM usage_event) usage_rows,
+                   (SELECT count(*) FROM page_view) page_view_rows,
                    (SELECT count(*) FROM quick_feedback) feedback_rows;"""),
     ]
 
@@ -159,7 +200,15 @@ def main() -> None:
         for title, sql in queries:
             print(f"\n### {title}")
             with conn.cursor() as cur:
-                cur.execute(sql)
+                # One missing table (an older DB without `page_view`, say) must
+                # not abort the whole report — and a failed statement poisons
+                # the transaction, so roll back before continuing.
+                try:
+                    cur.execute(sql)
+                except psycopg.Error as exc:
+                    conn.rollback()
+                    print(f"(unavailable: {str(exc).splitlines()[0]})")
+                    continue
                 cols = [d.name for d in cur.description]
                 rows = cur.fetchall()
                 widths = [len(c) for c in cols]

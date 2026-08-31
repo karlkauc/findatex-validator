@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Download, GitFork, HelpCircle, Info, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
 import {
@@ -81,6 +81,25 @@ export default function App() {
   const [isinCheckCurrency, setIsinCheckCurrency] = useState(false);
   const [isinCheckCic, setIsinCheckCic] = useState(false);
   const [openfigiApiKey, setOpenfigiApiKey] = useState('');
+  // The header is fixed, not sticky: `position: sticky` can only stick within
+  // its own containing block, which ends where the React app ends — the static
+  // landing content below #root lives outside it, so the header would slide
+  // away there. Fixed takes it out of flow, so the spacer below reserves its
+  // height; measured rather than hardcoded because the bar wraps to two rows on
+  // narrow screens.
+  const headerRef = useRef<HTMLElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const update = () => setHeaderHeight(el.offsetHeight);
+    update();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const [sampleLoading, setSampleLoading] = useState(false);
   const [sampleError, setSampleError] = useState<unknown>(null);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -174,8 +193,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      <header className="bg-gradient-to-b from-navy-700 to-navy-800 text-white">
-        <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-6 py-5 lg:px-8">
+      <header
+        ref={headerRef}
+        className="fixed inset-x-0 top-0 z-30 bg-gradient-to-b from-navy-700 to-navy-800 text-white shadow-md"
+      >
+        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-3 px-6 py-5 lg:px-8">
           <ShieldCheck className="h-7 w-7" aria-hidden="true" />
           <div className="flex-1">
             <h1 className="text-lg font-semibold tracking-tight">FinDatEx Validator</h1>
@@ -183,6 +205,7 @@ export default function App() {
               TPT · EET · EMT · EPT — quality and conformance against the official FinDatEx specs.
             </p>
           </div>
+          {quickFeedbackConfigQuery.data?.enabled && <QuickFeedback templateId={templateId} />}
           <RateLimitBadge />
           <a
             href={GITHUB_URL}
@@ -213,6 +236,9 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {/* Reserves the fixed header's space in the document flow. */}
+      <div style={{ height: headerHeight }} aria-hidden="true" />
 
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
       <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
@@ -395,7 +421,6 @@ export default function App() {
               com.findatex/findatex-validator
             </a>
           </div>
-          {quickFeedbackConfigQuery.data?.enabled && <QuickFeedback templateId={templateId} />}
           {newsletterConfigQuery.data?.enabled && <NewsletterSignup />}
         </div>
       </footer>

@@ -58,6 +58,9 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.desktop-download-url")
     Optional<String> desktopDownloadUrl;
 
+    @ConfigProperty(name = "findatex.web.canonical-host")
+    Optional<String> canonicalHost;
+
     @ConfigProperty(name = "findatex.web.feedback.github-repo")
     Optional<String> feedbackGithubRepo;
 
@@ -111,6 +114,19 @@ public class WebConfig {
      */
     public Optional<String> desktopDownloadUrl() {
         return desktopDownloadUrl.map(String::trim).filter(s -> !s.isEmpty());
+    }
+
+    /**
+     * Hostname this deployment wants to be indexed under (e.g.
+     * {@code www.findatex-validator.eu}). When set, GET/HEAD requests arriving
+     * on any other hostname are 301'd there by {@code CanonicalHostFilter};
+     * empty (the default) disables the redirect entirely, which is what dev
+     * mode, tests and self-hosted instances want.
+     */
+    public Optional<String> canonicalHost() {
+        return canonicalHost.map(String::trim)
+                .map(s -> s.toLowerCase(java.util.Locale.ROOT))
+                .filter(s -> !s.isEmpty());
     }
 
     /**

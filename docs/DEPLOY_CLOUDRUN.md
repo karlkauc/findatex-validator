@@ -25,6 +25,7 @@ are stored in the repo or in GitHub Secrets.
 | Min / max instances   | 0 / 1                              |
 | Request timeout       | 300 s                              |
 | External validation   | off (`FINDATEX_WEB_EXTERNAL_ENABLED=false`) |
+| Canonical host        | `www.findatex-validator.eu` (`FINDATEX_WEB_CANONICAL_HOST`) |
 | Usage statistics      | on (Postgres on the Hetzner VPS; password + ingest token via Secret Manager — see [Usage stats bootstrap](#usage-statistics-bootstrap)) |
 
 The region is pinned to `europe-west4` because Cloud Run **direct Domain
@@ -32,6 +33,17 @@ Mappings** are only available in a subset of regions (in the EU: `europe-west1`
 and `europe-west4`; **not** `europe-west3`). Switching to a different region
 later means redeploying the service and re-spiegeling the Artifact Registry
 image — both cheap operations, but easier to get right from the start.
+
+`FINDATEX_WEB_CANONICAL_HOST` exists for search engines. The service answers on
+three hostnames — the apex domain, `www`, and its `*.run.app` URL — with
+byte-identical HTML, which a crawler reads as three copies of the same site
+competing with each other. With the variable set, `CanonicalHostFilter` 301s
+every GET/HEAD on the other two to the canonical one (POSTs and `/_internal/`
+health probes are never redirected). Leave it **unset** for any self-hosted
+instance: an operator on their own hostname would otherwise be redirected to
+this deployment. Changing it means updating four places together —
+`index.html`'s `<link rel="canonical">`, `robots.txt`, `sitemap.xml` and this
+variable; `SeoMetadataTest` fails if the first three drift apart.
 
 `max-instances=1` is intentional: `Bucket4j` (rate limit) and `ReportStore`
 (post-validate XLSX cache) live in JVM memory per instance. Multiple

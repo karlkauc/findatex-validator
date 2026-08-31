@@ -9,7 +9,72 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <title>FinDatEx Validator</title>
+
+    <title>FinDatEx Validator — check TPT, EET, EMT &amp; EPT files online</title>
+    <meta
+      name="description"
+      content="Free online validator for FinDatEx data templates: upload a TPT, EET, EMT or EPT file and get a quality score, every rule violation and an Excel report. No login."
+    />
+
+    <!--
+      Canonical host. Must match findatex.web.canonical-host (application.properties),
+      the Sitemap line in robots.txt and the <loc> entries in sitemap.xml — a
+      canonical pointing at a host that 301s elsewhere is ignored by crawlers.
+    -->
+    <link rel="canonical" href="https://www.findatex-validator.eu/" />
+
+    <!-- Open Graph: how the link renders when someone pastes it into LinkedIn/Teams/Slack. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FinDatEx Validator" />
+    <meta property="og:locale" content="en" />
+    <meta property="og:url" content="https://www.findatex-validator.eu/" />
+    <meta property="og:title" content="FinDatEx Validator — check TPT, EET, EMT &amp; EPT files online" />
+    <meta
+      property="og:description"
+      content="Upload a TPT, EET, EMT or EPT file and get a quality score, every rule violation and an Excel report. No login, files are never stored."
+    />
+    <meta property="og:image" content="https://www.findatex-validator.eu/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="FinDatEx Validator — validation for TPT, EET, EMT and EPT data templates"
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FinDatEx Validator — check TPT, EET, EMT &amp; EPT files online" />
+    <meta
+      name="twitter:description"
+      content="Upload a TPT, EET, EMT or EPT file and get a quality score, every rule violation and an Excel report. No login, files are never stored."
+    />
+    <meta name="twitter:image" content="https://www.findatex-validator.eu/og-image.png" />
+
+    <!--
+      Structured data. Kept to SoftwareApplication on purpose: FAQPage markup
+      requires the answers to be visible on the page, which they are not (yet).
+      CSP is strict script-src 'self', so this inline block is allow-listed by
+      its sha256 hash in application.properties. Editing a single character in
+      here — whitespace included — invalidates that hash; SeoMetadataTest fails
+      loudly when the two drift apart.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "FinDatEx Validator",
+        "url": "https://www.findatex-validator.eu/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any (browser); Windows, macOS, Linux (desktop build)",
+        "description": "Validates FinDatEx data templates (TPT, EET, EMT, EPT) against the official specs: missing mandatory fields, wrong formats, invalid codes and cross-field rules. Returns a quality score and a downloadable Excel report.",
+        "license": "https://www.apache.org/licenses/LICENSE-2.0",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        }
+      }
+    </script>
   </head>
   <body class="bg-slate-50 text-slate-900 antialiased">
     <div id="root"></div>

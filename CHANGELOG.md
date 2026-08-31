@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **The rule reference is public.** ~57k lines generated from the spec sheets
+  existed only inside a modal (`GET /api/help/rules/{slug}`), where no search
+  engine could reach it. It is now ~2000 server-rendered pages: `/rules`,
+  `/rules/{slug}` per template version (scoring, profiles, general and
+  cross-field rules) and `/rules/{slug}/field/{num}` per field (definition,
+  flag per profile, codification, every rule that can fire on it). Each has its
+  own title, description and canonical, renders without JavaScript, and links
+  back into the validator. `RuleDocs` splits the generated Markdown on the
+  generator's own structure, and `RuleDocsTest` fails if that shape moves
+  instead of letting the pages go silently empty. Rendering uses commonmark-java
+  — the same managed version the desktop Help dialog already used.
+- **`sitemap.xml` is generated** (`SitemapResource`) and replaces the static
+  file, which listed a single URL: superseded spec versions rank below current
+  ones, since their field pages are near-identical to their successors'.
+  A static `sitemap.xml` must never come back — the static-resource handler
+  wins over the resource.
 - **"No file at hand? Try an example".** A first-time visitor evaluating the
   tool rarely has a TPT/EET/EMT/EPT file to hand, and going to find one is
   where they left. One click now loads the bundled example for the selected

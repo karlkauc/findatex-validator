@@ -31,7 +31,6 @@ class SeoMetadataTest {
     private static final Path INDEX_HTML = Path.of("src/main/frontend/index.html");
     private static final Path OG_IMAGE = Path.of("src/main/frontend/public/og-image.png");
     private static final Path ROBOTS_TXT = Path.of("src/main/resources/META-INF/resources/robots.txt");
-    private static final Path SITEMAP_XML = Path.of("src/main/resources/META-INF/resources/sitemap.xml");
     private static final Path PROPERTIES = Path.of("src/main/resources/application.properties");
 
     private static final String CANONICAL_HOST = "www.findatex-validator.eu";
@@ -118,11 +117,12 @@ class SeoMetadataTest {
     }
 
     @Test
-    void robotsAndSitemapPointAtTheSameCanonicalHostAsIndexHtml() throws IOException {
+    void robotsPointsAtTheSameCanonicalHostAsIndexHtml() throws IOException {
+        // The sitemap itself is generated (SitemapResource) and takes its host
+        // from findatex.web.canonical-host; robots.txt is the one static file
+        // that still hardcodes it.
         assertThat(read(ROBOTS_TXT))
                 .contains("Sitemap: https://" + CANONICAL_HOST + "/sitemap.xml");
-        assertThat(read(SITEMAP_XML))
-                .contains("<loc>https://" + CANONICAL_HOST + "/</loc>");
     }
 
     @Test

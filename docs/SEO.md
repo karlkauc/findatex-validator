@@ -26,16 +26,41 @@ competing copies of one site.
 
 ## Static files a crawler expects
 
-`robots.txt` and `sitemap.xml` live under
-`web-app/src/main/resources/META-INF/resources/` (the **backend** classpath, not
-the Vite `public/` dir) so they exist even in `-P backend-only` builds. They
-used to be swallowed by `SpaFallbackResource`, which answered every unmatched
-path with 200 + the SPA shell; that resource now returns a real 404 for
-file-like paths, and must keep doing so — otherwise every stale asset URL
-becomes a soft-404 "page" with identical content.
+`robots.txt` lives under `web-app/src/main/resources/META-INF/resources/` (the
+**backend** classpath, not the Vite `public/` dir) so it exists even in
+`-P backend-only` builds. It used to be swallowed by `SpaFallbackResource`,
+which answered every unmatched path with 200 + the SPA shell; that resource now
+returns a real 404 for file-like paths, and must keep doing so — otherwise
+every stale asset URL becomes a soft-404 "page" with identical content.
 
-The sitemap currently lists one URL. It becomes useful when the generated rule
-reference gets real URLs (see [Open](#open)).
+`sitemap.xml` is **generated** by `SitemapResource`: the app, `/rules`, one
+entry per template version and one per documented field — ~2000 URLs that
+change with every spec version. Never re-add a static `sitemap.xml`: a file of
+that name is served by the static-resource handler and wins over the resource.
+
+## The rule reference (`/rules`)
+
+`RulesPageResource` serves the generated rule documentation as ordinary
+server-rendered HTML:
+
+| URL | Content |
+|---|---|
+| `/rules` | index of the eight documented template versions |
+| `/rules/{slug}` | one template version: scoring, profiles, general and cross-field rules, plus links to every field |
+| `/rules/{slug}/field/{num}` | one field: definition, flag per profile, codification, every rule that can fire on it |
+
+`RuleDocs` splits the generated Markdown (`docs/rules/*.md`, bundled at
+`help/rules/`) on the generator's own structure — `## 5. Per-field catalog`,
+then `### Field N — name`. That coupling is deliberate and covered by
+`RuleDocsTest`: if the generator's shape moves, the pages would otherwise go
+silently empty.
+
+These pages carry no application bundle. Their point is being readable by a
+crawler and by someone arriving from a search result, so they render with an
+inline stylesheet and one small script (`/rules-page.js`, the page-view
+beacon). Each has its own `<title>`, description (the spec's own field
+definition) and canonical, and a call to action back into the validator —
+without it they would just be documentation.
 
 ## Link previews
 
@@ -112,6 +137,10 @@ Worth checking once, because all of it fails silently:
 
 - `curl -sI https://findatex-validator.eu` → `301` to the `www` host.
 - `curl -s https://www.findatex-validator.eu/robots.txt` → plain text, not HTML.
+- `curl -s https://www.findatex-validator.eu/sitemap.xml | grep -c '<url>'` →
+  ~2000, with `https://www.findatex-validator.eu` as the host of every `<loc>`.
+- `https://www.findatex-validator.eu/rules/tpt-v8-0/field/26` renders with
+  JavaScript disabled.
 - Paste the URL into the LinkedIn Post Inspector — the card must show the image.
 - Browser console on the live site: no CSP violation for the JSON-LD block.
 - `python3 tools/usage_report.py --days 7` → the **Traffic** section counts up.
@@ -120,16 +149,15 @@ Worth checking once, because all of it fails silently:
 
 Ordered by expected effect, not effort:
 
-1. **Publish the rule reference as real pages.** `docs/rules/*.md` is ~57k
-   lines of specific, hard-to-find content that currently exists only inside a
-   modal (`GET /api/help/rules/{slug}`), invisible to search engines. Generated
-   URLs like `/rules/tpt-v8-0` target exactly the long-tail queries the audience
-   types ("TPT field 117 mandatory", "EET codification invalid"). `RuleDocGenerator`
-   already produces the content; it needs an HTML output and sitemap entries.
-2. **`docs/TPT_V7_TO_V8_CHANGES.md` as a public page.** TPT V8 shipped
+1. **`docs/TPT_V7_TO_V8_CHANGES.md` as a public page.** TPT V8 shipped
    2026-05-26; "what changes from V7 to V8" is a time-limited traffic peak.
-3. **A German variant.** The audience sits in DE/AT/CH/LU; roughly double the
+2. **A German variant.** The audience sits in DE/AT/CH/LU; roughly double the
    search volume for the same content, at the cost of `hreflang` upkeep.
+3. **Watch the rule pages in Search Console.** ~2000 pages generated from one
+   template is exactly the shape Google can decide to treat as thin content.
+   The signal to watch is Coverage: many "Crawled — currently not indexed"
+   field pages would mean the per-field split was too fine, and the fix is to
+   fold fields back into per-version pages rather than to add more of them.
 
 ## Related
 

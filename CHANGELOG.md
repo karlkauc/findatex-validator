@@ -8,7 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- _Nothing yet._
+- **A download link for the offline desktop build in the header**
+  (`DesktopDownloadLink`, between the quota badge and the GitHub link). "Fund
+  data must not be uploaded to a third party" is the objection that keeps much
+  of the target audience from using the web app at all, and the answer to it
+  was reachable only from a note below the form or once the quota was already
+  exhausted. Hidden when `FINDATEX_WEB_DESKTOP_DOWNLOAD_URL` is empty, like
+  every other optional action.
 
 ### Changed
 - **The star rating moved into the header**, immediately left of the quota

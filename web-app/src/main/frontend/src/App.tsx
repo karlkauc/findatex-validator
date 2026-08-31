@@ -17,6 +17,7 @@ import { FileUpload } from './components/FileUpload';
 import { ResultPanel } from './components/ResultPanel';
 import { ErrorBanner } from './components/ErrorBanner';
 import { ExternalValidationToggle } from './components/ExternalValidationToggle';
+import { DesktopDownloadLink } from './components/DesktopDownloadLink';
 import { HelpModal } from './components/HelpModal';
 import { AboutModal } from './components/AboutModal';
 import { RATE_LIMIT_QUERY_KEY, RateLimitBadge } from './components/RateLimitBadge';
@@ -207,6 +208,7 @@ export default function App() {
           </div>
           {quickFeedbackConfigQuery.data?.enabled && <QuickFeedback templateId={templateId} />}
           <RateLimitBadge />
+          <DesktopDownloadLink url={rateLimitQuery.data?.desktopDownloadUrl} />
           <a
             href={GITHUB_URL}
             target="_blank"

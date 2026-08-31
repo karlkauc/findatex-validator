@@ -27,6 +27,17 @@ export async function fetchTemplates(): Promise<TemplateInfo[]> {
   return handle<TemplateInfo[]>(res);
 }
 
+/**
+ * Downloads a template's demo file and hands it back as a File, so it enters
+ * the exact same code path as a file the user dropped in themselves.
+ */
+export async function fetchSampleFile(sample: { url: string; filename: string }): Promise<File> {
+  const res = await fetch(sample.url);
+  if (!res.ok) throw new ApiError(res.status, `Sample file unavailable (${res.status})`);
+  const blob = await res.blob();
+  return new File([blob], sample.filename, { type: blob.type });
+}
+
 export async function fetchRateLimitStatus(): Promise<RateLimitStatus> {
   const res = await fetch('/api/limits/status');
   return handle<RateLimitStatus>(res);

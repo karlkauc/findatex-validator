@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **"No file at hand? Try an example".** A first-time visitor evaluating the
+  tool rarely has a TPT/EET/EMT/EPT file to hand, and going to find one is
+  where they left. One click now loads the bundled example for the selected
+  template and validates it. The fixtures are the generator-driven files from
+  `samples/`, mounted onto the web-app classpath by the build (single source of
+  truth, still asserted by the `*ExampleSamplesTest` suites) and served from
+  `GET /api/samples/{templateId}`; `GET /api/templates` advertises each one
+  together with the **spec version it was generated for**, which the UI switches
+  to — validating a fixture against another version reports findings that are
+  artefacts of the mismatch. `SampleResourceTest` pushes every sample through
+  `/api/validate` and fails if one stops producing findings, since a demo that
+  finds nothing demonstrates nothing.
+- **Landing-page content, visible to readers and crawlers.** What the four
+  templates are, what happens to an uploaded file, how the quality score is
+  computed, a seven-entry FAQ, and the "not an official FinDatEx tool"
+  disclaimer — as plain HTML in `index.html` below the app root, so it is in
+  the initial payload rather than behind a JavaScript render. The JSON-LD is
+  now a `@graph` with `SoftwareApplication` **and `FAQPage`**, which only
+  became legitimate once those answers are actually visible on the page;
+  `SeoMetadataTest` compares the markup against the rendered copy and asserts
+  the copy names the latest version of every template.
 - **Visitor counter (`page_view`), so the funnel is finally visible.**
   `usage_event` counts validation runs, which on its own cannot distinguish
   "nobody found the site" from "people arrived and left without uploading" —
@@ -47,6 +68,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the inline JSON-LD, which otherwise breaks silently in the browser.
 
 ### Changed
+- **Per-IP upload limit raised from 10/h to 30/h.** Evaluating the tool
+  legitimately means several files in one sitting (one per template, a
+  before/after fix); hitting the wall mid-evaluation was a conversion loss, not
+  abuse. The concurrency cap and the 25 MB body limit are what actually bound a
+  hostile client.
+- **The desktop download is a real link now.** The Notes panel said the desktop
+  app "is available for download" without linking it; the link only appeared
+  once the quota was already exhausted.
 - **CSP `script-src` gained a `sha256-` hash** for the single inline JSON-LD
   block. `'unsafe-inline'` was not an option and structured data cannot be
   loaded from an external file — search engines only read it inline.

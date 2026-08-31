@@ -12,11 +12,24 @@ export interface VersionInfo {
   profiles: ProfileInfo[];
 }
 
+/**
+ * The demo file offered for a template. `version` is the spec version the
+ * fixture was generated for — the UI switches to it, because validating the
+ * file against another version reports findings that are artefacts of the
+ * mismatch. Null when the build ships no fixture.
+ */
+export interface SampleInfo {
+  version: string;
+  url: string;
+  filename: string;
+}
+
 export interface TemplateInfo {
   id: 'TPT' | 'EET' | 'EMT' | 'EPT' | string;
   displayName: string;
   versions: VersionInfo[];
   externalAvailable: boolean;
+  sample: SampleInfo | null;
 }
 
 export type Severity = 'ERROR' | 'WARNING' | 'INFO';

@@ -61,6 +61,9 @@ validation engine is exactly the same.
 4. Click **Validieren**. You get findings on screen and a download
    link for the Excel report.
 
+Don't have a file to hand? **No file at hand? Try an example** loads the
+bundled example for the selected template and validates it in one click.
+
 The hosted instance has no login. Files are processed in memory and
 discarded the moment the response is sent; the report download link
 is single-use and expires after 5 minutes.
@@ -72,7 +75,7 @@ the defaults are):
 
 | Limit | Default | What you see when you hit it |
 |-------|---------|------------------------------|
-| Uploads per IP per hour | 10 | HTTP 429 — try again later |
+| Uploads per IP per hour | 30 | HTTP 429 — try again later |
 | Concurrent validations (whole instance) | 4 | HTTP 429 — retry shortly |
 | Max upload size | 25 MB | HTTP 413 — file too large |
 | Report download lifetime | 5 min, single use | link expires, re-validate |

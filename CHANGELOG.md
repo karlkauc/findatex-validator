@@ -11,10 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - _Nothing yet._
 
 ### Changed
-- _Nothing yet._
+- **The star rating moved into the header**, immediately left of the quota
+  badge, and the header bar is now **fixed** so it stays in reach while
+  scrolling. The rating's comment box and Send button open as a popover under
+  the stars (dismissable with Escape or a click outside), so the header stays
+  one row high for everyone who never rates anything. `position: fixed` rather
+  than `sticky`: a sticky element only sticks within its own containing block,
+  which ends where the React app ends — the static landing content below
+  `#root` sits outside it, so a sticky header would slide away there. A
+  measured spacer reserves the header's height, since the bar wraps to two rows
+  on narrow screens.
 
 ### Fixed
-- _Nothing yet._
+- **`index.html` was served with `public, immutable, max-age=86400`.** Quarkus
+  applies that to everything under `META-INF/resources/`, which is right for
+  the content-hashed bundle and wrong for the shell that names it: a returning
+  visitor kept the previous app for up to a day after a deploy, and would get a
+  blank page once the old assets were gone. `SpaCacheControlFilter` now sets
+  `no-cache` on `/` and `/index.html` while the hashed assets keep their long
+  cache — both asserted by `SeoResourcesTest`. Found by being hit by it while
+  verifying the header change.
 
 ## [1.0.13] — 2026-08-31
 

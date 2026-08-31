@@ -66,6 +66,36 @@ class SeoResourcesTest {
     }
 
     @Test
+    void theSpaShellIsNotCachedLikeAnImmutableAsset() {
+        // index.html names the hashed bundle it loads. Caching it for a day
+        // (which is what the static handler does by default, and what shipped)
+        // means a returning visitor keeps the previous app after a deploy, and
+        // a blank page once the old assets are gone.
+        given().when().get("/")
+                .then().statusCode(200)
+                .header("Cache-Control", containsString("no-cache"));
+
+        given().when().get("/index.html")
+                .then().statusCode(200)
+                .header("Cache-Control", containsString("no-cache"));
+    }
+
+    @Test
+    void hashedAssetsStayImmutable() {
+        // The flip side: those must keep their long cache, or every page load
+        // re-downloads 460 kB.
+        String shell = given().when().get("/").then().extract().body().asString();
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("/assets/index-[A-Za-z0-9_-]+\\.js").matcher(shell);
+        assertThat(m.find()).as("index.html must reference a hashed bundle").isTrue();
+
+        given().when().get(m.group())
+                .then().statusCode(200)
+                .header("Cache-Control", containsString("max-age"))
+                .header("Cache-Control", containsString("immutable"));
+    }
+
+    @Test
     void unknownFileLikePathsAre404NotTheSpaShell() {
         // A stale asset hash, a probe for a file we do not have: answering these
         // with 200 + index.html creates unbounded soft-404s for crawlers and

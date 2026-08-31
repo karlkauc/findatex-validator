@@ -91,4 +91,43 @@ describe('QuickFeedback', () => {
     // State is kept so the user can retry later.
     expect(screen.getByRole('button', { name: 'Send' })).toBeTruthy();
   });
+
+  it('dismisses the popover on Escape', async () => {
+    const user = userEvent.setup();
+    wrap(<QuickFeedback />);
+
+    await user.click(screen.getByRole('radio', { name: 'Rate 3 of 5' }));
+    expect(screen.getByRole('button', { name: 'Send' })).toBeTruthy();
+
+    // It overlays the page from the header, so it has to be closable without
+    // sending anything.
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Send' })).toBeNull());
+  });
+
+  it('dismisses the popover on a click outside it', async () => {
+    const user = userEvent.setup();
+    wrap(
+      <div>
+        <QuickFeedback />
+        <button type="button">elsewhere</button>
+      </div>,
+    );
+
+    await user.click(screen.getByRole('radio', { name: 'Rate 2 of 5' }));
+    expect(screen.getByLabelText('Feedback comment')).toBeTruthy();
+
+    await user.click(screen.getByRole('button', { name: 'elsewhere' }));
+    await waitFor(() => expect(screen.queryByLabelText('Feedback comment')).toBeNull());
+  });
+
+  it('keeps a click inside the popover from closing it', async () => {
+    const user = userEvent.setup();
+    wrap(<QuickFeedback />);
+
+    await user.click(screen.getByRole('radio', { name: 'Rate 5 of 5' }));
+    await user.click(screen.getByLabelText('Feedback comment'));
+
+    expect(screen.getByRole('button', { name: 'Send' })).toBeTruthy();
+  });
 });

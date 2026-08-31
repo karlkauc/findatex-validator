@@ -29,6 +29,12 @@ COPY web-app web-app
 # into the core JAR via core/pom.xml's <resource> pointing at ../docs/rules.
 # Regenerate before building the image with: mvn -pl core -Pdocs exec:java
 COPY docs/rules docs/rules
+# Demo files behind "Try an example" — web-app/pom.xml mounts
+# samples/*/03_bad_formats.xlsx onto the classpath from here. Without this COPY
+# Maven simply skips the missing resource directory and the image builds fine
+# with the feature silently absent (SampleFiles then reports "no sample" and
+# the UI hides the button), which is exactly what happened once.
+COPY samples samples
 
 # Commit identity is injected as a build-arg (CI passes ${{ github.sha }}); the
 # runtime endpoint /api/build-info prefers BUILD_GIT_COMMIT/BUILD_TIME env vars

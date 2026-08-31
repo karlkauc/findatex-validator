@@ -58,12 +58,13 @@ public class UsageStatsService {
     private volatile boolean warnedOnce;
 
     /**
-     * Cold-start resilience: Neon (serverless) suspends its compute when idle,
-     * so the first connection after a quiet period must wait for the wake. Even
-     * with a generous {@code acquisition-timeout} a single attempt can still
-     * fail (fast-fail during wake); a couple of retries let the first attempt
-     * warm Neon and a later one land the row. Package-private so the retry
-     * behaviour is unit-testable without a DB.
+     * Resilience for the fire-and-forget insert: Cloud Run throttles an
+     * instance's CPU to near zero once the response is sent, so the worker
+     * thread may be starved mid-insert and only make progress on a later
+     * request; a remote TLS Postgres can also drop a connection in between.
+     * Even with a generous {@code acquisition-timeout} a single attempt can
+     * therefore fail, and a couple of retries let a later one land the row.
+     * Package-private so the retry behaviour is unit-testable without a DB.
      */
     int maxInsertAttempts = 3;
     long retryBackoffMs = 1500;
@@ -129,7 +130,7 @@ public class UsageStatsService {
 
     /**
      * Runs {@code op}, retrying up to {@link #maxInsertAttempts} times with a
-     * linear backoff so a cold-Neon wake on the first attempt doesn't lose the
+     * linear backoff so a stalled or dropped first attempt doesn't lose the
      * row. Never rethrows — a persistently failing DB drops the event with a
      * rate-limited WARN, exactly as before. Package-private for testing.
      */

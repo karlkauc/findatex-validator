@@ -11,7 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - _Nothing yet._
 
 ### Changed
-- _Nothing yet._
+- **Neon decommissioned.** The last Neon traces are gone now that the stats DB has
+  run on the Hetzner VPS since 1.0.12: the superseded Neon password (version 1 of
+  the GCP secret `findatex-usage-db-password`) is disabled, and the cold-start
+  rationale in `application.properties`, `UsageStatsService`, `QuickFeedbackService`,
+  `QuickFeedbackResource`, both retry tests and the docs now states the reason that
+  actually applies — Cloud Run throttles an instance's CPU once the response is sent,
+  so a fire-and-forget insert can stall and only complete on a later request.
+  Retry counts, backoff and timeouts are unchanged.
 
 ### Fixed
 - _Nothing yet._

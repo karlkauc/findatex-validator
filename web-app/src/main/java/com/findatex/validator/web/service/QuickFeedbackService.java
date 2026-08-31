@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
  * Shares the usage-stats datasource and stays fully inert unless it is
  * configured: {@link #enabled()} gates every path so the app boots (and tests
  * run) with no DB. The submission is user-initiated, but persistence is still
- * asynchronous on a single-thread executor — Neon cold starts (10-30&nbsp;s)
+ * asynchronous on a single-thread executor — a slow or unreachable remote DB
  * must never block the HTTP response. All DB failures are swallowed
  * (rate-limited WARN, no rethrow).
  *
@@ -49,9 +49,9 @@ public class QuickFeedbackService {
     private volatile boolean warnedOnce;
 
     /**
-     * Cold-start resilience, mirroring {@link UsageStatsService}: Neon suspends
-     * its compute when idle, so the first attempt may fail while the wake is in
-     * progress; retries let a later attempt land the row. Package-private so
+     * Resilience mirroring {@link UsageStatsService}: Cloud Run throttles the
+     * instance's CPU once the response is sent, so the first attempt may stall
+     * or fail; retries let a later attempt land the row. Package-private so
      * the retry behaviour is unit-testable without a DB.
      */
     int maxInsertAttempts = 3;
@@ -95,7 +95,7 @@ public class QuickFeedbackService {
 
     /**
      * Runs {@code op}, retrying up to {@link #maxInsertAttempts} times with a
-     * linear backoff so a cold-Neon wake on the first attempt doesn't lose the
+     * linear backoff so a stalled or dropped first attempt doesn't lose the
      * row. Never rethrows — a persistently failing DB drops the feedback with a
      * rate-limited WARN. Package-private for testing.
      */

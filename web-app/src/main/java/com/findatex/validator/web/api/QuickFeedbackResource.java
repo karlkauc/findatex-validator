@@ -23,7 +23,8 @@ import org.slf4j.LoggerFactory;
  * is synchronous with a structured status the UI can act on — but persistence
  * is asynchronous ({@link QuickFeedbackService}) and the success answer is
  * optimistic: a star rating has no user-visible downstream state, and blocking
- * the response on a Neon cold start would ruin the low-barrier UX.
+ * the response on a slow database connection would ruin the low-barrier UX.
+ * The flip side is that a 200 does not prove the row was persisted.
  *
  * <p>Per-IP rate limiting is enforced by {@code RateLimitFilter} (strict
  * bucket, anti-spam). {@code country_code} is derived here from the TCP source

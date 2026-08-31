@@ -84,6 +84,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the inline JSON-LD, which otherwise breaks silently in the browser.
 
 ### Changed
+- **Cloud Run `min-instances` 0 → 1.** At this traffic level requests are far
+  enough apart that nearly every visitor was the one paying for the cold start,
+  looking at a blank page while a container came up. Costs ~8–10 EUR/month in
+  idle billing. Applied to the running service as well as to the deploy
+  workflow. While updating it, the scaling section of `docs/DEPLOY_CLOUDRUN.md`
+  was corrected: it still described `max-instances=1` and `concurrency=80`,
+  while the workflow has set 10 and 8 since the DoS baseline was introduced —
+  including what that actually implies for the in-memory rate limit and report
+  store.
 - **Per-IP upload limit raised from 10/h to 30/h.** Evaluating the tool
   legitimately means several files in one sitting (one per template, a
   before/after fix); hitting the wall mid-evaluation was a conversion loss, not

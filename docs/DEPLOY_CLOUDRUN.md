@@ -21,8 +21,8 @@ are stored in the repo or in GitHub Secrets.
 | Service name          | `findatex-validator-web`           |
 | Auth                  | `--allow-unauthenticated` (public) |
 | Memory / CPU          | 2 GiB / 1 vCPU + CPU-boost         |
-| Concurrency           | 80 per instance                    |
-| Min / max instances   | 0 / 1                              |
+| Concurrency           | 8 per instance                     |
+| Min / max instances   | 1 / 10                             |
 | Request timeout       | 300 s                              |
 | External validation   | off (`FINDATEX_WEB_EXTERNAL_ENABLED=false`) |
 | Canonical host        | `www.findatex-validator.eu` (`FINDATEX_WEB_CANONICAL_HOST`) |
@@ -45,11 +45,23 @@ this deployment. Changing it means updating four places together —
 `index.html`'s `<link rel="canonical">`, `robots.txt`, `sitemap.xml` and this
 variable; `SeoMetadataTest` fails if the first three drift apart.
 
-`max-instances=1` is intentional: `Bucket4j` (rate limit) and `ReportStore`
-(post-validate XLSX cache) live in JVM memory per instance. Multiple
-instances would split state and corrupt both the rate-limit and the
-download flow. For the expected traffic of a validator app this is fine;
-revisit only if usage exceeds what one 1-vCPU container can serve.
+`min-instances=1` buys away the cold start. At the current traffic level
+requests are far enough apart that nearly every visitor would otherwise be the
+one waiting for a container to come up, looking at a blank page — so this is
+not an edge case, it is the common case. It costs roughly **8–10 EUR/month** in
+idle billing (1 vCPU + 2 GiB held warm); set it back to `0` if that ever
+matters more than the first impression.
+
+`max-instances=10` with `--concurrency=8` is the DoS baseline: one bad actor
+opening 8 slow uploads can pin at most a single instance. **The trade-off is
+real but currently theoretical:** `Bucket4j` (rate limit) and `ReportStore`
+(post-validate XLSX cache) live in JVM memory *per instance*, so as soon as a
+second instance exists the per-IP limit is effectively multiplied, and a report
+download routed to a different instance than its validation returns 404. One
+instance serves all present traffic, which is why this has never been observed
+— but scaling out for real needs a shared store (or session affinity) first.
+Earlier versions of this document claimed `max-instances=1` for that reason;
+the workflow has set 10 since the DoS baseline was introduced.
 
 ## One-time bootstrap
 

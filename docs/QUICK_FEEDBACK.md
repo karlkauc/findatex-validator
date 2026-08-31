@@ -44,9 +44,10 @@ Gating:  GET /api/quick-feedback-config {enabled} drives whether the SPA shows
 
 The response is **optimistic**: validation is synchronous (400 `invalid`,
 503 `unavailable`, 429 rate-limited), but the INSERT runs asynchronously with
-the same 3-attempt/1500 ms retry as usage stats — a slow DB connection (e.g. the former Neon cold start, 10–30 s)
-must never block the response. A rating lost to a persistently dead DB is
-acceptable by design.
+the same 3-attempt/1500 ms retry as usage stats — a slow DB connection must
+never block the response. Note the flip side: a `200` means the submission was
+accepted, **not** that the row was persisted. A rating lost to a persistently
+dead DB is acceptable by design.
 
 ## Status vocabulary
 

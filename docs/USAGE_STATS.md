@@ -94,10 +94,10 @@ Web (`application.properties` / env):
   `tanzapp-prod`, see [Production database](#production-database)).
   **Empty ⇒ feature inert, app still boots.**
 - `FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT` — Agroal connection-acquisition
-  timeout (default `30s`, prod sets `10s`). Historically needed for Neon's
-  serverless cold start; kept because `UsageStatsService` retries the insert
-  (3 attempts, linear backoff) and Cloud Run throttles CPU after the response,
-  so the async insert may only complete on the next request.
+  timeout (default `30s`, prod sets `10s`). The inserts are fire-and-forget, so
+  a slow acquisition would drop them silently; `UsageStatsService` additionally
+  retries (3 attempts, linear backoff), because Cloud Run throttles CPU after
+  the response and the async insert may only complete on the next request.
 - `FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN` — required for ingest; empty ⇒
   endpoint accepts-and-discards (logged once at startup)
 - `FINDATEX_WEB_USAGE_STATS_RATE` — per-IP `/api/usage-stats` limit (default 60/h)

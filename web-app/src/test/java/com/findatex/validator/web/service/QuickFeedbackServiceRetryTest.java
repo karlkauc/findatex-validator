@@ -7,10 +7,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit test for the cold-start retry seam in {@link QuickFeedbackService}. No
- * DB or CDI needed — exercises {@link QuickFeedbackService#insertWithRetry}
- * directly with an in-memory op so the Neon-wake retry behaviour is covered
- * offline (mirrors {@link UsageStatsServiceRetryTest}).
+ * Unit test for the retry seam in {@link QuickFeedbackService}. No DB or CDI
+ * needed — exercises {@link QuickFeedbackService#insertWithRetry} directly with
+ * an in-memory op so the retry behaviour is covered offline (mirrors
+ * {@link UsageStatsServiceRetryTest}).
  */
 class QuickFeedbackServiceRetryTest {
 
@@ -33,7 +33,7 @@ class QuickFeedbackServiceRetryTest {
     void retriesThenSucceeds() {
         QuickFeedbackService s = newService();
         AtomicInteger calls = new AtomicInteger();
-        // Fail on the first attempt (cold Neon), succeed on the second.
+        // Fail on the first attempt (stalled/dropped connection), succeed on the second.
         s.insertWithRetry(() -> {
             if (calls.incrementAndGet() < 2) {
                 throw new RuntimeException("Acquisition timeout while waiting for new connection");

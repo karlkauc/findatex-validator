@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- _Nothing yet._
+
+### Changed
+- _Nothing yet._
+
+### Fixed
+- _Nothing yet._
+
+## [1.0.13] — 2026-08-31
+
+### Added
 - **The rule reference is public.** ~57k lines generated from the spec sheets
   existed only inside a modal (`GET /api/help/rules/{slug}`), where no search
   engine could reach it. It is now ~2000 server-rendered pages: `/rules`,
@@ -297,7 +308,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.12...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.13...HEAD
+[1.0.13]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.13
 [1.0.12]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.12
 [1.0.11]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.11
 [1.0.10]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.10

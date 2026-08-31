@@ -91,6 +91,9 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.quick-feedback.rate-per-ip-per-hour", defaultValue = "5")
     int quickFeedbackRatePerIpPerHour;
 
+    @ConfigProperty(name = "findatex.web.page-view.rate-per-ip-per-hour", defaultValue = "120")
+    int pageViewRatePerIpPerHour;
+
     public RateLimit rateLimit() {
         return new RateLimit(rateLimitPerIpPerHour);
     }
@@ -173,6 +176,15 @@ public class WebConfig {
         return new QuickFeedback(Math.max(1, quickFeedbackRatePerIpPerHour));
     }
 
+    /**
+     * Page-view beacon config. Enablement is driven by the shared usage-stats
+     * datasource ({@link UsageStats#dbConfigured()}) — there is no separate
+     * switch, only the rate limit is tunable.
+     */
+    public PageView pageView() {
+        return new PageView(Math.max(1, pageViewRatePerIpPerHour));
+    }
+
     public External external() {
         return new External(
                 externalEnabled,
@@ -206,6 +218,9 @@ public class WebConfig {
     }
 
     public record QuickFeedback(int ratePerIpPerHour) {
+    }
+
+    public record PageView(int ratePerIpPerHour) {
     }
 
     public record External(

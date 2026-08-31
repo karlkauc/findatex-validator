@@ -50,6 +50,7 @@ public class RateLimitService {
     private final ConcurrentMap<String, Bucket> usageBuckets = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Bucket> newsletterBuckets = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Bucket> quickFeedbackBuckets = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Bucket> pageViewBuckets = new ConcurrentHashMap<>();
     private final AtomicBoolean unknownWarned = new AtomicBoolean(false);
     private int capacityPerHour;
     private Duration refillInterval;
@@ -59,6 +60,8 @@ public class RateLimitService {
     private Duration newsletterRefillInterval;
     private int quickFeedbackCapacityPerHour;
     private Duration quickFeedbackRefillInterval;
+    private int pageViewCapacityPerHour;
+    private Duration pageViewRefillInterval;
 
     @PostConstruct
     void init() {
@@ -74,12 +77,16 @@ public class RateLimitService {
         quickFeedbackCapacityPerHour = Math.max(1, config.quickFeedback().ratePerIpPerHour());
         long quickFeedbackRefillSeconds = Math.max(1, 3600L / quickFeedbackCapacityPerHour);
         quickFeedbackRefillInterval = Duration.ofSeconds(quickFeedbackRefillSeconds);
+        pageViewCapacityPerHour = Math.max(1, config.pageView().ratePerIpPerHour());
+        long pageViewRefillSeconds = Math.max(1, 3600L / pageViewCapacityPerHour);
+        pageViewRefillInterval = Duration.ofSeconds(pageViewRefillSeconds);
         log.info("Rate limit configured: {} req/hour per IP for /api/validate, "
                         + "{} req/hour per IP for /api/usage-stats, "
                         + "{} req/hour per IP for /api/newsletter, "
-                        + "{} req/hour per IP for /api/quick-feedback",
+                        + "{} req/hour per IP for /api/quick-feedback, "
+                        + "{} req/hour per IP for /api/page-view",
                 capacityPerHour, usageCapacityPerHour, newsletterCapacityPerHour,
-                quickFeedbackCapacityPerHour);
+                quickFeedbackCapacityPerHour, pageViewCapacityPerHour);
     }
 
     /** Separate, more generous bucket for the lightweight usage-stats ingest. */
@@ -108,6 +115,20 @@ public class RateLimitService {
                 k -> Bucket.builder().addLimit(Bandwidth.builder()
                         .capacity(quickFeedbackCapacityPerHour)
                         .refillIntervally(1, quickFeedbackRefillInterval)
+                        .build()).build())
+                .tryConsumeAndReturnRemaining(1);
+    }
+
+    /**
+     * Separate, generous bucket for the page-view beacon: a real visitor
+     * reloading or opening tabs must never be throttled, but the counter still
+     * has to be expensive to inflate.
+     */
+    public ConsumptionProbe consumePageView(String clientIp) {
+        return pageViewBuckets.computeIfAbsent(normaliseKey(clientIp),
+                k -> Bucket.builder().addLimit(Bandwidth.builder()
+                        .capacity(pageViewCapacityPerHour)
+                        .refillIntervally(1, pageViewRefillInterval)
                         .build()).build())
                 .tryConsumeAndReturnRemaining(1);
     }

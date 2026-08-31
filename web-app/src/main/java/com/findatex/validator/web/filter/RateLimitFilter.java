@@ -38,15 +38,18 @@ public class RateLimitFilter implements ContainerRequestFilter {
         // Also matches /api/quick-feedback-config, but the POST-only guard above
         // keeps that GET outside the limiter.
         boolean isQuickFeedback = path.startsWith("api/quick-feedback") || path.startsWith("/api/quick-feedback");
-        if (!isValidate && !isUsage && !isNewsletter && !isQuickFeedback) return;
+        boolean isPageView = path.startsWith("api/page-view") || path.startsWith("/api/page-view");
+        if (!isValidate && !isUsage && !isNewsletter && !isQuickFeedback && !isPageView) return;
 
-        ConsumptionProbe probe = isQuickFeedback
-                ? rateLimits.consumeQuickFeedback(clientIp())
-                : isNewsletter
-                        ? rateLimits.consumeNewsletter(clientIp())
-                        : isUsage
-                                ? rateLimits.consumeUsage(clientIp())
-                                : rateLimits.consume(clientIp());
+        ConsumptionProbe probe = isPageView
+                ? rateLimits.consumePageView(clientIp())
+                : isQuickFeedback
+                        ? rateLimits.consumeQuickFeedback(clientIp())
+                        : isNewsletter
+                                ? rateLimits.consumeNewsletter(clientIp())
+                                : isUsage
+                                        ? rateLimits.consumeUsage(clientIp())
+                                        : rateLimits.consume(clientIp());
         if (!probe.isConsumed()) {
             long retryAfterSeconds = Math.max(1, probe.getNanosToWaitForRefill() / 1_000_000_000L);
             ctx.abortWith(

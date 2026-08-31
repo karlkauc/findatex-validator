@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Visitor counter (`page_view`), so the funnel is finally visible.**
+  `usage_event` counts validation runs, which on its own cannot distinguish
+  "nobody found the site" from "people arrived and left without uploading" —
+  two problems with opposite fixes. The SPA now fires one beacon per page load
+  (`POST /api/page-view`, always 204) into a new `page_view` table via
+  `PageViewService`; `tools/usage_report.py` prints both numbers together under
+  **Traffic** with a `pct_validated` column, plus referrers, campaigns
+  (`?utm_source=` / `?ref=`), pages and countries. Same shape as the existing
+  stats path: same DB, inert without `FINDATEX_WEB_USAGE_DB_URL`, async insert
+  with retry. Counted client-side on purpose — server-side counting would count
+  crawlers, which at this traffic level would dominate the number; JS-executing
+  bots are dropped by the new `BotDetector`. No cookie, no localStorage, no
+  visitor or session id, no IP, no full referrer URL, no query strings, so no
+  consent banner. `FINDATEX_WEB_PAGE_VIEW_RATE` (default 120/h per IP) tunes
+  the limit. Schema and privacy notes in `docs/USAGE_STATS.md`.
+- **`docs/SEO.md`** — one home for the findability thread: the four places that
+  must agree on the canonical host, the CSP-hash trap, how to read the traffic
+  funnel, the Google-Search-Console steps that have to be done by hand (DNS TXT
+  verification), a post-deploy checklist, and the ranked open items.
 - **Search-engine and link-preview metadata for the web app.** `index.html` now
   carries a descriptive `<title>`, a meta description, `<link rel="canonical">`,
   Open Graph and Twitter-card tags, and a schema.org `SoftwareApplication`

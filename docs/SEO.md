@@ -49,18 +49,31 @@ most links are actually shared.
 
 ## Structured data and the CSP hash
 
-`index.html` carries one inline `<script type="application/ld+json">` with a
-schema.org `SoftwareApplication` object. Search engines only read JSON-LD
-inline, and `script-src` is strict `'self'` with no `'unsafe-inline'` — so the
-block is allow-listed by a **`sha256-` hash** in
+`index.html` carries one inline `<script type="application/ld+json">`: a
+`@graph` with a schema.org `SoftwareApplication` object and a `FAQPage`. Search
+engines only read JSON-LD inline, and `script-src` is strict `'self'` with no
+`'unsafe-inline'` — so the block is allow-listed by a **`sha256-` hash** in
 `application.properties`.
+
+The FAQ answers in the markup must stay identical to the ones rendered in the
+page body — Google treats markup-only answers as a structured-data violation.
+`SeoMetadataTest` compares the two.
 
 **Editing one character of that block — whitespace included — invalidates the
 hash and browsers silently drop the structured data.** `SeoMetadataTest`
 recomputes it and prints the correct value in the failure message.
 
-No `FAQPage` markup yet: Google requires the answers to be visible on the page,
-and they are not (see [Open](#open)).
+## Page content
+
+The landing copy — what the templates are, what happens to an uploaded file,
+how the score is computed, the FAQ, and the "not an official FinDatEx tool"
+disclaimer — lives as **plain HTML in `index.html`**, below `<div id="root">`,
+not as a React component. It is then part of the initial payload: indexable
+without JavaScript execution and readable before the bundle boots. Tailwind
+compiles the classes used there (`tailwind.config.js` lists `./index.html`).
+
+`SeoMetadataTest` asserts that the latest version of every template is named in
+that copy, so adding a spec version fails the build until the page mentions it.
 
 ## Measuring whether any of it works
 
@@ -113,12 +126,9 @@ Ordered by expected effect, not effort:
    URLs like `/rules/tpt-v8-0` target exactly the long-tail queries the audience
    types ("TPT field 117 mandatory", "EET codification invalid"). `RuleDocGenerator`
    already produces the content; it needs an HTML output and sitemap entries.
-2. **Visible landing-page text.** The crawler currently sees no prose at all —
-   no explanation of what a TPT/EET/EMT/EPT file is, who the tool is for, or
-   what happens to an uploaded file. Adding it also unlocks `FAQPage` markup.
-3. **`docs/TPT_V7_TO_V8_CHANGES.md` as a public page.** TPT V8 shipped
+2. **`docs/TPT_V7_TO_V8_CHANGES.md` as a public page.** TPT V8 shipped
    2026-05-26; "what changes from V7 to V8" is a time-limited traffic peak.
-4. **A German variant.** The audience sits in DE/AT/CH/LU; roughly double the
+3. **A German variant.** The audience sits in DE/AT/CH/LU; roughly double the
    search volume for the same content, at the cost of `hreflang` upkeep.
 
 ## Related

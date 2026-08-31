@@ -236,7 +236,7 @@ hand-edited. Full picture incl. the manual Search-Console steps: `docs/SEO.md`.
 
 **Misbrauch-Schutz** (configurable via `FINDATEX_WEB_*` env vars; defaults in
 `web-app/src/main/resources/application.properties`):
-1. **Per-IP rate limit** (Bucket4j, default 10/h) — only on `POST /api/validate`.
+1. **Per-IP rate limit** (Bucket4j, default 30/h) — only on `POST /api/validate`.
 2. **Concurrency cap** (`Semaphore`, default 4 in flight) — overflow → HTTP 429.
 3. **Body size limit** (`quarkus.http.limits.max-body-size=25M`) → HTTP 413.
 4. **Auto-delete uploads + reports** (Quarkus deletes upload tempfiles on

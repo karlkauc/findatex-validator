@@ -6,6 +6,7 @@ import com.findatex.validator.template.api.TemplateRegistry;
 import com.findatex.validator.template.api.TemplateVersion;
 import com.findatex.validator.web.config.WebConfig;
 import com.findatex.validator.web.dto.TemplateInfo;
+import com.findatex.validator.web.service.SampleFiles;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -45,7 +46,14 @@ public class TemplateResource {
             // been needed yet.
             boolean externalAvailable = operatorEnabled
                     && !def.externalValidationConfigFor(def.latest()).isEmpty();
-            result.add(new TemplateInfo(def.id().name(), def.displayName(), versions, externalAvailable));
+            // Null when the build ships no fixture for this template — the SPA
+            // then simply hides the "try a sample file" action.
+            TemplateInfo.SampleInfo sample = SampleFiles.forTemplate(def.id().name())
+                    .map(s -> new TemplateInfo.SampleInfo(
+                            s.version(), "/api/samples/" + def.id().name(), s.filename()))
+                    .orElse(null);
+            result.add(new TemplateInfo(def.id().name(), def.displayName(), versions,
+                    externalAvailable, sample));
         }
         return result;
     }

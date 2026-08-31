@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { GitFork, HelpCircle, Info, Loader2, ShieldCheck } from 'lucide-react';
+import { Download, GitFork, HelpCircle, Info, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
 import {
   fetchBuildInfo,
   fetchFeedbackConfig,
   fetchNewsletterConfig,
   fetchQuickFeedbackConfig,
   fetchRateLimitStatus,
+  fetchSampleFile,
   fetchTemplates,
   validateUpload,
 } from './api/client';
@@ -80,6 +81,8 @@ export default function App() {
   const [isinCheckCurrency, setIsinCheckCurrency] = useState(false);
   const [isinCheckCic, setIsinCheckCic] = useState(false);
   const [openfigiApiKey, setOpenfigiApiKey] = useState('');
+  const [sampleLoading, setSampleLoading] = useState(false);
+  const [sampleError, setSampleError] = useState<unknown>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
 
@@ -116,15 +119,22 @@ export default function App() {
     [file, templateId, version, validateMutation.isPending, quotaExhausted],
   );
 
-  const submit = () => {
-    if (!file || !version) return;
+  // The override exists for the sample-file action: React state updates are not
+  // visible synchronously, so loading the file and validating it in one click
+  // has to pass the file and version explicitly.
+  const submit = (override?: { file: File; version: string; profiles: string[] }) => {
+    const activeFile = override?.file ?? file;
+    const activeVersion = override?.version ?? version;
+    const activeProfiles = override?.profiles ?? profiles;
+    if (!activeFile || !activeVersion) return;
     setResult(null);
+    setSampleError(null);
     const useExternal = externalEnabled && (currentTemplate?.externalAvailable ?? false);
     validateMutation.mutate({
       templateId,
-      templateVersion: version,
-      profiles,
-      file,
+      templateVersion: activeVersion,
+      profiles: activeProfiles,
+      file: activeFile,
       externalEnabled: useExternal,
       leiEnabled,
       leiCheckLapsed,
@@ -137,6 +147,29 @@ export default function App() {
     });
     // Don't keep the user-entered key around once it's been sent.
     setOpenfigiApiKey('');
+  };
+
+  // A first-time visitor evaluating the tool rarely has a TPT/EET/EMT/EPT file
+  // to hand, and going to find one is where they leave. One click loads the
+  // bundled example and validates it.
+  const runSample = async () => {
+    const sample = currentTemplate?.sample;
+    if (!sample) return;
+    setSampleError(null);
+    setSampleLoading(true);
+    try {
+      const sampleFile = await fetchSampleFile(sample);
+      setFile(sampleFile);
+      // The fixture is generated for one specific spec version; validating it
+      // against another would report findings that are artefacts of that.
+      setVersion(sample.version);
+      setProfiles([]);
+      submit({ file: sampleFile, version: sample.version, profiles: [] });
+    } catch (err) {
+      setSampleError(err);
+    } finally {
+      setSampleLoading(false);
+    }
   };
 
   return (
@@ -237,7 +270,7 @@ export default function App() {
                     className="btn-primary w-full"
                     disabled={!canSubmit}
                     aria-busy={validateMutation.isPending}
-                    onClick={submit}
+                    onClick={() => submit()}
                   >
                     {validateMutation.isPending ? (
                       <>
@@ -248,6 +281,26 @@ export default function App() {
                       'Validate'
                     )}
                   </button>
+                  {currentTemplate?.sample && (
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500"
+                      disabled={sampleLoading || validateMutation.isPending || quotaExhausted}
+                      onClick={runSample}
+                    >
+                      {sampleLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading example…
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" aria-hidden="true" />
+                          No file at hand? Try an example
+                        </>
+                      )}
+                    </button>
+                  )}
                   <div aria-live="polite" aria-atomic="true" className="sr-only">
                     {validateMutation.isPending ? 'Validation in progress' : ''}
                   </div>
@@ -261,8 +314,21 @@ export default function App() {
                   <li>Excel reports are available for 5 minutes via a single-use URL.</li>
                   <li>External validation (GLEIF/OpenFIGI) is disabled by default in the web UI.</li>
                   <li>
-                    For daily validations without web upload, the desktop app is available
-                    for download — your data never leaves your machine.
+                    For daily validations without web upload,{' '}
+                    {rateLimitQuery.data?.desktopDownloadUrl ? (
+                      <a
+                        href={rateLimitQuery.data.desktopDownloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 font-medium text-navy-700 underline underline-offset-2 hover:text-navy-500"
+                      >
+                        <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                        download the desktop app
+                      </a>
+                    ) : (
+                      <>the desktop app is available</>
+                    )}{' '}
+                    — your data never leaves your machine.
                   </li>
                 </ul>
               </div>
@@ -270,6 +336,7 @@ export default function App() {
 
             <section className="space-y-5">
               <QuotaExhaustedNotice />
+              {sampleError != null && <ErrorBanner error={sampleError} />}
               {validateMutation.isError && <ErrorBanner error={validateMutation.error} />}
               {result ? (
                 <ResultPanel

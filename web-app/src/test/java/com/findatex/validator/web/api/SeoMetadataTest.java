@@ -2,6 +2,8 @@ package com.findatex.validator.web.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.findatex.validator.template.api.TemplateDefinition;
+import com.findatex.validator.template.api.TemplateRegistry;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -63,11 +65,44 @@ class SeoMetadataTest {
 
     @Test
     void theInlineJsonLdIsValidJsonAndDescribesTheApplication() throws IOException {
-        JsonNode ld = new ObjectMapper().readTree(jsonLdBlock(read(INDEX_HTML)));
+        JsonNode app = graphNode(read(INDEX_HTML), "SoftwareApplication");
 
-        assertThat(ld.path("@type").asText()).isEqualTo("SoftwareApplication");
-        assertThat(ld.path("name").asText()).isEqualTo("FinDatEx Validator");
-        assertThat(ld.path("url").asText()).isEqualTo("https://" + CANONICAL_HOST + "/");
+        assertThat(app.path("name").asText()).isEqualTo("FinDatEx Validator");
+        assertThat(app.path("url").asText()).isEqualTo("https://" + CANONICAL_HOST + "/");
+    }
+
+    @Test
+    void everyFaqAnswerInTheMarkupIsAlsoVisibleOnThePage() throws IOException {
+        // Google requires FAQPage answers to be present in the rendered page;
+        // markup-only answers are a structured-data violation, not a shortcut.
+        String html = read(INDEX_HTML);
+        JsonNode faq = graphNode(html, "FAQPage");
+        String body = visibleText(html);
+
+        JsonNode questions = faq.path("mainEntity");
+        assertThat(questions).as("FAQ entries").isNotEmpty();
+        for (JsonNode q : questions) {
+            assertThat(body)
+                    .as("question rendered on the page: " + q.path("name").asText())
+                    .contains(q.path("name").asText());
+            assertThat(body)
+                    .as("answer rendered on the page for: " + q.path("name").asText())
+                    .contains(q.path("acceptedAnswer").path("text").asText());
+        }
+    }
+
+    @Test
+    void thePageCopyNamesTheCurrentSpecVersionOfEveryTemplate() throws IOException {
+        // A new template version that nobody mentions in the copy is a silent
+        // content regression: the page keeps advertising the superseded one.
+        TemplateRegistry.init();
+        String body = visibleText(read(INDEX_HTML));
+
+        for (TemplateDefinition def : TemplateRegistry.all()) {
+            assertThat(body)
+                    .as("latest %s version named in the landing copy", def.id())
+                    .contains(def.latest().version());
+        }
     }
 
     @Test
@@ -95,6 +130,30 @@ class SeoMetadataTest {
         String robots = read(ROBOTS_TXT);
         assertThat(robots).contains("Disallow: /api/");
         assertThat(robots).contains("Disallow: /_internal/");
+    }
+
+    /** The named node from the JSON-LD {@code @graph}. */
+    private static JsonNode graphNode(String html, String type) throws IOException {
+        JsonNode ld = new ObjectMapper().readTree(jsonLdBlock(html));
+        for (JsonNode node : ld.path("@graph")) {
+            if (type.equals(node.path("@type").asText())) return node;
+        }
+        throw new AssertionError("No @graph node of type " + type + " in the JSON-LD block");
+    }
+
+    /**
+     * Body text with tags, entities and the head stripped — an approximation of
+     * what a reader (and a crawler that does not run JavaScript) sees.
+     */
+    private static String visibleText(String html) {
+        String body = html.substring(html.indexOf("<body"));
+        String text = body.replaceAll("(?s)<!--.*?-->", " ")
+                .replaceAll("(?s)<script.*?</script>", " ")
+                .replaceAll("<[^>]+>", " ")
+                .replace("&nbsp;", " ")
+                .replace("&amp;", "&")
+                .replace("&quot;", "\"");
+        return text.replaceAll("\\s+", " ").trim();
     }
 
     private static String jsonLdBlock(String html) {

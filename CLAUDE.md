@@ -54,6 +54,7 @@ python3 tools/build_samples.py                 # regenerate core/src/test/resour
 python3 tools/build_examples.py                # regenerate samples/tpt/*
 python3 tools/build_eet_samples.py             # samples/eet/*  (also _emt_, _ept_)
 python3 tools/generate_requirements.py         # rebuild requirements.md from spec
+python3 tools/generate_og_image.py             # rebuild the 1200x630 link-preview card
 mvn -pl core -Pdocs exec:java                  # rebuild docs/rules/*.md (per-template rule reference)
 ./package/jpackage.sh                          # native desktop installer (CDS+AOT+splash baked in; see docs/JPACKAGE_OPTIMIZATIONS.md)
 ./package/benchmark-startup.sh                 # cold-start bench: none vs CDS vs AOT (5 runs each)
@@ -215,6 +216,22 @@ REST endpoints (all under `/api`):
 - `GET  /api/about`, `GET /api/build-info` — About markdown (web-bundle-specific
   third-party list) and Maven version + git metadata of the running container
 - `POST /api/usage-stats` — aggregate usage events from desktop installs (see below)
+
+**SEO / link previews** — four files must agree on one canonical host
+(`www.findatex-validator.eu`): the `<link rel="canonical">`, OG and JSON-LD tags
+in `web-app/src/main/frontend/index.html`; `robots.txt` and `sitemap.xml` (real
+static files under `web-app/src/main/resources/META-INF/resources/`, *not* the
+Vite `public/` dir, so they survive `-P backend-only`); and
+`findatex.web.canonical-host`, which makes `CanonicalHostFilter` 301 GET/HEAD
+from the apex domain and the `*.run.app` URL to the canonical one (empty =
+off, the right default for self-hosted instances). `SeoMetadataTest` fails when
+they drift. Two traps: the inline JSON-LD is allow-listed in CSP by a
+**`sha256-` hash** — editing one character of that block without updating
+`script-src` makes browsers drop the structured data silently; and
+`SpaFallbackResource` must keep 404-ing file-like paths, otherwise every
+unmatched `*.txt`/`*.xml`/`*.js` URL becomes a soft-404 serving the SPA shell.
+The link-preview card is generated (`tools/generate_og_image.py`), never
+hand-edited.
 
 **Misbrauch-Schutz** (configurable via `FINDATEX_WEB_*` env vars; defaults in
 `web-app/src/main/resources/application.properties`):

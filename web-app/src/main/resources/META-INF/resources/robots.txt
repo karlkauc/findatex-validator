@@ -1,0 +1,15 @@
+# https://www.findatex-validator.eu/robots.txt
+#
+# Served as a real static file from the backend classpath (not from the Vite
+# public/ dir) so it exists even in `-P backend-only` builds. Keep the Sitemap
+# line in sync with findatex.web.canonical-host in application.properties.
+
+User-agent: *
+Allow: /
+
+# JSON API, single-use report downloads and health probes: nothing indexable,
+# and crawling them burns the per-IP quota for real users.
+Disallow: /api/
+Disallow: /_internal/
+
+Sitemap: https://www.findatex-validator.eu/sitemap.xml

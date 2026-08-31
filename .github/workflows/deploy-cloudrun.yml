@@ -155,7 +155,7 @@ jobs:
             --max-instances=10 \
             --min-instances=0 \
             --timeout=300 \
-            --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=false,FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=findatex,FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT=10s,PROXY_ADDRESS_FORWARDING=true,PROXY_ALLOW_X_FORWARDED=true \
+            --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=false,FINDATEX_WEB_CANONICAL_HOST=www.findatex-validator.eu,FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=findatex,FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT=10s,PROXY_ADDRESS_FORWARDING=true,PROXY_ALLOW_X_FORWARDED=true \
             --update-secrets=FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest \
             --quiet
 

@@ -73,8 +73,8 @@ public final class QualityScorer {
         long nonEmptyCells = countNonEmptyCells(file);
         long formatErrors = findings.stream()
                 .filter(f -> f.severity() == Severity.ERROR)
-                .filter(f -> f.ruleId().startsWith("FORMAT/")
-                        && !isClosedListFinding(f))
+                .filter(QualityScorer::isFormatFinding)
+                .filter(f -> !isClosedListFinding(f))
                 .count();
         double formatScore = nonEmptyCells == 0 ? 1.0 : 1.0 - (double) formatErrors / nonEmptyCells;
         overall.put(ScoreCategory.FORMAT_CONFORMANCE, clamp(formatScore));
@@ -145,7 +145,8 @@ public final class QualityScorer {
             long nonEmptyCells = countNonEmptyCellsInRows(g.rows());
             long formatErrors = findings.stream()
                     .filter(f -> f.severity() == Severity.ERROR)
-                    .filter(f -> f.ruleId().startsWith("FORMAT/") && !isClosedListFinding(f))
+                    .filter(QualityScorer::isFormatFinding)
+                    .filter(f -> !isClosedListFinding(f))
                     .filter(f -> f.rowIndex() != null && rowIdx.contains(f.rowIndex()))
                     .count();
             double formatScore = nonEmptyCells == 0 ? 1.0
@@ -208,6 +209,25 @@ public final class QualityScorer {
             for (TptRow row : rows) if (row.stringValue(spec).isPresent()) n++;
         }
         return n;
+    }
+
+    /**
+     * Findings that count against FORMAT_CONFORMANCE.
+     *
+     * <p>Beyond {@code FORMAT/*} this includes the identifier checksum rules,
+     * which carry their own id prefixes ({@code ISIN/<code>/<type>},
+     * {@code LEI/...}). A filter keyed on {@code "FORMAT/"} alone left them out
+     * of every score dimension, so a corrupt ISIN or LEI check digit cost
+     * nothing at all — while the generated rule reference (and the public
+     * /rules pages built from it) promised it lowered FORMAT_CONFORMANCE.
+     *
+     * <p>The external-lookup rules are deliberately still excluded: their ids
+     * are {@code ISIN-LIVE/…} / {@code LEI-LIVE/…}, they depend on a network
+     * service being reachable, and the same docs describe them as advisory.
+     */
+    private static boolean isFormatFinding(Finding f) {
+        String id = f.ruleId();
+        return id.startsWith("FORMAT/") || id.startsWith("ISIN/") || id.startsWith("LEI/");
     }
 
     private boolean isClosedListFinding(Finding f) {

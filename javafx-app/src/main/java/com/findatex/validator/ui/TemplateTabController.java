@@ -18,6 +18,7 @@ import com.findatex.validator.report.GenerationUi;
 import com.findatex.validator.report.QualityReport;
 import com.findatex.validator.report.QualityScorer;
 import com.findatex.validator.report.ScoreCategory;
+import com.findatex.validator.report.ScorePercent;
 import com.findatex.validator.report.XlsxReportWriter;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.stats.UsageEvent;
@@ -1265,7 +1266,7 @@ public final class TemplateTabController {
             String infos = "—";
             if (r.status() == BatchFileStatus.OK && r.report() != null) {
                 Double overall = r.report().scores().get(ScoreCategory.OVERALL);
-                score = overall == null ? "—" : String.format(Locale.ROOT, "%.0f%%", overall * 100);
+                score = overall == null ? "—" : ScorePercent.format(overall);
                 rows = Integer.toString(r.file() == null ? 0 : r.file().rows().size());
                 long e = r.findings().stream().filter(f -> f.severity() == Severity.ERROR).count();
                 long w = r.findings().stream().filter(f -> f.severity() == Severity.WARNING).count();
@@ -1281,7 +1282,7 @@ public final class TemplateTabController {
         public static List<FileRow> fromSingleReport(Path path, QualityReport report) {
             String name = path.getFileName() == null ? path.toString() : path.getFileName().toString();
             Double overall = report.scores().get(ScoreCategory.OVERALL);
-            String score = overall == null ? "—" : String.format(Locale.ROOT, "%.0f%%", overall * 100);
+            String score = overall == null ? "—" : ScorePercent.format(overall);
             long e = report.findings().stream().filter(f -> f.severity() == Severity.ERROR).count();
             long w = report.findings().stream().filter(f -> f.severity() == Severity.WARNING).count();
             long i = report.findings().stream().filter(f -> f.severity() == Severity.INFO).count();

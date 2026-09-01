@@ -51,6 +51,53 @@ class QualityScorerEdgeCasesTest {
                 .isLessThan(1.0);
     }
 
+    /**
+     * The generated rule reference (docs/rules/*.md, served publicly at /rules)
+     * promises "Each ERROR lowers FORMAT_CONFORMANCE (20 %) by 1 / non-empty
+     * cells" for the ISIN and LEI rules. Those rules use their own id prefixes
+     * (ISIN/<code>/<type>, LEI/...), so a filter keyed on "FORMAT/" alone
+     * silently excluded them: a corrupt check digit cost exactly nothing.
+     */
+    @Test
+    void identifierChecksumErrorsBringDownFormatConformanceAsDocumented() {
+        TptFile file = new com.findatex.validator.validation.TestFileBuilder()
+                .row(TestFileBuilder.values("12", "FR12", "14", "FR0000571086"))
+                .build();
+        List<Finding> isin = List.of(
+                Finding.error("ISIN/14/15", null, "14", "Instrument code", 1,
+                        "FR0000571086", "ISIN check digit invalid"));
+        assertThat(new QualityScorer(CATALOG)
+                        .score(file, Set.of(TptProfiles.SOLVENCY_II), isin)
+                        .scores().get(ScoreCategory.FORMAT_CONFORMANCE))
+                .as("a corrupt ISIN checksum must cost something").isLessThan(1.0);
+
+        List<Finding> lei = List.of(
+                Finding.error("LEI/47/48", null, "47", "Issuer code", 1,
+                        "529900D6BF99LW9R2E69", "LEI check digits invalid"));
+        assertThat(new QualityScorer(CATALOG)
+                        .score(file, Set.of(TptProfiles.SOLVENCY_II), lei)
+                        .scores().get(ScoreCategory.FORMAT_CONFORMANCE))
+                .as("a corrupt LEI checksum must cost something").isLessThan(1.0);
+    }
+
+    @Test
+    void externalLookupFindingsStayAdvisoryAndDoNotAffectTheScore() {
+        // Counterpart to the rule above: the docs promise GLEIF/OpenFIGI
+        // findings are advisory, so the *-LIVE ids must stay out of the score.
+        TptFile file = new com.findatex.validator.validation.TestFileBuilder()
+                .row(TestFileBuilder.values("12", "FR12", "14", "FR0000571085"))
+                .build();
+        List<Finding> live = List.of(
+                Finding.error("ISIN-LIVE/14", null, "14", "Instrument code", 1,
+                        "FR0000571085", "not found in OpenFIGI"),
+                Finding.error("LEI-LIVE/47", null, "47", "Issuer code", 1,
+                        "969500TJ5KRTCJQSU990", "not found in GLEIF"));
+        assertThat(new QualityScorer(CATALOG)
+                        .score(file, Set.of(TptProfiles.SOLVENCY_II), live)
+                        .scores().get(ScoreCategory.FORMAT_CONFORMANCE))
+                .as("online-lookup findings are advisory").isEqualTo(1.0);
+    }
+
     @Test
     void formatErrorsBringDownFormatConformance() {
         TptFile file = new com.findatex.validator.validation.TestFileBuilder()

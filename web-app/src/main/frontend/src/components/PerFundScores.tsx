@@ -5,6 +5,16 @@ interface Props {
   perFundScores: PerFundScoreDto[];
 }
 
+// Mirrors core's ScorePercent: only a flawless score may read as 100, only a
+// zero score as 0. Used just as a fallback — the API normally sends
+// `percentage` already rounded this way.
+function toPercent(value: number): number {
+  const pct = Math.round(value * 100);
+  if (pct >= 100 && value < 1) return 99;
+  if (pct <= 0 && value > 0) return 1;
+  return pct;
+}
+
 export function PerFundScores({ perFundScores }: Props) {
   if (perFundScores.length === 0) return null;
   return (
@@ -24,7 +34,7 @@ export function PerFundScores({ perFundScores }: Props) {
                   <ScoreBadge
                     key={s.dimension}
                     label={prettyDim(s.dimension)}
-                    percentage={s.percentage ?? Math.round((s.value ?? 0) * 100)}
+                    percentage={s.percentage ?? toPercent(s.value ?? 0)}
                   />
                 ))}
               </div>

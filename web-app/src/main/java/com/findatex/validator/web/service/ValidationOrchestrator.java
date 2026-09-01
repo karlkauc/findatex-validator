@@ -303,6 +303,7 @@ public class ValidationOrchestrator {
                 version.version(),
                 sanitizeFilename(file.source().getFileName().toString()),
                 file.rows().size(),
+                report.cleanRowCount(),
                 findings.size(),
                 (int) errors,
                 (int) warnings,

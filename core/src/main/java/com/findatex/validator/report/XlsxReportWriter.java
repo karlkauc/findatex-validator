@@ -196,7 +196,12 @@ public final class XlsxReportWriter {
         XlsxStyles.addRow(s, row++, null,   "Source file",      r.file().source().toString());
         XlsxStyles.addRow(s, row++, null,   "Format",           r.file().inputFormat());
         XlsxStyles.addRow(s, row++, null,   "Generated",        r.generatedAt().toString());
-        XlsxStyles.addRow(s, row++, null,   "Rows",             Integer.toString(r.file().rows().size()));
+        XlsxStyles.addRow(s, row++, null,   "Rows",             Integer.toString(r.rowCount()));
+        // Sits next to the scores because those are per-cell error rates and
+        // stay high on a badly broken file; this is the number that separates
+        // "a few bad rows" from "nothing in here is usable".
+        XlsxStyles.addRow(s, row++, null,   "Rows without errors",
+                r.cleanRowCount() + " / " + r.rowCount());
         XlsxStyles.addRow(s, row++, null,   "Mapped fields",    Integer.toString(r.file().headerToNumKey().size()));
         XlsxStyles.addRow(s, row++, null,   "Unmapped headers", String.join(", ", r.file().unmappedHeaders()));
         XlsxStyles.addRow(s, row++, null,   "Active profiles",

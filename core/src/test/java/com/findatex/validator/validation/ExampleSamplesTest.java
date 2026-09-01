@@ -54,6 +54,46 @@ class ExampleSamplesTest {
         return direct;
     }
 
+    /**
+     * The showcase is what a first-time visitor sees, so it has two ways to
+     * fail silently: regenerated clean (a demo that finds nothing demonstrates
+     * nothing) or regenerated broken (a demo that is all red says the tool is
+     * noisy). The score band catches both; the rule-id list catches a defect
+     * that quietly stopped firing after a spec or rule change.
+     */
+    @Test
+    void showcaseIsARealisticImperfectDelivery() throws Exception {
+        QualityReport r = run("00_showcase.xlsx");
+        assertThat(r.file().rows()).as("showcase row count").hasSizeGreaterThanOrEqualTo(55);
+        assertThat(r.file().unmappedHeaders()).as("every header maps to a V7 field").isEmpty();
+        assertThat(r.perFundScores()).as("three funds, so per-fund scoring is exercised")
+                .hasSize(3);
+
+        assertThat(r.findings().stream().map(Finding::ruleId).map(id -> id.split("/")[0]).distinct())
+                .as("distinct rule families on show")
+                .hasSizeGreaterThanOrEqualTo(8);
+        for (String expected : List.of(
+                "FORMAT/21", "FORMAT/52", "FORMAT/15", "FORMAT/40",
+                "XF-04/POSITION_WEIGHT_SUM", "XF-05/CASH_PERCENTAGE",
+                "XF-08/COUPON_FREQUENCY", "XF-09/CUSTODIAN_PAIR",
+                "XF-10/INTEREST_RATE_TYPE", "XF-11/MATURITY_AFTER_REPORTING",
+                "XF-14/UNDERLYING_CIC")) {
+            assertThat(hasFinding(r, expected)).as("showcase must still show %s", expected).isTrue();
+        }
+        assertThat(r.findings().stream().anyMatch(f -> f.ruleId().startsWith("ISIN/")))
+                .as("a corrupt ISIN checksum").isTrue();
+        assertThat(r.findings().stream().anyMatch(f -> f.ruleId().startsWith("LEI/")))
+                .as("a corrupt LEI checksum").isTrue();
+        assertThat(r.findings().stream().anyMatch(f -> f.ruleId().startsWith("PRESENCE/")
+                        && f.severity() == Severity.ERROR))
+                .as("a missing mandatory cell").isTrue();
+
+        // Wide band on purpose: the file is deliberately well populated, so the
+        // score stays high — the point is that it is neither 1.0 nor collapsed.
+        assertThat(r.scores().get(ScoreCategory.OVERALL))
+                .as("showcase overall score").isBetween(0.85, 0.999);
+    }
+
     @Test
     void cleanFileHasNoDataErrors() throws Exception {
         QualityReport r = run("01_clean.xlsx");

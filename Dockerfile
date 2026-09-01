@@ -30,7 +30,7 @@ COPY web-app web-app
 # Regenerate before building the image with: mvn -pl core -Pdocs exec:java
 COPY docs/rules docs/rules
 # Demo files behind "Try an example" — web-app/pom.xml mounts
-# samples/*/03_bad_formats.xlsx onto the classpath from here. Without this COPY
+# samples/*/00_showcase.xlsx onto the classpath from here. Without this COPY
 # Maven simply skips the missing resource directory and the image builds fine
 # with the feature silently absent (SampleFiles then reports "no sample" and
 # the UI hides the button), which is exactly what happened once.

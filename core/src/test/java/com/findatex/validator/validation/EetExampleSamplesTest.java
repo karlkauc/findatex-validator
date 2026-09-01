@@ -52,6 +52,31 @@ class EetExampleSamplesTest {
         return direct;
     }
 
+    /**
+     * The showcase is the demo behind "Try an example". Regenerating it clean
+     * (nothing to show) or broken (all red) are both silent failures, so this
+     * pins the shape rather than exact counts.
+     */
+    @Test
+    void showcaseIsARealisticImperfectDelivery() throws Exception {
+        List<Finding> findings = run("00_showcase.xlsx");
+        assertThat(rowCount("00_showcase.xlsx")).as("showcase row count")
+                .isGreaterThanOrEqualTo(20);
+        long formatErrors = findings.stream()
+                .filter(f -> f.severity() == Severity.ERROR)
+                .filter(f -> f.ruleId().startsWith("FORMAT/"))
+                .count();
+        long presenceErrors = findings.stream()
+                .filter(f -> f.severity() == Severity.ERROR)
+                .filter(f -> f.ruleId().startsWith("PRESENCE/"))
+                .count();
+        assertThat(formatErrors).as("curated format defects").isBetween(3L, 25L);
+        assertThat(presenceErrors).as("a few missing mandatory cells, not a wall of them")
+                .isBetween(1L, 40L);
+        assertThat(findings.stream().anyMatch(f -> f.ruleId().startsWith("EET-XF-")))
+                .as("at least one SFDR cross-field finding").isTrue();
+    }
+
     @Test
     void cleanFileHasNoFormatErrors() throws Exception {
         List<Finding> findings = run("01_clean.xlsx");
@@ -139,6 +164,10 @@ class EetExampleSamplesTest {
         List<Finding> findings = run("08_taxonomy_min_unattributed.xlsx");
         boolean fired = findings.stream().anyMatch(f -> f.ruleId().equals("EET-XF-ART8-MIN-SI-SPLIT"));
         assertThat(fired).as("EET-XF-ART8-MIN-SI-SPLIT must fire").isTrue();
+    }
+
+    private static int rowCount(String filename) throws Exception {
+        return new TptFileLoader(CATALOG).load(samplesDir().resolve(filename)).rows().size();
     }
 
     private List<Finding> run(String filename) throws Exception {

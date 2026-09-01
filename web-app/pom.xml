@@ -148,7 +148,7 @@
                 <directory>${project.basedir}/../samples</directory>
                 <targetPath>samples</targetPath>
                 <includes>
-                    <include>*/03_bad_formats.xlsx</include>
+                    <include>*/00_showcase.xlsx</include>
                 </includes>
             </resource>
         </resources>

@@ -344,9 +344,17 @@ and `npm run build` during Maven's `generate-resources` phase. Dev mode:
 
 - `core/src/test/resources/sample/` — 3 minimal canonical fixtures used by core unit tests
   (also referenced by web-app tests via the relative path `../core/src/test/resources/sample/`).
-- `samples/<template>/` — generator-driven scenario fixtures (clean, missing-mandatory,
-  bad-formats, …) consumed by `*ExampleSamplesTest`. Regenerate with the matching
+- `samples/<template>/` — generator-driven fixtures consumed by `*ExampleSamplesTest`.
+  Two kinds: `00_showcase.xlsx` is the file behind "Try an example" (a full
+  delivery — 60 TPT positions over three funds, 25 share classes for the other
+  templates — with a curated spread of defects; built from `tools/tpt_showcase.py`
+  and `tools/findatex_realistic_values.py`), while `01_…` upwards are small
+  one-rule-family regression fixtures. Regenerate with the matching
   `tools/build_*_samples.py` whenever the spec or the rule set changes.
+  **A new file under `samples/` reaches the container only if you widen all
+  three of** `web-app/pom.xml`'s `<resources>` include, the `.dockerignore`
+  negation, and the `SampleFiles` map — each fails silently on its own
+  (`Application` logs a startup warning as the safety net).
 - `specs/` is the operator's drop zone (verbatim FinDatEx downloads, German
   filenames, .DS_Store noise). Files get **copied** into
   `core/src/main/resources/spec/<t>/` with normalised names — never reference

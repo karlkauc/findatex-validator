@@ -52,6 +52,29 @@ class EptExampleSamplesTest {
         return direct;
     }
 
+    /**
+     * The showcase is the demo behind "Try an example". Regenerating it clean
+     * (nothing to show) or broken (all red) are both silent failures, so this
+     * pins the shape rather than exact counts.
+     */
+    @Test
+    void showcaseIsARealisticImperfectDelivery() throws Exception {
+        List<Finding> findings = run("00_showcase.xlsx");
+        assertThat(rowCount("00_showcase.xlsx")).as("showcase row count")
+                .isGreaterThanOrEqualTo(20);
+        long formatErrors = findings.stream()
+                .filter(f -> f.severity() == Severity.ERROR)
+                .filter(f -> f.ruleId().startsWith("FORMAT/"))
+                .count();
+        long presenceErrors = findings.stream()
+                .filter(f -> f.severity() == Severity.ERROR)
+                .filter(f -> f.ruleId().startsWith("PRESENCE/"))
+                .count();
+        assertThat(formatErrors).as("curated format defects").isBetween(3L, 25L);
+        assertThat(presenceErrors).as("a few missing mandatory cells, not a wall of them")
+                .isBetween(1L, 40L);
+    }
+
     @Test
     void cleanFileHasNoFormatErrors() throws Exception {
         List<Finding> findings = run("01_clean.xlsx");
@@ -77,6 +100,10 @@ class EptExampleSamplesTest {
         List<Finding> findings = run("03_bad_formats.xlsx");
         boolean any = findings.stream().anyMatch(f -> f.ruleId().startsWith("FORMAT/"));
         assertThat(any).as("at least one FORMAT/* error").isTrue();
+    }
+
+    private static int rowCount(String filename) throws Exception {
+        return new TptFileLoader(CATALOG).load(samplesDir().resolve(filename)).rows().size();
     }
 
     private List<Finding> run(String filename) throws Exception {

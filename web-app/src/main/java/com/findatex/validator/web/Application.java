@@ -37,7 +37,7 @@ public class Application {
                 .toList();
         if (missing.isEmpty()) return;
         log.warn("Demo file missing for {} — the \"try an example\" action is hidden for "
-                + "those templates. The build did not put samples/*/03_bad_formats.xlsx on "
+                + "those templates. The build did not put samples/*/00_showcase.xlsx on "
                 + "the classpath (see the COPY in the Dockerfile).", missing);
     }
 }

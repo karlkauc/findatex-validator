@@ -17,9 +17,16 @@ import java.util.Optional;
  * <p>The files are the generator-driven fixtures from {@code samples/}, mounted
  * onto the classpath by the {@code <resources>} block in {@code pom.xml} rather
  * than copied here, so they cannot drift from what the
- * {@code *ExampleSamplesTest} suites assert. {@code 03_bad_formats} is used on
- * purpose: a clean file scores 100 and shows an empty findings list, which
- * demonstrates nothing.
+ * {@code *ExampleSamplesTest} suites assert. Adding a sample therefore means
+ * widening <b>three</b> things — this map, that {@code <resources>} include and
+ * the {@code .dockerignore} negation — or the feature silently disappears from
+ * the container (see the {@code Application} startup warning).
+ *
+ * <p>{@code 00_showcase} is used rather than one of the numbered fixtures: it is
+ * a full delivery (60 TPT positions across three funds, 25 share classes for
+ * the other templates) carrying a curated spread of realistic defects. A clean
+ * file scores 100 and shows an empty findings list, which demonstrates nothing;
+ * a three-row fixture demonstrates one rule.
  *
  * <p>Each entry pins the spec <b>version</b> the fixture was generated for
  * (TPT's is V7.0, not the latest V8.0) — validating it against another version
@@ -34,13 +41,13 @@ public final class SampleFiles {
 
     static {
         SAMPLES.put("TPT", new Sample("TPT", "V7.0",
-                "samples/tpt/03_bad_formats.xlsx", "findatex-sample-tpt-v7.xlsx"));
+                "samples/tpt/00_showcase.xlsx", "findatex-sample-tpt-v7.xlsx"));
         SAMPLES.put("EET", new Sample("EET", "V1.1.3",
-                "samples/eet/03_bad_formats.xlsx", "findatex-sample-eet-v1-1-3.xlsx"));
+                "samples/eet/00_showcase.xlsx", "findatex-sample-eet-v1-1-3.xlsx"));
         SAMPLES.put("EMT", new Sample("EMT", "V4.3",
-                "samples/emt/03_bad_formats.xlsx", "findatex-sample-emt-v4-3.xlsx"));
+                "samples/emt/00_showcase.xlsx", "findatex-sample-emt-v4-3.xlsx"));
         SAMPLES.put("EPT", new Sample("EPT", "V2.1",
-                "samples/ept/03_bad_formats.xlsx", "findatex-sample-ept-v2-1.xlsx"));
+                "samples/ept/00_showcase.xlsx", "findatex-sample-ept-v2-1.xlsx"));
     }
 
     private SampleFiles() {

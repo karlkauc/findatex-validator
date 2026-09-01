@@ -57,10 +57,15 @@ def load_spec(template_id: str, version: str) -> tuple[dict, list[FieldRow]]:
     wb = openpyxl.load_workbook(ROOT / xlsx_rel, data_only=True)
     sheet = wb[manifest["sheetName"]] if manifest["sheetName"] in wb.sheetnames else wb.worksheets[0]
     cols = manifest["columns"]
+    # Manifest schema drift: the TPT manifests call the column holding the
+    # dotted field token "path", the EET/EMT/EPT ones call it "name". Both
+    # point at the same cell (e.g. "00001_EMT_Version"), which is what the
+    # generated header row has to contain for HeaderMapper to match it.
+    path_col = cols.get("path") or cols["name"]
     out: list[FieldRow] = []
     for r in range(manifest["firstDataRow"], sheet.max_row + 1):
         num = sheet.cell(r, cols["numData"]).value
-        path = sheet.cell(r, cols["path"]).value
+        path = sheet.cell(r, path_col).value
         # Section-header rows have a NUM but no path; drop them.
         if path is None:
             continue
@@ -73,6 +78,32 @@ def load_spec(template_id: str, version: str) -> tuple[dict, list[FieldRow]]:
             codif=str(codif),
         ))
     return manifest, out
+
+
+def profile_flags(template_id: str, version: str) -> dict[str, dict[str, str]]:
+    """num → {profileCode: flag} for every profile column in the manifest.
+
+    ``load_spec`` only exposes the manifest's ``primaryFlag`` column, which for
+    EET is SFDR_PERIODIC alone — not enough to build a header set for a file
+    that activates several profiles at once.
+    """
+    manifest_rel, xlsx_rel = _SPEC_LOCATIONS[(template_id, version)]
+    manifest = json.loads((ROOT / manifest_rel).read_text(encoding="utf-8"))
+    wb = openpyxl.load_workbook(ROOT / xlsx_rel, data_only=True)
+    sheet = wb[manifest["sheetName"]] if manifest["sheetName"] in wb.sheetnames else wb.worksheets[0]
+    cols = manifest["columns"]
+    path_col = cols.get("path") or cols["name"]
+    out: dict[str, dict[str, str]] = {}
+    for r in range(manifest["firstDataRow"], sheet.max_row + 1):
+        if sheet.cell(r, path_col).value is None:
+            continue
+        num = str(sheet.cell(r, cols["numData"]).value).strip()
+        flags = {}
+        for prof in manifest["profileColumns"]:
+            col = prof.get("column") or prof["columns"][0]
+            flags[prof["code"]] = str(sheet.cell(r, col).value or "").strip().upper()
+        out[num] = flags
+    return out
 
 
 # ---------- value heuristics ----------------------------------------------

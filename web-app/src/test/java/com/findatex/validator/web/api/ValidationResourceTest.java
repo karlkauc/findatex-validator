@@ -29,6 +29,16 @@ class ValidationResourceTest {
                 .body("summary.templateId", org.hamcrest.Matchers.is("TPT"))
                 .body("summary.rowCount", org.hamcrest.Matchers.greaterThanOrEqualTo(1))
                 .body("summary.filename", org.hamcrest.Matchers.is("clean_v7.xlsx"))
+                // The plain-language counterpart to the score; see
+                // QualityReport.cleanRowCount(). Note clean_v7 is "clean" only in
+                // the sense of no format/cross-field errors — it fills ~40 of 152
+                // fields, so mandatory-presence errors hit every row and the count
+                // is legitimately 0. The semantics are pinned by
+                // QualityReportCleanRowsTest; here we only check it is exposed and
+                // consistent with rowCount.
+                .body("summary.cleanRowCount", org.hamcrest.Matchers.allOf(
+                        org.hamcrest.Matchers.greaterThanOrEqualTo(0),
+                        org.hamcrest.Matchers.lessThanOrEqualTo(3)))
                 .body("scores.size()", org.hamcrest.Matchers.greaterThan(0))
                 .body("findings", org.hamcrest.Matchers.notNullValue());
     }
@@ -42,7 +52,8 @@ class ValidationResourceTest {
                 .then()
                 .statusCode(200)
                 .body("summary.filename", org.hamcrest.Matchers.is("missing_mandatory.csv"))
-                .body("summary.errorCount", org.hamcrest.Matchers.greaterThan(0));
+                .body("summary.errorCount", org.hamcrest.Matchers.greaterThan(0))
+                .body("summary.cleanRowCount", org.hamcrest.Matchers.lessThan(3));
     }
 
     @Test

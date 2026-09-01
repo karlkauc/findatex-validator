@@ -83,11 +83,15 @@ function SummaryGrid({ result }: { result: ValidationResponse }) {
     { label: 'File',         value: s.filename },
     { label: 'Template',     value: `${s.templateId} ${s.templateVersion}` },
     { label: 'Rows',         value: String(s.rowCount) },
+    // The score is a per-cell error rate, so it stays high even on a badly
+    // broken file. This is the number that separates "a few bad rows" from
+    // "nothing in here is usable".
+    { label: 'Rows without errors', value: `${s.cleanRowCount} / ${s.rowCount}` },
     { label: 'Findings',     value: `${s.findingCount} (${s.errorCount} E / ${s.warningCount} W / ${s.infoCount} I)` },
     { label: 'Validated at', value: new Date(s.generatedAt).toLocaleString() },
   ];
   return (
-    <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       {items.map((it) => (
         <div key={it.label}>
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">{it.label}</dt>

@@ -1029,6 +1029,11 @@ public final class TemplateTabController {
 
     private void renderReport(QualityReport report) {
         scorePane.getChildren().clear();
+        // Leads the row on purpose: every score dimension is a per-cell error
+        // rate and stays high even on a badly broken file, so "48 / 60 rows"
+        // is the number that tells a mostly-fine delivery from a hopeless one.
+        scorePane.getChildren().add(buildCountCard("ROWS WITHOUT ERRORS",
+                report.cleanRowCount(), report.rowCount()));
         Map<ScoreCategory, Double> scores = report.scores();
         for (ScoreCategory cat : ScoreCategory.values()) {
             Double v = scores.get(cat);
@@ -1076,6 +1081,22 @@ public final class TemplateTabController {
 
     /** Result of {@link #prepareDisplayBatch(List)}. {@code totalBeforeCap} is 0 when not truncated. */
     record DisplayBatch(List<Finding> rows, int totalBeforeCap) { }
+
+    /** Same shape as a score card, but showing "clean / total" instead of a percentage. */
+    private VBox buildCountCard(String title, int clean, int total) {
+        VBox card = new VBox();
+        card.getStyleClass().add("score-card");
+        Label t = new Label(title);
+        t.getStyleClass().add("title");
+        Label v = new Label(clean + " / " + total);
+        v.getStyleClass().add("value");
+        double share = total == 0 ? 1.0 : (double) clean / total;
+        if (share >= 0.9)      v.getStyleClass().add("score-good");
+        else if (share >= 0.7) v.getStyleClass().add("score-warn");
+        else                   v.getStyleClass().add("score-poor");
+        card.getChildren().addAll(t, v);
+        return card;
+    }
 
     private VBox buildScoreCard(String title, double value) {
         VBox card = new VBox();

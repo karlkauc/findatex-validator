@@ -63,6 +63,7 @@ export interface ValidationSummary {
   templateVersion: string;
   filename: string;
   rowCount: number;
+  cleanRowCount: number;
   findingCount: number;
   errorCount: number;
   warningCount: number;

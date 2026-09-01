@@ -17,6 +17,12 @@ public record ValidationResponse(
             String templateVersion,
             String filename,
             int rowCount,
+            /**
+             * Rows with no ERROR — the plain-language counterpart to the score,
+             * which is a per-cell rate and therefore reads high on large files.
+             * See QualityReport.cleanRowCount().
+             */
+            int cleanRowCount,
             int findingCount,
             int errorCount,
             int warningCount,

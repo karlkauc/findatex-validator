@@ -50,13 +50,13 @@
         <HBox spacing="10" alignment="CENTER_LEFT">
             <Button text="Validate" fx:id="validateButton" onAction="#onValidate"
                     styleClass="primary-button" disable="true"/>
-            <MenuButton text="Excel-Report exportieren..." fx:id="exportMenu" disable="true">
+            <MenuButton text="Export Excel report..." fx:id="exportMenu" disable="true">
                 <items>
-                    <MenuItem text="Pro Datei exportieren..." fx:id="exportPerFileItem"
+                    <MenuItem text="One report per file..." fx:id="exportPerFileItem"
                               onAction="#onExportPerFile"/>
-                    <MenuItem text="Kombinierten Report exportieren..." fx:id="exportCombinedItem"
+                    <MenuItem text="Combined report..." fx:id="exportCombinedItem"
                               onAction="#onExportCombined"/>
-                    <MenuItem text="Kombinierten Report mit Annotated Source..." fx:id="exportCombinedWithSourceItem"
+                    <MenuItem text="Combined report + annotated source..." fx:id="exportCombinedWithSourceItem"
                               onAction="#onExportCombinedWithSource"/>
                 </items>
             </MenuButton>

@@ -62,7 +62,7 @@ if [ -f "$FRAMES/FAILED" ]; then
 fi
 
 # --- compose
-python3 "$ROOT/tools/demo/build_desktop_demo.py" "$FRAMES" "$OUT"
+python3 "$ROOT/tools/demo/build_demo_gif.py" "$FRAMES" "$OUT"
 
 if [ -z "${KEEP_FRAMES:-}" ]; then
     rm -rf "$WORK"

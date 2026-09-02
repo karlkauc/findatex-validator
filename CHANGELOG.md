@@ -13,9 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and the view scrolls to the control it talks about. They are recorded, not
   hand-made: `tools/demo/DesktopDemoRecorder.java` drives the shaded jar under
   Xvfb through the JavaFX `Robot` and dumps frames plus a manifest,
-  `build_desktop_demo.py` paints caption, pointer and highlight and encodes
+  `build_demo_gif.py` paints caption, pointer and highlight and encodes
   through ffmpeg; `record_desktop_demo.sh` wires it up in an isolated HOME so
-  no usage event is posted. The README also gained the public rule reference
+  no usage event is posted. `web-app-demo.gif` is re-recorded the same way
+  (`record_web_demo.sh` + Playwright against a locally started jar) — the old
+  one still showed V7.0 as default, a 10/h quota and a header without the
+  rating and the offline-app link. The README also gained the public rule reference
   and the star rating, and the web steps say *Validate*, which is what the
   button reads.
 - **A download link for the offline desktop build in the header**

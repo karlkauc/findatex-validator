@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Compose the README desktop-app GIFs from the frames DesktopDemoRecorder dumps.
+"""Compose the README walkthrough GIFs from recorded frames.
 
-    build_desktop_demo.py <frames-dir> <out-dir>
+    build_demo_gif.py <frames-dir> <out-dir> [<prefix>]
 
 Reads ``manifest.json`` (one entry per frame: file, part, hold time, caption,
-cursor position, highlighted control) and, per ``part``, writes
-``desktop-<part>.gif``. Each frame gets a caption bar below the window, a
+cursor position, highlighted control) as written by ``DesktopDemoRecorder.java``
+or ``record_web_demo.mjs`` and, per ``part``, writes ``<prefix>-<part>.gif``
+(prefix defaults to ``desktop``). Each frame gets a caption bar below the window, a
 highlight box around the control the caption talks about, and a painted
 mouse pointer (screen captures don't contain the real one). Encoding goes
 through ffmpeg's palettegen/paletteuse — Pillow's per-frame quantisation
@@ -119,6 +120,7 @@ def encode_gif(pngs: list[tuple[Path, float]], out: Path) -> None:
 
 def main() -> None:
     frames_dir, out_dir = Path(sys.argv[1]), Path(sys.argv[2])
+    prefix = sys.argv[3] if len(sys.argv) > 3 else "desktop"
     out_dir.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((frames_dir / "manifest.json").read_text())
     fnt_regular = font(FONT_CANDIDATES, 21)
@@ -137,7 +139,7 @@ def main() -> None:
                 p = work / f"{part}-{i:04d}.png"
                 img.save(p)
                 pngs.append((p, e["ms"] / 1000.0))
-            out = out_dir / f"desktop-{part}.gif"
+            out = out_dir / f"{prefix}-{part}.gif"
             encode_gif(pngs, out)
             total = sum(s for _, s in pngs)
             print(f"[demo] {out.name}: {len(pngs)} frames, {total:.1f}s, {out.stat().st_size / 1024:.0f} KB")

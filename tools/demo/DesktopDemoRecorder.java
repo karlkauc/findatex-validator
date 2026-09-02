@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Drives the JavaFX desktop app through a scripted walkthrough and dumps one
  * screen capture per animation frame plus a JSON manifest (caption, cursor
- * position, highlighted control, hold time) that {@code build_desktop_demo.py}
+ * position, highlighted control, hold time) that {@code build_demo_gif.py}
  * turns into the README GIFs.
  *
  * <p>Run via {@code tools/demo/record_desktop_demo.sh} — it needs a display

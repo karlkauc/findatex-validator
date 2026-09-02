@@ -41,7 +41,7 @@ the full one-row-per-finding detail.
 Bundled templates: **TPT V8.0 + V7.0**, **EET V1.1.3 + V1.1.2**,
 **EMT V4.3 + V4.2**, **EPT V2.1 + V2.0**.
 
-![Animated walkthrough: pick template and profile, upload a file, validate, then group the findings by error](docs/screenshots/web-app-demo.gif)
+![Animated walkthrough of the web app: pick template and version, choose profiles, drop a file, validate, read the scores, group the findings by error, report a false positive](docs/screenshots/web-app-demo.gif)
 
 ---
 
@@ -244,8 +244,9 @@ the validator actually checks.
   rollback, optional custom domain.
 - [`samples/`](samples/) — per-template scenario fixtures (clean +
   broken variants).
-- [`tools/demo/`](tools/demo/) — re-records the animated desktop
-  walkthroughs above (`record_desktop_demo.sh`, needs Xvfb + ffmpeg).
+- [`tools/demo/`](tools/demo/) — re-records the animated walkthroughs
+  (`record_desktop_demo.sh` needs Xvfb + ffmpeg, `record_web_demo.sh`
+  needs a built `web-app` + Playwright).
 
 ---
 

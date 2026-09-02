@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Animated desktop walkthroughs in the README** (`docs/screenshots/desktop-*.gif`):
+  validate a file, work with the results, batch mode. Each step is captioned
+  and the view scrolls to the control it talks about. They are recorded, not
+  hand-made: `tools/demo/DesktopDemoRecorder.java` drives the shaded jar under
+  Xvfb through the JavaFX `Robot` and dumps frames plus a manifest,
+  `build_desktop_demo.py` paints caption, pointer and highlight and encodes
+  through ffmpeg; `record_desktop_demo.sh` wires it up in an isolated HOME so
+  no usage event is posted. The README also gained the public rule reference
+  and the star rating, and the web steps say *Validate*, which is what the
+  button reads.
 - **A download link for the offline desktop build in the header**
   (`DesktopDownloadLink`, between the quota badge and the GitHub link). "Fund
   data must not be uploaded to a third party" is the objection that keeps much
@@ -17,6 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   every other optional action.
 
 ### Changed
+- **The desktop export menu reads English** ("Export Excel report…", "One
+  report per file…", "Combined report…", "Combined report + annotated
+  source…") — the four strings were the last German labels in an otherwise
+  English UI and showed up as such in the recorded walkthrough.
 - **The star rating moved into the header**, immediately left of the quota
   badge, and the header bar is now **fixed** so it stays in reach while
   scrolling. The rating's comment box and Send button open as a popover under

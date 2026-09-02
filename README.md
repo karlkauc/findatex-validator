@@ -58,8 +58,9 @@ validation engine is exactly the same.
 2. Pick the template (TPT / EET / EMT / EPT) and version.
 3. Drag your `.xlsx`, `.xlsm` or `.csv` file onto the upload area
    (max 25 MB).
-4. Click **Validieren**. You get findings on screen and a download
-   link for the Excel report.
+4. Click **Validate**. The findings appear on screen, grouped by rule,
+   together with the quality score and a download link for the Excel
+   report.
 
 Don't have a file to hand? **No file at hand? Try an example** loads the
 bundled example for the selected template and validates it in one click.
@@ -114,6 +115,35 @@ Override the warning once and you're set:
 
 No Java install needed — the installers ship a bundled runtime.
 
+#### Desktop walkthrough
+
+**Validate a file.** Pick the template tab and the spec version, choose a
+file (or drag & drop it onto the window), keep the regulatory profiles
+that apply, and hit *Validate*. All profiles are ticked by default; the
+optional online cross-check of LEIs and ISINs against GLEIF / OpenFIGI
+stays off unless you enable it under *Settings*.
+
+![Animated walkthrough: pick the template tab and version, choose a file, select the profiles, validate](docs/screenshots/desktop-validate.gif)
+
+**Work with the results.** The *Files* table gets one row per file with
+the overall score and the error / warning counts. The *Quality scores*
+cards break the score down by category, profile and fund and show how
+many rows are error-free. The *Findings* table lists every problem with
+fund, row, field, rule and message: filter by severity, tick *Group by
+error* to read one line per rule with its occurrence count, select a
+finding and use *Report a false positive…* when the tool got it wrong,
+and export the Excel report.
+
+![Animated walkthrough: quality scores, findings filtered and grouped by error, false-positive report, Excel export](docs/screenshots/desktop-results.gif)
+
+**Batch mode.** Choose a folder instead of a file and every supported
+delivery in it is validated in one run. The *Files* table fills up as
+each file finishes; click a row to see its findings, then export one
+report per file or a combined one, optionally with the annotated source
+file.
+
+![Animated walkthrough: a folder of deliveries validated in one run, one row per file, combined export](docs/screenshots/desktop-batch.gif)
+
 ---
 
 ## Privacy
@@ -136,7 +166,10 @@ issue* in your browser. You review the exact text and submit it
 yourself; nothing is sent automatically, no account data leaves your
 machine beyond the GitHub issue you choose to post.
 
-This is the fastest way to get a rule fixed. General bug reports and
+This is the fastest way to get a rule fixed. For a quicker signal there
+is also a 1–5-star rating with an optional comment (*★ Rate this app* in
+the desktop header, the stars in the web header); it stores no e-mail,
+no IP address and no install id. General bug reports and
 feature requests are equally welcome on the
 [issue tracker](https://github.com/karlkauc/findatex-validator/issues)
 (see [`CONTRIBUTING.md`](CONTRIBUTING.md)). Security issues go through
@@ -175,12 +208,20 @@ GDPR notes: [`docs/NEWSLETTER.md`](docs/NEWSLETTER.md).
 
 ---
 
-## Help
+## Help and rule reference
 
 User-facing help — what gets validated, what the profiles mean, how
 the GLEIF / OpenFIGI lookup works — is in
 [`HELP.md`](core/src/main/resources/help/HELP.md). It is also
 reachable from the **Help** button in either UI.
+
+Every rule the validator applies is published as plain web pages at
+<https://www.findatex-validator.eu/rules>: one page per template version
+(scoring, profiles, general and cross-field rules) and one per field
+(definition, flag per profile, codification, every rule that can fire on
+it). The pages are generated from the bundled spec sheets — the same
+content sits behind the **Help** button — so they cannot drift from what
+the validator actually checks.
 
 ---
 
@@ -203,6 +244,8 @@ reachable from the **Help** button in either UI.
   rollback, optional custom domain.
 - [`samples/`](samples/) — per-template scenario fixtures (clean +
   broken variants).
+- [`tools/demo/`](tools/demo/) — re-records the animated desktop
+  walkthroughs above (`record_desktop_demo.sh`, needs Xvfb + ffmpeg).
 
 ---
 

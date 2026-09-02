@@ -55,6 +55,7 @@ python3 tools/build_examples.py                # regenerate samples/tpt/*
 python3 tools/build_eet_samples.py             # samples/eet/*  (also _emt_, _ept_)
 python3 tools/generate_requirements.py         # rebuild requirements.md from spec
 python3 tools/generate_og_image.py             # rebuild the 1200x630 link-preview card
+tools/demo/record_desktop_demo.sh              # re-record docs/screenshots/desktop-*.gif (Xvfb + ffmpeg + Pillow; drives the shaded jar)
 mvn -pl core -Pdocs exec:java                  # rebuild docs/rules/*.md (per-template rule reference)
 ./package/jpackage.sh                          # native desktop installer (CDS+AOT+splash baked in; see docs/JPACKAGE_OPTIMIZATIONS.md)
 ./package/benchmark-startup.sh                 # cold-start bench: none vs CDS vs AOT (5 runs each)

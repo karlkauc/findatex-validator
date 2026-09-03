@@ -8,6 +8,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Annotated Source in the web app.** The result panel now has two tabs,
+  *Findings* and *Annotated Source*; the latter shows the original file as a
+  grid with every finding painted on its cell — the same join the desktop tab
+  and the Excel sheet use. Cells carry the finding text as a tooltip, "only
+  rows / columns with findings" filters and 200-row paging keep the DOM small,
+  and a *Source* button (or a double-click) on a finding row jumps to its
+  cell. Server side, `ValidationOrchestrator` writes a gzip JSON artefact
+  (`AnnotatedSourceJson`, core) next to the Excel report under the same id;
+  `GET /api/annotated-source/{id}` serves it repeatedly until the report's
+  5-minute TTL, and the XLSX download no longer deletes it. Files over
+  `FINDATEX_WEB_ANNOTATED_SOURCE_MAX_ROWS` / `_MAX_CELLS` (20 000 / 2 M) skip
+  the artefact — the response says `annotatedSourceAvailable=false` and the
+  tab points at the Excel sheet.
+- **Collapsible web layout.** The input column (Input + Notes) folds into a
+  slim rail so the wide findings table gets the full viewport; Scores, Per
+  Fund and Notes fold individually. All states are remembered per browser
+  (`CollapsibleSection`, `usePersistedBoolean`). Manual only — no auto-collapse
+  after a run.
+- **Public `/help` page.** The Help markdown (`HELP.md`) is now also
+  server-rendered at `/help` (Commonmark, same renderer as `/rules`), listed
+  in the sitemap and linked from the footer and the rules pages. The FAQ
+  structured data moved there.
+
+### Changed
+- **Full-width web layout.** Header, main and footer drop the 1600 px cap;
+  the input column is 320 px and left-aligned.
+- **External validation is on for the public instance.** The Cloud Run deploy
+  workflow set `FINDATEX_WEB_EXTERNAL_ENABLED=false` on every release, which
+  is why the "Enable GLEIF / OpenFIGI online checks" switch had vanished from
+  the web UI. It is now `true`, with the OpenFIGI key mounted from Secret
+  Manager (`findatex-openfigi-key`, a documented prerequisite). The per-run
+  toggle still defaults to off.
+- **Landing copy moved into Help.** The ~220 lines of static text under the
+  validator (what the templates are, privacy, scoring, FAQ) left
+  `index.html` and were merged into `HELP.md` / `ABOUT.md`, so the start page
+  is the validator alone; search engines get the same text at `/help`.
+
 - **Animated desktop walkthroughs in the README** (`docs/screenshots/desktop-*.gif`):
   validate a file, work with the results, batch mode. Each step is captioned
   and the view scrolls to the control it talks about. They are recorded, not

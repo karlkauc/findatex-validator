@@ -460,6 +460,13 @@ export default function App() {
               com.findatex/findatex-validator
             </a>
           </div>
+          <div className="mt-2 text-slate-400">
+            <strong className="font-semibold text-slate-500">Not an official FinDatEx tool.</strong>{' '}
+            A private, open-source project, not affiliated with, endorsed by or connected to the
+            FinDatEx initiative or any of its member organisations. Provided as-is, without warranty
+            of any kind — validation results may be incomplete or wrong, so do not rely on this as
+            the sole check before delivering data to a counterparty or regulator.
+          </div>
           {newsletterConfigQuery.data?.enabled && <NewsletterSignup />}
         </div>
       </footer>

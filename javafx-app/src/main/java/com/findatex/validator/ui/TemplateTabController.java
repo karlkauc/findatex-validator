@@ -58,6 +58,9 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -194,6 +197,12 @@ public final class TemplateTabController {
     @FXML private CheckBox groupByError;
     @FXML private Button reportFpButton;
     @FXML private MenuItem reportFpMenuItem;
+    @FXML private MenuItem showInSourceMenuItem;
+    @FXML private TabPane resultTabs;
+    @FXML private Tab annotatedSourceTab;
+    @FXML private StackPane annotatedSourceHost;
+    /** In-app "Annotated Source" grid (lazy-loaded when its tab is opened). */
+    private AnnotatedSourcePane annotatedSourcePane;
     @FXML private Label findingCountLabel;
     @FXML private TableView<FindingRow> findingsTable;
     @FXML private TableColumn<FindingRow, String> colSeverity;
@@ -330,6 +339,19 @@ public final class TemplateTabController {
         findingsTable.getSelectionModel().selectedItemProperty()
                 .addListener((o, was, is) -> updateReportFpState(is));
         updateReportFpState(null);
+
+        // Annotated Source sub-tab: same grid as the Excel sheet, built on demand.
+        annotatedSourcePane = new AnnotatedSourcePane(template.id() + "-annotated-source");
+        annotatedSourceHost.getChildren().add(annotatedSourcePane);
+        annotatedSourceTab.selectedProperty().addListener((o, was, is) -> annotatedSourcePane.setActive(is));
+        annotatedSourcePane.setActive(annotatedSourceTab.isSelected());
+        findingsTable.setRowFactory(tv -> {
+            TableRow<FindingRow> row = new TableRow<>();
+            row.setOnMouseClicked(ev -> {
+                if (ev.getClickCount() == 2 && !row.isEmpty()) showInAnnotatedSource(row.getItem());
+            });
+            return row;
+        });
 
         filePathField.textProperty().addListener((o, a, b) ->
                 validateButton.setDisable(b == null || b.trim().isEmpty()));
@@ -516,6 +538,7 @@ public final class TemplateTabController {
         allFindings.clear();
         totalFindingsBeforeCap = 0;
         scorePane.getChildren().clear();
+        annotatedSourcePane.clear();
         filePathField.setText(folder.toString());
         batchModeLabel.setText("Batch mode: all supported files in '" + folder.getFileName() + "'");
         batchModeLabel.setManaged(true);
@@ -530,6 +553,7 @@ public final class TemplateTabController {
         batchFolder = null;
         currentBatch = null;
         fileRows.clear();
+        annotatedSourcePane.clear();
         batchModeLabel.setText("");
         batchModeLabel.setManaged(false);
         batchModeLabel.setVisible(false);
@@ -1024,6 +1048,7 @@ public final class TemplateTabController {
                 allFindings.clear();
                 totalFindingsBeforeCap = 0;
                 applyFilters();
+                annotatedSourcePane.clear();
                 statusLabel.setText("Could not validate " + r.displayName()
                         + ": " + (r.errorMessage() == null ? r.status().name() : r.errorMessage()));
             }
@@ -1097,6 +1122,7 @@ public final class TemplateTabController {
         allFindings.setAll(batch.rows.stream().map(FindingRow::of).toList());
         groupedFindings.setAll(buildGroupRows(currentFindings));
         applyFilters();
+        annotatedSourcePane.setReport(report);
     }
 
     /**
@@ -1208,6 +1234,24 @@ public final class TemplateTabController {
         boolean enabled = sel != null;
         if (reportFpButton != null) reportFpButton.setDisable(!enabled);
         if (reportFpMenuItem != null) reportFpMenuItem.setDisable(!enabled);
+        if (showInSourceMenuItem != null) showInSourceMenuItem.setDisable(!canShowInSource(sel));
+    }
+
+    /** Only findings anchored to a parsed row have a cell to jump to; global ones do not. */
+    static boolean canShowInSource(FindingRow sel) {
+        return sel != null && sel.source() != null && sel.source().rowIndex() != null;
+    }
+
+    @FXML
+    private void onShowInAnnotatedSource(ActionEvent e) {
+        showInAnnotatedSource(findingsTable.getSelectionModel().getSelectedItem());
+    }
+
+    /** Switches to the Annotated Source tab and selects the finding's cell (grouped rows jump to the first occurrence). */
+    private void showInAnnotatedSource(FindingRow sel) {
+        if (!canShowInSource(sel)) return;
+        resultTabs.getSelectionModel().select(annotatedSourceTab);
+        annotatedSourcePane.showCell(sel.source());
     }
 
     @FXML

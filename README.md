@@ -136,6 +136,11 @@ and export the Excel report.
 
 ![Animated walkthrough: quality scores, findings filtered and grouped by error, false-positive report, Excel export](docs/screenshots/desktop-results.gif)
 
+**Annotated Source.** The tab next to *Findings* shows the original file
+cell-for-cell with the same severity tinting as the Excel sheet of that
+name: hover a highlighted cell for its findings, double-click a finding to
+jump to its cell, and hide finding-free rows or columns with one click.
+
 **Batch mode.** Choose a folder instead of a file and every supported
 delivery in it is validated in one run. The *Files* table fills up as
 each file finishes; click a row to see its findings, then export one

@@ -1,7 +1,5 @@
 package com.findatex.validator.report;
 
-import com.findatex.validator.domain.RawCell;
-import com.findatex.validator.domain.TptRow;
 import com.findatex.validator.validation.Finding;
 import com.findatex.validator.validation.Severity;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,30 +17,29 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Writes the "Annotated Source" sheet from an {@link AnnotatedSourceModel}: the original file
+ * cell-for-cell with original number/date formats, cells tinted by worst severity and an Excel
+ * comment listing the findings. The join logic lives in the model so the desktop view and the
+ * sheet stay in lock-step.
+ */
 final class AnnotatedSourceSheetWriter {
 
     private static final Logger log = LoggerFactory.getLogger(AnnotatedSourceSheetWriter.class);
-
-    private static final int MAX_FINDING_MSG = 400;
-    private static final int MAX_COMMENT_TEXT = 1500;
-
-    private record CellKey(int row, int col) {}
 
     private AnnotatedSourceSheetWriter() {}
 
     static void write(Sheet sheet, QualityReport report,
                       CellStyle headerStyle,
                       CellStyle err, CellStyle warn, CellStyle info) {
-        SourceMirror.SourceData src;
+        AnnotatedSourceModel model;
         try {
-            src = SourceMirror.read(report.file());
+            model = AnnotatedSourceModel.build(report);
         } catch (IOException ex) {
             log.warn("Could not re-read source file for Annotated Source tab: {}", ex.toString());
             Row rr = sheet.createRow(0);
@@ -50,7 +47,7 @@ final class AnnotatedSourceSheetWriter {
                     "Original file no longer available — see the Findings tab for details.");
             return;
         }
-        if (src.rows().isEmpty()) {
+        if (model.rows().isEmpty()) {
             Row rr = sheet.createRow(0);
             rr.createCell(0).setCellValue("Original file is empty.");
             return;
@@ -59,83 +56,43 @@ final class AnnotatedSourceSheetWriter {
         Workbook wb = sheet.getWorkbook();
         Drawing<?> drawing = sheet.createDrawingPatriarch();
         CreationHelper helper = wb.getCreationHelper();
-
-        Map<Integer, TptRow> rowsByLogical = new HashMap<>();
-        Map<Integer, Integer> mirrorRowToLogical = new HashMap<>();
-        for (TptRow tr : report.file().rows()) {
-            rowsByLogical.put(tr.rowIndex(), tr);
-            Iterator<RawCell> it = tr.all().values().iterator();
-            if (it.hasNext()) {
-                mirrorRowToLogical.put(it.next().sourceRow() - 1, tr.rowIndex());
-            }
-        }
-
-        Map<CellKey, List<Finding>> byCell = new HashMap<>();
-        Map<Integer, Severity> worstByRow = new HashMap<>();
-        for (Finding f : report.findings()) {
-            if (f.rowIndex() == null) continue;
-            TptRow tr = rowsByLogical.get(f.rowIndex());
-            if (tr == null) continue;
-            Iterator<RawCell> it = tr.all().values().iterator();
-            if (!it.hasNext()) continue;
-            int mirrorRow = it.next().sourceRow() - 1;
-            int mirrorCol;
-            if (f.fieldNum() != null) {
-                RawCell rc = tr.all().get(f.fieldNum());
-                mirrorCol = rc == null ? 0 : rc.sourceCol();
-            } else {
-                mirrorCol = 0;
-            }
-            byCell.computeIfAbsent(new CellKey(mirrorRow, mirrorCol), k -> new ArrayList<>()).add(f);
-            worstByRow.merge(mirrorRow, f.severity(), AnnotatedSourceSheetWriter::worse);
-        }
-
-        int dataWidth = 0;
-        for (List<SourceMirror.SourceCell> row : src.rows()) dataWidth = Math.max(dataWidth, row.size());
-        int totalCols = dataWidth + 1;
-
         StyleResolver styles = new StyleResolver(wb, err, warn, info);
+        int totalCols = model.width() + 1;
 
-        for (int rIdx = 0; rIdx < src.rows().size(); rIdx++) {
-            Row rr = sheet.createRow(rIdx);
-            List<SourceMirror.SourceCell> srcRow = src.rows().get(rIdx);
-            boolean isHeaderRow = rIdx == src.headerRowIndex();
+        for (AnnotatedSourceModel.Row mr : model.rows()) {
+            Row rr = sheet.createRow(mr.mirrorIndex());
+            boolean isHeaderRow = mr.header();
 
             Cell zeile = rr.createCell(0);
             if (isHeaderRow) {
                 zeile.setCellValue("Row");
                 zeile.setCellStyle(headerStyle);
-            } else if (mirrorRowToLogical.containsKey(rIdx)) {
-                zeile.setCellValue(mirrorRowToLogical.get(rIdx));
+            } else if (mr.logicalRow() != null) {
+                zeile.setCellValue(mr.logicalRow());
             } else {
                 zeile.setCellValue("");
             }
-            if (!isHeaderRow) {
-                Severity rowSeverity = worstByRow.get(rIdx);
-                if (rowSeverity != null) {
-                    zeile.setCellStyle(styleFor(rowSeverity, err, warn, info));
-                }
+            if (!isHeaderRow && mr.rowSeverity() != null) {
+                zeile.setCellStyle(styleFor(mr.rowSeverity(), err, warn, info));
             }
-            List<Finding> rowLevelFindings = byCell.get(new CellKey(rIdx, 0));
-            if (rowLevelFindings != null && !rowLevelFindings.isEmpty()) {
-                attachComment(drawing, helper, zeile, rowLevelFindings);
+            if (!mr.rowLevelFindings().isEmpty()) {
+                attachComment(drawing, helper, zeile, mr.rowLevelFindings());
             }
 
-            for (int c = 0; c < srcRow.size(); c++) {
-                int mirrorCol = c + 1;
-                Cell cell = rr.createCell(mirrorCol);
-                SourceMirror.SourceCell sc = srcRow.get(c);
-                writeTypedValue(cell, sc, isHeaderRow);
-                List<Finding> findings = byCell.get(new CellKey(rIdx, mirrorCol));
-                CellStyle target = resolveStyle(styles, headerStyle, sc, findings, isHeaderRow);
+            List<AnnotatedSourceModel.Cell> cells = mr.cells();
+            for (int c = 0; c < cells.size(); c++) {
+                AnnotatedSourceModel.Cell ac = cells.get(c);
+                Cell cell = rr.createCell(c + 1);
+                writeTypedValue(cell, ac.source(), isHeaderRow);
+                CellStyle target = resolveStyle(styles, headerStyle, ac, isHeaderRow);
                 if (target != null) cell.setCellStyle(target);
-                if (findings != null && !findings.isEmpty()) {
-                    attachComment(drawing, helper, cell, findings);
+                if (ac.hasFindings()) {
+                    attachComment(drawing, helper, cell, ac.findings());
                 }
             }
         }
 
-        sheet.createFreezePane(1, src.headerRowIndex() + 1);
+        sheet.createFreezePane(1, model.headerRowIndex() + 1);
         sheet.setColumnWidth(0, 2500);
         for (int c = 1; c < totalCols; c++) sheet.setColumnWidth(c, 4500);
     }
@@ -158,12 +115,11 @@ final class AnnotatedSourceSheetWriter {
     }
 
     private static CellStyle resolveStyle(StyleResolver styles, CellStyle headerStyle,
-                                          SourceMirror.SourceCell sc, List<Finding> findings,
-                                          boolean isHeaderRow) {
+                                          AnnotatedSourceModel.Cell ac, boolean isHeaderRow) {
         if (isHeaderRow) return headerStyle;
-        boolean hasFinding = findings != null && !findings.isEmpty();
-        if (hasFinding) {
-            return styles.findingStyle(worstSeverity(findings), sc.dataFormat());
+        SourceMirror.SourceCell sc = ac.source();
+        if (ac.hasFindings()) {
+            return styles.findingStyle(ac.severity(), sc.dataFormat());
         }
         if (needsFormat(sc)) {
             return styles.plainFormatStyle(sc.dataFormat());
@@ -211,11 +167,7 @@ final class AnnotatedSourceSheetWriter {
         }
 
         private CellStyle buildFinding(Severity severity, String fmt) {
-            CellStyle base = switch (severity) {
-                case ERROR -> err;
-                case WARNING -> warn;
-                case INFO -> info;
-            };
+            CellStyle base = styleFor(severity, err, warn, info);
             if (fmt == null || fmt.isEmpty() || "General".equalsIgnoreCase(fmt)) {
                 return base;
             }
@@ -224,21 +176,6 @@ final class AnnotatedSourceSheetWriter {
             s.setDataFormat(wb.createDataFormat().getFormat(fmt));
             return s;
         }
-    }
-
-    private static Severity worstSeverity(List<Finding> findings) {
-        Severity worst = Severity.INFO;
-        for (Finding f : findings) {
-            if (f.severity() == Severity.ERROR) return Severity.ERROR;
-            if (f.severity() == Severity.WARNING) worst = Severity.WARNING;
-        }
-        return worst;
-    }
-
-    private static Severity worse(Severity a, Severity b) {
-        if (a == Severity.ERROR || b == Severity.ERROR) return Severity.ERROR;
-        if (a == Severity.WARNING || b == Severity.WARNING) return Severity.WARNING;
-        return Severity.INFO;
     }
 
     private static CellStyle styleFor(Severity sev, CellStyle err, CellStyle warn, CellStyle info) {
@@ -257,42 +194,8 @@ final class AnnotatedSourceSheetWriter {
         a.setRow1(cell.getRowIndex());
         a.setRow2(cell.getRowIndex() + 5);
         Comment c = drawing.createCellComment(a);
-        c.setString(helper.createRichTextString(findingsToCommentText(findings)));
+        c.setString(helper.createRichTextString(AnnotatedSourceModel.describe(findings)));
         c.setAuthor("FinDatEx Validator");
         cell.setCellComment(c);
-    }
-
-    private static String findingsToCommentText(List<Finding> findings) {
-        List<Finding> sorted = new ArrayList<>(findings);
-        sorted.sort((x, y) -> {
-            int sx = severityOrder(x.severity());
-            int sy = severityOrder(y.severity());
-            if (sx != sy) return Integer.compare(sx, sy);
-            return String.valueOf(x.ruleId()).compareTo(String.valueOf(y.ruleId()));
-        });
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < sorted.size(); i++) {
-            Finding f = sorted.get(i);
-            if (i > 0) sb.append("\n\n");
-            String msg = f.message() == null ? "" : f.message();
-            if (msg.length() > MAX_FINDING_MSG) msg = msg.substring(0, MAX_FINDING_MSG) + "…";
-            sb.append('[').append(f.severity().name()).append("] ");
-            if (f.ruleId() != null) sb.append(f.ruleId()).append(" — ");
-            sb.append(msg);
-            if (sb.length() > MAX_COMMENT_TEXT) {
-                sb.setLength(MAX_COMMENT_TEXT);
-                sb.append("\n…(truncated)");
-                break;
-            }
-        }
-        return sb.toString();
-    }
-
-    private static int severityOrder(Severity sev) {
-        return switch (sev) {
-            case ERROR -> 0;
-            case WARNING -> 1;
-            case INFO -> 2;
-        };
     }
 }

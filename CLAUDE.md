@@ -193,6 +193,11 @@ per-version `ExternalValidationConfig` (e.g. the custodian LEI columns
 
 `MainView.fxml` is a `TabPane` built dynamically from `TemplateRegistry.all()`.
 `TemplateTab.fxml` is reused once per template (no template-specific FXML).
+Below the score cards a `TabPane` holds **Findings** and **Annotated Source**;
+the latter is `AnnotatedSourcePane` (code-built, no FXML) rendering
+`core/.../report/AnnotatedSourceModel` — the same cell/finding join the Excel
+sheet uses — lazily on first tab open (POI re-read on a background `Task`).
+Double-click / context menu on a finding jumps to its cell.
 The external-validation controls are shown for any template/version whose
 `externalValidationConfigFor(...)` is non-empty (currently all four). Window
 title is "FinDatEx Validator" and the macOS dock label uses

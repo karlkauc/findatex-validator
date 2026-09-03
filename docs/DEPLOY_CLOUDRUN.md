@@ -24,7 +24,7 @@ are stored in the repo or in GitHub Secrets.
 | Concurrency           | 8 per instance                     |
 | Min / max instances   | 1 / 10                             |
 | Request timeout       | 300 s                              |
-| External validation   | off (`FINDATEX_WEB_EXTERNAL_ENABLED=false`) |
+| External validation   | on (`FINDATEX_WEB_EXTERNAL_ENABLED=true`; OpenFIGI key from Secret Manager `findatex-openfigi-key` — see [External validation](#external-validation-prerequisite-openfigi-secret)). The per-run toggle in the UI still defaults to off. |
 | Canonical host        | `www.findatex-validator.eu` (`FINDATEX_WEB_CANONICAL_HOST`) |
 | Usage statistics      | on (Postgres on the Hetzner VPS; password + ingest token via Secret Manager — see [Usage stats bootstrap](#usage-statistics-bootstrap)) |
 
@@ -299,37 +299,47 @@ be in place for it to resolve on Cloud Run:
 Both apply only to **new** runs — the IP is never stored, so historical
 `usage_event` rows keep `country_code = NULL`.
 
-## Enabling external validation later
+## External validation (prerequisite: OpenFIGI secret)
 
-External validation (GLEIF + OpenFIGI) is off by default in the deployed
-service. To turn it on without baking secrets into the image:
+External validation (GLEIF + OpenFIGI) is **on** in the deployed service since
+1.0.14 (`FINDATEX_WEB_EXTERNAL_ENABLED=true` in the workflow). The user still
+has to switch it on per run in the UI; only the LEIs / ISINs from the file are
+sent to the registries. GLEIF needs no key. OpenFIGI works keyless with a low
+rate limit, so the workflow mounts a server-side key from Secret Manager.
+
+**The secret is a manual prerequisite.** Cloud Run resolves `--update-secrets`
+when the revision is created — a missing secret or a missing IAM binding
+makes the deploy fail. Create it once before the first deploy that carries
+the change:
 
 ```bash
 PROJECT=findatex-validator
 REGION=europe-west4
 SERVICE=findatex-validator-web
 
-# Store the OpenFIGI key in Secret Manager (one-time)
-echo -n "<your-openfigi-api-key>" | \
+# 1) Store the OpenFIGI key in Secret Manager (one-time; key via stdin, never in shell history)
+printf '%s' "$OPENFIGI_KEY" | \
   gcloud secrets create findatex-openfigi-key \
-    --replication-policy=automatic --data-file=-
+    --project="$PROJECT" --replication-policy=automatic --data-file=-
 
-# Grant the Cloud Run runtime SA access (default Cloud Run SA, or a custom one)
-RUNTIME_SA=$(gcloud run services describe "$SERVICE" --region="$REGION" \
+# 2) Grant the Cloud Run runtime SA access
+RUNTIME_SA=$(gcloud run services describe "$SERVICE" --region="$REGION" --project="$PROJECT" \
   --format='value(spec.template.spec.serviceAccountName)')
-gcloud secrets add-iam-policy-binding findatex-openfigi-key \
+gcloud secrets add-iam-policy-binding findatex-openfigi-key --project="$PROJECT" \
   --member="serviceAccount:$RUNTIME_SA" \
   --role=roles/secretmanager.secretAccessor
 
-# Update the service: turn the feature on, mount the secret as env
-gcloud run services update "$SERVICE" --region="$REGION" \
-  --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=true \
-  --update-secrets=FINDATEX_WEB_EXTERNAL_OPENFIGI_KEY=findatex-openfigi-key:latest
+# 3) Verify
+gcloud secrets versions access latest --secret=findatex-openfigi-key --project="$PROJECT" | wc -c
 ```
 
-GLEIF needs no key. Add proxy env vars (`FINDATEX_WEB_EXTERNAL_PROXY_*`)
-the same way if egress requires a corporate proxy — but Cloud Run normally
-has direct internet egress, so usually unnecessary.
+To rotate the key, add a new version (`gcloud secrets versions add
+findatex-openfigi-key --data-file=-`); `:latest` in the workflow picks it up on
+the next deploy. Add proxy env vars (`FINDATEX_WEB_EXTERNAL_PROXY_*`) the same
+way if egress requires a corporate proxy — Cloud Run normally has direct
+internet egress, so usually unnecessary. The GLEIF/OpenFIGI lookup cache
+(`findatex.web.external.cache-dir`, under the instance's tmp dir) is per
+instance and does not survive a scale-to-zero — acceptable at this traffic.
 
 ## Custom domain
 

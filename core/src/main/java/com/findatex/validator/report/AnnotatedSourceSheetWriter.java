@@ -37,9 +37,20 @@ final class AnnotatedSourceSheetWriter {
     static void write(Sheet sheet, QualityReport report,
                       CellStyle headerStyle,
                       CellStyle err, CellStyle warn, CellStyle info) {
-        AnnotatedSourceModel model;
+        write(sheet, report, null, headerStyle, err, warn, info);
+    }
+
+    /**
+     * @param prebuilt an already built model for {@code report}, or {@code null} to build one
+     *                 here — callers that need the model for something else (the web JSON side
+     *                 artifact) pass it in so the source is re-read only once
+     */
+    static void write(Sheet sheet, QualityReport report, AnnotatedSourceModel prebuilt,
+                      CellStyle headerStyle,
+                      CellStyle err, CellStyle warn, CellStyle info) {
+        AnnotatedSourceModel model = prebuilt;
         try {
-            model = AnnotatedSourceModel.build(report);
+            if (model == null) model = AnnotatedSourceModel.build(report);
         } catch (IOException ex) {
             log.warn("Could not re-read source file for Annotated Source tab: {}", ex.toString());
             Row rr = sheet.createRow(0);

@@ -1,5 +1,6 @@
 import { PerFundScoreDto } from '../types/api';
 import { ScoreBadge } from './ScoreBadge';
+import { CollapsibleSection } from './CollapsibleSection';
 
 interface Props {
   perFundScores: PerFundScoreDto[];
@@ -18,9 +19,9 @@ function toPercent(value: number): number {
 export function PerFundScores({ perFundScores }: Props) {
   if (perFundScores.length === 0) return null;
   return (
-    <section aria-label="Per fund scores" className="space-y-3">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Per Fund</h3>
-      <div className="space-y-3">
+    <section aria-label="Per fund scores">
+      <CollapsibleSection title="Per Fund" storageKey="perFund">
+        <div className="space-y-3">
         {perFundScores.map((f) => (
           <div key={(f.portfolioId ?? '') + '|' + (f.valuationDate ?? '')} className="card">
             <div className="card-header">
@@ -29,7 +30,7 @@ export function PerFundScores({ perFundScores }: Props) {
               {f.valuationDate && <span className="ml-2 text-xs text-slate-400">{f.valuationDate}</span>}
             </div>
             <div className="card-body">
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {f.scores.map((s) => (
                   <ScoreBadge
                     key={s.dimension}
@@ -41,7 +42,8 @@ export function PerFundScores({ perFundScores }: Props) {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      </CollapsibleSection>
     </section>
   );
 }

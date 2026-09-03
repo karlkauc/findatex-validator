@@ -1,4 +1,5 @@
 import {
+  AnnotatedSourceDto,
   ApiError,
   BuildInfo,
   FeedbackConfig,
@@ -140,6 +141,16 @@ export async function validateUpload(args: ValidateArgs): Promise<ValidationResp
 
 export function reportDownloadUrl(reportId: string): string {
   return `/api/report/${reportId}`;
+}
+
+export function annotatedSourceUrl(reportId: string): string {
+  return `/api/annotated-source/${reportId}`;
+}
+
+/** Repeatable until the report's TTL expires (unlike the single-use XLSX download). */
+export async function fetchAnnotatedSource(reportId: string): Promise<AnnotatedSourceDto> {
+  const res = await fetch(annotatedSourceUrl(reportId));
+  return handle<AnnotatedSourceDto>(res);
 }
 
 export async function fetchHelp(): Promise<string> {

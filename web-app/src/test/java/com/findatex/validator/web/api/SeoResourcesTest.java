@@ -32,7 +32,7 @@ class SeoResourcesTest {
     }
 
     @Test
-    void sitemapIsGeneratedAndListsTheAppAndTheRulePages() {
+    void sitemapIsGeneratedAndListsTheAppTheHelpAndTheRulePages() {
         // Generated, not a static file: there are ~2000 rule pages and they
         // change with every spec version, so a hand-written list would be
         // stale within one release.
@@ -42,6 +42,7 @@ class SeoResourcesTest {
                 .statusCode(200)
                 .contentType(containsString("xml"))
                 .body(containsString("<urlset"))
+                .body(containsString("/help</loc>"))
                 .body(containsString("/rules</loc>"))
                 .body(containsString("/rules/tpt-v8-0</loc>"))
                 .body(containsString("/rules/tpt-v8-0/field/26</loc>"));

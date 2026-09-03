@@ -85,6 +85,35 @@ export interface ValidationResponse {
   perFundScores: PerFundScoreDto[];
   findings: FindingDto[];
   reportId: string;
+  /**
+   * True when the server kept an annotated-source artefact next to the report
+   * (same 5-minute TTL). False for files over the size cap — the Excel report's
+   * "Annotated Source" sheet is the fallback then.
+   */
+  annotatedSourceAvailable: boolean;
+}
+
+/**
+ * Mirrors core's AnnotatedSourceJson: the original grid plus the finding→cell
+ * join. `rows[k]` is mirror row k (the header row is `rows[headerRowIndex]`,
+ * shown as column titles, not as a body row). `findingCells` triples are
+ * `[findingIndex, mirrorRow, mirrorCol]` where findingIndex indexes
+ * `ValidationResponse.findings` and mirrorCol 0 is the synthetic Row column
+ * (row-level findings); source column c is mirror column c + 1.
+ */
+export interface AnnotatedSourceDto {
+  headerRowIndex: number;
+  headers: string[];
+  columnsWithFindings: number[];
+  rows: AnnotatedSourceRow[];
+  findingCells: [number, number, number][];
+}
+
+export interface AnnotatedSourceRow {
+  /** Logical row index as used by FindingDto.rowIndex; null for header/preamble rows. */
+  r: number | null;
+  /** Cell text per source column (headers.length entries). */
+  c: string[];
 }
 
 export interface RateLimitStatus {

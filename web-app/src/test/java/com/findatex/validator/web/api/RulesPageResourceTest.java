@@ -80,6 +80,15 @@ class RulesPageResourceTest {
     }
 
     @Test
+    void everyPageLinksTheHelpPage() {
+        // The header bar is shared with /help; the two public page families
+        // must reach each other without going through the SPA.
+        given().when().get("/rules")
+                .then().statusCode(200)
+                .body(containsString("href=\"/help\""));
+    }
+
+    @Test
     void unknownSlugsAndFieldsAre404NotTheSpaShell() {
         // SpaFallbackResource must not swallow these: a soft 200 would tell a
         // crawler that every made-up /rules/... URL is a real page.

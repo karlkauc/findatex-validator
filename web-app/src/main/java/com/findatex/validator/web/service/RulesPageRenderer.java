@@ -9,8 +9,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import java.util.List;
 
 /**
- * Renders the public rule-reference pages: Markdown to HTML, wrapped in a
- * self-contained page shell.
+ * Renders the public rule-reference pages and the help page: Markdown to HTML,
+ * wrapped in a self-contained page shell.
  *
  * <p>These pages are plain server-rendered HTML with no React and no client-side
  * routing — that is the entire point. Their value is being readable by a
@@ -34,6 +34,12 @@ public class RulesPageRenderer {
             .extensions(EXTENSIONS)
             .softbreak("<br />")
             .build();
+    // Hand-written prose (HELP.md) is hard-wrapped at ~75 columns; there a soft
+    // line break is just the author's editor width and must flow.
+    private static final HtmlRenderer PROSE_RENDERER = HtmlRenderer.builder()
+            .extensions(EXTENSIONS)
+            .softbreak("\n")
+            .build();
 
     private static final String STYLE = """
             :root { color-scheme: light; }
@@ -46,6 +52,8 @@ public class RulesPageRenderer {
                    display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
             header.site a { color: #fff; text-decoration: none; font-weight: 600; }
             header.site .tag { color: #dde6f0; font-size: 13px; font-weight: 400; }
+            header.site a.nav { color: #dde6f0; font-size: 13px; font-weight: 500; }
+            header.site a.nav:hover { color: #fff; text-decoration: underline; }
             header.site .cta { margin-left: auto; border: 1px solid rgba(255,255,255,.25);
                    background: rgba(255,255,255,.1); border-radius: 6px; padding: 6px 12px; font-size: 13px; }
             main { max-width: 60rem; margin: 0 auto; padding: 28px 24px 64px; }
@@ -84,8 +92,17 @@ public class RulesPageRenderer {
 
     /** Markdown (GFM tables) to HTML, with wide tables kept scrollable. */
     public String markdownToHtml(String markdown) {
+        return render(RENDERER, markdown);
+    }
+
+    /** Like {@link #markdownToHtml} but soft line breaks flow — for hand-wrapped prose such as HELP.md. */
+    public String proseToHtml(String markdown) {
+        return render(PROSE_RENDERER, markdown);
+    }
+
+    private static String render(HtmlRenderer renderer, String markdown) {
         if (markdown == null || markdown.isBlank()) return "";
-        String html = RENDERER.render(PARSER.parse(markdown));
+        String html = renderer.render(PARSER.parse(markdown));
         // The rule tables are wide; without this the page body scrolls sideways
         // on a phone instead of the table doing it.
         return html.replace("<table>", "<div class=\"scroll\"><table>")
@@ -123,6 +140,8 @@ public class RulesPageRenderer {
                 <header class="site"><div class="bar">
                   <a href="/">FinDatEx Validator</a>
                   <span class="tag">TPT · EET · EMT · EPT</span>
+                  <a class="nav" href="/help">Help</a>
+                  <a class="nav" href="/rules">Rules</a>
                   <a class="cta" href="/">Validate a file</a>
                 </div></header>
                 <main>

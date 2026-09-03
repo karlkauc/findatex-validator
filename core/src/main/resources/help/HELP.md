@@ -8,11 +8,25 @@ custodian — and the operations engineer making sure those files keep
 flowing.
 
 The same content is shown inside the desktop app (Help button), the web app
-(Help button), and on GitHub (`core/src/main/resources/help/HELP.md`).
+(Help button), as a public page at <https://www.findatex-validator.eu/help>,
+and on GitHub (`core/src/main/resources/help/HELP.md`).
 
 ---
 
 ## 1. What this tool does
+
+FinDatEx publishes the standard templates European asset managers, insurers
+and distributors use to exchange fund data. Filling them correctly is
+fiddly: hundreds of numbered fields, per-profile mandatory flags, closed
+code lists and rules that only make sense across several columns at once.
+A counterparty usually finds the mistakes days later, in a rejection
+e-mail.
+
+This validator checks a file against the official spec sheet before you
+send it: missing mandatory fields, wrong formats, invalid codes and broken
+cross-field rules. You get a quality score out of 100, every finding
+grouped by rule, and an Excel report with one row per problem so the fixes
+can be worked through in your source system.
 
 The FinDatEx Validator reads a data-template file (`.xlsx`, `.xlsm`, or
 `.csv`) and reports how well it conforms to the official
@@ -30,7 +44,7 @@ You get the same engine in two delivery modes:
 - **Desktop app (JavaFX)** — files never leave your machine. Use this for
   daily validations on confidential fund data. Besides the findings table
   it shows the original file as an in-app **Annotated Source** grid (same
-  colours and finding texts as the Excel sheet of the same name, see §8).
+  colours and finding texts as the Excel sheet of the same name, see §9).
 - **Web app (Quarkus + React, Docker)** — useful when the desktop install
   is not an option, or for occasional use. Uploads are processed in
   memory and discarded immediately; reports are available for 5 minutes
@@ -39,9 +53,34 @@ You get the same engine in two delivery modes:
 Both modes share the same validation core, the same rules, the same
 reports.
 
+### 1.1 Every rule, documented
+
+The full [rule reference](https://www.findatex-validator.eu/rules) is
+public: for every template version, what each field means, its mandatory
+flag in each profile, the codification it must match, and every cross-field
+rule with its severity and effect on the score. Generated from the official
+spec sheets, one page per field — so you can look up why a finding fired
+without opening the tool. The same reference is bundled in both apps as the
+per-template tabs of this Help window.
+
 ---
 
 ## 2. Templates supported
+
+- **TPT — Tripartite Template** — portfolio holdings, position by position.
+  Used by insurers for Solvency II reporting and by pension funds; profiles
+  for Solvency II, IORP/EIOPA/ECB, NW 675 and SST.
+- **EET — European ESG Template** — sustainability data for SFDR
+  disclosures, taxonomy alignment, principal adverse impacts and MiFID
+  sustainability preferences.
+- **EMT — European MiFID Template** — product governance data: target
+  market, distribution strategy and cost disclosure under MiFID II.
+- **EPT — European PRIIPs Template** — the data behind a PRIIPs KID: risk
+  indicator, costs and performance scenarios.
+
+Two spec versions of each are bundled, because a migration period usually
+means delivering the old version to some counterparties and the new one to
+others:
 
 | Template | Bundled versions          | Spec owner   |
 |----------|---------------------------|--------------|
@@ -57,7 +96,26 @@ version" section in `README.md`.
 
 ---
 
-## 3. Profiles explained
+## 3. What happens to your file
+
+Fund data is confidential, so the short version: in the web app the upload
+is parsed in memory and deleted the moment the response is sent. Nothing
+is written to disk, there is no account, and no file content is logged or
+stored. The Excel report (behind a single-use download link) and the data
+behind the Annotated Source view are held for five minutes and then
+deleted. Anonymous usage statistics record only aggregates (template,
+finding counts, file format and size, browser OS family, a daily-rotating
+visitor hash) — never file content, file names or your IP.
+
+If uploading to any third-party service is off the table — which for many
+compliance departments it is — use the desktop app instead. It runs the
+identical validation engine locally: no upload, no rate limit, no file-size
+ceiling, and nothing leaves your machine except an optional GLEIF/OpenFIGI
+lookup you switch on yourself.
+
+---
+
+## 4. Profiles explained
 
 A "profile" is a regulatory dimension that decides which fields are
 mandatory in a file. Selecting a profile in the UI tells the validator
@@ -112,17 +170,17 @@ you don't yet know which regulatory regime your file is meant for.
 
 ---
 
-## 4. What gets validated
+## 5. What gets validated
 
 The validator categorises every check into one of five buckets.
 
-### 4.1 Presence (mandatory completeness)
+### 5.1 Presence (mandatory completeness)
 
 For each field marked **M** in the selected profile's column, the
 validator checks the cell is non-blank. Missing mandatory values are
 reported as **ERROR**.
 
-### 4.2 Format
+### 5.2 Format
 
 Every field is validated against the format declared in the spec:
 
@@ -136,7 +194,7 @@ Every field is validated against the format declared in the spec:
 
 Format violations are reported as **ERROR**.
 
-### 4.3 Codification (closed lists & checksums)
+### 5.3 Codification (closed lists & checksums)
 
 - **ISIN** — 12-character format + Luhn checksum. The spec's
   type-of-code companion field controls when the ISIN check applies
@@ -152,7 +210,7 @@ Format violations are reported as **ERROR**.
 
 Closed-list violations are reported as **ERROR**.
 
-### 4.4 Cross-field consistency (TPT only)
+### 5.4 Cross-field consistency (TPT only)
 
 TPT carries ~25 hand-written cross-field rules. The most important ones:
 
@@ -189,7 +247,7 @@ TPT carries ~25 hand-written cross-field rules. The most important ones:
 Cross-field violations are reported as **ERROR** unless the spec
 designates the rule as a warning.
 
-### 4.5 Conditional presence (all templates)
+### 5.5 Conditional presence (all templates)
 
 Spec-driven "if field X has value Y then field Z is mandatory". The
 trigger is read from the spec's qualifier text on the field (or, for
@@ -201,14 +259,14 @@ spec rows; EPT carries the same shape.
 
 ---
 
-## 5. What is *not* validated
+## 6. What is *not* validated
 
 The validator deliberately stops short of enforcing regulatory logic
 that requires a subject-matter expert to maintain. The following are
 **not** checked, even when the file looks "wrong" against a regulator's
 own guidance:
 
-### 5.1 EET regulatory cross-checks (deferred)
+### 6.1 EET regulatory cross-checks (deferred)
 
 - SFDR Article 6 / 8 / 9 product-classification consistency across
   fields.
@@ -217,13 +275,13 @@ own guidance:
 - SFDR look-through aggregation (FoF) — *the look-through profile only
   enforces presence of the look-through fields, not the arithmetic*.
 
-### 5.2 EMT regulatory cross-checks (deferred)
+### 6.2 EMT regulatory cross-checks (deferred)
 
 - MiFID II target-market consistency (manufacturer-target-market vs.
   distributor-target-market vs. negative-target-market combinations).
 - IDD-specific target-market overrides.
 
-### 5.3 EPT regulatory cross-checks (deferred)
+### 6.3 EPT regulatory cross-checks (deferred)
 
 - PRIIPs RTS scenarios (favourable / moderate / unfavourable / stress)
   arithmetic and consistency.
@@ -237,7 +295,7 @@ trigger logic. **Do not infer that a clean validator report means a file
 is regulator-ready** — for non-TPT templates, the validator only
 guarantees mechanical conformance.
 
-### 5.4 Out of scope (will not be added)
+### 6.4 Out of scope (will not be added)
 
 - **PDF rendering** — the validator does not parse PRIIPs KID PDFs
   produced from the EPT.
@@ -248,9 +306,9 @@ guarantees mechanical conformance.
 
 ---
 
-## 6. Severity levels and quality scoring
+## 7. Severity levels and quality scoring
 
-### 6.1 Severity
+### 7.1 Severity
 
 | Level   | When you'll see it |
 |---------|--------------------|
@@ -258,7 +316,7 @@ guarantees mechanical conformance.
 | **WARNING** | Spec violation that is recoverable on the receiving side, or a soft-fail rule (e.g. weight sum just outside tolerance). |
 | **INFO**    | Diagnostic information — typically from external validation (GLEIF/OpenFIGI service unreachable) or an unusual-but-legal value. |
 
-### 6.2 Quality score
+### 7.2 Quality score
 
 The overall percentage is a weighted average of five sub-scores:
 
@@ -280,7 +338,7 @@ typically scores in the high 90s — most of the score reflects the
 
 ---
 
-## 7. External validation: GLEIF and OpenFIGI
+## 8. External validation: GLEIF and OpenFIGI
 
 This is an **optional** second pass that runs after local validation.
 It cross-checks identifiers in the file against authoritative external
@@ -292,7 +350,7 @@ registries:
   confirm ISIN existence and (optionally) cross-check currency and CIC
   consistency.
 
-### 7.1 What gets checked
+### 8.1 What gets checked
 
 Per LEI in the file:
 
@@ -318,7 +376,7 @@ Per ISIN in the file:
   vs. OpenFIGI security type. Mismatch → **WARNING**
   (`ISIN-LIVE-CIC`).
 
-### 7.2 When it runs
+### 8.2 When it runs
 
 External validation runs only if you (a) enable it for the session in
 the UI, and (b) — in the web UI — the operator has flipped on the
@@ -328,7 +386,12 @@ phase, can be cancelled, and emits a single **INFO** finding if the
 service is unreachable rather than flooding the report with per-row
 failures.
 
-### 7.3 Identifier sources
+The public instance at <https://www.findatex-validator.eu> has the
+server-wide switch enabled, so there the per-run toggle alone decides
+whether the external phase runs. Self-hosted instances start with it off
+(see §8.8).
+
+### 8.3 Identifier sources
 
 The validator reads identifiers from the columns the spec assigns to
 them, per template and version:
@@ -346,7 +409,7 @@ them, per template and version:
   (`"1"` = ISIN, `"9"` = LEI in practice). Field 11 (manufacturer LEI)
   is alphanum-only.
 
-### 7.4 Caching
+### 8.4 Caching
 
 Results are cached per identifier on disk:
 
@@ -361,7 +424,7 @@ Results are cached per identifier on disk:
 This means re-running a validation on the same file the next morning
 is essentially free for previously-seen identifiers.
 
-### 7.5 Failure modes
+### 8.5 Failure modes
 
 - **Service unreachable / all retries exhausted** → one **INFO** finding
   (`EXTERNAL/SERVICE_UNREACHABLE`) and a status banner. The local
@@ -372,7 +435,7 @@ is essentially free for previously-seen identifiers.
   This is a deliberate trade-off — flooding the report with timeout
   noise is worse than missing a single data point.
 
-### 7.6 Credentials
+### 8.6 Credentials
 
 - **GLEIF** — no key required; rate-limited at the public API tier.
 - **OpenFIGI** — works key-less at 4 requests/second; with an
@@ -384,7 +447,7 @@ is essentially free for previously-seen identifiers.
     or per-request via the UI form (the per-request key is used only
     for that validation and never stored).
 
-### 7.7 Proxy modes
+### 8.7 Proxy modes
 
 Many corporate networks force outbound HTTPS through an authenticated
 proxy. The desktop app supports three modes:
@@ -398,7 +461,7 @@ proxy. The desktop app supports three modes:
 The web app exposes the same modes via the
 `FINDATEX_WEB_EXTERNAL_PROXY_*` env vars.
 
-### 7.8 Web-mode default
+### 8.8 Web-mode default
 
 In the web UI the external pipeline is **off by default**. The operator
 must opt in by setting `FINDATEX_WEB_EXTERNAL_ENABLED=true` (and likely
@@ -408,7 +471,7 @@ accidentally hammering GLEIF / OpenFIGI on every upload.
 
 ---
 
-## 8. Reading the Excel report
+## 9. Reading the Excel report
 
 The exported `.xlsx` has six sheets:
 
@@ -421,22 +484,24 @@ The exported `.xlsx` has six sheets:
 | **Per Position**     | Per-row roll-up: Errors / Warnings / Status (PASS / WARN / FAIL). Easy way to find the worst rows in a large file. |
 | **Annotated Source** | The original file content, mirrored cell-for-cell. Cells with findings are tinted by severity (red / amber / blue) and carry an Excel comment with the matching findings. The leftmost helper column is labelled **Row**. |
 
-If the source file can't be re-read (deleted, moved, or never persisted —
-e.g. a streaming web upload), the Annotated Source sheet contains the
-note "Original file no longer available — see the Findings tab for
-details."
+If the source file can't be re-read (deleted or moved since the run), the
+Annotated Source sheet contains the note "Original file no longer
+available — see the Findings tab for details."
 
-The desktop app shows the same grid without exporting: the **Annotated
-Source** tab next to *Findings* mirrors the file with identical tinting,
-the findings appear as a tooltip instead of an Excel comment, and two
+Both apps show the same grid without exporting: the **Annotated Source**
+tab next to *Findings* mirrors the file with identical tinting, the
+findings appear as a tooltip instead of an Excel comment, and two
 checkboxes hide rows or columns that carry no finding. Double-click a
 finding (or use *Show in annotated source* in its context menu) to jump
-straight to the offending cell. In batch mode the grid follows the file
-selected in the *Files* table.
+straight to the offending cell. On the desktop, in batch mode the grid
+follows the file selected in the *Files* table. In the web app the grid is
+kept for 5 minutes like the report and then deleted; for very large files
+the in-browser view is skipped and the Excel sheet of the same name is the
+place to look.
 
 ---
 
-## 9. Sample files
+## 10. Sample files
 
 The repo ships per-template scenario fixtures under `samples/`:
 
@@ -462,7 +527,40 @@ python3 tools/build_eet_samples.py    # also _emt_, _ept_
 
 ---
 
-## 10. FAQ
+## 11. FAQ
+
+**Do I need an account?**
+No. There is no sign-up, no login and no e-mail address required. Pick a
+template, drop a file, get the result.
+
+**Is my file stored anywhere?**
+No. The upload is processed in memory and discarded as soon as the
+response is sent; the Excel report is deleted after the first download
+or five minutes, whichever comes first. No file content is logged.
+
+**What does it cost?**
+Nothing. It is a free, open-source project under the Apache 2.0 licence;
+the full source is on GitHub.
+
+**Which file formats can I upload?**
+Excel (.xlsx, .xlsm) and CSV, up to 25 MB. The sheet is matched against
+the spec by its field numbers, so column order does not have to be
+exact.
+
+**Can I validate confidential fund data?**
+Use the desktop app for that. It runs the same validation engine
+entirely on your machine, with no upload and no network access unless
+you enable the optional GLEIF/OpenFIGI lookups.
+
+**Does a score of 100 mean my file is accepted?**
+No. It means the checks implemented here found no errors. Counterparties
+apply their own additional rules, and this tool does not implement
+regulatory interpretation. Treat it as a first pass, not as a substitute
+for your recipient's validation.
+
+**Can I run it in-house?**
+Yes. The web app ships as a Docker image and the desktop app as a native
+installer for Windows, macOS and Linux. Both are on GitHub.
 
 **Why is field X reported as missing when I provided a value?**
 A blank-looking cell often contains whitespace, a stray apostrophe-only
@@ -503,7 +601,7 @@ not block a clean local validation.
 **Why doesn't the web app validate SFDR cross-field logic?**
 Because that logic is a moving target maintained by regulators, not
 FinDatEx. We refused to invent it without an SME on the hook. See
-section 5 for the explicit deferred list.
+section 6 for the explicit deferred list.
 
 **Where do I get help?**
 - Issues with the data file → check the Annotated Source sheet first;

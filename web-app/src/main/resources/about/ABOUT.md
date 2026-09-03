@@ -10,6 +10,13 @@ codification, and cross-field rules. Uploads are processed in memory and
 deleted immediately after the response; reports are available for 5 minutes
 via a single-use URL.
 
+## Run it in-house
+
+Yes, you can. The web app ships as a Docker image
+(`ghcr.io/karlkauc/findatex-validator-web`) and the desktop app as a native
+installer for Windows, macOS and Linux on the GitHub Releases page. Both are
+on GitHub: <https://github.com/karlkauc/findatex-validator>.
+
 ---
 
 ## Author

@@ -2,8 +2,6 @@ package com.findatex.validator.web.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.findatex.validator.template.api.TemplateDefinition;
-import com.findatex.validator.template.api.TemplateRegistry;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,6 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Keeps the SEO metadata internally consistent. Four files have to agree on the
  * same facts, and nothing at runtime notices when they stop agreeing — a wrong
  * canonical host or a stale CSP hash fails silently, in the crawler, weeks later.
+ *
+ * <p>{@code index.html} carries metadata only; the crawlable copy (templates,
+ * privacy, FAQ) lives in {@code HELP.md} and is served at {@code /help} —
+ * see {@link HelpPageTest} for the checks on that content.
  *
  * <p>Plain JUnit on the source files (no Quarkus boot): what matters is what is
  * committed, and the frontend sources are what Vite ships verbatim.
@@ -71,46 +73,13 @@ class SeoMetadataTest {
     }
 
     @Test
-    void everyFaqAnswerInTheMarkupIsAlsoVisibleOnThePage() throws IOException {
-        // Google requires FAQPage answers to be present in the rendered page;
-        // markup-only answers are a structured-data violation, not a shortcut.
-        String html = read(INDEX_HTML);
-        JsonNode faq = graphNode(html, "FAQPage");
-        String body = visibleText(html);
-
-        JsonNode questions = faq.path("mainEntity");
-        assertThat(questions).as("FAQ entries").isNotEmpty();
-        for (JsonNode q : questions) {
-            assertThat(body)
-                    .as("question rendered on the page: " + q.path("name").asText())
-                    .contains(q.path("name").asText());
-            assertThat(body)
-                    .as("answer rendered on the page for: " + q.path("name").asText())
-                    .contains(q.path("acceptedAnswer").path("text").asText());
-        }
-    }
-
-    @Test
-    void thePageCopyNamesTheCurrentSpecVersionOfEveryTemplate() throws IOException {
-        // A new template version that nobody mentions in the copy is a silent
-        // content regression: the page keeps advertising the superseded one.
-        TemplateRegistry.init();
-        String body = visibleText(read(INDEX_HTML));
-
-        for (TemplateDefinition def : TemplateRegistry.all()) {
-            assertThat(body)
-                    .as("latest %s version named in the landing copy", def.id())
-                    .contains(def.latest().version());
-        }
-    }
-
-    @Test
     void theCspAllowListsExactlyTheInlineJsonLdThatIsShipped() throws IOException {
         String expected = "'sha256-" + sha256Base64(jsonLdBlock(read(INDEX_HTML))) + "'";
 
         // If this fails, the JSON-LD block was edited without updating the hash:
         // browsers then drop the structured data with a CSP violation. Copy the
-        // expected value from the failure message into script-src.
+        // expected value from the failure message into script-src (it carries a
+        // second hash for the FAQ block served on /help — see HelpPageTest).
         assertThat(read(PROPERTIES))
                 .as("script-src hash in application.properties must match index.html's JSON-LD")
                 .contains(expected);
@@ -139,21 +108,6 @@ class SeoMetadataTest {
             if (type.equals(node.path("@type").asText())) return node;
         }
         throw new AssertionError("No @graph node of type " + type + " in the JSON-LD block");
-    }
-
-    /**
-     * Body text with tags, entities and the head stripped — an approximation of
-     * what a reader (and a crawler that does not run JavaScript) sees.
-     */
-    private static String visibleText(String html) {
-        String body = html.substring(html.indexOf("<body"));
-        String text = body.replaceAll("(?s)<!--.*?-->", " ")
-                .replaceAll("(?s)<script.*?</script>", " ")
-                .replaceAll("<[^>]+>", " ")
-                .replace("&nbsp;", " ")
-                .replace("&amp;", "&")
-                .replace("&quot;", "\"");
-        return text.replaceAll("\\s+", " ").trim();
     }
 
     private static String jsonLdBlock(String html) {

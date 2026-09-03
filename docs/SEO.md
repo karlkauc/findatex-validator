@@ -1,9 +1,10 @@
 # Findability — SEO, link previews and traffic measurement
 
 What is in place, what it depends on, and what still has to be done by hand.
-The web app is a single-page app with no login and one public URL, so almost
-everything here is a property of `index.html`, a static file, or one config
-value — there is no CMS to configure.
+The web app is a single-page app with no login, plus two families of
+server-rendered pages (`/help` and `/rules…`), so almost everything here is a
+property of `index.html`, `HELP.md`, a static file, or one config value —
+there is no CMS to configure.
 
 ## The canonical host
 
@@ -33,10 +34,18 @@ which answered every unmatched path with 200 + the SPA shell; that resource now
 returns a real 404 for file-like paths, and must keep doing so — otherwise
 every stale asset URL becomes a soft-404 "page" with identical content.
 
-`sitemap.xml` is **generated** by `SitemapResource`: the app, `/rules`, one
-entry per template version and one per documented field — ~2000 URLs that
-change with every spec version. Never re-add a static `sitemap.xml`: a file of
+`sitemap.xml` is **generated** by `SitemapResource`: the app, `/help`,
+`/rules`, one entry per template version and one per documented field — ~2000
+URLs that change with every spec version. Never re-add a static `sitemap.xml`: a file of
 that name is served by the static-resource handler and wins over the resource.
+
+## The help page (`/help`)
+
+`HelpPageResource` renders the bundled `core/src/main/resources/help/HELP.md`
+through the same `RulesPageRenderer` shell as the rule pages: own `<title>`,
+description and canonical, the shared header bar (Help · Rules · Validate a
+file), no React bundle. It is the crawlable home of the landing copy — see
+"Page content" below — and carries the `FAQPage` structured data.
 
 ## The rule reference (`/rules`)
 
@@ -45,6 +54,7 @@ server-rendered HTML:
 
 | URL | Content |
 |---|---|
+| `/help` | the help document: what the tool does, templates and versions, what happens to your file, profiles, scoring, external validation, FAQ |
 | `/rules` | index of the eight documented template versions |
 | `/rules/{slug}` | one template version: scoring, profiles, general and cross-field rules, plus links to every field |
 | `/rules/{slug}/field/{num}` | one field: definition, flag per profile, codification, every rule that can fire on it |
@@ -72,33 +82,42 @@ without it they would just be documentation.
 This is what LinkedIn, Teams and Slack render, which for a B2B tool is where
 most links are actually shared.
 
-## Structured data and the CSP hash
+## Structured data and the CSP hashes
 
-`index.html` carries one inline `<script type="application/ld+json">`: a
-`@graph` with a schema.org `SoftwareApplication` object and a `FAQPage`. Search
-engines only read JSON-LD inline, and `script-src` is strict `'self'` with no
-`'unsafe-inline'` — so the block is allow-listed by a **`sha256-` hash** in
-`application.properties`.
+There are two inline `<script type="application/ld+json">` blocks, and
+`script-src` carries one **`sha256-` hash** for each in `application.properties`
+— search engines only read JSON-LD inline, and `script-src` is strict `'self'`
+with no `'unsafe-inline'`:
 
-The FAQ answers in the markup must stay identical to the ones rendered in the
-page body — Google treats markup-only answers as a structured-data violation.
-`SeoMetadataTest` compares the two.
+| Block | Where it lives | Guarded by |
+|---|---|---|
+| `@graph` with the schema.org `SoftwareApplication` | `index.html` (static, in `<head>`) | `SeoMetadataTest` — recomputes the hash from the file and compares it with the properties text |
+| `FAQPage` | `HelpPageResource.FAQ_JSON_LD`, emitted byte-for-byte on `/help` | `HelpPageTest` — recomputes the hash from the served page and compares it with the `Content-Security-Policy` **response header** |
 
-**Editing one character of that block — whitespace included — invalidates the
-hash and browsers silently drop the structured data.** `SeoMetadataTest`
-recomputes it and prints the correct value in the failure message.
+The FAQ answers in the markup must stay identical to the ones rendered on
+`/help` from `HELP.md` — Google treats markup-only answers as a structured-data
+violation. `HelpPageTest` compares the two, so an edited FAQ answer in `HELP.md`
+fails until the constant is updated (and its hash with it).
+
+**Editing one character of either block — whitespace included — invalidates
+its hash and browsers silently drop the structured data.** Each test prints the
+correct value in its failure message.
 
 ## Page content
 
-The landing copy — what the templates are, what happens to an uploaded file,
-how the score is computed, the FAQ, and the "not an official FinDatEx tool"
-disclaimer — lives as **plain HTML in `index.html`**, below `<div id="root">`,
-not as a React component. It is then part of the initial payload: indexable
-without JavaScript execution and readable before the bundle boots. Tailwind
-compiles the classes used there (`tailwind.config.js` lists `./index.html`).
+The landing copy — what the tool does, what the templates are, what happens to
+an uploaded file, how the score is computed, the FAQ — lives in **`HELP.md`**
+(`core/src/main/resources/help/`), the single source for the desktop Help
+dialog, the web Help modal and the crawlable `/help` page. `index.html`
+carries metadata only (title, description, canonical, OG/Twitter tags, the
+`SoftwareApplication` JSON-LD); there is no static copy below `<div id="root">`
+any more. Links in `HELP.md` must be absolute (`https://www.findatex-validator.eu/rules`),
+because the desktop dialog opens them through `SafeLinkOpener`.
 
-`SeoMetadataTest` asserts that the latest version of every template is named in
-that copy, so adding a spec version fails the build until the page mentions it.
+`HelpPageTest` asserts that the latest version of every template is named on
+`/help`, so adding a spec version fails the build until the help mentions it.
+The "not an official FinDatEx tool" disclaimer is in the footer that
+`RulesPageRenderer` puts under every server-rendered page.
 
 ## Measuring whether any of it works
 
@@ -129,7 +148,11 @@ Needed to submit the sitemap and to see which queries the site appears for.
    both of those would have to be redeployed with the container, and the
    HTML-file method now correctly 404s for unknown file paths.
 3. After verification: *Sitemaps* → submit `sitemap.xml`.
-4. Bing Webmaster Tools can import the verified Google property in one click.
+4. *URL inspection* → enter `https://www.findatex-validator.eu/help` →
+   **Request indexing**. The help page is new and linked only from the app
+   footer and the rule pages; asking explicitly is faster than waiting for the
+   next sitemap crawl.
+5. Bing Webmaster Tools can import the verified Google property in one click.
 
 ### After the first deploy
 
@@ -139,10 +162,13 @@ Worth checking once, because all of it fails silently:
 - `curl -s https://www.findatex-validator.eu/robots.txt` → plain text, not HTML.
 - `curl -s https://www.findatex-validator.eu/sitemap.xml | grep -c '<url>'` →
   ~2000, with `https://www.findatex-validator.eu` as the host of every `<loc>`.
+- `curl -s https://www.findatex-validator.eu/help | grep -c '<h2'` → ~11 (one
+  per help section) — the page is real content, not the SPA shell.
 - `https://www.findatex-validator.eu/rules/tpt-v8-0/field/26` renders with
   JavaScript disabled.
 - Paste the URL into the LinkedIn Post Inspector — the card must show the image.
-- Browser console on the live site: no CSP violation for the JSON-LD block.
+- Browser console on the live site and on `/help`: no CSP violation for
+  either JSON-LD block.
 - `python3 tools/usage_report.py --days 7` → the **Traffic** section counts up.
 
 ## Open

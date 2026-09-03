@@ -209,6 +209,11 @@ REST endpoints (all under `/api`):
 - `GET  /api/templates` — TemplateInfo[] (id, displayName, versions[], profiles[])
 - `POST /api/validate`  — multipart (templateId, templateVersion, profiles[], file) → ValidationResponse JSON
 - `GET  /api/report/{uuid}` — streams the XLSX once, then evicts the temp file
+- `GET  /api/annotated-source/{uuid}` — gzip JSON of the original grid + the
+  finding→cell join (`core/.../report/AnnotatedSourceJson`, same uuid as the
+  report); repeatable until the report TTL, survives the XLSX download.
+  Absent (404, `annotatedSourceAvailable=false` in the validate response) when
+  the file exceeds `FINDATEX_WEB_ANNOTATED_SOURCE_MAX_ROWS` / `_MAX_CELLS`
 - `GET  /api/feedback-config` — `{githubRepo}` (null when unset); drives the
   "Report a false positive" action
 - `POST /api/newsletter/subscribe` — `{email}` → `{status}`; `GET
@@ -230,9 +235,11 @@ REST endpoints (all under `/api`):
 
 Outside `/api` the web layer also serves **server-rendered HTML pages**:
 `GET /rules`, `/rules/{slug}` and `/rules/{slug}/field/{num}`
-(`RulesPageResource` + `RuleDocs` + `RulesPageRenderer`), plus the generated
-`GET /sitemap.xml` (`SitemapResource`). These deliberately carry no React
-bundle — see the SEO block below.
+(`RulesPageResource` + `RuleDocs` + `RulesPageRenderer`), `GET /help`
+(`HelpPageResource` — the bundled `HELP.md` through the same renderer, plus the
+FAQ JSON-LD as a second CSP-hashed inline block; `HelpPageTest`), plus the
+generated `GET /sitemap.xml` (`SitemapResource`). These deliberately carry no
+React bundle — see the SEO block below.
 
 **SEO / link previews** — four files must agree on one canonical host
 (`www.findatex-validator.eu`): the `<link rel="canonical">`, OG and JSON-LD tags
@@ -248,10 +255,13 @@ they drift. Two traps: the inline JSON-LD is allow-listed in CSP by a
 `SpaFallbackResource` must keep 404-ing file-like paths, otherwise every
 unmatched `*.txt`/`*.xml`/`*.js` URL becomes a soft-404 serving the SPA shell.
 The link-preview card is generated (`tools/generate_og_image.py`), never
-hand-edited. The landing copy (what the templates are, privacy, scoring, FAQ,
-disclaimer) is plain HTML **in `index.html` below `<div id="root">`**, not a
-React component, so it ships in the initial payload; `SeoMetadataTest` also
-asserts it names the latest version of every template.
+hand-edited. `index.html` carries **metadata only** — the former landing copy
+(what the templates are, privacy, scoring, FAQ) lives in `HELP.md`, which is
+one source for the desktop Help dialog, the web Help modal and the crawlable
+`/help` page; `HelpPageTest` asserts that page names the latest version of
+every template and that every FAQ answer in its JSON-LD is visible text. Two
+inline JSON-LD blocks, two `sha256-` entries in `script-src`: the
+SoftwareApplication node in `index.html` and `HelpPageResource.FAQ_JSON_LD`.
 
 **The rule reference is public** — `/rules`, `/rules/{slug}`,
 `/rules/{slug}/field/{num}`. `RuleDocs` splits the generated Markdown on the
@@ -268,11 +278,16 @@ steps: `docs/SEO.md`.
 2. **Concurrency cap** (`Semaphore`, default 4 in flight) — overflow → HTTP 429.
 3. **Body size limit** (`quarkus.http.limits.max-body-size=25M`) → HTTP 413.
 4. **Auto-delete uploads + reports** (Quarkus deletes upload tempfiles on
-   request end; `ReportStore` evicts XLSX after first download or 5-min TTL).
+   request end; `ReportStore` evicts XLSX after first download or 5-min TTL.
+   The annotated-source JSON sits in a sibling cache under the same uuid:
+   readable repeatedly, deleted at TTL — the XLSX `take()` never touches it).
 
 External validation (GLEIF/OpenFIGI) is **off by default in the web layer**.
 Operators flip it on via `FINDATEX_WEB_EXTERNAL_ENABLED=true` and provide
-keys/proxy creds via env. With the operator switch on, `TemplateResource`
+keys/proxy creds via env. The public Cloud Run instance has it **on** (the
+deploy workflow sets the flag and mounts `findatex-openfigi-key` from Secret
+Manager — a manual prerequisite, see `docs/DEPLOY_CLOUDRUN.md`); the per-run
+checkbox still defaults to off. With the operator switch on, `TemplateResource`
 surfaces `externalAvailable=true` for every template that declares an
 `ExternalValidationConfig` (currently all four), and `ValidationOrchestrator`
 runs the GLEIF/OpenFIGI pipeline through that config when the per-request
@@ -357,6 +372,20 @@ with the web layer) POSTs to `POST /api/newsletter/subscribe`; the web
 `GET /api/newsletter-config`). Strict per-IP rate limit (anti e-mail-bombing).
 Desktop endpoint URL: Settings → Newsletter (`AppSettings.Newsletter`). Full
 setup, GDPR/DPA notes and the EmailOctopus variant in `docs/NEWSLETTER.md`.
+
+**Web UI shell (React)** — `App.tsx` renders `SidebarLayout`: a 320 px input
+column (Input card + Notes) that collapses into a slim rail, results taking the
+rest of the viewport (no max-width). Scores, Per Fund and Notes are
+`CollapsibleSection`s; every open/closed state persists via
+`lib/usePersistedState.ts` (`findatex.ui.*` in localStorage, try/catch —
+never a hard dependency). `ResultPanel` (keyed by `reportId`) holds a
+`TabStrip` *Findings* | *Annotated Source*; `AnnotatedSourceView` fetches
+`/api/annotated-source/{id}` lazily on first activation and renders the grid
+without virtualisation (defaults: only rows with findings, 200-row pages),
+`lib/annotatedSource.ts` mirrors core's `describe()` / column letters.
+`FindingsTable`'s `onShowInSource(findingIndex)` (Source button / row
+double-click) jumps to the cell — the index refers to `findings` as delivered,
+which is why the response's finding order must stay the report's order.
 
 The React frontend lives in `web-app/src/main/frontend/`. Vite writes the
 production bundle into `web-app/target/classes/META-INF/resources/`, which

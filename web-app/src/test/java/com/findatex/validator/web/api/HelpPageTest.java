@@ -57,6 +57,15 @@ class HelpPageTest {
     }
 
     @Test
+    void hardWrappedParagraphsFlowInsteadOfBreakingPerSourceLine() {
+        // HELP.md is wrapped at editor width; the rule pages' "<br />" softbreak
+        // would chop every paragraph into ragged lines here.
+        String html = given().when().get("/help").then().statusCode(200).extract().asString();
+        assertThat(html).contains("what the FinDatEx Validator does, what it\ndoes not do");
+        assertThat(html).doesNotContain("what it<br />");
+    }
+
+    @Test
     void theHelpPageLinksTheRuleReference() {
         given().when().get("/help")
                 .then().statusCode(200)

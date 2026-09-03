@@ -55,6 +55,16 @@ public final class XlsxReportWriter {
     }
 
     public void write(QualityReport report, Path out) throws IOException {
+        write(report, out, null);
+    }
+
+    /**
+     * @param annotatedSource an {@link AnnotatedSourceModel} already built for {@code report},
+     *                        or {@code null} to build it here. Lets a caller that also needs the
+     *                        model (web JSON side artifact) avoid re-reading the source twice.
+     */
+    public void write(QualityReport report, Path out, AnnotatedSourceModel annotatedSource)
+            throws IOException {
         // Atomic write: populate the workbook in memory, stream to a sibling .tmp file, then
         // rename to the final path. Guarantees the user never sees a 0-byte or partial file at
         // {out} — either the previous version stays put on failure, or the new file appears
@@ -85,7 +95,7 @@ public final class XlsxReportWriter {
             writeFindings(wb, report, header, err, warn);
             writeFieldCoverage(wb, report, header);
             writePerPosition(wb, report, header, ok, warn, err);
-            writeAnnotatedSource(wb, report, header, err, warn, info);
+            writeAnnotatedSource(wb, report, annotatedSource, header, err, warn, info);
 
             try (OutputStream os = Files.newOutputStream(tmp)) {
                 wb.write(os);
@@ -445,9 +455,10 @@ public final class XlsxReportWriter {
     }
 
     private static void writeAnnotatedSource(Workbook wb, QualityReport r,
+                                             AnnotatedSourceModel prebuiltOrNull,
                                              CellStyle headerStyle,
                                              CellStyle err, CellStyle warn, CellStyle info) {
         Sheet s = wb.createSheet("Annotated Source");
-        AnnotatedSourceSheetWriter.write(s, r, headerStyle, err, warn, info);
+        AnnotatedSourceSheetWriter.write(s, r, prebuiltOrNull, headerStyle, err, warn, info);
     }
 }

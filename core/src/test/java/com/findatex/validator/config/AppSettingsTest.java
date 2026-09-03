@@ -87,4 +87,30 @@ class AppSettingsTest {
         assertThat(s.withUsageStatsEnabled(false).newsletter().endpointUrl())
                 .isEqualTo("https://validator.example.org");
     }
+
+    @Test
+    void usageStatsDefaultsToPublicIngestEndpoint() {
+        assertThat(AppSettings.defaults().usageStats().endpointUrl())
+                .isEqualTo(AppSettings.UsageStats.DEFAULT_ENDPOINT);
+        assertThat(AppSettings.UsageStats.DEFAULT_ENDPOINT)
+                .isEqualTo("https://www.findatex-validator.eu/api/usage-stats");
+    }
+
+    @Test
+    void blankUsageStatsEndpointFromOldSettingsFileFallsBackToDefault() {
+        // Every settings.json written before the default existed carries "" here
+        // (the UI never exposed the field), so blank must not mean "disabled".
+        assertThat(new AppSettings.UsageStats(true, "id", "").endpointUrl())
+                .isEqualTo(AppSettings.UsageStats.DEFAULT_ENDPOINT);
+        assertThat(new AppSettings.UsageStats(true, "id", null).endpointUrl())
+                .isEqualTo(AppSettings.UsageStats.DEFAULT_ENDPOINT);
+        assertThat(new AppSettings.UsageStats(true, "id", "   ").endpointUrl())
+                .isEqualTo(AppSettings.UsageStats.DEFAULT_ENDPOINT);
+    }
+
+    @Test
+    void explicitUsageStatsEndpointIsPreserved() {
+        assertThat(new AppSettings.UsageStats(true, "id", "http://localhost:18082/api/usage-stats").endpointUrl())
+                .isEqualTo("http://localhost:18082/api/usage-stats");
+    }
 }

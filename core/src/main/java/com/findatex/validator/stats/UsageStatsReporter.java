@@ -1,6 +1,7 @@
 package com.findatex.validator.stats;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.findatex.validator.AppInfo;
 import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.config.SettingsService;
 import com.findatex.validator.external.http.HttpExecutor;
@@ -58,17 +59,27 @@ public final class UsageStatsReporter {
         if (local == null) {
             synchronized (UsageStatsReporter.class) {
                 if (instance == null) {
-                    String token = System.getenv("FINDATEX_USAGE_TOKEN");
                     instance = new UsageStatsReporter(
                             new HttpExecutor(new RateLimiter(5, 5)),
                             () -> SettingsService.getInstance().getCurrent().usageStats(),
-                            token == null ? "" : token,
+                            resolveToken(System.getenv("FINDATEX_USAGE_TOKEN"), AppInfo.usageToken()),
                             QUEUE_CAPACITY);
                 }
                 local = instance;
             }
         }
         return local;
+    }
+
+    /**
+     * Runtime env var wins (operator override / local testing), otherwise the
+     * token embedded into the build ({@link AppInfo#usageToken()}); blank when
+     * neither is set, which keeps {@link #report} a no-op.
+     */
+    static String resolveToken(String fromEnv, String embedded) {
+        if (fromEnv != null && !fromEnv.isBlank()) return fromEnv.trim();
+        if (embedded != null && !embedded.isBlank()) return embedded.trim();
+        return "";
     }
 
     /** Non-blocking: validates the gate, serialises, and enqueues. Never throws. */

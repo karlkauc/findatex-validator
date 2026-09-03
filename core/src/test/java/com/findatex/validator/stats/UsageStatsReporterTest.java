@@ -53,11 +53,20 @@ class UsageStatsReporterTest {
     }
 
     @Test
-    void blankEndpointShortCircuits() {
-        UsageStatsReporter r = reporter(
-                () -> new AppSettings.UsageStats(true, "id", ""),
-                10);
-        assertThatCode(() -> r.report(sampleEvent())).doesNotThrowAnyException();
+    void environmentTokenWinsOverEmbeddedToken() {
+        assertThat(UsageStatsReporter.resolveToken("from-env", "from-build")).isEqualTo("from-env");
+    }
+
+    @Test
+    void embeddedTokenIsUsedWhenEnvironmentIsUnset() {
+        assertThat(UsageStatsReporter.resolveToken(null, "from-build")).isEqualTo("from-build");
+        assertThat(UsageStatsReporter.resolveToken("  ", "from-build")).isEqualTo("from-build");
+    }
+
+    @Test
+    void noTokenAnywhereResolvesToBlank() {
+        assertThat(UsageStatsReporter.resolveToken(null, null)).isEmpty();
+        assertThat(UsageStatsReporter.resolveToken("", "")).isEmpty();
     }
 
     @Test

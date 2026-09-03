@@ -181,6 +181,16 @@ await moveTo(group, 8);
 await click();
 await hold(400);
 const source = page.getByRole('button', { name: 'Source' }).first();
+// The flat table is wider than the grouped one: slide its scroll container to
+// the end again so the Source column is on screen before clicking.
+for (let i = 1; i <= 6; i++) {
+  await source.evaluate((el, p) => {
+    let c = el.parentElement;
+    while (c && c.scrollWidth <= c.clientWidth + 1) c = c.parentElement;
+    if (c) c.scrollLeft = (c.scrollWidth - c.clientWidth) * p;
+  }, i / 6);
+  await frame(50);
+}
 highlight = source;
 await moveTo(source, 8);
 await hold(600);

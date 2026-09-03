@@ -5,6 +5,8 @@ import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.external.ExternalValidationService;
 import com.findatex.validator.ingest.TptFileLoader;
+import com.findatex.validator.report.AnnotatedSourceJson;
+import com.findatex.validator.report.AnnotatedSourceModel;
 import com.findatex.validator.report.QualityReport;
 import com.findatex.validator.report.QualityScorer;
 import com.findatex.validator.report.ScoreCategory;
@@ -260,6 +262,12 @@ public class ValidationOrchestrator {
 
         QualityReport report = new QualityScorer(bundle.catalog).score(file, gatedProfiles, findings);
 
+        // The annotated-source model is shared by the XLSX sheet and the JSON side artifact
+        // for the SPA, so it is built once here (or not at all when the grid is over the cap
+        // — the XLSX writer then builds its own for the sheet). Best-effort: a failure here
+        // degrades to "no in-browser view", never to a failed validation.
+        AnnotatedSourceModel annotatedModel = buildAnnotatedModel(file, report);
+
         Path xlsxPath;
         try {
             xlsxPath = createOwnerOnlyTempFile("findatex-report-", ".xlsx");
@@ -267,13 +275,17 @@ public class ValidationOrchestrator {
                     bundle.profileSet,
                     version,
                     com.findatex.validator.report.GenerationUi.WEB)
-                    .write(report, xlsxPath);
+                    .write(report, xlsxPath, annotatedModel);
         } catch (IOException e) {
             log.error("Could not write report tempfile", e);
             throw new WebApplicationException(
                     Response.serverError().entity("Could not write report.").build());
         }
-        UUID reportId = reportStore.store(xlsxPath, templateName, versionName);
+        // The JSON's findingCells index into report.findings() — the very list
+        // assembleResponse() maps 1:1 into ValidationResponse.findings (see there).
+        Path annotatedPath = annotatedModel == null
+                ? null : writeAnnotatedSource(annotatedModel, report.findings());
+        UUID reportId = reportStore.store(xlsxPath, annotatedPath, templateName, versionName);
 
         try {
             boolean ext = externalOptions != null && externalOptions.enabled()
@@ -286,7 +298,53 @@ public class ValidationOrchestrator {
             log.debug("Usage-stats recording skipped: {}", e.toString());
         }
 
-        return assembleResponse(def, version, file, report, findings, reportId);
+        return assembleResponse(def, version, file, report, findings, reportId, annotatedPath != null);
+    }
+
+    /**
+     * Builds the annotated-source join when the upload is within the configured cap;
+     * {@code null} when it is over the cap or the source could not be re-read.
+     */
+    private AnnotatedSourceModel buildAnnotatedModel(TptFile file, QualityReport report) {
+        WebConfig.AnnotatedSource caps = config.annotatedSource();
+        int rows = file.rows().size();
+        int width = file.rawHeaders().size();
+        if (!AnnotatedSourceJson.withinLimits(rows, width, caps.maxRows(), caps.maxCells())) {
+            log.debug("Annotated source skipped: {} rows x {} cols exceeds cap ({} rows / {} cells)",
+                    rows, width, caps.maxRows(), caps.maxCells());
+            return null;
+        }
+        try {
+            return AnnotatedSourceModel.build(report);
+        } catch (IOException | RuntimeException e) {
+            log.warn("Annotated source unavailable for this run: {}", e.toString());
+            return null;
+        }
+    }
+
+    /**
+     * Writes the gzip-JSON side artifact; {@code null} (and no leftover file) on any failure.
+     * The validation result is never failed over this side artifact.
+     */
+    private static Path writeAnnotatedSource(AnnotatedSourceModel model, List<Finding> findings) {
+        Path path = null;
+        try {
+            path = createOwnerOnlyTempFile("findatex-annotated-", ".json.gz");
+            try (java.io.OutputStream out = Files.newOutputStream(path)) {
+                AnnotatedSourceJson.write(model, findings, out);
+            }
+            return path;
+        } catch (IOException | RuntimeException e) {
+            log.warn("Could not write annotated-source tempfile: {}", e.toString());
+            if (path != null) {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException ignored) {
+                    // best-effort; the OS tmp reaper picks up the rest
+                }
+            }
+            return null;
+        }
     }
 
     private static long elapsedMs(long t0) {
@@ -354,7 +412,8 @@ public class ValidationOrchestrator {
                                                 TptFile file,
                                                 QualityReport report,
                                                 List<Finding> findings,
-                                                UUID reportId) {
+                                                UUID reportId,
+                                                boolean annotatedSourceAvailable) {
         long errors = findings.stream().filter(f -> f.severity() == Severity.ERROR).count();
         long warnings = findings.stream().filter(f -> f.severity() == Severity.WARNING).count();
         long infos = findings.stream().filter(f -> f.severity() == Severity.INFO).count();
@@ -385,6 +444,10 @@ public class ValidationOrchestrator {
             perProfile.put(pe.getKey().code(), list);
         }
 
+        // INVARIANT: findingDtos[i] corresponds to findings[i] == report.findings().get(i)
+        // (same list, same order, no filtering). The annotated-source JSON's findingCells
+        // carry indices into report.findings(), and the SPA joins them against
+        // ValidationResponse.findings by position — AnnotatedSourceLifecycleTest checks it.
         List<FindingDto> findingDtos = findings.stream().map(FindingDto::from).toList();
 
         List<PerFundScoreDto> perFund = new ArrayList<>();
@@ -411,7 +474,8 @@ public class ValidationOrchestrator {
                     dtos));
         }
 
-        return new ValidationResponse(summary, scores, perProfile, perFund, findingDtos, reportId.toString());
+        return new ValidationResponse(summary, scores, perProfile, perFund, findingDtos,
+                reportId.toString(), annotatedSourceAvailable);
     }
 
     private static WebApplicationException badRequest(String message) {

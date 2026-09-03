@@ -22,7 +22,7 @@ are stored in the repo or in GitHub Secrets.
 | Auth                  | `--allow-unauthenticated` (public) |
 | Memory / CPU          | 2 GiB / 1 vCPU + CPU-boost         |
 | Concurrency           | 8 per instance                     |
-| Min / max instances   | 1 / 10                             |
+| Min / max instances   | 0 / 10 (scale-to-zero; the first request after idle pays a cold start) |
 | Request timeout       | 300 s                              |
 | External validation   | on (`FINDATEX_WEB_EXTERNAL_ENABLED=true`; OpenFIGI key from Secret Manager `findatex-openfigi-key` — see [External validation](#external-validation-prerequisite-openfigi-secret)). The per-run toggle in the UI still defaults to off. |
 | Canonical host        | `www.findatex-validator.eu` (`FINDATEX_WEB_CANONICAL_HOST`) |
@@ -45,12 +45,13 @@ this deployment. Changing it means updating four places together —
 `index.html`'s `<link rel="canonical">`, `robots.txt`, `sitemap.xml` and this
 variable; `SeoMetadataTest` fails if the first three drift apart.
 
-`min-instances=1` buys away the cold start. At the current traffic level
-requests are far enough apart that nearly every visitor would otherwise be the
-one waiting for a container to come up, looking at a blank page — so this is
-not an edge case, it is the common case. It costs roughly **8–10 EUR/month** in
-idle billing (1 vCPU + 2 GiB held warm); set it back to `0` if that ever
-matters more than the first impression.
+`min-instances=0` (scale-to-zero, since 2026-09-03). A warm instance
+(`min-instances=1`) would buy away the cold start — at the current traffic
+level nearly every visitor is the one waiting for a container to come up — but
+it costs roughly **8–10 EUR/month** in idle billing (1 vCPU + 2 GiB held warm),
+which was judged not worth it. `--cpu-boost` keeps the cold start to a few
+seconds. Set it to `1` again if the first impression ever matters more than
+the idle bill.
 
 `max-instances=10` with `--concurrency=8` is the DoS baseline: one bad actor
 opening 8 slow uploads can pin at most a single instance. **The trade-off is

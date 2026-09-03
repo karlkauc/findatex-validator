@@ -151,7 +151,7 @@ file.
 | Mode | What happens to your data |
 |------|---------------------------|
 | **Desktop app** | Files stay on your machine. The only outbound call is the optional GLEIF / OpenFIGI lookup, which sends only the LEIs / ISINs from your file — never the full file. |
-| **Hosted web app** | Files are processed in memory and discarded immediately after the response. Reports live for 5 minutes via a single-use URL, then are deleted. No login, no per-file logging. External validation off by default. |
+| **Hosted web app** | Files are processed in memory and discarded immediately after the response. Reports live for 5 minutes via a single-use URL, then are deleted. No login; no file content or file names are logged — only derived attributes (format, size, naming-pattern class) reach the usage statistics. External validation off by default. |
 
 For confidential fund data, prefer the desktop app.
 
@@ -180,10 +180,16 @@ the private process in [`SECURITY.md`](SECURITY.md) instead.
 ## Anonymous usage statistics (opt-out)
 
 To understand which templates and versions are actually used, the tool
-records **aggregate-only** run statistics (template, version, finding
-counts, a server-derived country code). It **never** records your
-files, fund names, ISINs/LEIs, cell or finding content, or your IP
-address. The raw IP is never stored or logged.
+records **aggregate-only** usage events (validation runs — including
+failed ones by failure class —, report exports/downloads, sample loads and
+web page views): template, version, finding counts, score, duration, file
+**format / size / naming-pattern class** (never the name), the GLEIF/OpenFIGI
+lookup counts, a server-derived country code and, for the web app, the
+browser's OS family / device class plus a **daily-rotating visitor hash**
+(`sha256(secret-salt | ip | user-agent)`, not reversible, not linkable across
+days). It **never** records your files, file names, fund names, ISINs/LEIs,
+cell or finding content, or your IP address. The raw IP is never stored or
+logged.
 
 This is **on by default and easy to switch off**:
 

@@ -69,6 +69,9 @@ services:
       FINDATEX_WEB_USAGE_DB_USER: "${FINDATEX_WEB_USAGE_DB_USER:-}"
       FINDATEX_WEB_USAGE_DB_PASSWORD: "${FINDATEX_WEB_USAGE_DB_PASSWORD:-}"
       FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN: "${FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN:-}"
+      # Keys the daily-rotating visitor hash of web events; must be the same on
+      # every instance. Empty = per-process random salt (counts approximate).
+      FINDATEX_WEB_VISITOR_SALT_SECRET: "${FINDATEX_WEB_VISITOR_SALT_SECRET:-}"
       # Optional: per-IP rate limit on /api/usage-stats (default 60/h).
       # FINDATEX_WEB_USAGE_STATS_RATE: "60"
       # GeoIP country derivation: the GeoLite2-Country.mmdb is baked into the

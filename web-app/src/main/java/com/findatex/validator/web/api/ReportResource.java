@@ -1,12 +1,16 @@
 package com.findatex.validator.web.api;
 
+import com.findatex.validator.web.service.ClientContextFactory;
 import com.findatex.validator.web.service.ReportStore;
+import com.findatex.validator.web.service.UsageStatsService;
+import io.vertx.core.http.HttpServerRequest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
@@ -19,6 +23,15 @@ public class ReportResource {
 
     @Inject
     ReportStore reportStore;
+
+    @Inject
+    UsageStatsService usageStats;
+
+    @Inject
+    ClientContextFactory clientContexts;
+
+    @Context
+    HttpServerRequest request;
 
     @GET
     @Path("/{id}")
@@ -36,8 +49,18 @@ public class ReportResource {
         // + invalidate-in-finally" pattern allowed (two concurrent GETs could
         // both observe the entry and both stream it). The caller owns the file
         // from this point — we delete it once the response body is fully written.
-        java.nio.file.Path path = reportStore.take(uuid)
+        ReportStore.Entry entry = reportStore.take(uuid)
                 .orElseThrow(NotFoundException::new);
+        java.nio.file.Path path = entry.path();
+
+        // The download is the "did the result get used" signal of the funnel.
+        // Recorded once per report (take() is single-use), best-effort.
+        try {
+            usageStats.recordReportDownload(entry.templateId(), entry.templateVersion(),
+                    clientContexts.from(request));
+        } catch (RuntimeException e) {
+            // stats must never affect the download
+        }
 
         StreamingOutput stream = out -> {
             try (InputStream in = Files.newInputStream(path)) {

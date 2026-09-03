@@ -10,6 +10,9 @@ import com.findatex.validator.report.QualityScorer;
 import com.findatex.validator.report.ScoreCategory;
 import com.findatex.validator.report.XlsxReportWriter;
 import com.findatex.validator.spec.SpecCatalog;
+import com.findatex.validator.stats.ExternalLookupCounter;
+import com.findatex.validator.stats.FileNameShape;
+import com.findatex.validator.stats.UsageEvent;
 import com.findatex.validator.template.api.ProfileKey;
 import com.findatex.validator.template.api.ProfileSet;
 import com.findatex.validator.template.api.TemplateDefinition;
@@ -91,21 +94,33 @@ public class ValidationOrchestrator {
                 config.maxConcurrency(), config.acquireTimeoutMillis());
     }
 
+    /**
+     * @param filename   client-supplied upload name — used for format dispatch
+     *                   and reduced to non-identifying classes for the stats
+     *                   ({@link FileNameShape}); never stored
+     * @param inputBytes upload size, or -1 when unknown
+     * @param ctx        request-derived client context for the usage stats
+     */
     public ValidationResponse validate(String templateId,
                                        String templateVersion,
                                        List<String> profileCodes,
                                        InputStream upload,
                                        String filename,
+                                       long inputBytes,
                                        ExternalOptions externalOptions,
-                                       String clientCountry) {
+                                       ClientContext ctx) {
+        UsageEvent.Input input = FileNameShape.of(filename, inputBytes < 0 ? null : inputBytes);
+        boolean isSample = SampleFiles.isSampleFilename(filename);
         boolean acquired;
         try {
             acquired = concurrencyGate.tryAcquire(config.acquireTimeoutMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            recordFailure(UsageEvent.STATUS_BUSY, templateId, templateVersion, input, isSample, null, ctx);
             throw new WebApplicationException("Server busy, try again later.", Response.Status.SERVICE_UNAVAILABLE);
         }
         if (!acquired) {
+            recordFailure(UsageEvent.STATUS_BUSY, templateId, templateVersion, input, isSample, null, ctx);
             throw new WebApplicationException(
                     Response.status(429)
                             .entity("Server busy: too many concurrent validations. Try again shortly.")
@@ -114,7 +129,7 @@ public class ValidationOrchestrator {
         }
         try {
             return doValidate(templateId, templateVersion, profileCodes, upload,
-                    filename, externalOptions, clientCountry);
+                    filename, input, isSample, externalOptions, ctx);
         } finally {
             concurrencyGate.release();
         }
@@ -125,13 +140,27 @@ public class ValidationOrchestrator {
                                           List<String> profileCodes,
                                           InputStream upload,
                                           String filename,
+                                          UsageEvent.Input input,
+                                          boolean isSample,
                                           ExternalOptions externalOptions,
-                                          String clientCountry) {
+                                          ClientContext ctx) {
         long t0 = System.nanoTime();
-        TemplateDefinition def = resolveTemplate(templateId);
-        TemplateVersion version = resolveVersion(def, templateVersion);
-        ProfileSet profileSet = def.profilesFor(version);
-        Set<ProfileKey> activeProfiles = resolveProfiles(profileSet, profileCodes);
+        TemplateDefinition def;
+        TemplateVersion version;
+        Set<ProfileKey> activeProfiles;
+        ProfileSet profileSet;
+        try {
+            def = resolveTemplate(templateId);
+            version = resolveVersion(def, templateVersion);
+            profileSet = def.profilesFor(version);
+            activeProfiles = resolveProfiles(profileSet, profileCodes);
+        } catch (WebApplicationException e) {
+            recordFailure(UsageEvent.STATUS_BAD_REQUEST, templateId, templateVersion, input, isSample,
+                    elapsedMs(t0), ctx);
+            throw e;
+        }
+        String templateName = def.id().name();
+        String versionName = version.version();
 
         CatalogBundle bundle = catalogs.computeIfAbsent(def.id() + "/" + version.version(), k -> {
             SpecCatalog catalog = def.specLoaderFor(version).load();
@@ -146,6 +175,8 @@ public class ValidationOrchestrator {
             // Don't echo POI's exception text to the client — it can leak internal
             // class names and host paths. Full detail is logged server-side.
             log.warn("Upload parse failed for filename '{}': {}", filename, e.toString());
+            recordFailure(UsageEvent.STATUS_PARSE_ERROR, templateName, versionName, input, isSample,
+                    elapsedMs(t0), ctx);
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)
                             .entity("Could not parse upload. Check that the file is a valid XLSX/CSV "
@@ -158,6 +189,8 @@ public class ValidationOrchestrator {
         // every mandatory field becomes a "missing" finding — easily 100k+ findings
         // on a multi-thousand-row file, which exhausts the JVM heap.
         if (file.headerToNumKey().isEmpty() && !file.rawHeaders().isEmpty()) {
+            recordFailure(UsageEvent.STATUS_TEMPLATE_MISMATCH, templateName, versionName, input, isSample,
+                    elapsedMs(t0), ctx);
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)
                             .entity("File does not match template " + def.id() + " " + version.version()
@@ -193,6 +226,7 @@ public class ValidationOrchestrator {
         }
 
         ExternalValidationConfig externalCfg = def.externalValidationConfigFor(version);
+        UsageEvent.External external = null;
         if (externalOptions != null
                 && externalOptions.enabled()
                 && !externalCfg.isEmpty()
@@ -203,10 +237,15 @@ public class ValidationOrchestrator {
                 ExternalValidationService svc = handle.service();
                 if (svc != null) {
                     AppSettings settings = externalFactory.buildSettings(externalOptions);
+                    // Count the online phase for the usage stats (lookups, cache
+                    // hits, duration, unavailable phases) — counts only, never keys.
+                    ExternalLookupCounter counter = new ExternalLookupCounter(
+                            ExternalValidationService.ProgressSink.NOOP);
+                    long e0 = System.nanoTime();
                     List<Finding> online = FindingEnricher.enrich(file,
-                            svc.run(file, externalCfg, settings, () -> false,
-                                    ExternalValidationService.ProgressSink.NOOP),
+                            svc.run(file, externalCfg, settings, () -> false, counter),
                             def.findingContextSpec(), bundle.catalog);
+                    external = counter.finish(elapsedMs(e0), online);
                     List<Finding> merged = new ArrayList<>(findings);
                     merged.addAll(online);
                     findings = merged;
@@ -234,22 +273,44 @@ public class ValidationOrchestrator {
             throw new WebApplicationException(
                     Response.serverError().entity("Could not write report.").build());
         }
-        UUID reportId = reportStore.store(xlsxPath);
+        UUID reportId = reportStore.store(xlsxPath, templateName, versionName);
 
         try {
             boolean ext = externalOptions != null && externalOptions.enabled()
                     && config.external().enabled();
             usageStatsService.record(
-                    com.findatex.validator.stats.UsageEvent.forWeb(
-                            report, def, version, ext,
-                            java.time.Duration.ofNanos(System.nanoTime() - t0).toMillis()),
-                    "web", clientCountry);
+                    UsageEvent.forWeb(report, def, version, ext, elapsedMs(t0), input, external, isSample),
+                    ctx);
         } catch (RuntimeException e) {
             // Stats are best-effort and must never affect the validation response.
             log.debug("Usage-stats recording skipped: {}", e.toString());
         }
 
         return assembleResponse(def, version, file, report, findings, reportId);
+    }
+
+    private static long elapsedMs(long t0) {
+        return java.time.Duration.ofNanos(System.nanoTime() - t0).toMillis();
+    }
+
+    /** A validation attempt that produced no report is still an event — only its class is kept. */
+    private void recordFailure(String status, String templateId, String templateVersion,
+                               UsageEvent.Input input, boolean isSample, Long durationMs,
+                               ClientContext ctx) {
+        try {
+            usageStatsService.recordFailedRun(status,
+                    blankToNull(templateId), blankToNull(templateVersion), input, isSample,
+                    durationMs == null ? null : (int) Math.min(durationMs, Integer.MAX_VALUE), ctx);
+        } catch (RuntimeException e) {
+            // Stats are best-effort and must never affect the validation response.
+            log.debug("Usage-stats failure recording skipped: {}", e.toString());
+        }
+    }
+
+    private static String blankToNull(String s) {
+        if (s == null) return null;
+        String t = s.trim();
+        return t.isEmpty() ? null : t.length() > 40 ? t.substring(0, 40) : t;
     }
 
     private static TemplateDefinition resolveTemplate(String templateId) {

@@ -342,6 +342,11 @@ export default function App() {
                   <li>Excel reports are available for 5 minutes via a single-use URL.</li>
                   <li>External validation (GLEIF/OpenFIGI) is disabled by default in the web UI.</li>
                   <li>
+                    Anonymous usage statistics record aggregates only (template, finding counts, file
+                    format and size, browser OS family, a daily-rotating visitor hash) — never file
+                    content, file names or your IP address.
+                  </li>
+                  <li>
                     For daily validations without web upload,{' '}
                     {rateLimitQuery.data?.desktopDownloadUrl ? (
                       <a

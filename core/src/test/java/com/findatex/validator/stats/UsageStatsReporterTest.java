@@ -13,9 +13,10 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 class UsageStatsReporterTest {
 
     private UsageEvent sampleEvent() {
-        return new UsageEvent("id-1", "desktop", "dev", "Linux", "TPT", "V7",
+        return new UsageEvent("validate", "ok", "id-1", "desktop", "dev", "Linux", 21, "TPT", "V7",
                 java.util.List.of("EIOPA_QRT"), "single", 1, 10, 0, 0, 0,
-                99.0, 5, false, java.util.List.of("XF-16"), "2026-05-17T00:00:00Z");
+                99.0, 5, false, java.util.List.of("XF-16"),
+                UsageEvent.Input.UNKNOWN, null, null, null, "2026-05-17T00:00:00Z");
     }
 
     private UsageStatsReporter reporter(Supplier<AppSettings.UsageStats> cfg, int cap) {

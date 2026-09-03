@@ -1,11 +1,16 @@
 package com.findatex.validator.web.api;
 
+import com.findatex.validator.web.service.ClientContextFactory;
 import com.findatex.validator.web.service.SampleFiles;
+import com.findatex.validator.web.service.UsageStatsService;
+import io.vertx.core.http.HttpServerRequest;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 
 import java.io.IOException;
@@ -26,6 +31,15 @@ public class SampleResource {
     private static final String XLSX =
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
+    @Inject
+    UsageStatsService usageStats;
+
+    @Inject
+    ClientContextFactory clientContexts;
+
+    @Context
+    HttpServerRequest request;
+
     @GET
     @jakarta.ws.rs.Path("/{templateId}")
     @Produces(XLSX)
@@ -35,6 +49,7 @@ public class SampleResource {
         Optional<InputStream> stream = sample.open();
         if (stream.isEmpty()) throw new NotFoundException();
         try (InputStream in = stream.get()) {
+            recordSampleLoad(sample);
             return Response.ok(in.readAllBytes(), XLSX)
                     .header("Content-Disposition",
                             "attachment; filename=\"" + sample.filename() + "\"")
@@ -42,6 +57,16 @@ public class SampleResource {
                     .build();
         } catch (IOException e) {
             throw new NotFoundException();
+        }
+    }
+
+    /** "Try an example" clicked — separates playing from real usage in the stats. Best-effort. */
+    private void recordSampleLoad(SampleFiles.Sample sample) {
+        try {
+            usageStats.recordSampleLoad(sample.templateId(), sample.version(),
+                    clientContexts.from(request));
+        } catch (RuntimeException e) {
+            // stats must never affect the download
         }
     }
 }

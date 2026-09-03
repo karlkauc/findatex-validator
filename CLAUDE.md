@@ -297,30 +297,48 @@ Rate-limited via `FINDATEX_WEB_QUICK_FEEDBACK_RATE` (default 5/h per IP).
 Details in `docs/QUICK_FEEDBACK.md`. The GitHub repo link shown in both UI
 headers comes from `AppInfo.githubUrl()` — the single source for the repo URL.
 
-**Usage statistics (opt-out)** — aggregate-only run stats, default on, per
-install. Desktop never writes the DB: `core/.../stats/UsageStatsReporter`
-fire-and-forgets a `UsageEvent` (aggregate counts only — never files, names,
-codes, cell/finding content, or IP) to `POST /api/usage-stats`
+**Usage statistics (opt-out)** — aggregate-only usage events, default on, per
+install. One table, `usage_event`, told apart by `event_type` (`validate` incl.
+failed runs with a `status` class, `report_download`, `sample_load`,
+`page_view`). Desktop never writes the DB: `core/.../stats/UsageStatsReporter`
+fire-and-forgets a `UsageEvent` (aggregate counts and *classes* only — never
+files, names, codes, cell/finding content, or IP) to `POST /api/usage-stats`
 (`X-Usage-Token`); failures are silently dropped (DEBUG), the run is never
-disturbed. Web runs self-record from `ValidationOrchestrator` (sentinel
-install id). The web layer is the sole DB writer via plain Agroal/JDBC
-(`UsageStatsService`) — **inert with no `FINDATEX_WEB_USAGE_DB_URL`** (app/tests
-still boot). `country_code` is derived server-side from the request IP
-(`GeoIpService`, offline GeoLite2); the **raw IP is never stored or logged**.
-Opt-out: desktop Settings → Statistik (`AppSettings.UsageStats`); the install
-id is generated and persisted by `SettingsService`. Full schema, env vars and
-psql ops in `docs/USAGE_STATS.md`. Never add instance data to `UsageEvent`.
+disturbed. Old desktop builds still post the pre-2026-09 JSON — every new DTO
+field is nullable and defaults to `validate`/`ok`. Web runs self-record from
+`ValidationOrchestrator` (sentinel install id); downloads/samples/failures from
+`ReportResource`, `SampleResource`, `ValidationResource`, `RateLimitFilter`.
+The web layer is the sole DB writer via plain Agroal/JDBC (`UsageStatsService`,
+row shape `UsageRow`) — **inert with no `FINDATEX_WEB_USAGE_DB_URL`** (app/tests
+still boot). Everything request-derived comes from one place,
+`ClientContextFactory` → `ClientContext`: `country_code` (`GeoIpService`,
+offline GeoLite2), the daily-rotating `visitor_hash` (`VisitorHasher`,
+`sha256(HMAC(FINDATEX_WEB_VISITOR_SALT_SECRET, day) | ip | ua)`, same scheme as
+the viewer apps), `device`/`os_name` from the UA (`UserAgentClassifier` — a web
+run must never record the *server's* `os.name`). The **raw IP is never stored
+or logged**. File attributes are reduced by `core/.../stats/FileNameShape` to
+format / size / naming-pattern class — the only code allowed to look at a file
+name for stats; the external phase is counted by `ExternalLookupCounter`
+(a `ProgressSink` decorator). Opt-out: desktop Settings → Statistik
+(`AppSettings.UsageStats`); the install id is generated and persisted by
+`SettingsService`. Full schema, migration, env vars and psql ops in
+`docs/USAGE_STATS.md`. Never add instance data (names, paths, codes, cell or
+finding content, IP) to `UsageEvent`; derived, non-identifying classes are
+fine but must go through `FileNameShape`. HTTP 413 (upload over
+`max-body-size`) is **not** counted — Quarkus rejects it before any router.
 
-**Page views** — `usage_event` counts runs, which alone cannot say whether a
-quiet week means nobody came or everybody left without uploading. The SPA fires
-one beacon per page load from `main.tsx` (`POST /api/page-view`, **always 204**)
-into the `page_view` table via `PageViewService` (same DB, same inert-without-DB
-rule, same async+retry shape as `QuickFeedbackService`). Client-side on purpose:
-server-side counting would count crawlers, which at this traffic level would
-dominate. No cookie, no id, no IP, no full referrer URL, no query strings — only
-path, referrer **host**, campaign slug (`?utm_source=`/`?ref=`) and country; bot
-UAs are dropped by `BotDetector`. The funnel is in `tools/usage_report.py` under
-**Traffic** (`pct_validated`).
+**Page views** — runs alone cannot say whether a quiet week means nobody came
+or everybody left without uploading. The SPA fires one beacon per page load
+from `main.tsx` (`POST /api/page-view`, **always 204**); `PageViewService`
+sanitises it and `UsageStatsService` stores it as `event_type='page_view'`
+(the old `page_view` table is legacy, backfilled once, read-only). Client-side
+on purpose: server-side counting would count crawlers, which at this traffic
+level would dominate. No cookie, no full referrer URL, no query strings — only
+path, referrer **host**, campaign slug (`?utm_source=`/`?ref=`), country and the
+daily visitor hash; bot UAs are dropped by `BotDetector`. The funnel
+(page_view → validate → report_download per visitor) lives in the usage
+dashboard (`~/webdav/usage_statistics`, findatex profile) and in
+`tools/usage_report.py` under **Traffic**.
 
 **Newsletter sign-up (external provider)** — user-initiated, so **synchronous
 with a clear result** (not fire-and-forget). The e-mail is **never stored in

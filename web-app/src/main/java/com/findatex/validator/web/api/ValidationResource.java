@@ -1,8 +1,13 @@
 package com.findatex.validator.web.api;
 
+import com.findatex.validator.stats.FileNameShape;
+import com.findatex.validator.stats.UsageEvent;
 import com.findatex.validator.web.dto.ExternalOptions;
 import com.findatex.validator.web.dto.ValidationResponse;
-import com.findatex.validator.web.service.GeoIpService;
+import com.findatex.validator.web.service.ClientContext;
+import com.findatex.validator.web.service.ClientContextFactory;
+import com.findatex.validator.web.service.SampleFiles;
+import com.findatex.validator.web.service.UsageStatsService;
 import com.findatex.validator.web.service.ValidationOrchestrator;
 import io.vertx.core.http.HttpServerRequest;
 import jakarta.inject.Inject;
@@ -30,7 +35,10 @@ public class ValidationResource {
     ValidationOrchestrator orchestrator;
 
     @Inject
-    GeoIpService geoIp;
+    ClientContextFactory clientContexts;
+
+    @Inject
+    UsageStatsService usageStats;
 
     @Context
     HttpServerRequest request;
@@ -62,7 +70,18 @@ public class ValidationResource {
         String filename = file.fileName();
         if (filename == null || filename.isBlank()) filename = "uploaded.xlsx";
 
-        validateMagicBytes(file.uploadedFile(), filename);
+        ClientContext ctx = clientContexts.from(request);
+        long size = uploadSize(file);
+
+        try {
+            validateMagicBytes(file.uploadedFile(), filename);
+        } catch (WebApplicationException e) {
+            // Rejected before parsing: still a validation attempt for the stats.
+            String status = FileNameShape.format(filename) == null
+                    ? UsageEvent.STATUS_UNSUPPORTED_TYPE : UsageEvent.STATUS_PARSE_ERROR;
+            recordRejected(status, templateId, templateVersion, filename, size, ctx);
+            throw e;
+        }
 
         ExternalOptions opts = new ExternalOptions(
                 parseBool(externalEnabled, false),
@@ -77,22 +96,34 @@ public class ValidationResource {
                         .map(String::trim)
                         .filter(s -> !s.isEmpty()));
 
-        String country = null;
-        try {
-            if (request != null && request.remoteAddress() != null) {
-                country = geoIp.countryFor(request.remoteAddress().host());
-            }
-        } catch (RuntimeException ignored) {
-            // Geo lookup must never fail a validation request.
-        }
-
         try (InputStream in = Files.newInputStream(file.uploadedFile())) {
             return orchestrator.validate(templateId, templateVersion, profiles, in,
-                    filename, opts, country);
+                    filename, size, opts, ctx);
         } catch (IOException e) {
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)
                             .entity("Could not read upload: " + e.getMessage()).build());
+        }
+    }
+
+    private static long uploadSize(FileUpload file) {
+        try {
+            long s = file.size();
+            if (s > 0) return s;
+            return Files.size(file.uploadedFile());
+        } catch (IOException | RuntimeException e) {
+            return -1;
+        }
+    }
+
+    private void recordRejected(String status, String templateId, String templateVersion,
+                                String filename, long size, ClientContext ctx) {
+        try {
+            usageStats.recordFailedRun(status, templateId, templateVersion,
+                    FileNameShape.of(filename, size < 0 ? null : size),
+                    SampleFiles.isSampleFilename(filename), null, ctx);
+        } catch (RuntimeException e) {
+            // stats must never affect the response
         }
     }
 

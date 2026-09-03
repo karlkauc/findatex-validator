@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -30,9 +31,16 @@ import java.util.concurrent.Executors;
  * fire-and-forget on a single-thread executor — never blocks the HTTP response
  * — and all DB failures are swallowed (rate-limited WARN, no rethrow).
  *
+ * <p>Since 2026-09 every event kind lands in the one {@code usage_event}
+ * table, told apart by {@code event_type}: validation runs (ok or failed),
+ * report downloads, sample loads and page views. The desktop posts
+ * {@link UsageStatsDto}s; the web layer records its own runs from
+ * {@link ValidationOrchestrator} and the other kinds through the
+ * {@code record…} helpers here.
+ *
  * <p>The schema is created out-of-band (see docs/USAGE_STATS.md); this service
- * never issues DDL. {@code country_code} is supplied by the caller (derived
- * from the request IP); the raw IP is never seen or logged here.
+ * never issues DDL. Country / visitor hash / device come from a
+ * {@link ClientContext}; the raw IP is never seen or logged here.
  */
 @ApplicationScoped
 public class UsageStatsService {
@@ -41,11 +49,16 @@ public class UsageStatsService {
 
     private static final String INSERT = """
             INSERT INTO usage_event (
-                client_event_at, install_id, source, app_version, os_name,
+                event_type, status, client_event_at, install_id, source,
+                app_version, os_name, java_major, visitor_hash, user_agent, device,
                 template_id, template_version, profiles, mode, file_count,
                 row_count, error_count, warning_count, info_count,
-                overall_score, duration_ms, external_enabled, rule_ids, country_code)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                overall_score, duration_ms, external_enabled, rule_ids,
+                input_format, input_bytes, name_pattern, is_sample,
+                ext_lookups, ext_cache_hits, ext_duration_ms, ext_errors,
+                export_kind, path, referrer_host, campaign, country_code)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
     @Inject
@@ -79,31 +92,138 @@ public class UsageStatsService {
         return config.usageStats().dbConfigured() && dataSource.isResolvable();
     }
 
-    /** Desktop path: maps the posted DTO. {@code country} derived server-side. */
-    public void record(UsageStatsDto dto, String source, String country) {
+    // ---- desktop ------------------------------------------------------------
+
+    /**
+     * Desktop path: maps the posted DTO. Only the country is taken from
+     * {@code ctx} — a desktop install is identified by its install id, so the
+     * visitor hash / UA / device columns stay NULL.
+     */
+    public void record(UsageStatsDto dto, ClientContext ctx) {
         if (dto == null || !enabled()) return;
-        submit(new Row(
-                dto.clientEventAt(), dto.installId(),
-                source != null ? source : dto.source(),
-                dto.appVersion(), dto.osName(), dto.templateId(), dto.templateVersion(),
-                dto.profiles(), dto.mode(), dto.fileCount(), dto.rowCount(),
-                dto.errorCount(), dto.warningCount(), dto.infoCount(),
-                dto.overallScore(), dto.durationMs(), dto.externalEnabled(),
-                dto.ruleIds(), country));
+        UsageRow r = new UsageRow();
+        r.eventType = dto.eventType() == null ? UsageEvent.TYPE_VALIDATE : dto.eventType();
+        r.status = dto.status() == null ? UsageEvent.STATUS_OK : dto.status();
+        r.clientEventAt = dto.clientEventAt();
+        r.installId = dto.installId();
+        r.source = "desktop";
+        r.appVersion = dto.appVersion();
+        r.osName = dto.osName();
+        r.javaMajor = dto.javaMajor();
+        r.templateId = dto.templateId();
+        r.templateVersion = dto.templateVersion();
+        r.profiles = dto.profiles();
+        r.mode = dto.mode();
+        r.fileCount = dto.fileCount();
+        r.rowCount = dto.rowCount();
+        r.errorCount = dto.errorCount();
+        r.warningCount = dto.warningCount();
+        r.infoCount = dto.infoCount();
+        r.overallScore = dto.overallScore();
+        r.durationMs = dto.durationMs();
+        r.externalEnabled = dto.externalEnabled();
+        r.ruleIds = dto.ruleIds();
+        if (dto.input() != null) {
+            r.inputFormat = dto.input().format();
+            r.inputBytes = dto.input().bytes();
+            r.namePattern = dto.input().namePattern();
+        }
+        if (dto.external() != null) {
+            r.extLookups = dto.external().lookups();
+            r.extCacheHits = dto.external().cacheHits();
+            r.extDurationMs = dto.external().durationMs();
+            r.extErrors = dto.external().errors();
+        }
+        r.isSample = dto.isSample();
+        r.exportKind = dto.exportKind();
+        r.country = ctx == null ? null : ctx.countryCode();
+        submit(r);
     }
 
-    /** Web path: maps a server-built {@link UsageEvent}. */
-    public void record(UsageEvent ev, String source, String country) {
+    // ---- web ----------------------------------------------------------------
+
+    /**
+     * Web run built by {@link ValidationOrchestrator}. {@code os_name} comes
+     * from the browser's User-Agent in {@code ctx} (the event leaves it null).
+     */
+    public void record(UsageEvent ev, ClientContext ctx) {
         if (ev == null || !enabled()) return;
-        submit(new Row(
-                ev.clientEventAt(), ev.installId(),
-                source != null ? source : ev.source(),
-                ev.appVersion(), ev.osName(), ev.templateId(), ev.templateVersion(),
-                ev.profiles(), ev.mode(), ev.fileCount(), ev.rowCount(),
-                ev.errorCount(), ev.warningCount(), ev.infoCount(),
-                ev.overallScore(), ev.durationMs(), ev.externalEnabled(),
-                ev.ruleIds(), country));
+        UsageRow r = UsageRow.web(ev.eventType(), ev.status(), ctx);
+        r.clientEventAt = ev.clientEventAt();
+        r.appVersion = ev.appVersion();
+        if (ev.osName() != null) r.osName = ev.osName();
+        r.template(ev.templateId(), ev.templateVersion());
+        r.profiles = ev.profiles();
+        r.mode = ev.mode();
+        r.fileCount = ev.fileCount();
+        r.rowCount = ev.rowCount();
+        r.errorCount = ev.errorCount();
+        r.warningCount = ev.warningCount();
+        r.infoCount = ev.infoCount();
+        r.overallScore = ev.overallScore();
+        r.durationMs = ev.durationMs();
+        r.externalEnabled = ev.externalEnabled();
+        r.ruleIds = ev.ruleIds();
+        r.input(ev.input()).external(ev.external());
+        r.isSample = ev.isSample();
+        r.exportKind = ev.exportKind();
+        submit(r);
     }
+
+    /** Web validation attempt that produced no report; {@code status} is the failure class. */
+    public void recordFailedRun(String status, String templateId, String templateVersion,
+                                UsageEvent.Input input, Boolean isSample, Integer durationMs,
+                                ClientContext ctx) {
+        if (!enabled()) return;
+        UsageRow r = UsageRow.web(UsageEvent.TYPE_VALIDATE, status, ctx)
+                .template(templateId, templateVersion)
+                .input(input);
+        r.mode = "single";
+        r.fileCount = 1;
+        r.isSample = isSample;
+        r.durationMs = durationMs;
+        r.appVersion = appVersion();
+        submit(r);
+    }
+
+    public void recordReportDownload(String templateId, String templateVersion, ClientContext ctx) {
+        if (!enabled()) return;
+        UsageRow r = UsageRow.web(UsageEvent.TYPE_REPORT_DOWNLOAD, UsageEvent.STATUS_OK, ctx)
+                .template(templateId, templateVersion);
+        r.mode = "single";
+        r.fileCount = 1;
+        r.exportKind = UsageEvent.EXPORT_XLSX;
+        r.appVersion = appVersion();
+        submit(r);
+    }
+
+    public void recordSampleLoad(String templateId, String templateVersion, ClientContext ctx) {
+        if (!enabled()) return;
+        UsageRow r = UsageRow.web(UsageEvent.TYPE_SAMPLE_LOAD, UsageEvent.STATUS_OK, ctx)
+                .template(templateId, templateVersion);
+        r.fileCount = 0;
+        r.appVersion = appVersion();
+        submit(r);
+    }
+
+    /** Page load; {@code path}/{@code referrerHost}/{@code campaign} already normalised. */
+    public void recordPageView(String path, String referrerHost, String campaign, ClientContext ctx) {
+        if (!enabled()) return;
+        UsageRow r = UsageRow.web(UsageEvent.TYPE_PAGE_VIEW, UsageEvent.STATUS_OK, ctx);
+        r.fileCount = 0;
+        r.path = path;
+        r.referrerHost = referrerHost;
+        r.campaign = campaign;
+        r.appVersion = appVersion();
+        submit(r);
+    }
+
+    private static String appVersion() {
+        String v = com.findatex.validator.AppInfo.version();
+        return v == null || v.isBlank() ? null : v;
+    }
+
+    // ---- plumbing -----------------------------------------------------------
 
     private synchronized ExecutorService worker() {
         if (worker == null) {
@@ -116,16 +236,17 @@ public class UsageStatsService {
         return worker;
     }
 
-    private void submit(Row row) {
+    private void submit(UsageRow row) {
         try {
+            row.normalise();
             worker().submit(() -> insert(row));
         } catch (RuntimeException e) {
             log.debug("Usage-stats submit rejected (ignored): {}", e.toString());
         }
     }
 
-    private void insert(Row r) {
-        insertWithRetry(() -> doInsert(r));
+    private void insert(UsageRow row) {
+        insertWithRetry(() -> doInsert(row));
     }
 
     /**
@@ -172,40 +293,127 @@ public class UsageStatsService {
         }
     }
 
-    private void doInsert(Row r) throws Exception {
+    private void doInsert(UsageRow r) throws Exception {
         try (Connection c = dataSource.get().getConnection();
              PreparedStatement ps = c.prepareStatement(INSERT)) {
-
-            setTimestamp(ps, 1, r.clientEventAt());
-            setUuid(ps, 2, r.installId());
-            ps.setString(3, r.source());
-            ps.setString(4, trimToNull(r.appVersion()));
-            ps.setString(5, trimToNull(r.osName()));
-            ps.setString(6, r.templateId());
-            ps.setString(7, r.templateVersion());
-            Array profiles = c.createArrayOf("text", toArray(r.profiles()));
-            ps.setArray(8, profiles);
-            ps.setString(9, r.mode());
-            ps.setInt(10, r.fileCount() == null ? 1 : r.fileCount());
-            setInt(ps, 11, r.rowCount());
-            setInt(ps, 12, r.errorCount());
-            setInt(ps, 13, r.warningCount());
-            setInt(ps, 14, r.infoCount());
-            if (r.overallScore() == null) ps.setNull(15, Types.NUMERIC);
-            else ps.setBigDecimal(15, java.math.BigDecimal.valueOf(r.overallScore()));
-            setInt(ps, 16, r.durationMs());
-            if (r.externalEnabled() == null) ps.setNull(17, Types.BOOLEAN);
-            else ps.setBoolean(17, r.externalEnabled());
-            Array rules = c.createArrayOf("text", toArray(r.ruleIds()));
-            ps.setArray(18, rules);
-            ps.setString(19, trimToNull(r.country()));
-
-            ps.executeUpdate();
-            profiles.free();
-            rules.free();
+            Array profiles = c.createArrayOf("text", toArray(r.profiles));
+            Array rules = c.createArrayOf("text", toArray(r.ruleIds));
+            try {
+                Binder b = new Binder(ps);
+                b.str(r.eventType);
+                b.str(r.status);
+                b.timestamp(r.clientEventAt);
+                b.uuid(r.installId);
+                b.str(r.source);
+                b.str(trimToNull(r.appVersion));
+                b.str(trimToNull(r.osName));
+                b.integer(r.javaMajor);
+                b.str(trimToNull(r.visitorHash));
+                b.str(trimToNull(r.userAgent));
+                b.str(r.device);
+                b.str(trimToNull(r.templateId));
+                b.str(trimToNull(r.templateVersion));
+                b.array(profiles);
+                b.str(r.mode);
+                b.ps.setInt(b.next(), r.fileCount == null ? 1 : r.fileCount);
+                b.integer(r.rowCount);
+                b.integer(r.errorCount);
+                b.integer(r.warningCount);
+                b.integer(r.infoCount);
+                b.numeric(r.overallScore);
+                b.integer(r.durationMs);
+                b.bool(r.externalEnabled);
+                b.array(rules);
+                b.str(r.inputFormat);
+                b.bigint(r.inputBytes);
+                b.str(r.namePattern);
+                b.bool(r.isSample);
+                b.integer(r.extLookups);
+                b.integer(r.extCacheHits);
+                b.integer(r.extDurationMs);
+                b.integer(r.extErrors);
+                b.str(r.exportKind);
+                b.str(trimToNull(r.path));
+                b.str(trimToNull(r.referrerHost));
+                b.str(trimToNull(r.campaign));
+                b.str(trimToNull(r.country));
+                ps.executeUpdate();
+            } finally {
+                profiles.free();
+                rules.free();
+            }
         }
         // Failures propagate to insertWithRetry, which retries then drops the
         // event with a rate-limited WARN — never disturbing the request path.
+    }
+
+    /** Sequential parameter binding so the column list above stays the single source of order. */
+    private static final class Binder {
+        final PreparedStatement ps;
+        private int idx;
+
+        Binder(PreparedStatement ps) {
+            this.ps = ps;
+        }
+
+        int next() {
+            return ++idx;
+        }
+
+        void str(String v) throws SQLException {
+            ps.setString(next(), v);
+        }
+
+        void integer(Integer v) throws SQLException {
+            int i = next();
+            if (v == null) ps.setNull(i, Types.INTEGER);
+            else ps.setInt(i, v);
+        }
+
+        void bigint(Long v) throws SQLException {
+            int i = next();
+            if (v == null) ps.setNull(i, Types.BIGINT);
+            else ps.setLong(i, v);
+        }
+
+        void bool(Boolean v) throws SQLException {
+            int i = next();
+            if (v == null) ps.setNull(i, Types.BOOLEAN);
+            else ps.setBoolean(i, v);
+        }
+
+        void numeric(Double v) throws SQLException {
+            int i = next();
+            if (v == null) ps.setNull(i, Types.NUMERIC);
+            else ps.setBigDecimal(i, java.math.BigDecimal.valueOf(v));
+        }
+
+        void array(Array a) throws SQLException {
+            ps.setArray(next(), a);
+        }
+
+        void uuid(String v) throws SQLException {
+            int i = next();
+            try {
+                ps.setObject(i, UUID.fromString(v));
+            } catch (IllegalArgumentException | NullPointerException e) {
+                // Defensive: a malformed install id shouldn't fail the insert path.
+                ps.setObject(i, UUID.fromString(UsageEvent.WEB_INSTALL_ID));
+            }
+        }
+
+        void timestamp(String iso) throws SQLException {
+            int i = next();
+            if (iso == null || iso.isBlank()) {
+                ps.setNull(i, Types.TIMESTAMP_WITH_TIMEZONE);
+                return;
+            }
+            try {
+                ps.setObject(i, OffsetDateTime.ofInstant(Instant.parse(iso), ZoneOffset.UTC));
+            } catch (RuntimeException e) {
+                ps.setNull(i, Types.TIMESTAMP_WITH_TIMEZONE);
+            }
+        }
     }
 
     private static Object[] toArray(List<String> xs) {
@@ -218,43 +426,8 @@ public class UsageStatsService {
         return t.isEmpty() ? null : t;
     }
 
-    private static void setInt(PreparedStatement ps, int idx, Integer v) throws java.sql.SQLException {
-        if (v == null) ps.setNull(idx, Types.INTEGER);
-        else ps.setInt(idx, v);
-    }
-
-    private static void setUuid(PreparedStatement ps, int idx, String v) throws java.sql.SQLException {
-        try {
-            ps.setObject(idx, UUID.fromString(v));
-        } catch (IllegalArgumentException | NullPointerException e) {
-            // Defensive: a malformed install id shouldn't fail the insert path.
-            ps.setObject(idx, UUID.fromString(UsageEvent.WEB_INSTALL_ID));
-        }
-    }
-
-    private static void setTimestamp(PreparedStatement ps, int idx, String iso) throws java.sql.SQLException {
-        if (iso == null || iso.isBlank()) {
-            ps.setNull(idx, Types.TIMESTAMP_WITH_TIMEZONE);
-            return;
-        }
-        try {
-            ps.setObject(idx, OffsetDateTime.ofInstant(Instant.parse(iso), ZoneOffset.UTC));
-        } catch (RuntimeException e) {
-            ps.setNull(idx, Types.TIMESTAMP_WITH_TIMEZONE);
-        }
-    }
-
     @PreDestroy
     void shutdown() {
         if (worker != null) worker.shutdownNow();
-    }
-
-    private record Row(String clientEventAt, String installId, String source,
-                       String appVersion, String osName, String templateId,
-                       String templateVersion, List<String> profiles, String mode,
-                       Integer fileCount, Integer rowCount, Integer errorCount,
-                       Integer warningCount, Integer infoCount, Double overallScore,
-                       Integer durationMs, Boolean externalEnabled,
-                       List<String> ruleIds, String country) {
     }
 }

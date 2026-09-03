@@ -21,6 +21,8 @@ import com.findatex.validator.report.ScoreCategory;
 import com.findatex.validator.report.ScorePercent;
 import com.findatex.validator.report.XlsxReportWriter;
 import com.findatex.validator.spec.SpecCatalog;
+import com.findatex.validator.stats.ExternalLookupCounter;
+import com.findatex.validator.stats.FileNameShape;
 import com.findatex.validator.stats.UsageEvent;
 import com.findatex.validator.stats.UsageStatsReporter;
 import com.findatex.validator.template.api.ProfileKey;
@@ -599,6 +601,10 @@ public final class TemplateTabController {
         }
         final Stage pStage = progressStage;
         final LookupProgressController pCtrl = progressController;
+        // Usage stats: count the online phase (lookups / cache hits / duration),
+        // never a key. Wraps the UI sink so progress display is unchanged.
+        final ExternalLookupCounter extCounter = new ExternalLookupCounter(buildSink(pCtrl));
+        final java.util.concurrent.atomic.AtomicLong extElapsedMs = new java.util.concurrent.atomic.AtomicLong(-1);
 
         Task<QualityReport> task = new Task<>() {
             @Override
@@ -619,10 +625,11 @@ public final class TemplateTabController {
                     ExternalValidationService svc = ExternalValidationService.forProduction(
                             cacheDir, settings.external().isin());
                     BooleanSupplier cancelled = pCtrl != null ? pCtrl::isCancelled : () -> false;
-                    ExternalValidationService.ProgressSink sink = buildSink(pCtrl);
+                    long e0 = System.nanoTime();
                     List<Finding> online = FindingEnricher.enrich(
-                            file, svc.run(file, externalConfig, settings, cancelled, sink),
+                            file, svc.run(file, externalConfig, settings, cancelled, extCounter),
                             contextSpec, cat);
+                    extElapsedMs.set(Duration.ofNanos(System.nanoTime() - e0).toMillis());
                     List<Finding> all = new ArrayList<>(findings);
                     all.addAll(online);
                     findings = all;
@@ -642,7 +649,9 @@ public final class TemplateTabController {
             renderReport(report);
             UsageStatsReporter.getInstance().report(UsageEvent.from(
                     report, template, selectedVersion, settings, "single",
-                    Duration.ofNanos(System.nanoTime() - t0).toMillis()));
+                    Duration.ofNanos(System.nanoTime() - t0).toMillis(),
+                    FileNameShape.of(path),
+                    extCounter.finish(extElapsedMs.get(), report.findings())));
             long extIssues = report.findings().stream()
                     .filter(f -> f.ruleId().startsWith("EXTERNAL/")).count();
             if (extIssues > 0) {
@@ -661,6 +670,12 @@ public final class TemplateTabController {
             if (pCtrl != null) pCtrl.close();
             Throwable th = task.getException();
             log.error("Validation failed", th);
+            // A failed run is still a run for the statistics — only its class, never the message.
+            UsageStatsReporter.getInstance().report(UsageEvent.failed(
+                    template, selectedVersion, settings, "single",
+                    th instanceof java.io.IOException
+                            ? UsageEvent.STATUS_PARSE_ERROR : UsageEvent.STATUS_ERROR,
+                    FileNameShape.of(path)));
             progress.setVisible(false);
             validateButton.setDisable(false);
             statusLabel.setText("Validation failed: " + (th == null ? "" : th.getMessage()));
@@ -730,12 +745,13 @@ public final class TemplateTabController {
                 settings,
                 cacheDir);
 
+        final ExternalLookupCounter extCounter = new ExternalLookupCounter(buildSink(pCtrl));
         Task<BatchSummary> task = new Task<>() {
             @Override
             protected BatchSummary call() {
                 BatchValidationService svc = new BatchValidationService(cat, opts);
                 BooleanSupplier cancelled = pCtrl != null ? pCtrl::isCancelled : () -> false;
-                ExternalValidationService.ProgressSink sink = buildSink(pCtrl);
+                ExternalValidationService.ProgressSink sink = extCounter;
                 return svc.run(scan.accepted(), cancelled, new BatchValidationService.Listener() {
                     @Override public void onProgress(com.findatex.validator.batch.BatchProgress p) {
                         if (pCtrl != null) pCtrl.updateBatch(p);
@@ -758,9 +774,13 @@ public final class TemplateTabController {
             exportCombinedItem.setDisable(false);
             exportCombinedWithSourceItem.setDisable(!hasOk);
             renderBatchHeader(summary);
+            List<Finding> allFindings = summary.results().stream()
+                    .flatMap(r -> r.findings().stream()).toList();
             UsageStatsReporter.getInstance().report(UsageEvent.fromBatch(
                     summary, template, selectedVersion, settings,
-                    summary.totalElapsed().toMillis()));
+                    summary.totalElapsed().toMillis(),
+                    FileNameShape.ofBatch(summary.results()),
+                    extCounter.finish(-1, allFindings)));
             // Auto-select first OK row to populate the detail panes; leaving the table
             // selection-less also leaves scorePane and findings empty, which is confusing.
             int firstOk = -1;
@@ -773,6 +793,8 @@ public final class TemplateTabController {
             if (pCtrl != null) pCtrl.close();
             Throwable th = task.getException();
             log.error("Batch validation failed", th);
+            UsageStatsReporter.getInstance().report(UsageEvent.failed(
+                    template, selectedVersion, settings, "batch", UsageEvent.STATUS_ERROR, null));
             progress.setVisible(false);
             validateButton.setDisable(false);
             statusLabel.setText("Batch validation failed: " + (th == null ? "" : th.getMessage()));
@@ -843,6 +865,7 @@ public final class TemplateTabController {
             };
             final long t0 = System.nanoTime();
             task.setOnSucceeded(ev -> {
+                reportExport(UsageEvent.EXPORT_PER_FILE, "batch", writtenPaths.size());
                 statusLabel.setText("Wrote " + total + " report(s)"
                         + (failed > 0 ? " (skipped " + failed + " failed file(s))" : "")
                         + " to " + target.getFileName());
@@ -874,6 +897,7 @@ public final class TemplateTabController {
             };
             final long t0 = System.nanoTime();
             task.setOnSucceeded(ev -> {
+                reportExport(UsageEvent.EXPORT_XLSX, "single", 1);
                 statusLabel.setText("Report exported: " + target.getFileName());
                 showExportToast(ToastInfo.singleFile(target,
                         safeFileSize(target),
@@ -925,6 +949,8 @@ public final class TemplateTabController {
                 : "Combined report exported: ";
         final long t0 = System.nanoTime();
         task.setOnSucceeded(ev -> {
+            reportExport(withAnnotatedSource
+                    ? UsageEvent.EXPORT_COMBINED_ANNOTATED : UsageEvent.EXPORT_COMBINED, "batch", 1);
             statusLabel.setText(successMsg + target.getFileName());
             showExportToast(ToastInfo.singleFile(target,
                     safeFileSize(target),
@@ -932,6 +958,17 @@ public final class TemplateTabController {
         });
         task.setOnFailed(ev -> reportExportFailure(task.getException()));
         new Thread(task, template.id() + "-export-combined").start();
+    }
+
+    /** Usage stats: a report export is the "result got used" signal. Kind + count only. */
+    private void reportExport(String exportKind, String mode, int fileCount) {
+        try {
+            UsageStatsReporter.getInstance().report(UsageEvent.export(
+                    template, selectedVersion, SettingsService.getInstance().getCurrent(),
+                    mode, exportKind, fileCount));
+        } catch (RuntimeException e) {
+            log.debug("Usage-stats export event skipped: {}", e.toString());
+        }
     }
 
     private void showExportToast(ToastInfo info) {

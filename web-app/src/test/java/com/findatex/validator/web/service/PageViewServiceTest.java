@@ -2,13 +2,11 @@ package com.findatex.validator.web.service;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for the sanitising and retry seams of {@link PageViewService}. No
- * DB or CDI needed. The sanitisers matter twice over: they enforce the privacy
+ * Unit tests for the sanitising seams of {@link PageViewService}. No DB or CDI
+ * needed (persistence and retries live in {@code UsageStatsService}). The sanitisers matter twice over: they enforce the privacy
  * promise (no query strings, no full referrer URLs) and they keep values that
  * come straight out of an attacker-controllable URL from reaching a report.
  */
@@ -80,25 +78,4 @@ class PageViewServiceTest {
         assertThat(PageViewService.normaliseCampaign("x".repeat(200))).hasSize(64);
     }
 
-    // --- retry --------------------------------------------------------------
-
-    @Test
-    void insertRetriesThenGivesUpWithoutThrowing() {
-        PageViewService s = new PageViewService();
-        s.retryBackoffMs = 0;
-        s.maxInsertAttempts = 3;
-
-        AtomicInteger calls = new AtomicInteger();
-        s.insertWithRetry(() -> {
-            calls.incrementAndGet();
-            throw new RuntimeException("db down");
-        });
-        assertThat(calls.get()).isEqualTo(3);
-
-        AtomicInteger recovering = new AtomicInteger();
-        s.insertWithRetry(() -> {
-            if (recovering.incrementAndGet() < 2) throw new RuntimeException("Acquisition timeout");
-        });
-        assertThat(recovering.get()).isEqualTo(2);
-    }
 }

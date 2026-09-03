@@ -3,7 +3,7 @@ package com.findatex.validator.web.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findatex.validator.web.config.WebConfig;
 import com.findatex.validator.web.dto.UsageStatsDto;
-import com.findatex.validator.web.service.GeoIpService;
+import com.findatex.validator.web.service.ClientContextFactory;
 import com.findatex.validator.web.service.UsageStatsService;
 import io.vertx.core.http.HttpServerRequest;
 import jakarta.inject.Inject;
@@ -30,8 +30,10 @@ import java.security.MessageDigest;
  * a buggy client can never be disturbed by this endpoint. 413 (body size) and
  * 429 (per-IP rate limit) are enforced by existing infrastructure.
  *
- * <p>{@code country_code} is derived here from the TCP source IP; the raw IP is
- * never persisted or logged.
+ * <p>{@code country_code} is derived from the TCP source IP via
+ * {@link ClientContextFactory}; the raw IP is never persisted or logged. A
+ * desktop event is identified by its install id, so the visitor-hash / UA /
+ * device columns are not filled for this path.
  */
 @Path("/api/usage-stats")
 public class UsageStatsResource {
@@ -46,7 +48,7 @@ public class UsageStatsResource {
     UsageStatsService usageStats;
 
     @Inject
-    GeoIpService geoIp;
+    ClientContextFactory clientContexts;
 
     @Context
     HttpServerRequest request;
@@ -73,19 +75,8 @@ public class UsageStatsResource {
         }
         if (dto == null) return Response.accepted().build();
 
-        String country = null;
-        try {
-            country = geoIp.countryFor(clientIp());
-        } catch (RuntimeException e) {
-            log.debug("Usage-stats: geo lookup failed (ignored)");
-        }
-        usageStats.record(dto, "desktop", country);
+        usageStats.record(dto, clientContexts.from(request));
         return Response.accepted().build();
-    }
-
-    private String clientIp() {
-        if (request == null || request.remoteAddress() == null) return null;
-        return request.remoteAddress().host();
     }
 
     private static boolean constantTimeEquals(String expected, String provided) {

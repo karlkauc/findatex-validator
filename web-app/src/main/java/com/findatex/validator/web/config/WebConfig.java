@@ -73,6 +73,9 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.usage-stats.geoip-db")
     Optional<String> usageStatsGeoipDb;
 
+    @ConfigProperty(name = "findatex.web.usage-stats.visitor-salt-secret")
+    Optional<String> usageStatsVisitorSaltSecret;
+
     @ConfigProperty(name = "quarkus.datasource.jdbc.url")
     Optional<String> usageDbUrl;
 
@@ -150,7 +153,8 @@ public class WebConfig {
                 usageStatsIngestToken.map(String::trim).filter(s -> !s.isEmpty()),
                 Math.max(1, usageStatsRatePerIpPerHour),
                 usageStatsGeoipDb.map(String::trim).filter(s -> !s.isEmpty()),
-                usageDbUrl.map(String::trim).filter(s -> !s.isEmpty()).isPresent());
+                usageDbUrl.map(String::trim).filter(s -> !s.isEmpty()).isPresent(),
+                usageStatsVisitorSaltSecret.map(String::trim).filter(s -> !s.isEmpty()));
     }
 
     /**
@@ -202,10 +206,16 @@ public class WebConfig {
     public record RateLimit(int perIpPerHour) {
     }
 
+    /**
+     * {@code visitorSaltSecret} keys the daily visitor-hash salt
+     * ({@link com.findatex.validator.web.service.VisitorHasher}); empty ⇒
+     * per-process random salt (visitor counts approximate across instances).
+     */
     public record UsageStats(Optional<String> ingestToken,
                              int ratePerIpPerHour,
                              Optional<String> geoipDbPath,
-                             boolean dbConfigured) {
+                             boolean dbConfigured,
+                             Optional<String> visitorSaltSecret) {
     }
 
     public record Report(int ttlMinutes) {

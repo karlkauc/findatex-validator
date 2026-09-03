@@ -1,51 +1,29 @@
 package com.findatex.validator.web.service;
 
-import com.findatex.validator.web.config.WebConfig;
-import io.agroal.api.AgroalDataSource;
-import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
- * Persists page views to Postgres via plain Agroal/JDBC, mirroring
- * {@link QuickFeedbackService}: shares the usage-stats datasource, stays fully
- * inert unless it is configured ({@link #enabled()} gates every path so the app
- * boots and tests run with no DB), writes fire-and-forget on a single-thread
- * executor, and swallows every DB failure (rate-limited WARN, no rethrow).
+ * Sanitises a page-view beacon and hands it to {@link UsageStatsService},
+ * which stores it as a {@code usage_event} row with {@code event_type =
+ * 'page_view'} (the separate {@code page_view} table is legacy, see
+ * docs/USAGE_STATS.md). Everything about persistence — inert without a DB,
+ * async, retries — lives in the stats service now.
  *
- * <p>Why this exists: {@code usage_event} counts validation <i>runs</i>, so a
- * quiet week is ambiguous — nobody visited, or visitors arrived and left
- * without uploading anything. Those two call for opposite fixes (promotion vs.
- * a better landing page). Page views plus runs make the ratio visible.
+ * <p>Why page views exist: {@code usage_event} runs alone cannot say whether a
+ * quiet week means nobody came or everybody left without uploading. With the
+ * views in the same table, the dashboard can build the funnel
+ * page_view → validate → report_download per (daily-rotating) visitor hash.
  *
- * <p>Deliberately not a general analytics tool. No cookie, no local storage, no
- * IP, no fingerprint, no session or visitor id — the row cannot be tied to a
- * person or to another row, which is also why it needs no consent banner.
- * The referrer is reduced to its <b>host</b> here and the raw URL is never
- * stored or logged.
- *
- * <p>The schema is created out-of-band (see docs/USAGE_STATS.md); this service
- * never issues DDL.
+ * <p>Still deliberately not a general analytics tool: no cookie, no local
+ * storage, no raw IP, no full referrer URL, no query strings. The referrer is
+ * reduced to its <b>host</b> here and the raw URL is never stored or logged.
  */
 @ApplicationScoped
 public class PageViewService {
-
-    private static final Logger log = LoggerFactory.getLogger(PageViewService.class);
-
-    private static final String INSERT = """
-            INSERT INTO page_view (path, referrer_host, campaign, country_code)
-            VALUES (?, ?, ?, ?)
-            """;
 
     /** Generous caps: these columns exist to be grouped by, not to hold prose. */
     private static final int MAX_PATH = 200;
@@ -53,44 +31,19 @@ public class PageViewService {
     private static final int MAX_CAMPAIGN = 64;
 
     @Inject
-    WebConfig config;
-
-    @Inject
-    Instance<AgroalDataSource> dataSource;
-
-    private ExecutorService worker;
-    private volatile boolean warnedOnce;
-
-    /**
-     * Resilience mirroring {@link UsageStatsService}: Cloud Run throttles the
-     * instance's CPU once the response is sent, so the first attempt may stall
-     * or fail; retries let a later attempt land the row. Package-private so the
-     * retry behaviour is unit-testable without a DB.
-     */
-    int maxInsertAttempts = 3;
-    long retryBackoffMs = 1500;
-
-    /** One insert attempt; throws so {@link #insertWithRetry} can retry it. */
-    @FunctionalInterface
-    interface SqlOp {
-        void run() throws Exception;
-    }
+    UsageStatsService usageStats;
 
     public boolean enabled() {
-        return config.usageStats().dbConfigured() && dataSource.isResolvable();
+        return usageStats.enabled();
     }
 
     /**
      * Records one page load. {@code referrer} may be a full URL — only its host
-     * survives. {@code country} is derived by the caller from the request IP.
+     * survives. Country / visitor hash / device come from {@code ctx}.
      */
-    public void record(String path, String referrer, String campaign, String country) {
+    public void record(String path, String referrer, String campaign, ClientContext ctx) {
         if (!enabled()) return;
-        submit(new Row(
-                normalisePath(path),
-                hostOf(referrer),
-                normaliseCampaign(campaign),
-                trimToNull(country)));
+        usageStats.recordPageView(normalisePath(path), hostOf(referrer), normaliseCampaign(campaign), ctx);
     }
 
     /**
@@ -160,95 +113,5 @@ public class PageViewService {
         if (i < 0) return j;
         if (j < 0) return i;
         return Math.min(i, j);
-    }
-
-    private synchronized ExecutorService worker() {
-        if (worker == null) {
-            worker = Executors.newSingleThreadExecutor(r -> {
-                Thread t = new Thread(r, "page-view-db");
-                t.setDaemon(true);
-                return t;
-            });
-        }
-        return worker;
-    }
-
-    private void submit(Row row) {
-        try {
-            worker().submit(() -> insertWithRetry(() -> doInsert(row)));
-        } catch (RuntimeException e) {
-            log.debug("Page-view submit rejected (ignored): {}", e.toString());
-        }
-    }
-
-    /**
-     * Runs {@code op}, retrying up to {@link #maxInsertAttempts} times with a
-     * linear backoff so a stalled or dropped first attempt doesn't lose the
-     * row. Never rethrows — a persistently failing DB drops the view with a
-     * rate-limited WARN. Package-private for testing.
-     */
-    void insertWithRetry(SqlOp op) {
-        for (int attempt = 1; ; attempt++) {
-            try {
-                op.run();
-                // Success: re-arm the WARN so a later failure after a recovered
-                // DB is visible again, while a continuous streak stays quiet.
-                warnedOnce = false;
-                return;
-            } catch (Exception e) {
-                if (attempt >= maxInsertAttempts) {
-                    if (!warnedOnce) {
-                        warnedOnce = true;
-                        log.warn("Page-view insert failed after {} attempt(s) "
-                                + "(further failures suppressed): {}", attempt, e.toString());
-                    } else {
-                        log.debug("Page-view insert failed after {} attempt(s) (ignored): {}",
-                                attempt, e.toString());
-                    }
-                    return;
-                }
-                if (!backoff(attempt)) return; // interrupted (shutdown) — abandon
-            }
-        }
-    }
-
-    /** Linear backoff between retries; returns false if interrupted. */
-    private boolean backoff(int attempt) {
-        long ms = retryBackoffMs * attempt;
-        if (ms <= 0) return true;
-        try {
-            Thread.sleep(ms);
-            return true;
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-            return false;
-        }
-    }
-
-    private void doInsert(Row r) throws Exception {
-        try (Connection c = dataSource.get().getConnection();
-             PreparedStatement ps = c.prepareStatement(INSERT)) {
-            ps.setString(1, r.path());
-            ps.setString(2, r.referrerHost());
-            ps.setString(3, r.campaign());
-            ps.setString(4, r.country());
-            ps.executeUpdate();
-        }
-        // Failures propagate to insertWithRetry, which retries then drops the
-        // view with a rate-limited WARN — never disturbing the request path.
-    }
-
-    private static String trimToNull(String s) {
-        if (s == null) return null;
-        String t = s.trim();
-        return t.isEmpty() ? null : t;
-    }
-
-    @PreDestroy
-    void shutdown() {
-        if (worker != null) worker.shutdownNow();
-    }
-
-    private record Row(String path, String referrerHost, String campaign, String country) {
     }
 }

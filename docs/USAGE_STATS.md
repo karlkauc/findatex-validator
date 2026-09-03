@@ -1,20 +1,37 @@
 # Anonymous usage statistics (opt-out)
 
-The validator can report **aggregate-only** run statistics so development can be
+The validator can report **aggregate-only** usage events so development can be
 prioritised by real usage (which templates/versions, success/error rates,
-performance). It is **opt-out** (default on) and can be disabled per
-installation. **No instance data ever leaves the machine**: no files, file
-names, paths, fund names, ISIN/LEI/codes, cell values, finding messages/values,
-user/host name, MAC, or exact OS version. The raw client **IP is never stored
-or logged** — the server derives only an ISO country code from it.
+performance, whether results get downloaded, how many people visit vs. upload).
+It is **opt-out** (default on) and can be disabled per installation. **No
+instance data ever leaves the machine**: no files, file names, paths, fund
+names, ISIN/LEI/codes, cell values, finding messages/values, user/host name,
+MAC, or exact OS version. File attributes are reduced to non-identifying
+*classes* (format, size, naming pattern — see `FileNameShape`). The raw client
+**IP is never stored or logged** — the server derives only an ISO country code
+and, for web visitors, a daily-rotating hash from it.
+
+Since **2026-09** every event kind lands in the one `usage_event` table, told
+apart by `event_type`:
+
+| `event_type` | Emitted by | Meaning |
+|---|---|---|
+| `validate` | desktop + web | one validation run (single file or folder batch). `status='ok'` when a report was produced; otherwise the failure class (`parse_error`, `template_mismatch`, `unsupported_type`, `bad_request`, `rate_limited`, `busy`, `error`) — never a message |
+| `report_download` | desktop (export) + web (`GET /api/report/{id}`) | the result got used; `export_kind` = `xlsx` \| `per_file` \| `combined` \| `combined_annotated` |
+| `sample_load` | web (`GET /api/samples/{t}`) | "Try an example" clicked (runs on that file additionally carry `is_sample=true`) |
+| `page_view` | web SPA beacon | one page load (was the separate `page_view` table before) |
 
 ## Architecture
 
 ```
-Desktop:  validation done → UsageStatsReporter.report()  (enqueue, returns at once)
+Desktop:  run / failure / export → UsageStatsReporter.report()  (enqueue, returns at once)
             → daemon thread → POST /api/usage-stats  (X-Usage-Token)
-Web:      ValidationOrchestrator end → UsageStatsService.record(source=web)
-Both:     → single-thread JDBC INSERT into Postgres (Hetzner VPS)
+Web:      ValidationOrchestrator (runs, failures), ReportResource (downloads),
+          SampleResource (sample loads), PageViewResource (page views),
+          RateLimitFilter (429) → UsageStatsService.record…(ClientContext)
+Request → ClientContextFactory: country (GeoIP), visitor_hash (VisitorHasher),
+          device / os_name (UserAgentClassifier)  — the IP is consumed here, never stored
+Both:     → single-thread JDBC INSERT into usage_event (Postgres, Hetzner VPS)
 Any failure/timeout → silently dropped (DEBUG log); the user never notices.
 ```
 
@@ -23,28 +40,43 @@ web app is the sole DB writer.
 
 ## What is collected
 
-One row per validation run (single file or one folder-batch):
+One row per event. Columns that do not apply to an event type stay `NULL`.
 
 | Field | Meaning |
 |---|---|
 | `event_id`, `received_at` | server-assigned (PK, `now()`) |
-| `client_event_at` | client timestamp of the run |
+| `event_type`, `status` | see the table above |
+| `client_event_at` | client timestamp of the event |
 | `install_id` | random UUID in `settings.json` (no PII); web uses the all-zero sentinel |
 | `source` | `desktop` \| `web` |
-| `app_version`, `os_name` | build version; OS **family only** (`Windows`/`Mac`/`Linux`/`Other`) |
-| `template_id`, `template_version` | e.g. `TPT`, `V7` |
+| `app_version` | build version |
+| `os_name` | OS **family only**: desktop from the JVM (`Windows`/`Mac`/`Linux`/`Other`), web from the browser User-Agent (`+ iOS`/`Android`). A web run used to record the *server's* OS — fixed 2026-09 |
+| `java_major` | desktop only: Java feature version (21, 24 …) |
+| `visitor_hash` | web only: `sha256(HMAC(secret, UTC-day) \| ip \| user-agent)[0:32]` — same visitor = same value within one day, different the next; not reversible, not linkable across days. Same scheme as xsd-viewer / xml-viewer |
+| `user_agent` | web only, ≤ 255 chars, for the device/OS split and bot exclusion |
+| `device` | web only: `desktop` \| `mobile` \| `bot` \| `unknown` (`BotDetector` + UA heuristics) |
+| `template_id`, `template_version` | e.g. `TPT`, `V7.0`; `NULL` for page views and rejected uploads that never named one |
 | `profiles` | profile **codes** only |
-| `mode`, `file_count`, `row_count` | `single`/`batch`; counts only |
+| `mode`, `file_count`, `row_count` | `single`/`batch`; counts only (`file_count` = reports written for `report_download`, 0 for page views) |
 | `error_count`, `warning_count`, `info_count` | findings by severity |
 | `overall_score` | OVERALL scaled to 0–100 (2 decimals) |
 | `duration_ms` | measured run time |
 | `external_enabled` | whether GLEIF/OpenFIGI ran |
 | `rule_ids` | triggered rule IDs only (e.g. `XF-16`) — never values |
+| `input_format`, `input_bytes`, `name_pattern` | derived file attributes: `xlsx`/`csv`/`mixed` (batch), size in bytes (sum for a batch), and whether the name follows the FinDatEx pattern — `dated_template` (`20260331_TPTV7_…`), `template_token` (a template token anywhere), `other`. The name itself is never sent |
+| `is_sample` | web: the upload was the bundled sample file (matched by its download name) |
+| `ext_lookups`, `ext_cache_hits`, `ext_duration_ms`, `ext_errors` | GLEIF/OpenFIGI phase: remote requests (distinct keys), cache hits, wall-clock, unavailable/cancelled phases |
+| `export_kind` | `report_download` only, see above |
+| `path`, `referrer_host`, `campaign` | `page_view` only — SPA route (query/fragment cut), referrer **host**, `?utm_source=`/`?ref=` slug |
 | `country_code` | ISO-3166-1 alpha-2, derived server-side from the request IP; `NULL` if unknown |
 
 **Never collected:** file names/paths, fund names, ISIN/LEI/codes, cell
-values, `Finding.message()/value()`, raw IP, user/host name, MAC, exact OS
-version.
+values, `Finding.message()/value()`, error/exception text, raw IP, user/host
+name, MAC, exact OS version, cookies or any persistent client id.
+
+**Backward compatibility:** desktop builds from before 2026-09 keep posting the
+old JSON (no `eventType`/`status`/`input`/`external`); the ingest defaults them
+to `validate`/`ok`/`NULL`.
 
 ## Schema (run once in the target Postgres — the app never issues DDL)
 
@@ -55,12 +87,21 @@ CREATE TABLE usage_event (
   client_event_at  timestamptz,
   install_id       uuid        NOT NULL,
   source           text        NOT NULL CHECK (source IN ('desktop','web')),
+  event_type       text        NOT NULL DEFAULT 'validate'
+                               CHECK (event_type IN ('page_view','validate','report_download','sample_load')),
+  status           text        NOT NULL DEFAULT 'ok'
+                               CHECK (status IN ('ok','unsupported_type','parse_error','template_mismatch',
+                                                 'bad_request','rate_limited','too_large','busy','error')),
   app_version      text,
   os_name          text,
-  template_id      text        NOT NULL,
-  template_version text        NOT NULL,
+  java_major       int,
+  visitor_hash     text,                      -- web only
+  user_agent       text,                      -- web only, <= 255
+  device           text        CHECK (device IS NULL OR device IN ('desktop','mobile','bot','unknown')),
+  template_id      text,
+  template_version text,
   profiles         text[]      NOT NULL DEFAULT '{}',
-  mode             text        NOT NULL CHECK (mode IN ('single','batch')),
+  mode             text        CHECK (mode IS NULL OR mode IN ('single','batch')),
   file_count       int         NOT NULL DEFAULT 1,
   row_count        int,
   error_count      int,
@@ -70,15 +111,99 @@ CREATE TABLE usage_event (
   duration_ms      int,
   external_enabled boolean,
   rule_ids         text[]      NOT NULL DEFAULT '{}',
+  input_format     text        CHECK (input_format IS NULL OR input_format IN ('xlsx','csv','mixed')),
+  input_bytes      bigint,
+  name_pattern     text        CHECK (name_pattern IS NULL OR name_pattern IN ('dated_template','template_token','other')),
+  is_sample        boolean,
+  ext_lookups      int,
+  ext_cache_hits   int,
+  ext_duration_ms  int,
+  ext_errors       int,
+  export_kind      text        CHECK (export_kind IS NULL OR export_kind IN ('xlsx','per_file','combined','combined_annotated')),
+  path             text,                      -- page_view
+  referrer_host    text,                      -- page_view
+  campaign         text,                      -- page_view
   country_code     text
 );
 CREATE INDEX idx_usage_received_at ON usage_event (received_at);
 CREATE INDEX idx_usage_template    ON usage_event (template_id, template_version);
 CREATE INDEX idx_usage_install     ON usage_event (install_id);
 CREATE INDEX idx_usage_country     ON usage_event (country_code);
+CREATE INDEX idx_usage_event_type_time ON usage_event (event_type, received_at);
+CREATE INDEX idx_usage_visitor     ON usage_event (visitor_hash);
 ```
 
 `gen_random_uuid()` is built in on Postgres ≥ 13.
+
+### Migration 2026-09 (existing DB — run once, **before** deploying the new container)
+
+Additive: widens `usage_event`, relaxes three `NOT NULL`s, folds the old
+`page_view` rows in. Deploy order: **1)** this SQL on the Hetzner DB,
+**2)** the usage dashboard (reads the new columns), **3)** the web container,
+**4)** a desktop release whenever (old builds keep working).
+
+```sql
+BEGIN;
+ALTER TABLE usage_event
+  ADD COLUMN event_type      text NOT NULL DEFAULT 'validate',
+  ADD COLUMN status          text NOT NULL DEFAULT 'ok',
+  ADD COLUMN visitor_hash    text,
+  ADD COLUMN user_agent      text,
+  ADD COLUMN device          text,
+  ADD COLUMN java_major      int,
+  ADD COLUMN input_format    text,
+  ADD COLUMN input_bytes     bigint,
+  ADD COLUMN name_pattern    text,
+  ADD COLUMN is_sample       boolean,
+  ADD COLUMN ext_lookups     int,
+  ADD COLUMN ext_cache_hits  int,
+  ADD COLUMN ext_duration_ms int,
+  ADD COLUMN ext_errors      int,
+  ADD COLUMN export_kind     text,
+  ADD COLUMN path            text,
+  ADD COLUMN referrer_host   text,
+  ADD COLUMN campaign        text;
+
+ALTER TABLE usage_event
+  ALTER COLUMN template_id      DROP NOT NULL,
+  ALTER COLUMN template_version DROP NOT NULL,
+  ALTER COLUMN mode             DROP NOT NULL;
+
+-- auto-generated name; confirm with \d usage_event
+ALTER TABLE usage_event DROP CONSTRAINT usage_event_mode_check;
+ALTER TABLE usage_event
+  ADD CONSTRAINT usage_event_mode_check
+      CHECK (mode IS NULL OR mode IN ('single','batch')),
+  ADD CONSTRAINT usage_event_event_type_check
+      CHECK (event_type IN ('page_view','validate','report_download','sample_load')),
+  ADD CONSTRAINT usage_event_status_check
+      CHECK (status IN ('ok','unsupported_type','parse_error','template_mismatch',
+                        'bad_request','rate_limited','too_large','busy','error')),
+  ADD CONSTRAINT usage_event_device_check
+      CHECK (device IS NULL OR device IN ('desktop','mobile','bot','unknown')),
+  ADD CONSTRAINT usage_event_input_format_check
+      CHECK (input_format IS NULL OR input_format IN ('xlsx','csv','mixed')),
+  ADD CONSTRAINT usage_event_name_pattern_check
+      CHECK (name_pattern IS NULL OR name_pattern IN ('dated_template','template_token','other')),
+  ADD CONSTRAINT usage_event_export_kind_check
+      CHECK (export_kind IS NULL OR export_kind IN ('xlsx','per_file','combined','combined_annotated'));
+
+CREATE INDEX idx_usage_event_type_time ON usage_event (event_type, received_at);
+CREATE INDEX idx_usage_visitor         ON usage_event (visitor_hash);
+
+-- one-time backfill of the legacy page_view table (kept read-only afterwards;
+-- drop it once the dashboard and tools/usage_report.py no longer reference it)
+INSERT INTO usage_event (received_at, install_id, source, event_type, status,
+                         path, referrer_host, campaign, country_code, file_count)
+SELECT received_at, '00000000-0000-0000-0000-000000000000', 'web', 'page_view', 'ok',
+       path, referrer_host, campaign, country_code, 0
+FROM page_view;
+COMMIT;
+
+-- sanity: the two counts must match
+SELECT (SELECT count(*) FROM page_view) legacy,
+       (SELECT count(*) FROM usage_event WHERE event_type='page_view') folded;
+```
 
 ## Configuration (all env-overridable; feature off until set)
 
@@ -103,6 +228,12 @@ Web (`application.properties` / env):
 - `FINDATEX_WEB_USAGE_STATS_RATE` — per-IP `/api/usage-stats` limit (default 60/h)
 - `FINDATEX_WEB_GEOIP_DB` — path to a MaxMind **GeoLite2-Country.mmdb**;
   empty/missing ⇒ `country_code` is `NULL` (no boot failure)
+- `FINDATEX_WEB_VISITOR_SALT_SECRET` — secret behind the daily visitor-hash
+  salt (`HMAC-SHA256(secret, yyyy-MM-dd)`). Must be **identical on every
+  instance** (Cloud Run runs several) or one visitor counts N times; prod
+  keeps it in Secret Manager `findatex-visitor-salt`. Empty ⇒ per-process
+  random salt: still works, but visitor counts are approximate and a WARN is
+  logged once at first use
 
 ### GeoLite2 database
 
@@ -135,43 +266,45 @@ available from https://www.maxmind.com.”*
 
 ## Page views (visitors vs. validations)
 
-`usage_event` counts validation **runs**. On its own a quiet week is ambiguous:
-nobody found the site, or people arrived and left without uploading anything —
-two problems with opposite fixes (promotion vs. a better landing page).
-`page_view` supplies the other half of that ratio.
+`usage_event` runs alone leave a quiet week ambiguous — nobody visited, or
+visitors arrived and left without uploading anything? Those are two problems
+with opposite fixes (promotion vs. a better landing page). Page views supply
+the other half of that ratio, and since they share the table with runs and
+downloads, the dashboard can build the funnel
+**page_view → validate → report_download** per daily visitor hash.
 
-One row per page load, written by `PageViewService` from the beacon the SPA
-fires in `main.tsx` (`POST /api/page-view`, always answers **204**).
+One row per page load, `event_type='page_view'`, written by `PageViewService`
+→ `UsageStatsService` from the beacon the SPA fires in `main.tsx`
+(`POST /api/page-view`, always answers **204**). The beacon body is unchanged
+(`path`, `referrer`, `campaign`); country, visitor hash, device and OS family
+are derived from the request (`ClientContextFactory`).
 
 | Field | Meaning |
 |---|---|
-| `view_id`, `received_at` | server-assigned (PK, `now()`) |
 | `path` | SPA route; query string and fragment are **cut off** before storing |
 | `referrer_host` | **host only** of `document.referrer` (`www.` stripped, http/https only); `NULL` for direct traffic and for same-origin navigation |
 | `campaign` | `?utm_source=` / `?ref=`, reduced to a `[a-z0-9._-]` slug — tells a LinkedIn post apart from organic traffic |
-| `country_code` | ISO-3166-1 alpha-2, derived server-side from the request IP (same `GeoIpService` as usage stats) |
+| `visitor_hash`, `device`, `os_name`, `user_agent`, `country_code` | as for every web event (see above) |
 
-**Never collected:** no cookie, no localStorage, no visitor or session id, no
-fingerprint, no raw IP, no full referrer URL, no query strings. The rows cannot
-be tied to a person or linked to each other — which is also why the counter
-needs no consent banner. Client-side counting (rather than counting HTML
-requests server-side) is deliberate: it keeps crawlers and uptime probes out of
-a number that would otherwise be mostly bots at this traffic level. Bot user
-agents that do execute JavaScript are dropped by `BotDetector`.
+**Never collected:** no cookie, no localStorage, no persistent visitor or
+session id, no fingerprint, no raw IP, no full referrer URL, no query strings.
+The daily hash lets the dashboard count *distinct visitors per day* and follow
+one visitor from page view to download **within that day**; it cannot be
+reversed and cannot link two days. Client-side counting (rather than counting
+HTML requests server-side) is deliberate: it keeps crawlers and uptime probes
+out of a number that would otherwise be mostly bots at this traffic level. Bot
+user agents that do execute JavaScript are dropped by `BotDetector`.
+
+Legacy: before 2026-09 page views had their own table —
 
 ```sql
-CREATE TABLE page_view (
-  view_id       bigserial   PRIMARY KEY,
-  received_at   timestamptz NOT NULL DEFAULT now(),
-  path          text        NOT NULL,
-  referrer_host text,
-  campaign      text,
-  country_code  text
-);
-CREATE INDEX idx_page_view_received_at ON page_view (received_at);
-CREATE INDEX idx_page_view_referrer    ON page_view (referrer_host);
-CREATE INDEX idx_page_view_campaign    ON page_view (campaign);
+CREATE TABLE page_view (  -- LEGACY, read-only since the 2026-09 migration
+  view_id bigserial PRIMARY KEY, received_at timestamptz NOT NULL DEFAULT now(),
+  path text NOT NULL, referrer_host text, campaign text, country_code text);
 ```
+
+— its rows were folded into `usage_event` by the migration above; drop it once
+nothing reads it any more (`DROP TABLE page_view;`).
 
 Config: no separate switch — the feature follows `FINDATEX_WEB_USAGE_DB_URL`
 (empty ⇒ inert, endpoint still answers 204). `FINDATEX_WEB_PAGE_VIEW_RATE`
@@ -179,14 +312,18 @@ tunes the per-IP limit (default 120/h; deliberately generous — a real visitor
 reloading must never be throttled).
 
 `tools/usage_report.py` prints the funnel under **Traffic**: views and web runs
-per day with a `pct_validated` column, plus referrers, campaigns, pages and
-countries.
+per day with a `pct_validated` column, plus visitors, referrers, campaigns,
+pages and countries. The richer view (funnel per visitor, devices, file
+formats, failures, external lookups) is the findatex profile of the usage
+dashboard (`~/webdav/usage_statistics`).
 
 ## Abuse protection
 
 - Static shared `X-Usage-Token` (constant-time compared) — wrong/missing ⇒ 401.
 - Dedicated per-IP Bucket4j limit on `POST /api/usage-stats` (default 60/h).
-- Existing 25 MB body limit ⇒ 413.
+- Existing 25 MB body limit ⇒ 413. Not counted as a `too_large` run: Quarkus
+  rejects the request before any router/JAX-RS code runs (the `status` value
+  exists for a future client-side beacon).
 - Endpoint returns **202** immediately; insert is async fire-and-forget.
   Malformed JSON ⇒ 202 (DEBUG log), never 5xx.
 
@@ -196,33 +333,65 @@ Connect (from the VPS): `psql "postgresql://findatex:$(cat /home/deploy/findatex
 — or remotely with `…@62.238.116.11:5432/findatex_stats?sslmode=require`.
 
 ```sql
--- Runs per day & template
+-- Events by type / status
+SELECT event_type, status, source, count(*) FROM usage_event
+GROUP BY 1,2,3 ORDER BY 1,2,3;
+
+-- Runs per day & template (successful runs only)
 SELECT received_at::date AS day, template_id, template_version,
        count(*) runs, round(avg(overall_score),1) avg_score
-FROM usage_event GROUP BY 1,2,3 ORDER BY 1 DESC, 4 DESC;
+FROM usage_event WHERE event_type='validate' AND status='ok'
+GROUP BY 1,2,3 ORDER BY 1 DESC, 4 DESC;
 
--- Active installations (28 days)
-SELECT count(DISTINCT install_id) active_installs
-FROM usage_event
-WHERE source='desktop' AND received_at > now() - interval '28 days';
+-- Active installations (28 days) + distinct web visitors today (no bots)
+SELECT count(DISTINCT install_id) FILTER (WHERE source='desktop') active_installs,
+       count(DISTINCT visitor_hash) FILTER (WHERE source='web' AND device IS DISTINCT FROM 'bot'
+                                            AND received_at::date = current_date) web_visitors_today
+FROM usage_event WHERE received_at > now() - interval '28 days';
+
+-- Web funnel per day (page views → runs → downloads, by daily visitor hash)
+SELECT received_at::date d,
+       count(DISTINCT visitor_hash) FILTER (WHERE event_type='page_view') visitors,
+       count(DISTINCT visitor_hash) FILTER (WHERE event_type='validate') validating,
+       count(*) FILTER (WHERE event_type='report_download') downloads
+FROM usage_event WHERE source='web' AND device IS DISTINCT FROM 'bot'
+GROUP BY 1 ORDER BY 1 DESC LIMIT 14;
 
 -- Desktop vs web, single vs batch
 SELECT source, mode, count(*), round(avg(duration_ms)) avg_ms
-FROM usage_event GROUP BY 1,2 ORDER BY 1,2;
+FROM usage_event WHERE event_type='validate' GROUP BY 1,2 ORDER BY 1,2;
+
+-- Devices & OS of web runs (the "everything is Linux" bug is gone)
+SELECT device, os_name, count(*) FROM usage_event
+WHERE source='web' GROUP BY 1,2 ORDER BY 3 DESC;
+
+-- Input files: format, naming pattern, size
+SELECT source, input_format, name_pattern, count(*) runs,
+       round(percentile_cont(0.5) WITHIN GROUP (ORDER BY input_bytes)/1024) p50_kb,
+       count(*) FILTER (WHERE is_sample) sample_runs
+FROM usage_event WHERE event_type='validate' GROUP BY 1,2,3 ORDER BY 1, 4 DESC;
+
+-- Failed runs by class
+SELECT status, source, count(*) FROM usage_event
+WHERE event_type='validate' AND status <> 'ok' GROUP BY 1,2 ORDER BY 3 DESC;
+
+-- External lookups
+SELECT source, count(*) runs, sum(ext_lookups) lookups, sum(ext_cache_hits) cache_hits,
+       sum(ext_errors) errors FROM usage_event WHERE external_enabled GROUP BY 1;
 
 -- Runs per country
-SELECT country_code, count(*) FROM usage_event
+SELECT country_code, count(*) FROM usage_event WHERE event_type='validate'
 GROUP BY 1 ORDER BY 2 DESC;
 
 -- Most-triggered rules
 SELECT r AS rule_id, count(*) FROM usage_event, unnest(rule_ids) r
-GROUP BY 1 ORDER BY 2 DESC LIMIT 25;
+WHERE event_type='validate' GROUP BY 1 ORDER BY 2 DESC LIMIT 25;
 
 -- Error rate per template-version
 SELECT template_id, template_version,
        round(avg(error_count),2) avg_errors,
        count(*) FILTER (WHERE error_count=0)*100.0/count(*) pct_clean
-FROM usage_event GROUP BY 1,2 ORDER BY 1,2;
+FROM usage_event WHERE event_type='validate' AND status='ok' GROUP BY 1,2 ORDER BY 1,2;
 
 -- DB size / Free-tier watch (≤ 500 MB)
 SELECT pg_size_pretty(pg_database_size(current_database())) db_size,
@@ -271,10 +440,15 @@ compute quota exhausted). Started **empty**; no Neon rows were carried over.
 
 ## Privacy / GDPR
 
-Only aggregate counts and a server-derived country are stored; no personal
-data, no raw IP. This covers `page_view` too: it holds no id of any kind, so
-one row cannot be linked to another or to a person. The Settings dialog states
-what is/isn't sent and links here.
+Only aggregate counts, derived classes and a server-derived country are
+stored; no personal data, no raw IP, no file names. Desktop rows carry a random
+install id that is bound to nothing (no user, host or hardware). Web rows carry
+a **daily-rotating visitor hash**: `sha256(HMAC(secret, day) | ip | user-agent)`
+truncated to 32 hex chars — it cannot be reversed to the IP (keyed, salted,
+rotated), and the same person yields a different value every day, so rows can
+be grouped within a day (visitors, funnel) but not tracked over time. This is
+the identical scheme the xsd-viewer / xml-viewer apps use. The Settings dialog
+and the web landing copy state what is/isn't sent and link here.
 The DSGVO wording in the Settings tab and this document should be reviewed by
 legal/SME before public deployment.
 

@@ -174,6 +174,47 @@ await moveTo(report, 10);
 await hold(1800);
 highlight = null;
 
+caption = 'Annotated Source — the original file with every finding on its cell; "Source" on a finding row jumps straight to it.';
+// Back to the flat list (the grouped view has no per-row action); the table's
+// scroll container keeps its position, so the Source column is still on screen.
+await moveTo(group, 8);
+await click();
+await hold(400);
+const source = page.getByRole('button', { name: 'Source' }).first();
+highlight = source;
+await moveTo(source, 8);
+await hold(600);
+await click();
+highlight = null;
+const grid = page.getByTestId('annotated-source-grid');
+for (let i = 0; i < 60; i++) {
+  if (await grid.isVisible().catch(() => false)) break;
+  await frame(120);
+  await sleep(60);
+}
+const jumped = page.locator('.src-cell-jump').first();
+if (await jumped.count()) {
+  await jumped.scrollIntoViewIfNeeded().catch(() => {});
+  await sleep(200);
+  highlight = jumped;
+  await moveTo(jumped, 10);
+}
+await hold(2400);
+highlight = null;
+
+caption = 'The input column folds away to give the wide table the whole screen; the app remembers your choice.';
+await scrollTo(null, 7, 0);
+const collapse = page.getByRole('button', { name: 'Collapse input panel' });
+highlight = collapse;
+await moveTo(collapse, 10);
+await click();
+highlight = null;
+await hold(1800);
+const expand = page.getByRole('button', { name: 'Expand input panel' });
+await moveTo(expand, 8);
+await click();
+await hold(600);
+
 caption = 'No login. 30 uploads per hour per IP — and for confidential data the desktop app is one click away.';
 await scrollTo(null, 7, 0);
 const header = page.locator('header');

@@ -238,3 +238,35 @@
 .toast-close:hover {
     -fx-text-fill: white;
 }
+
+/* ===== Annotated source grid ============================================ */
+
+.source-grid .table-cell {
+    -fx-padding: 2 6;
+}
+.source-grid .table-cell.source-row-col {
+    -fx-font-weight: bold;
+    -fx-background-color: #f3f5f8;
+}
+.source-grid .table-cell.source-cell-error { -fx-background-color: #fdecea; }
+.source-grid .table-cell.source-cell-warn  { -fx-background-color: #fff4cc; }
+.source-grid .table-cell.source-cell-info  { -fx-background-color: #dbeafe; }
+.source-grid .table-cell.source-cell-error:selected { -fx-background-color: #f5b6ad; }
+.source-grid .table-cell.source-cell-warn:selected  { -fx-background-color: #f2dd8a; }
+.source-grid .table-cell.source-cell-info:selected  { -fx-background-color: #b6d0f7; }
+.source-grid .table-cell.source-cell-error:selected .text,
+.source-grid .table-cell.source-cell-warn:selected .text,
+.source-grid .table-cell.source-cell-info:selected .text {
+    -fx-fill: black;
+}
+
+.source-legend {
+    -fx-padding: 1 8;
+    -fx-border-color: #d0d8e0;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-font-size: 11px;
+}
+.source-legend.source-cell-error { -fx-background-color: #fdecea; }
+.source-legend.source-cell-warn  { -fx-background-color: #fff4cc; }
+.source-legend.source-cell-info  { -fx-background-color: #dbeafe; }

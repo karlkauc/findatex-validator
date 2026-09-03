@@ -83,42 +83,54 @@
         <Label text="Quality scores" styleClass="section-title"/>
         <FlowPane fx:id="scorePane" hgap="20" vgap="14" prefWrapLength="1000"/>
 
-        <Label text="Findings" styleClass="section-title"/>
-        <HBox spacing="14" alignment="CENTER_LEFT">
-            <CheckBox fx:id="filterErrors" text="Errors" selected="true"/>
-            <CheckBox fx:id="filterWarnings" text="Warnings" selected="true"/>
-            <CheckBox fx:id="filterInfo" text="Info" selected="true"/>
-            <CheckBox fx:id="groupByError" text="Group by error"/>
-            <Button fx:id="reportFpButton" text="Report a false positive…"
-                    onAction="#onReportFalsePositive" disable="true"/>
-            <Label fx:id="findingCountLabel"/>
-        </HBox>
+        <Label text="Results" styleClass="section-title"/>
+        <TabPane fx:id="resultTabs" prefHeight="420" tabClosingPolicy="UNAVAILABLE">
+            <Tab text="Findings">
+                <VBox spacing="10">
+                    <padding><Insets top="10"/></padding>
+                    <HBox spacing="14" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="filterErrors" text="Errors" selected="true"/>
+                        <CheckBox fx:id="filterWarnings" text="Warnings" selected="true"/>
+                        <CheckBox fx:id="filterInfo" text="Info" selected="true"/>
+                        <CheckBox fx:id="groupByError" text="Group by error"/>
+                        <Button fx:id="reportFpButton" text="Report a false positive…"
+                                onAction="#onReportFalsePositive" disable="true"/>
+                        <Label fx:id="findingCountLabel"/>
+                    </HBox>
 
-        <TableView fx:id="findingsTable" prefHeight="320">
-            <contextMenu>
-                <ContextMenu>
-                    <items>
-                        <MenuItem fx:id="reportFpMenuItem" text="Report a false positive…"
-                                  onAction="#onReportFalsePositive" disable="true"/>
-                    </items>
-                </ContextMenu>
-            </contextMenu>
-            <columns>
-                <TableColumn fx:id="colSeverity"   text="Severity"        prefWidth="90"/>
-                <TableColumn fx:id="colProfile"    text="Profile"         prefWidth="140"/>
-                <TableColumn fx:id="colFundId"     text="Fund ID"         prefWidth="130"/>
-                <TableColumn fx:id="colFundName"   text="Fund name"       prefWidth="180"/>
-                <TableColumn fx:id="colDate"       text="Valuation date"  prefWidth="100"/>
-                <TableColumn fx:id="colRow"        text="Row"             prefWidth="60"/>
-                <TableColumn fx:id="colInstCode"   text="Instrument code" prefWidth="160"/>
-                <TableColumn fx:id="colInstName"   text="Instrument"      prefWidth="180"/>
-                <TableColumn fx:id="colWeight"     text="Weight"          prefWidth="80"/>
-                <TableColumn fx:id="colRule"       text="Rule"            prefWidth="180"/>
-                <TableColumn fx:id="colField"      text="Field"           prefWidth="80"/>
-                <TableColumn fx:id="colFieldName"  text="Field name"      prefWidth="220"/>
-                <TableColumn fx:id="colCount"      text="Occurrences"     prefWidth="90" visible="false"/>
-                <TableColumn fx:id="colMessage"    text="Message"         prefWidth="380"/>
-            </columns>
-        </TableView>
+                    <TableView fx:id="findingsTable" prefHeight="320" VBox.vgrow="ALWAYS">
+                        <contextMenu>
+                            <ContextMenu>
+                                <items>
+                                    <MenuItem fx:id="showInSourceMenuItem" text="Show in annotated source"
+                                              onAction="#onShowInAnnotatedSource" disable="true"/>
+                                    <MenuItem fx:id="reportFpMenuItem" text="Report a false positive…"
+                                              onAction="#onReportFalsePositive" disable="true"/>
+                                </items>
+                            </ContextMenu>
+                        </contextMenu>
+                        <columns>
+                            <TableColumn fx:id="colSeverity"   text="Severity"        prefWidth="90"/>
+                            <TableColumn fx:id="colProfile"    text="Profile"         prefWidth="140"/>
+                            <TableColumn fx:id="colFundId"     text="Fund ID"         prefWidth="130"/>
+                            <TableColumn fx:id="colFundName"   text="Fund name"       prefWidth="180"/>
+                            <TableColumn fx:id="colDate"       text="Valuation date"  prefWidth="100"/>
+                            <TableColumn fx:id="colRow"        text="Row"             prefWidth="60"/>
+                            <TableColumn fx:id="colInstCode"   text="Instrument code" prefWidth="160"/>
+                            <TableColumn fx:id="colInstName"   text="Instrument"      prefWidth="180"/>
+                            <TableColumn fx:id="colWeight"     text="Weight"          prefWidth="80"/>
+                            <TableColumn fx:id="colRule"       text="Rule"            prefWidth="180"/>
+                            <TableColumn fx:id="colField"      text="Field"           prefWidth="80"/>
+                            <TableColumn fx:id="colFieldName"  text="Field name"      prefWidth="220"/>
+                            <TableColumn fx:id="colCount"      text="Occurrences"     prefWidth="90" visible="false"/>
+                            <TableColumn fx:id="colMessage"    text="Message"         prefWidth="380"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+            <Tab fx:id="annotatedSourceTab" text="Annotated Source">
+                <StackPane fx:id="annotatedSourceHost"/>
+            </Tab>
+        </TabPane>
     </VBox>
 </ScrollPane>

@@ -28,7 +28,9 @@ The output has two parts:
 You get the same engine in two delivery modes:
 
 - **Desktop app (JavaFX)** — files never leave your machine. Use this for
-  daily validations on confidential fund data.
+  daily validations on confidential fund data. Besides the findings table
+  it shows the original file as an in-app **Annotated Source** grid (same
+  colours and finding texts as the Excel sheet of the same name, see §8).
 - **Web app (Quarkus + React, Docker)** — useful when the desktop install
   is not an option, or for occasional use. Uploads are processed in
   memory and discarded immediately; reports are available for 5 minutes
@@ -423,6 +425,14 @@ If the source file can't be re-read (deleted, moved, or never persisted —
 e.g. a streaming web upload), the Annotated Source sheet contains the
 note "Original file no longer available — see the Findings tab for
 details."
+
+The desktop app shows the same grid without exporting: the **Annotated
+Source** tab next to *Findings* mirrors the file with identical tinting,
+the findings appear as a tooltip instead of an Excel comment, and two
+checkboxes hide rows or columns that carry no finding. Double-click a
+finding (or use *Show in annotated source* in its context menu) to jump
+straight to the offending cell. In batch mode the grid follows the file
+selected in the *Files* table.
 
 ---
 

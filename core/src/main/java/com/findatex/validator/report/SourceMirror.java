@@ -20,18 +20,18 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-final class SourceMirror {
+public final class SourceMirror {
 
-    enum CellKind { STRING, NUMERIC, DATE, BOOLEAN, BLANK }
+    public enum CellKind { STRING, NUMERIC, DATE, BOOLEAN, BLANK }
 
-    record SourceCell(CellKind kind, Object value, String dataFormat) {
-        static final SourceCell BLANK = new SourceCell(CellKind.BLANK, null, null);
+    public record SourceCell(CellKind kind, Object value, String dataFormat) {
+        public static final SourceCell BLANK = new SourceCell(CellKind.BLANK, null, null);
 
         static SourceCell text(String s) {
             return new SourceCell(CellKind.STRING, s == null ? "" : s, null);
         }
 
-        String asText() {
+        public String asText() {
             return switch (kind) {
                 case STRING -> value == null ? "" : (String) value;
                 case NUMERIC -> {
@@ -54,9 +54,9 @@ final class SourceMirror {
         }
     }
 
-    record SourceData(List<List<SourceCell>> rows, int headerRowIndex) {}
+    public record SourceData(List<List<SourceCell>> rows, int headerRowIndex) {}
 
-    static SourceData read(TptFile file) throws IOException {
+    public static SourceData read(TptFile file) throws IOException {
         String fmt = file.inputFormat();
         if ("xlsx".equals(fmt)) return readXlsx(file);
         if ("csv".equals(fmt)) return readCsv(file);

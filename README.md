@@ -156,7 +156,7 @@ file.
 | Mode | What happens to your data |
 |------|---------------------------|
 | **Desktop app** | Files stay on your machine. The only outbound call is the optional GLEIF / OpenFIGI lookup, which sends only the LEIs / ISINs from your file — never the full file. |
-| **Hosted web app** | Files are processed in memory and discarded immediately after the response. Reports live for 5 minutes via a single-use URL, then are deleted. No login; no file content or file names are logged — only derived attributes (format, size, naming-pattern class) reach the usage statistics. External validation off by default. |
+| **Hosted web app** | Files are processed in memory and discarded immediately after the response. Reports live for 5 minutes via a single-use URL, then are deleted. No login; no file content or file names are logged — only derived attributes (format, size, naming-pattern class) reach the usage statistics. The annotated-source view shares the report's 5-minute lifetime. External validation (GLEIF / OpenFIGI) is opt-in per run; when enabled, only the LEIs / ISINs from your file are sent to those registries. |
 
 For confidential fund data, prefer the desktop app.
 

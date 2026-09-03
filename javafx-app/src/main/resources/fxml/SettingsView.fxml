@@ -129,7 +129,7 @@
           <TitledPane text="Anonymous usage statistics" collapsible="false">
             <VBox spacing="6">
               <CheckBox fx:id="usageEnabled" text="Send anonymous usage statistics (no data/files)"/>
-              <Label text="Only aggregate run figures are transmitted (template/version, finding &#10;counts by severity, score, duration). Never files, file names, cell &#10;contents, fund/instrument identifiers, or your IP address. Disabling &#10;stops all transmission. Details: docs/USAGE_STATS.md" wrapText="true"/>
+              <Label text="Only aggregate figures are transmitted (template/version, finding counts by &#10;severity, score, duration, file format and size, whether the file name follows &#10;the FinDatEx naming pattern, online-lookup counts, report exports, Java &#10;version). Never files, file names, cell contents, fund/instrument identifiers, &#10;or your IP address. Disabling stops all transmission. Details: docs/USAGE_STATS.md" wrapText="true"/>
               <Label text="Anonymous installation ID (no personal/machine binding):"/>
               <TextField fx:id="usageInstallId" editable="false" focusTraversable="false" prefColumnCount="40"/>
             </VBox>

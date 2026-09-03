@@ -27,14 +27,22 @@ public class ReportStore {
 
     private static final Logger log = LoggerFactory.getLogger(ReportStore.class);
 
-    private final Cache<UUID, Path> cache;
+    private final Cache<UUID, Entry> cache;
+
+    /**
+     * What the store knows about a report: the temp file plus the template it
+     * was produced for, so the download can be attributed in the usage stats.
+     */
+    public record Entry(Path path, String templateId, String templateVersion) {
+    }
 
     @Inject
     public ReportStore(WebConfig config) {
         this.cache = Caffeine.newBuilder()
                 .expireAfterWrite(Duration.ofMinutes(config.report().ttlMinutes()))
-                .removalListener((UUID key, Path path, RemovalCause cause) -> {
-                    if (path == null) return;
+                .removalListener((UUID key, Entry entry, RemovalCause cause) -> {
+                    if (entry == null || entry.path() == null) return;
+                    Path path = entry.path();
                     // EXPLICIT removals come from take() — the caller has taken
                     // ownership of the path and is responsible for deleting the
                     // file when its stream is fully written. Auto-deleting here
@@ -54,8 +62,12 @@ public class ReportStore {
     }
 
     public UUID store(Path file) {
+        return store(file, null, null);
+    }
+
+    public UUID store(Path file, String templateId, String templateVersion) {
         UUID id = UUID.randomUUID();
-        cache.put(id, file);
+        cache.put(id, new Entry(file, templateId, templateVersion));
         return id;
     }
 
@@ -65,7 +77,7 @@ public class ReportStore {
      * survive concurrent GETs.
      */
     public Optional<Path> get(UUID id) {
-        return Optional.ofNullable(cache.getIfPresent(id));
+        return Optional.ofNullable(cache.getIfPresent(id)).map(Entry::path);
     }
 
     /**
@@ -76,7 +88,7 @@ public class ReportStore {
      * UUID can never both succeed: exactly one {@code asMap().remove()} returns
      * the value, the other returns empty.
      */
-    public Optional<Path> take(UUID id) {
+    public Optional<Entry> take(UUID id) {
         return Optional.ofNullable(cache.asMap().remove(id));
     }
 

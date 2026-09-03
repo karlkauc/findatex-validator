@@ -58,23 +58,43 @@ class UsageEventTest {
         Set<String> names = Arrays.stream(UsageEvent.class.getRecordComponents())
                 .map(RecordComponent::getName).collect(Collectors.toSet());
         assertThat(names).containsExactlyInAnyOrder(
-                "installId", "source", "appVersion", "osName", "templateId",
-                "templateVersion", "profiles", "mode", "fileCount", "rowCount",
-                "errorCount", "warningCount", "infoCount", "overallScore",
-                "durationMs", "externalEnabled", "ruleIds", "clientEventAt");
-        // No field that could carry instance data.
-        assertThat(names).doesNotContain("ip", "ipAddress", "fileName", "filename",
-                "path", "isin", "lei", "fundName", "message", "value", "cells", "rows");
+                "eventType", "status", "installId", "source", "appVersion", "osName",
+                "javaMajor", "templateId", "templateVersion", "profiles", "mode",
+                "fileCount", "rowCount", "errorCount", "warningCount", "infoCount",
+                "overallScore", "durationMs", "externalEnabled", "ruleIds",
+                "input", "external", "isSample", "exportKind", "clientEventAt");
+        // No field that could carry instance data — checked recursively through
+        // the nested Input / External records as well.
+        Set<String> all = new java.util.HashSet<>();
+        collectComponentNames(UsageEvent.class, all);
+        assertThat(all).doesNotContain("ip", "ipAddress", "fileName", "filename", "name",
+                "path", "isin", "lei", "fundName", "message", "value", "cells", "rows",
+                "userAgent", "visitorHash");
+    }
+
+    private static void collectComponentNames(Class<?> type, Set<String> into) {
+        for (RecordComponent c : type.getRecordComponents()) {
+            into.add(c.getName());
+            if (c.getType().isRecord()) collectComponentNames(c.getType(), into);
+        }
     }
 
     @Test
     void mapperEmitsOnlyAggregatesNeverSensitiveContent() throws Exception {
         QualityReport report = reportWithSecrets();
+        UsageEvent.Input input = FileNameShape.of("20260331_TPTV7_SECRETFUNDCODE_LU9999999999.xlsx", 4096L);
         UsageEvent ev = UsageEvent.from(report, TPT, V, AppSettings.defaults(),
-                "single", 123L);
+                "single", 123L, input, new UsageEvent.External(3, 1, 40, 0));
 
+        assertThat(ev.eventType()).isEqualTo(UsageEvent.TYPE_VALIDATE);
+        assertThat(ev.status()).isEqualTo(UsageEvent.STATUS_OK);
         assertThat(ev.source()).isEqualTo("desktop");
         assertThat(ev.mode()).isEqualTo("single");
+        assertThat(ev.javaMajor()).isEqualTo(Runtime.version().feature());
+        assertThat(ev.input().format()).isEqualTo("xlsx");
+        assertThat(ev.input().bytes()).isEqualTo(4096L);
+        assertThat(ev.input().namePattern()).isEqualTo(FileNameShape.PATTERN_DATED_TEMPLATE);
+        assertThat(ev.external().lookups()).isEqualTo(3);
         assertThat(ev.fileCount()).isEqualTo(1);
         assertThat(ev.rowCount()).isEqualTo(1);
         assertThat(ev.errorCount()).isEqualTo(1);
@@ -93,26 +113,50 @@ class UsageEventTest {
                 .doesNotContain("FR0000120271")
                 .doesNotContain("Confidential message")
                 .doesNotContain("in-memory")
-                .doesNotContain("/test/");
+                .doesNotContain("/test/")
+                .doesNotContain("SECRETFUNDCODE")
+                .doesNotContain("LU9999999999")
+                .doesNotContain("20260331");
     }
 
     @Test
     void webFactoryUsesSentinelInstallIdAndWebSource() {
         QualityReport report = reportWithSecrets();
-        UsageEvent ev = UsageEvent.forWeb(report, TPT, V, true, 50L);
+        UsageEvent ev = UsageEvent.forWeb(report, TPT, V, true, 50L, null, null, true);
         assertThat(ev.installId()).isEqualTo(UsageEvent.WEB_INSTALL_ID);
         assertThat(ev.source()).isEqualTo("web");
         assertThat(ev.externalEnabled()).isTrue();
         assertThat(ev.mode()).isEqualTo("single");
+        assertThat(ev.isSample()).isTrue();
+        // The server's own OS / JVM must never be recorded for a browser run —
+        // the web layer fills os_name from the User-Agent instead.
+        assertThat(ev.osName()).isNull();
+        assertThat(ev.javaMajor()).isNull();
+        assertThat(ev.input()).isEqualTo(UsageEvent.Input.UNKNOWN);
     }
 
     @Test
-    void withSourceWebSwapsToSentinel() {
-        QualityReport report = reportWithSecrets();
-        UsageEvent ev = UsageEvent.from(report, TPT, V, AppSettings.defaults(),
-                "single", 1L).withSource("web");
-        assertThat(ev.installId()).isEqualTo(UsageEvent.WEB_INSTALL_ID);
-        assertThat(ev.source()).isEqualTo("web");
+    void failedRunCarriesOnlyTheStatusClass() {
+        UsageEvent ev = UsageEvent.failed(TPT, V, AppSettings.defaults(), "single",
+                UsageEvent.STATUS_PARSE_ERROR, FileNameShape.of("broken.csv", 12L));
+        assertThat(ev.eventType()).isEqualTo(UsageEvent.TYPE_VALIDATE);
+        assertThat(ev.status()).isEqualTo(UsageEvent.STATUS_PARSE_ERROR);
+        assertThat(ev.templateId()).isEqualTo("TPT");
+        assertThat(ev.rowCount()).isNull();
+        assertThat(ev.overallScore()).isNull();
+        assertThat(ev.input().format()).isEqualTo("csv");
+        assertThat(ev.profiles()).isEmpty();
+    }
+
+    @Test
+    void exportEventRecordsKindAndCount() throws Exception {
+        UsageEvent ev = UsageEvent.export(TPT, V, AppSettings.defaults(), "batch",
+                UsageEvent.EXPORT_PER_FILE, 7);
+        assertThat(ev.eventType()).isEqualTo(UsageEvent.TYPE_REPORT_DOWNLOAD);
+        assertThat(ev.exportKind()).isEqualTo("per_file");
+        assertThat(ev.fileCount()).isEqualTo(7);
+        assertThat(ev.status()).isEqualTo(UsageEvent.STATUS_OK);
+        assertThat(new ObjectMapper().writeValueAsString(ev)).contains("\"report_download\"");
     }
 
     @Test

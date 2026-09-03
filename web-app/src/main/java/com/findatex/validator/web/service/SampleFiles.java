@@ -71,6 +71,22 @@ public final class SampleFiles {
         return Map.copyOf(SAMPLES);
     }
 
+    /**
+     * True when an upload carries the download name of one of the bundled
+     * samples — the SPA re-uploads "Try an example" under exactly that name,
+     * which lets the usage stats tell demo runs from real files.
+     */
+    public static boolean isSampleFilename(String filename) {
+        if (filename == null) return false;
+        String n = filename.trim();
+        int slash = Math.max(n.lastIndexOf('/'), n.lastIndexOf('\\'));
+        if (slash >= 0) n = n.substring(slash + 1);
+        for (Sample s : SAMPLES.values()) {
+            if (s.filename().equalsIgnoreCase(n)) return true;
+        }
+        return false;
+    }
+
     public record Sample(String templateId, String version, String resource, String filename) {
 
         /** Streams the file; caller closes. Empty when the resource is absent. */

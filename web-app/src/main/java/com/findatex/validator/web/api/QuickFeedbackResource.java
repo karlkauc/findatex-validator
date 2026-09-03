@@ -4,7 +4,7 @@ import com.findatex.validator.quickfeedback.QuickFeedbackEntry;
 import com.findatex.validator.quickfeedback.QuickFeedbackStatus;
 import com.findatex.validator.web.dto.QuickFeedbackResultDto;
 import com.findatex.validator.web.dto.QuickFeedbackSubmitDto;
-import com.findatex.validator.web.service.GeoIpService;
+import com.findatex.validator.web.service.ClientContextFactory;
 import com.findatex.validator.web.service.QuickFeedbackService;
 import io.vertx.core.http.HttpServerRequest;
 import jakarta.inject.Inject;
@@ -41,7 +41,7 @@ public class QuickFeedbackResource {
     QuickFeedbackService quickFeedback;
 
     @Inject
-    GeoIpService geoIp;
+    ClientContextFactory clientContexts;
 
     @Context
     HttpServerRequest request;
@@ -63,7 +63,7 @@ public class QuickFeedbackResource {
         String source = "desktop".equalsIgnoreCase(trimmed(dto.source())) ? "desktop" : "web";
         String country = null;
         try {
-            country = geoIp.countryFor(clientIp());
+            country = clientContexts.from(request).countryCode();
         } catch (RuntimeException e) {
             log.debug("Quick-feedback: geo lookup failed (ignored)");
         }
@@ -76,10 +76,6 @@ public class QuickFeedbackResource {
         return s == null ? "" : s.trim();
     }
 
-    private String clientIp() {
-        if (request == null || request.remoteAddress() == null) return null;
-        return request.remoteAddress().host();
-    }
 
     private Response result(Response.Status http, QuickFeedbackStatus status) {
         return Response.status(http).entity(new QuickFeedbackResultDto(status.wire())).build();

@@ -51,4 +51,14 @@ class SampleFilesTest {
         assertThat(SampleFiles.forTemplate("UFO")).isEmpty();
         assertThat(SampleFiles.forTemplate(null)).isEmpty();
     }
+
+    @Test
+    void recognisesTheDownloadNameOfEverySample() {
+        for (SampleFiles.Sample s : SampleFiles.declared().values()) {
+            assertThat(SampleFiles.isSampleFilename(s.filename())).isTrue();
+            assertThat(SampleFiles.isSampleFilename("C:\\Downloads\\" + s.filename().toUpperCase())).isTrue();
+        }
+        assertThat(SampleFiles.isSampleFilename("20260331_TPTV7_LU123.xlsx")).isFalse();
+        assertThat(SampleFiles.isSampleFilename(null)).isFalse();
+    }
 }

@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { ChevronDown, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { ValidationResponse } from '../types/api';
 import { reportDownloadUrl } from '../api/client';
 import { ScoreBadge } from './ScoreBadge';
 import { FindingsTable } from './FindingsTable';
 import { PerFundScores } from './PerFundScores';
+import { CollapsibleSection } from './CollapsibleSection';
+import { TabPanel, TabStrip } from './Tabs';
+import { AnnotatedSourceView, JumpTarget } from './AnnotatedSourceView';
 
 interface Props {
   result: ValidationResponse;
@@ -15,7 +18,13 @@ interface Props {
 export function ResultPanel({ result, githubRepo, appVersion }: Props) {
   const overall = result.scores.find((s) => s.dimension === 'OVERALL');
   const others = result.scores.filter((s) => s.dimension !== 'OVERALL');
-  const [scoresOpen, setScoresOpen] = useState(true);
+  // Tab and jump state are per validation run — App keys this component by reportId.
+  const [tab, setTab] = useState<'findings' | 'source'>('findings');
+  const [jump, setJump] = useState<JumpTarget | null>(null);
+  const showInSource = (findingIndex: number) => {
+    setJump({ findingIndex, nonce: Date.now() });
+    setTab('source');
+  };
 
   return (
     <div className="space-y-6">
@@ -35,44 +44,49 @@ export function ResultPanel({ result, githubRepo, appVersion }: Props) {
         </div>
       </div>
 
-      <div>
-        <button
-          type="button"
-          onClick={() => setScoresOpen((v) => !v)}
-          aria-expanded={scoresOpen}
-          aria-controls="scores-grid"
-          className="mb-3 inline-flex items-center gap-2 rounded-md text-sm font-semibold uppercase tracking-wide text-slate-500 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 focus-visible:ring-offset-1"
-        >
-          <ChevronDown
-            className={'h-4 w-4 transition-transform ' + (scoresOpen ? '' : '-rotate-90')}
-            aria-hidden="true"
-          />
-          Scores
-        </button>
-        {scoresOpen && (
-          <div
-            id="scores-grid"
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {overall && (
-              <ScoreBadge label="Overall score" percentage={overall.percentage} prominent />
-            )}
-            {others.map((s) => (
-              <ScoreBadge key={s.dimension} label={prettyDimension(s.dimension)} percentage={s.percentage} />
-            ))}
-          </div>
-        )}
-      </div>
+      <CollapsibleSection title="Scores" storageKey="scores" panelId="scores-grid">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {overall && (
+            <ScoreBadge label="Overall score" percentage={overall.percentage} prominent />
+          )}
+          {others.map((s) => (
+            <ScoreBadge key={s.dimension} label={prettyDimension(s.dimension)} percentage={s.percentage} />
+          ))}
+        </div>
+      </CollapsibleSection>
 
       <PerFundScores perFundScores={result.perFundScores ?? []} />
 
-      <FindingsTable
-        findings={result.findings}
-        githubRepo={githubRepo}
-        templateId={result.summary.templateId}
-        templateVersion={result.summary.templateVersion}
-        appVersion={appVersion}
-      />
+      <div className="space-y-3">
+        <TabStrip
+          ariaLabel="Result views"
+          active={tab}
+          onChange={setTab}
+          tabs={[
+            { id: 'findings', label: `Findings (${result.findings.length})` },
+            { id: 'source', label: 'Annotated Source' },
+          ]}
+        />
+        <TabPanel id="findings" active={tab === 'findings'}>
+          <FindingsTable
+            findings={result.findings}
+            githubRepo={githubRepo}
+            templateId={result.summary.templateId}
+            templateVersion={result.summary.templateVersion}
+            appVersion={appVersion}
+            onShowInSource={showInSource}
+          />
+        </TabPanel>
+        <TabPanel id="source" active={tab === 'source'}>
+          <AnnotatedSourceView
+            reportId={result.reportId}
+            available={result.annotatedSourceAvailable ?? false}
+            findings={result.findings}
+            active={tab === 'source'}
+            jump={jump}
+          />
+        </TabPanel>
+      </div>
     </div>
   );
 }

@@ -9,7 +9,14 @@ public record ValidationResponse(
         Map<String, List<ScoreDto>> perProfileScores,
         List<PerFundScoreDto> perFundScores,
         List<FindingDto> findings,
-        String reportId
+        String reportId,
+        /**
+         * Whether {@code GET /api/annotated-source/{reportId}} will serve the in-browser
+         * annotated view for this run. False when the upload exceeded the configured size
+         * cap or the side artifact could not be written — the XLSX report is unaffected.
+         * Appended last so older clients simply ignore it.
+         */
+        boolean annotatedSourceAvailable
 ) {
 
     public record Summary(

@@ -24,6 +24,12 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.report.ttl-minutes", defaultValue = "5")
     int reportTtlMinutes;
 
+    @ConfigProperty(name = "findatex.web.annotated-source.max-rows", defaultValue = "20000")
+    int annotatedSourceMaxRows;
+
+    @ConfigProperty(name = "findatex.web.annotated-source.max-cells", defaultValue = "2000000")
+    long annotatedSourceMaxCells;
+
     @ConfigProperty(name = "findatex.web.external.enabled", defaultValue = "false")
     boolean externalEnabled;
 
@@ -111,6 +117,15 @@ public class WebConfig {
 
     public Report report() {
         return new Report(reportTtlMinutes);
+    }
+
+    /**
+     * Size cap for the annotated-source JSON side artifact (rows × columns of the
+     * upload). Above it the run still produces the XLSX report, just no in-browser
+     * annotated view ({@code annotatedSourceAvailable=false}).
+     */
+    public AnnotatedSource annotatedSource() {
+        return new AnnotatedSource(annotatedSourceMaxRows, annotatedSourceMaxCells);
     }
 
     /**
@@ -219,6 +234,9 @@ public class WebConfig {
     }
 
     public record Report(int ttlMinutes) {
+    }
+
+    public record AnnotatedSource(int maxRows, long maxCells) {
     }
 
     public record Newsletter(String provider,

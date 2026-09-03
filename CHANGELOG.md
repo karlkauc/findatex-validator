@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.15] — 2026-09-03
+
+### Fixed
+- **Desktop usage statistics never reached the server.** Two gates in the
+  desktop sender were closed on every install: `usageStats.endpointUrl`
+  defaulted to `""` (the Settings dialog never exposed the field) and the
+  ingest token was read from a runtime env var no build or installer ever set.
+  The endpoint now defaults to the public instance
+  (`AppSettings.UsageStats.DEFAULT_ENDPOINT`; opt-out is `enabled=false` only),
+  and the token is baked in at build time — the `usage-token` Maven profile
+  copies `FINDATEX_USAGE_TOKEN` from the build env into
+  `META-INF/findatex-validator.properties`, `release.yml` supplies it from the
+  repository secret. A runtime `FINDATEX_USAGE_TOKEN` still overrides.
+- **Desktop ingest and page-view beacons are written synchronously.** Cloud Run
+  throttles the CPU once the response is out, so the fire-and-forget insert
+  only progressed on the next request — and with scale-to-zero a lone desktop
+  POST has no next request (observed: 202 at 22:06, row landed at 22:08 when an
+  unrelated GET woke the instance). `UsageStatsService` now inserts those two
+  kinds on the request thread before responding; web-run events keep the
+  worker. `UsageStatsServiceDeliveryTest` pins which thread writes which kind.
+
 ## [1.0.14] — 2026-09-03
 
 ### Added
@@ -386,7 +407,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.14...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.15...HEAD
+[1.0.15]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.15
 [1.0.14]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.14
 [1.0.13]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.13
 [1.0.12]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.12

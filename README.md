@@ -134,7 +134,7 @@ error* to read one line per rule with its occurrence count, select a
 finding and use *Report a false positive…* when the tool got it wrong,
 and export the Excel report.
 
-![Animated walkthrough: quality scores, findings filtered and grouped by error, false-positive report, Excel export](docs/screenshots/desktop-results.gif)
+![Animated walkthrough: quality scores, findings filtered and grouped by error, false-positive report, annotated source grid with filters and jump-to-cell, Excel export](docs/screenshots/desktop-results.gif)
 
 **Annotated Source.** The tab next to *Findings* shows the original file
 cell-for-cell with the same severity tinting as the Excel sheet of that

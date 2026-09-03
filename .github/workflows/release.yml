@@ -32,6 +32,11 @@ jobs:
           cache: maven
 
       - name: Build packages
+        env:
+          # Baked into META-INF/findatex-validator.properties (usage-token profile in
+          # the root pom) so desktop installs can post to /api/usage-stats. Must equal
+          # the FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN the web instance runs with.
+          FINDATEX_USAGE_TOKEN: ${{ secrets.FINDATEX_USAGE_TOKEN }}
         run: mvn -B -ntp -DskipTests package
 
       - name: Create GitHub Release with assets
@@ -78,6 +83,8 @@ jobs:
 
       - name: Build shaded JAR
         shell: bash
+        env:
+          FINDATEX_USAGE_TOKEN: ${{ secrets.FINDATEX_USAGE_TOKEN }}
         run: mvn -B -ntp -pl javafx-app -am -DskipTests package
 
       - name: Compute APP_VERSION from tag

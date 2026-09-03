@@ -324,7 +324,12 @@ failed runs with a `status` class, `report_download`, `sample_load`,
 fire-and-forgets a `UsageEvent` (aggregate counts and *classes* only — never
 files, names, codes, cell/finding content, or IP) to `POST /api/usage-stats`
 (`X-Usage-Token`); failures are silently dropped (DEBUG), the run is never
-disturbed. Old desktop builds still post the pre-2026-09 JSON — every new DTO
+disturbed. The token is **baked in at build time** (`usage-token` Maven profile
+→ `META-INF/findatex-validator.properties`, from the build env
+`FINDATEX_USAGE_TOKEN` = repo secret in `release.yml`); a local `mvn package`
+has no token, so dev desktop builds never post — set `FINDATEX_USAGE_TOKEN`
+at runtime to test. The endpoint defaults to the public instance
+(`AppSettings.UsageStats.DEFAULT_ENDPOINT`); opt-out is `enabled=false` only. Old desktop builds still post the pre-2026-09 JSON — every new DTO
 field is nullable and defaults to `validate`/`ok`. Web runs self-record from
 `ValidationOrchestrator` (sentinel install id); downloads/samples/failures from
 `ReportResource`, `SampleResource`, `ValidationResource`, `RateLimitFilter`.

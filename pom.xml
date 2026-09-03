@@ -52,6 +52,10 @@
         <maven.compiler.release>21</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
+        <!-- Desktop usage-stats ingest token, baked into META-INF/findatex-validator.properties.
+             Empty by default; the usage-token profile below fills it from the build env
+             (FINDATEX_USAGE_TOKEN), -Dfindatex.usage.token=… overrides both. -->
+        <findatex.usage.token/>
 
         <javafx.version>21.0.12</javafx.version>
         <poi.version>5.5.1</poi.version>
@@ -272,6 +276,24 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!--
+            Bakes the desktop usage-stats ingest token into the core JAR when the
+            build environment carries FINDATEX_USAGE_TOKEN (release.yml sets it from
+            the repository secret). Without the variable the property stays empty and
+            desktop builds never post usage events — see docs/USAGE_STATS.md.
+        -->
+        <profile>
+            <id>usage-token</id>
+            <activation>
+                <property>
+                    <name>env.FINDATEX_USAGE_TOKEN</name>
+                </property>
+            </activation>
+            <properties>
+                <findatex.usage.token>${env.FINDATEX_USAGE_TOKEN}</findatex.usage.token>
+            </properties>
         </profile>
     </profiles>
 

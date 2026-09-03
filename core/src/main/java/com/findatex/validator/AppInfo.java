@@ -34,6 +34,17 @@ public final class AppInfo {
         return GITHUB_URL;
     }
 
+    /**
+     * Ingest token for {@code POST /api/usage-stats}, baked in at build time from
+     * the Maven property {@code findatex.usage.token} (set from the
+     * {@code FINDATEX_USAGE_TOKEN} build env by the {@code usage-token} profile in
+     * the root pom). Empty in local/dev builds — the desktop sender then stays
+     * silent unless the same variable is present at runtime.
+     */
+    public static String usageToken() {
+        return resolved("usageToken", "");
+    }
+
     private static String resolved(String key, String fallback) {
         String value = PROPS.getProperty(key);
         if (value == null || value.isBlank() || value.startsWith("${")) {

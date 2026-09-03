@@ -16,7 +16,7 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback,
      */
     public AppSettings {
         if (feedback == null) feedback = new Feedback("");
-        if (usageStats == null) usageStats = new UsageStats(true, "", "");
+        if (usageStats == null) usageStats = new UsageStats(true, "", null);
         if (newsletter == null) newsletter = new Newsletter("");
         if (quickFeedback == null) quickFeedback = new QuickFeedback(null);
     }
@@ -69,14 +69,20 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback,
      * Anonymous usage-statistics opt-out block. {@code enabled} defaults to
      * true. {@code installId} is a random UUID generated once and persisted
      * (no PII / machine binding). {@code endpointUrl} is the web-app ingest
-     * URL; blank disables the background sender.
+     * URL (full path, not the base URL). Blank falls back to the public
+     * instance: the Settings dialog never exposed this field, so every
+     * settings.json written before 1.0.15 carries {@code ""} here — opting out
+     * is {@code enabled=false}, never a blank URL. Self-hosters point it at
+     * their own {@code /api/usage-stats} by editing settings.json.
      */
     public record UsageStats(boolean enabled, String installId, String endpointUrl) {
+        public static final String DEFAULT_ENDPOINT = "https://www.findatex-validator.eu/api/usage-stats";
+
         public UsageStats {
             if (installId == null || installId.isBlank()) {
                 installId = UUID.randomUUID().toString();
             }
-            if (endpointUrl == null) endpointUrl = "";
+            if (endpointUrl == null || endpointUrl.isBlank()) endpointUrl = DEFAULT_ENDPOINT;
         }
     }
 
@@ -118,7 +124,7 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback,
                         ProxyMode.SYSTEM,
                         new ManualProxy("", 0, "", "", "localhost|127.0.0.1")),
                 new Feedback(""),
-                new UsageStats(true, "", ""),
+                new UsageStats(true, "", null),
                 new Newsletter(""),
                 new QuickFeedback(null));
     }

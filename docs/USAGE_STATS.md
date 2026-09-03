@@ -207,11 +207,26 @@ SELECT (SELECT count(*) FROM page_view) legacy,
 
 ## Configuration (all env-overridable; feature off until set)
 
-Desktop (`settings.json` → `usageStats`, plus env):
-- `enabled` — opt-out flag (default `true`)
+Desktop (`settings.json` → `usageStats`, plus build/runtime env):
+- `enabled` — opt-out flag (default `true`); this is the only opt-out switch
 - `installId` — generated + persisted automatically
-- `endpointUrl` — web ingest URL; blank disables the sender
-- `FINDATEX_USAGE_TOKEN` — embedded ingest token; blank disables the sender
+- `endpointUrl` — full web ingest URL, default
+  `https://www.findatex-validator.eu/api/usage-stats`
+  (`AppSettings.UsageStats.DEFAULT_ENDPOINT`). Blank/missing falls back to the
+  default — every settings.json written before 1.0.15 carries `""` here because
+  the Settings dialog never exposed the field. Self-hosters edit settings.json
+  and point it at their own instance.
+- Ingest token — **baked into the build**: the `usage-token` profile in the
+  root pom copies the build-time env var `FINDATEX_USAGE_TOKEN` into
+  `META-INF/findatex-validator.properties` (`usageToken=`), read via
+  `AppInfo.usageToken()`. `release.yml` sets it from the repository secret
+  `FINDATEX_USAGE_TOKEN`, which must equal the web instance's
+  `FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN` (Secret Manager
+  `findatex-usage-ingest-token`). A runtime `FINDATEX_USAGE_TOKEN` env var
+  overrides the embedded value (local testing against a dev instance). Local
+  `mvn package` without the variable yields an empty token and a silent
+  sender — that is why dev builds never show up in the stats.
+  `-Dfindatex.usage.token=…` overrides both.
 
 Web (`application.properties` / env):
 - `FINDATEX_WEB_USAGE_DB_URL` / `_USER` / `_PASSWORD` — JDBC URL of the

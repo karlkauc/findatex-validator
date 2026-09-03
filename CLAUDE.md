@@ -335,7 +335,11 @@ field is nullable and defaults to `validate`/`ok`. Web runs self-record from
 `ReportResource`, `SampleResource`, `ValidationResource`, `RateLimitFilter`.
 The web layer is the sole DB writer via plain Agroal/JDBC (`UsageStatsService`,
 row shape `UsageRow`) — **inert with no `FINDATEX_WEB_USAGE_DB_URL`** (app/tests
-still boot). Everything request-derived comes from one place,
+still boot). Delivery differs by event kind: web-run events go through the
+fire-and-forget worker, but **desktop ingest and page views are inserted
+synchronously on the request thread** (`submitNow`) — Cloud Run throttles CPU
+after the response, and those arrive as a lone request with no follow-up to
+wake the worker (`UsageStatsServiceDeliveryTest` pins this). Everything request-derived comes from one place,
 `ClientContextFactory` → `ClientContext`: `country_code` (`GeoIpService`,
 offline GeoLite2), the daily-rotating `visitor_hash` (`VisitorHasher`,
 `sha256(HMAC(FINDATEX_WEB_VISITOR_SALT_SECRET, day) | ip | ua)`, same scheme as

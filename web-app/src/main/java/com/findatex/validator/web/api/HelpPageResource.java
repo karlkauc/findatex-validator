@@ -125,7 +125,7 @@ public class HelpPageResource {
 
     @GET
     public Response page() {
-        String body = renderer.markdownToHtml(help.helpMarkdown())
+        String body = renderer.proseToHtml(help.helpMarkdown())
                 + "<script type=\"application/ld+json\">" + FAQ_JSON_LD + "</script>";
 
         return Response.ok(renderer.page(

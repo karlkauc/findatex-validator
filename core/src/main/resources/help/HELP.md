@@ -44,7 +44,8 @@ You get the same engine in two delivery modes:
 - **Desktop app (JavaFX)** — files never leave your machine. Use this for
   daily validations on confidential fund data. Besides the findings table
   it shows the original file as an in-app **Annotated Source** grid (same
-  colours and finding texts as the Excel sheet of the same name, see §9).
+  colours and finding texts as the Excel sheet of the same name, see §9);
+  the web app has the same tab.
 - **Web app (Quarkus + React, Docker)** — useful when the desktop install
   is not an option, or for occasional use. Uploads are processed in
   memory and discarded immediately; reports are available for 5 minutes
@@ -492,12 +493,13 @@ Both apps show the same grid without exporting: the **Annotated Source**
 tab next to *Findings* mirrors the file with identical tinting, the
 findings appear as a tooltip instead of an Excel comment, and two
 checkboxes hide rows or columns that carry no finding. Double-click a
-finding (or use *Show in annotated source* in its context menu) to jump
-straight to the offending cell. On the desktop, in batch mode the grid
-follows the file selected in the *Files* table. In the web app the grid is
-kept for 5 minutes like the report and then deleted; for very large files
-the in-browser view is skipped and the Excel sheet of the same name is the
-place to look.
+finding (desktop: or *Show in annotated source* in its context menu; web:
+or the *Source* button on the row) to jump straight to the offending cell.
+On the desktop, in batch mode the grid follows the file selected in the
+*Files* table. In the web app the grid starts with only the rows that
+carry findings and pages in blocks of 200 rows; it is kept for 5 minutes
+like the report and then deleted, and for very large files the in-browser
+view is skipped and the Excel sheet of the same name is the place to look.
 
 ---
 

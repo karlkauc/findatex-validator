@@ -25,7 +25,7 @@ import static com.findatex.validator.web.service.RulesPageRenderer.escape;
  * win over this resource in the static-resource handler.
  *
  * <p>Priorities are the honest ordering rather than a lever: the app itself,
- * then the per-version references, then fields of the current spec version,
+ * then the help page and the per-version references, then fields of the current spec version,
  * then fields of superseded versions — which are near-identical to their
  * successors and should not compete with them.
  */
@@ -50,6 +50,7 @@ public class SitemapResource {
                 .append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
 
         url(xml, origin + "/", "weekly", "1.0");
+        url(xml, origin + "/help", "monthly", "0.8");
         if (!docs.index().isEmpty()) url(xml, origin + "/rules", "monthly", "0.8");
 
         Set<String> currentTemplates = new HashSet<>();

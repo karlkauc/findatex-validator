@@ -60,6 +60,12 @@ public class HelpResource {
         }
     }
 
+    /** The bundled {@code HELP.md}, verbatim — also rendered by {@link HelpPageResource}. */
+    public String helpMarkdown() {
+        if (body == null) throw new IllegalStateException("Help content not loaded");
+        return body;
+    }
+
     @GET
     @Produces("text/markdown; charset=utf-8")
     public Response get() {

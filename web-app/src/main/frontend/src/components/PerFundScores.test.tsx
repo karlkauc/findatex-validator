@@ -35,3 +35,14 @@ describe('PerFundScores', () => {
     expect(screen.getAllByText(/LU0010000003/).length).toBeGreaterThan(0);
   });
 });
+
+describe('PerFundScores collapsing', () => {
+  it('collapses when the header is clicked', async () => {
+    window.localStorage.clear();
+    const user = (await import('@testing-library/user-event')).default.setup();
+    render(<PerFundScores perFundScores={[make('FR0000000001', 0.5)]} />);
+    expect(screen.getByText('FR0000000001')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Per Fund' }));
+    expect(screen.queryByText('FR0000000001')).toBeNull();
+  });
+});

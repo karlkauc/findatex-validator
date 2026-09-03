@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Download, GitFork, HelpCircle, Info, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
+import { ChevronLeft, Download, GitFork, HelpCircle, Info, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
 import {
   fetchBuildInfo,
   fetchFeedbackConfig,
@@ -24,6 +24,9 @@ import { RATE_LIMIT_QUERY_KEY, RateLimitBadge } from './components/RateLimitBadg
 import { QuotaExhaustedNotice } from './components/QuotaExhaustedNotice';
 import { NewsletterSignup } from './components/NewsletterSignup';
 import { QuickFeedback } from './components/QuickFeedback';
+import { CollapsibleSection } from './components/CollapsibleSection';
+import { INPUT_COLUMN_ID, SidebarLayout } from './components/SidebarLayout';
+import { usePersistedBoolean } from './lib/usePersistedState';
 import { RateLimitStatus, ValidationResponse } from './types/api';
 
 const GITHUB_URL = 'https://github.com/karlkauc/findatex-validator';
@@ -104,6 +107,9 @@ export default function App() {
   const [sampleLoading, setSampleLoading] = useState(false);
   const [sampleError, setSampleError] = useState<unknown>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  // Manual only: the wide findings table wants the full width, but someone
+  // iterating over profiles wants the inputs in view — so no auto-collapse.
+  const [inputCollapsed, setInputCollapsed] = usePersistedBoolean('inputCollapsed', false);
   const [aboutOpen, setAboutOpen] = useState(false);
 
   const templates = templatesQuery.data ?? [];
@@ -198,7 +204,7 @@ export default function App() {
         ref={headerRef}
         className="fixed inset-x-0 top-0 z-30 bg-gradient-to-b from-navy-700 to-navy-800 text-white shadow-md"
       >
-        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-3 px-6 py-5 lg:px-8">
+        <div className="flex flex-wrap items-center gap-3 px-4 py-5 lg:px-6">
           <ShieldCheck className="h-7 w-7" aria-hidden="true" />
           <div className="flex-1">
             <h1 className="text-lg font-semibold tracking-tight">FinDatEx Validator</h1>
@@ -245,134 +251,152 @@ export default function App() {
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
       <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
 
-      <main className="mx-auto max-w-[1600px] space-y-6 px-6 py-8 lg:px-8">
+      <main className="space-y-6 px-4 py-8 lg:px-6">
         {templatesQuery.isLoading && (
           <p className="text-sm text-slate-500">Loading templates…</p>
         )}
         {templatesQuery.isError && <ErrorBanner error={templatesQuery.error} />}
 
         {!templatesQuery.isLoading && !templatesQuery.isError && (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
-            <section className="space-y-5">
-              <div className="card">
-                <div className="card-header">Input</div>
-                <div className="card-body space-y-5">
-                  <TemplatePicker
-                    templates={templates}
-                    selectedTemplateId={templateId}
-                    selectedVersion={version}
-                    onTemplateChange={setTemplateId}
-                    onVersionChange={setVersion}
-                  />
-                  {currentVersion && (
-                    <ProfileSelector
-                      profiles={currentVersion.profiles}
-                      selected={profiles}
-                      onChange={setProfiles}
-                    />
-                  )}
-                  <ExternalValidationToggle
-                    available={currentTemplate?.externalAvailable ?? false}
-                    externalEnabled={externalEnabled}
-                    leiEnabled={leiEnabled}
-                    leiCheckLapsed={leiCheckLapsed}
-                    leiCheckName={leiCheckName}
-                    leiCheckCountry={leiCheckCountry}
-                    isinEnabled={isinEnabled}
-                    isinCheckCurrency={isinCheckCurrency}
-                    isinCheckCic={isinCheckCic}
-                    apiKey={openfigiApiKey}
-                    onExternalEnabledChange={setExternalEnabled}
-                    onLeiEnabledChange={setLeiEnabled}
-                    onLeiCheckLapsedChange={setLeiCheckLapsed}
-                    onLeiCheckNameChange={setLeiCheckName}
-                    onLeiCheckCountryChange={setLeiCheckCountry}
-                    onIsinEnabledChange={setIsinEnabled}
-                    onIsinCheckCurrencyChange={setIsinCheckCurrency}
-                    onIsinCheckCicChange={setIsinCheckCic}
-                    onApiKeyChange={setOpenfigiApiKey}
-                  />
-                  <FileUpload file={file} onFileChange={setFile} />
-                  <button
-                    type="button"
-                    className="btn-primary w-full"
-                    disabled={!canSubmit}
-                    aria-busy={validateMutation.isPending}
-                    onClick={() => submit()}
-                  >
-                    {validateMutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Validating…
-                      </>
-                    ) : (
-                      'Validate'
-                    )}
-                  </button>
-                  {currentTemplate?.sample && (
+          <SidebarLayout
+            collapsed={inputCollapsed}
+            onExpand={() => setInputCollapsed(false)}
+            sidebar={
+              <>
+                <div className="card">
+                  <div className="card-header flex items-center justify-between gap-3">
+                    <span>Input</span>
                     <button
                       type="button"
-                      className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500"
-                      disabled={sampleLoading || validateMutation.isPending || quotaExhausted}
-                      onClick={runSample}
+                      onClick={() => setInputCollapsed(true)}
+                      aria-label="Collapse input panel"
+                      aria-expanded={true}
+                      aria-controls={INPUT_COLUMN_ID}
+                      title="Hide input panel"
+                      className="hidden rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 lg:inline-flex"
                     >
-                      {sampleLoading ? (
-                        <>
+                      <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <div className="card-body space-y-5">
+                    <TemplatePicker
+                      templates={templates}
+                      selectedTemplateId={templateId}
+                      selectedVersion={version}
+                      onTemplateChange={setTemplateId}
+                      onVersionChange={setVersion}
+                    />
+                    {currentVersion && (
+                      <ProfileSelector
+                        profiles={currentVersion.profiles}
+                        selected={profiles}
+                        onChange={setProfiles}
+                      />
+                    )}
+                    <ExternalValidationToggle
+                      available={currentTemplate?.externalAvailable ?? false}
+                      externalEnabled={externalEnabled}
+                      leiEnabled={leiEnabled}
+                      leiCheckLapsed={leiCheckLapsed}
+                      leiCheckName={leiCheckName}
+                      leiCheckCountry={leiCheckCountry}
+                      isinEnabled={isinEnabled}
+                      isinCheckCurrency={isinCheckCurrency}
+                      isinCheckCic={isinCheckCic}
+                      apiKey={openfigiApiKey}
+                      onExternalEnabledChange={setExternalEnabled}
+                      onLeiEnabledChange={setLeiEnabled}
+                      onLeiCheckLapsedChange={setLeiCheckLapsed}
+                      onLeiCheckNameChange={setLeiCheckName}
+                      onLeiCheckCountryChange={setLeiCheckCountry}
+                      onIsinEnabledChange={setIsinEnabled}
+                      onIsinCheckCurrencyChange={setIsinCheckCurrency}
+                      onIsinCheckCicChange={setIsinCheckCic}
+                      onApiKeyChange={setOpenfigiApiKey}
+                    />
+                    <FileUpload file={file} onFileChange={setFile} />
+                    <button
+                      type="button"
+                      className="btn-primary w-full"
+                      disabled={!canSubmit}
+                      aria-busy={validateMutation.isPending}
+                      onClick={() => submit()}
+                    >
+                      {validateMutation.isPending ? (
+                      <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Loading example…
-                        </>
+                          Validating…
+                      </>
                       ) : (
-                        <>
-                          <Sparkles className="h-4 w-4" aria-hidden="true" />
-                          No file at hand? Try an example
-                        </>
+                        'Validate'
                       )}
                     </button>
-                  )}
-                  <div aria-live="polite" aria-atomic="true" className="sr-only">
-                    {validateMutation.isPending ? 'Validation in progress' : ''}
+                    {currentTemplate?.sample && (
+                      <button
+                        type="button"
+                        className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500"
+                        disabled={sampleLoading || validateMutation.isPending || quotaExhausted}
+                        onClick={runSample}
+                      >
+                        {sampleLoading ? (
+                        <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Loading example…
+                        </>
+                        ) : (
+                        <>
+                            <Sparkles className="h-4 w-4" aria-hidden="true" />
+                            No file at hand? Try an example
+                        </>
+                        )}
+                      </button>
+                    )}
+                    <div aria-live="polite" aria-atomic="true" className="sr-only">
+                      {validateMutation.isPending ? 'Validation in progress' : ''}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="rounded-md border border-slate-200 bg-white p-4 text-xs text-slate-500">
-                <p className="font-semibold text-slate-700">Notes</p>
-                <ul className="mt-2 list-disc space-y-1 pl-4">
-                  <li>Uploaded files are <strong>not persisted</strong> on the server and are deleted immediately after the response.</li>
-                  <li>Excel reports are available for 5 minutes via a single-use URL.</li>
-                  <li>External validation (GLEIF/OpenFIGI) is disabled by default in the web UI.</li>
-                  <li>
-                    Anonymous usage statistics record aggregates only (template, finding counts, file
-                    format and size, browser OS family, a daily-rotating visitor hash) — never file
-                    content, file names or your IP address.
-                  </li>
-                  <li>
-                    For daily validations without web upload,{' '}
-                    {rateLimitQuery.data?.desktopDownloadUrl ? (
-                      <a
-                        href={rateLimitQuery.data.desktopDownloadUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-medium text-navy-700 underline underline-offset-2 hover:text-navy-500"
-                      >
-                        <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                        download the desktop app
-                      </a>
-                    ) : (
-                      <>the desktop app is available</>
-                    )}{' '}
-                    — your data never leaves your machine.
-                  </li>
-                </ul>
-              </div>
-            </section>
-
-            <section className="space-y-5">
+                <CollapsibleSection title="Notes" storageKey="notes">
+                  <div className="rounded-md border border-slate-200 bg-white p-4 text-xs text-slate-500">
+                    <ul className="list-disc space-y-1 pl-4">
+                      <li>Uploaded files are <strong>not persisted</strong> on the server and are deleted immediately after the response.</li>
+                      <li>The Excel report (single-use link) and the Annotated Source view are kept for 5 minutes, then deleted.</li>
+                      <li>External validation (GLEIF/OpenFIGI) runs only if you switch it on for a run; only the identifiers from your file are sent.</li>
+                      <li>
+                        Anonymous usage statistics record aggregates only (template, finding counts, file
+                        format and size, browser OS family, a daily-rotating visitor hash) — never file
+                        content, file names or your IP address.
+                      </li>
+                      <li>
+                        For daily validations without web upload,{' '}
+                        {rateLimitQuery.data?.desktopDownloadUrl ? (
+                          <a
+                            href={rateLimitQuery.data.desktopDownloadUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 font-medium text-navy-700 underline underline-offset-2 hover:text-navy-500"
+                          >
+                            <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                            download the desktop app
+                          </a>
+                        ) : (
+                          <>the desktop app is available</>
+                        )}{' '}
+                        — your data never leaves your machine.
+                      </li>
+                    </ul>
+                  </div>
+                </CollapsibleSection>
+              </>
+            }
+          >
               <QuotaExhaustedNotice />
               {sampleError != null && <ErrorBanner error={sampleError} />}
               {validateMutation.isError && <ErrorBanner error={validateMutation.error} />}
               {result ? (
                 <ResultPanel
+                  key={result.reportId}
                   result={result}
                   githubRepo={feedbackConfigQuery.data?.githubRepo ?? null}
                   appVersion={
@@ -392,13 +416,12 @@ export default function App() {
                   </div>
                 </div>
               )}
-            </section>
-          </div>
+          </SidebarLayout>
         )}
       </main>
 
       <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-[1600px] px-6 py-4 text-xs text-slate-500 lg:px-8">
+        <div className="px-4 py-4 text-xs text-slate-500 lg:px-6">
           {buildInfoQuery.data && (
             <div>
               FinDatEx Validator{' '}
@@ -417,6 +440,15 @@ export default function App() {
               )}
             </div>
           )}
+          <div>
+            <a href="/help" className="underline hover:text-slate-700">
+              Help &amp; FAQ
+            </a>
+            {' · '}
+            <a href="/rules" className="underline hover:text-slate-700">
+              Rule reference
+            </a>
+          </div>
           <div>
             — Source &amp; Desktop-Build:&nbsp;
             <a

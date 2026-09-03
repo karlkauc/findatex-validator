@@ -32,5 +32,10 @@
   .badge-error    { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-50    text-red-700    ring-1 ring-inset ring-red-200; }
   .badge-warning  { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-50  text-amber-800  ring-1 ring-inset ring-amber-200; }
   .badge-info     { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-sky-50    text-sky-700    ring-1 ring-inset ring-sky-200; }
+  /* Annotated Source cells — same tints as the desktop app (app.css) and the Excel sheet. */
+  .src-cell-error { background-color: #fdecea; }
+  .src-cell-warn  { background-color: #fff4cc; }
+  .src-cell-info  { background-color: #dbeafe; }
+  .src-cell-jump  { @apply ring-2 ring-inset ring-navy-600; }
   .badge-success  { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200; }
 }

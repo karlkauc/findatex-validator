@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FindingsTable } from './FindingsTable';
@@ -152,5 +152,40 @@ describe('FindingsTable', () => {
     const cells = within(row as HTMLElement);
     expect(cells.getByText('ERROR')).toBeInTheDocument();
     expect(cells.getByText('PRESENCE/5')).toBeInTheDocument();
+  });
+});
+
+describe('FindingsTable — show in source', () => {
+  const rows: FindingDto[] = [
+    f({ severity: 'ERROR', ruleId: 'GLOBAL/1', message: 'file-level' }),
+    f({ severity: 'ERROR', ruleId: 'FORMAT/2', rowIndex: 7, message: 'bad' }),
+    f({ severity: 'WARNING', ruleId: 'XF-3', rowIndex: 9, message: 'odd' }),
+  ];
+
+  it('renders no Source column without the callback', () => {
+    render(<FindingsTable findings={rows} />);
+    expect(screen.queryByRole('button', { name: 'Source' })).toBeNull();
+  });
+
+  it('reports the original index, filtering notwithstanding', async () => {
+    const user = userEvent.setup();
+    const onShow = vi.fn();
+    render(<FindingsTable findings={rows} onShowInSource={onShow} />);
+    // Hide errors so the WARNING row is the only visible one with a button.
+    await user.click(screen.getByRole('button', { name: 'ERROR (2)' }));
+    await user.click(screen.getByRole('button', { name: 'Source' }));
+    expect(onShow).toHaveBeenCalledWith(2);
+  });
+
+  it('offers no action for file-level findings and reacts to double-click', async () => {
+    const user = userEvent.setup();
+    const onShow = vi.fn();
+    render(<FindingsTable findings={rows} onShowInSource={onShow} />);
+    // two row-bound findings → two buttons, the file-level one has none
+    expect(screen.getAllByRole('button', { name: 'Source' })).toHaveLength(2);
+    await user.dblClick(screen.getByText('FORMAT/2'));
+    expect(onShow).toHaveBeenCalledWith(1);
+    await user.dblClick(screen.getByText('GLOBAL/1'));
+    expect(onShow).toHaveBeenCalledTimes(1);
   });
 });

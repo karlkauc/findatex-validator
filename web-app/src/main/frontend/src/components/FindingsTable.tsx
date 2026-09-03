@@ -9,6 +9,11 @@ interface Props {
   templateId?: string;
   templateVersion?: string;
   appVersion?: string;
+  /**
+   * Adds a "Source" action per finding row (flat view only) that reports the
+   * finding's index in `findings`; the caller opens the Annotated Source tab.
+   */
+  onShowInSource?: (findingIndex: number) => void;
 }
 
 type ReportContext = Omit<FalsePositiveReport, 'userComment'>;
@@ -62,6 +67,7 @@ export function FindingsTable({
   templateId = '',
   templateVersion = '',
   appVersion = 'web',
+  onShowInSource,
 }: Props) {
   const [enabled, setEnabled] = useState<Set<Severity>>(new Set(SEVERITIES));
   const [query, setQuery] = useState('');
@@ -70,6 +76,24 @@ export function FindingsTable({
 
   const feedbackEnabled = isValidRepoSlug(githubRepo);
   const extraCol = feedbackEnabled ? 1 : 0;
+  const sourceCol = onShowInSource ? 1 : 0;
+
+  // Only findings that sit on a row can be shown in the grid; file-level
+  // findings (no rowIndex) get no action.
+  const SourceCell = ({ f }: { f: FindingDto }) => (
+    <td className="whitespace-nowrap px-3 py-2 align-top">
+      {f.rowIndex != null && (
+        <button
+          type="button"
+          onClick={() => onShowInSource?.(findings.indexOf(f))}
+          title="Show this finding in the annotated source"
+          className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500"
+        >
+          Source
+        </button>
+      )}
+    </td>
+  );
 
   const reportFromFinding = (f: FindingDto): ReportContext => ({
     templateId,
@@ -311,12 +335,21 @@ export function FindingsTable({
                 <th className="whitespace-nowrap px-3 py-2 font-medium">Field</th>
                 <th className="whitespace-nowrap px-3 py-2 font-medium">Field name</th>
                 <th className="px-3 py-2 font-medium">Message</th>
+                {onShowInSource && <th className="px-3 py-2 font-medium">Source</th>}
                 {feedbackEnabled && <th className="px-3 py-2 font-medium">Report</th>}
               </tr>
             </thead>
             <tbody>
               {filtered.map((f, idx) => (
-                <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                <tr
+                  key={idx}
+                  className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                  onDoubleClick={
+                    onShowInSource && f.rowIndex != null
+                      ? () => onShowInSource(findings.indexOf(f))
+                      : undefined
+                  }
+                >
                   <td className="whitespace-nowrap px-3 py-2 align-top">
                     <span className={severityBadge(f.severity)}>{f.severity}</span>
                   </td>
@@ -350,12 +383,13 @@ export function FindingsTable({
                   </td>
                   <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">{f.fieldName ?? ''}</td>
                   <td className="whitespace-normal break-words px-3 py-2 align-top text-slate-700">{f.message}</td>
+                  {onShowInSource && <SourceCell f={f} />}
                   {feedbackEnabled && <ReportCell ctx={reportFromFinding(f)} />}
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={FLAT_COLUMN_COUNT + extraCol} className="px-4 py-6 text-center text-sm text-slate-500">
+                  <td colSpan={FLAT_COLUMN_COUNT + extraCol + sourceCol} className="px-4 py-6 text-center text-sm text-slate-500">
                     No findings for the current selection.
                   </td>
                 </tr>

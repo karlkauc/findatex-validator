@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Download } from 'lucide-react';
 import { ValidationResponse } from '../types/api';
 import { reportDownloadUrl } from '../api/client';
@@ -5,6 +6,8 @@ import { ScoreBadge } from './ScoreBadge';
 import { FindingsTable } from './FindingsTable';
 import { PerFundScores } from './PerFundScores';
 import { CollapsibleSection } from './CollapsibleSection';
+import { TabPanel, TabStrip } from './Tabs';
+import { AnnotatedSourceView, JumpTarget } from './AnnotatedSourceView';
 
 interface Props {
   result: ValidationResponse;
@@ -15,6 +18,13 @@ interface Props {
 export function ResultPanel({ result, githubRepo, appVersion }: Props) {
   const overall = result.scores.find((s) => s.dimension === 'OVERALL');
   const others = result.scores.filter((s) => s.dimension !== 'OVERALL');
+  // Tab and jump state are per validation run — App keys this component by reportId.
+  const [tab, setTab] = useState<'findings' | 'source'>('findings');
+  const [jump, setJump] = useState<JumpTarget | null>(null);
+  const showInSource = (findingIndex: number) => {
+    setJump({ findingIndex, nonce: Date.now() });
+    setTab('source');
+  };
 
   return (
     <div className="space-y-6">
@@ -47,13 +57,36 @@ export function ResultPanel({ result, githubRepo, appVersion }: Props) {
 
       <PerFundScores perFundScores={result.perFundScores ?? []} />
 
-      <FindingsTable
-        findings={result.findings}
-        githubRepo={githubRepo}
-        templateId={result.summary.templateId}
-        templateVersion={result.summary.templateVersion}
-        appVersion={appVersion}
-      />
+      <div className="space-y-3">
+        <TabStrip
+          ariaLabel="Result views"
+          active={tab}
+          onChange={setTab}
+          tabs={[
+            { id: 'findings', label: `Findings (${result.findings.length})` },
+            { id: 'source', label: 'Annotated Source' },
+          ]}
+        />
+        <TabPanel id="findings" active={tab === 'findings'}>
+          <FindingsTable
+            findings={result.findings}
+            githubRepo={githubRepo}
+            templateId={result.summary.templateId}
+            templateVersion={result.summary.templateVersion}
+            appVersion={appVersion}
+            onShowInSource={showInSource}
+          />
+        </TabPanel>
+        <TabPanel id="source" active={tab === 'source'}>
+          <AnnotatedSourceView
+            reportId={result.reportId}
+            available={result.annotatedSourceAvailable ?? false}
+            findings={result.findings}
+            active={tab === 'source'}
+            jump={jump}
+          />
+        </TabPanel>
+      </div>
     </div>
   );
 }

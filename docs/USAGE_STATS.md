@@ -234,10 +234,17 @@ Web (`application.properties` / env):
   `tanzapp-prod`, see [Production database](#production-database)).
   **Empty ⇒ feature inert, app still boots.**
 - `FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT` — Agroal connection-acquisition
-  timeout (default `30s`, prod sets `10s`). The inserts are fire-and-forget, so
-  a slow acquisition would drop them silently; `UsageStatsService` additionally
-  retries (3 attempts, linear backoff), because Cloud Run throttles CPU after
-  the response and the async insert may only complete on the next request.
+  timeout (default `30s`, prod sets `10s`). Web-run inserts are fire-and-forget,
+  so a slow acquisition would drop them silently; `UsageStatsService`
+  additionally retries (3 attempts, linear backoff), because Cloud Run throttles
+  CPU after the response and the async insert may only complete on the next
+  request. **Desktop ingest (`POST /api/usage-stats`) and page-view beacons are
+  written synchronously on the request thread** for exactly that reason: they
+  arrive as a lone request with no follow-up, so a queued insert would wait for
+  the next visitor or be lost on scale-to-zero (observed 2026-09-03: a desktop
+  event was acknowledged with 202 and only landed two minutes later, when an
+  unrelated request gave the instance CPU). The desktop client posts from a
+  daemon thread and ignores the response, so the added latency is invisible.
 - `FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN` — required for ingest; empty ⇒
   endpoint accepts-and-discards (logged once at startup)
 - `FINDATEX_WEB_USAGE_STATS_RATE` — per-IP `/api/usage-stats` limit (default 60/h)

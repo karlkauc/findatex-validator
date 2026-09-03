@@ -41,6 +41,15 @@ import java.util.concurrent.Executors;
  * <p>The schema is created out-of-band (see docs/USAGE_STATS.md); this service
  * never issues DDL. Country / visitor hash / device come from a
  * {@link ClientContext}; the raw IP is never seen or logged here.
+ *
+ * <p><b>Delivery.</b> Cloud Run throttles an instance's CPU to near zero the
+ * moment the response is sent, so a queued insert only progresses when the
+ * <em>next</em> request arrives — and is lost if the instance is scaled to zero
+ * first. For web-run events that is fine (the same user keeps clicking). For a
+ * desktop ingest or a page-view beacon there is no next request: a lone POST,
+ * then silence. Those two are therefore written on the request thread, before
+ * the response ({@link #submitNow}); the caller is a fire-and-forget client
+ * that never sees the latency.
  */
 @ApplicationScoped
 public class UsageStatsService {
@@ -137,7 +146,7 @@ public class UsageStatsService {
         r.isSample = dto.isSample();
         r.exportKind = dto.exportKind();
         r.country = ctx == null ? null : ctx.countryCode();
-        submit(r);
+        submitNow(r);
     }
 
     // ---- web ----------------------------------------------------------------
@@ -215,7 +224,7 @@ public class UsageStatsService {
         r.referrerHost = referrerHost;
         r.campaign = campaign;
         r.appVersion = appVersion();
-        submit(r);
+        submitNow(r);
     }
 
     private static String appVersion() {
@@ -236,6 +245,7 @@ public class UsageStatsService {
         return worker;
     }
 
+    /** Fire-and-forget: the single worker thread writes the row after the response. */
     private void submit(UsageRow row) {
         try {
             row.normalise();
@@ -245,7 +255,22 @@ public class UsageStatsService {
         }
     }
 
-    private void insert(UsageRow row) {
+    /**
+     * Writes the row on the calling (request) thread so it is committed before
+     * the response leaves — see the class comment on Cloud Run CPU throttling.
+     * Same retry/swallow semantics as the worker path; never throws.
+     */
+    private void submitNow(UsageRow row) {
+        try {
+            row.normalise();
+            insert(row);
+        } catch (RuntimeException e) {
+            log.debug("Usage-stats synchronous insert rejected (ignored): {}", e.toString());
+        }
+    }
+
+    /** Insert with retry; package-private seam so delivery tests can observe the thread. */
+    void insert(UsageRow row) {
         insertWithRetry(() -> doInsert(row));
     }
 

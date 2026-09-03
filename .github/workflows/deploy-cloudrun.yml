@@ -129,12 +129,12 @@ jobs:
         # Combined with quarkus.http.{read,idle}-timeout in the app this caps
         # blast radius without adding Cloud Armor.
         #
-        # --min-instances=1 costs roughly 8-10 EUR/month in idle billing and
-        # buys away the cold start. At this traffic level that is not an edge
-        # case: requests are far enough apart that nearly every visitor would
-        # otherwise be the one waiting for a container to come up, staring at a
-        # blank page. Set it back to 0 if the idle bill ever matters more than
-        # the first impression.
+        # --min-instances=0: scale-to-zero (since 2026-09-03, on request — the
+        # ~8-10 EUR/month idle billing of a warm instance was not worth it at
+        # this traffic level). The first visitor after an idle period pays the
+        # cold start (CDS/AOT-trimmed, a few seconds); --cpu-boost softens it.
+        # Set it to 1 again if the first impression ever matters more than the
+        # idle bill.
         #
         # PROXY_ADDRESS_FORWARDING + PROXY_ALLOW_X_FORWARDED make Quarkus derive
         # the source IP from X-Forwarded-For (set by Google's front end), so the
@@ -165,7 +165,7 @@ jobs:
             --cpu-boost \
             --concurrency=8 \
             --max-instances=10 \
-            --min-instances=1 \
+            --min-instances=0 \
             --timeout=300 \
             --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=true,FINDATEX_WEB_CANONICAL_HOST=www.findatex-validator.eu,FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=findatex,FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT=10s,PROXY_ADDRESS_FORWARDING=true,PROXY_ALLOW_X_FORWARDED=true \
             --update-secrets=FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest,FINDATEX_WEB_VISITOR_SALT_SECRET=findatex-visitor-salt:latest,FINDATEX_WEB_EXTERNAL_OPENFIGI_KEY=findatex-openfigi-key:latest \

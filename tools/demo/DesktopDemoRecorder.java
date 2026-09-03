@@ -198,7 +198,9 @@ public final class DesktopDemoRecorder {
         hold(2200);
         highlight = null;
 
-        caption("Export the Excel report — one row per finding, five sheets, ready for your source-system team.", null);
+        recordAnnotatedSource(sp, findings, group);
+
+        caption("Export the Excel report — one row per finding, six sheets, ready for your source-system team.", null);
         scrollTo(sp, n("validateButton"), 7, 48);
         Node export = n("exportMenu");
         highlight = export;
@@ -208,6 +210,99 @@ public final class DesktopDemoRecorder {
         key(KeyCode.ESCAPE);
         hold(600);
         highlight = null;
+    }
+
+    /** The in-app Annotated Source tab: tinted grid, filters, tooltip, jump from a finding. */
+    private static void recordAnnotatedSource(ScrollPane sp, TableView<?> findings, Node group) throws Exception {
+        caption("Annotated Source — the original file cell by cell, every cell with a finding tinted by severity.", null);
+        TabPane resultTabs = (TabPane) n("resultTabs");
+        scrollTo(sp, resultTabs, 7, 40);
+        Node sourceTabHeader = tabHeader(resultTabs, 1);
+        moveTo(sourceTabHeader, 10);
+        click();
+        Node host = n("annotatedSourceHost");
+        TableView<?> grid = waitForGrid(host);
+        highlight = grid;
+        hold(2200);
+        highlight = null;
+
+        caption("Keep only the rows and columns that carry a finding — the overview of a large delivery in one screen.", null);
+        List<Node> boxes = new ArrayList<>(fx(() -> host.lookupAll(".check-box")));
+        highlight = boxes.get(0);
+        moveTo(boxes.get(0), 10);
+        click();
+        hold(700);
+        highlight = boxes.get(1);
+        moveTo(boxes.get(1), 8);
+        click();
+        hold(1400);
+        highlight = null;
+
+        caption("Double-click a finding to jump straight to the offending cell.", null);
+        Node findingsTabHeader = tabHeader(resultTabs, 0);
+        moveTo(findingsTabHeader, 8);
+        click();
+        hold(500);
+        moveTo(group, 8);      // leave "group by error" so rows carry their position again
+        click();
+        hold(500);
+        Node row = topmostRow(findings);
+        moveTo(row, 10);
+        doubleClick();
+        hold(600);
+        highlight = grid;
+        hold(2400);
+        highlight = null;
+
+        caption("Hover a tinted cell to read its findings — the same text as the comment in the Excel sheet.", null);
+        Node tinted = tintedDataCell(grid);
+        if (tinted != null) {
+            moveTo(tinted, 12);
+            sleep(900);           // tooltip show delay
+            hold(2600);
+            fx(() -> robot.mouseMove(curX, curY + 80));   // leave the cell so the tooltip hides
+            curY += 80;
+            sleep(300);
+        }
+
+        // Leave the tab as we found it: filters off, Findings in front (the batch scene expects it).
+        fx(() -> { ((javafx.scene.control.CheckBox) boxes.get(0)).setSelected(false);
+                   ((javafx.scene.control.CheckBox) boxes.get(1)).setSelected(false); });
+        moveTo(findingsTabHeader, 6);
+        click();
+        hold(300);
+    }
+
+    private static TableView<?> waitForGrid(Node host) throws Exception {
+        for (int i = 0; i < 200; i++) {
+            TableView<?> t = fx(() -> (TableView<?>) host.lookup(".source-grid"));
+            if (t != null && fx(() -> t.getColumns().size() > 0)) return t;
+            sleep(100);
+        }
+        throw new IllegalStateException("annotated source grid never loaded");
+    }
+
+    /**
+     * Leftmost tinted data cell (not the Row helper column) inside the grid's viewport, errors
+     * first — leftmost so the tooltip that opens to the right of the cursor stays on screen.
+     */
+    private static Node tintedDataCell(TableView<?> grid) throws Exception {
+        return fx(() -> {
+            Bounds view = grid.localToScene(grid.getBoundsInLocal());
+            for (String cls : List.of(".source-cell-error", ".source-cell-warn", ".source-cell-info")) {
+                Node best = null;
+                double bestX = Double.MAX_VALUE;
+                for (Node c : grid.lookupAll(cls)) {
+                    if (c.getStyleClass().contains("source-row-col")) continue;
+                    Bounds b = c.localToScene(c.getBoundsInLocal());
+                    boolean inView = b.getMinX() >= view.getMinX() && b.getMaxX() <= view.getMaxX()
+                            && b.getMinY() >= view.getMinY() && b.getMaxY() <= view.getMaxY() - 20;
+                    if (inView && b.getMinX() < bestX) { best = c; bestX = b.getMinX(); }
+                }
+                if (best != null) return best;
+            }
+            return null;
+        });
     }
 
     private static void recordBatch(Path folder) throws Exception {
@@ -316,6 +411,12 @@ public final class DesktopDemoRecorder {
 
     private static void click() throws Exception {
         fx(() -> robot.mouseClick(MouseButton.PRIMARY));
+        sleep(150);
+        frame(250);
+    }
+
+    private static void doubleClick() throws Exception {
+        fx(() -> { robot.mouseClick(MouseButton.PRIMARY); robot.mouseClick(MouseButton.PRIMARY); });
         sleep(150);
         frame(250);
     }

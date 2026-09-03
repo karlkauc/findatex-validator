@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.14] — 2026-09-03
+
 ### Added
 - **Annotated Source in the web app.** The result panel now has two tabs,
   *Findings* and *Annotated Source*; the latter shows the original file as a
@@ -384,7 +386,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.13...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.14...HEAD
+[1.0.14]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.14
 [1.0.13]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.13
 [1.0.12]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.12
 [1.0.11]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.11

@@ -41,7 +41,7 @@ the full one-row-per-finding detail.
 Bundled templates: **TPT V8.0 + V7.0**, **EET V1.1.3 + V1.1.2**,
 **EMT V4.3 + V4.2**, **EPT V2.1 + V2.0**.
 
-![Animated walkthrough of the web app: pick template and version, choose profiles, drop a file, validate, read the scores, group the findings by error, report a false positive](docs/screenshots/web-app-demo.gif)
+![Animated walkthrough of the web app: pick template and version, choose profiles, drop a file, validate, read the scores, group the findings by error, report a false positive, jump from a finding into the annotated source grid, fold the input column away](docs/screenshots/web-app-demo.gif)
 
 ---
 
@@ -61,13 +61,19 @@ validation engine is exactly the same.
 4. Click **Validate**. The findings appear on screen, grouped by rule,
    together with the quality score and a download link for the Excel
    report.
+5. Switch to the **Annotated Source** tab (or click **Source** on a
+   finding row) to see the original file as a grid with every finding
+   painted on its cell — the same view the desktop app and the Excel
+   report's *Annotated Source* sheet show. The input column, Scores and
+   Per Fund fold away so the wide tables get the whole screen.
 
 Don't have a file to hand? **No file at hand? Try an example** loads the
 bundled example for the selected template and validates it in one click.
 
 The hosted instance has no login. Files are processed in memory and
 discarded the moment the response is sent; the report download link
-is single-use and expires after 5 minutes.
+is single-use and, like the annotated-source view, expires after
+5 minutes.
 
 **Limits on the hosted web app.** Because it is a public, unauthenticated
 service, the web app is throttled to keep it usable for everyone (the
@@ -224,7 +230,8 @@ GDPR notes: [`docs/NEWSLETTER.md`](docs/NEWSLETTER.md).
 User-facing help — what gets validated, what the profiles mean, how
 the GLEIF / OpenFIGI lookup works — is in
 [`HELP.md`](core/src/main/resources/help/HELP.md). It is also
-reachable from the **Help** button in either UI.
+reachable from the **Help** button in either UI and, as a plain web
+page, at <https://www.findatex-validator.eu/help>.
 
 Every rule the validator applies is published as plain web pages at
 <https://www.findatex-validator.eu/rules>: one page per template version

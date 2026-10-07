@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Background warm-up of the spec catalogs removed again.** Cloud Run
+  throttles the CPU outside of requests, so the thread introduced in 1.0.16
+  never finished there and would have competed with the first validation for
+  the single vCPU.
+
 ## [1.0.16] — 2026-10-07
 
 ### Fixed

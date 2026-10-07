@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.17] — 2026-10-07
+
 ### Changed
 - **Spec catalogs are pre-parsed at build time.** The core build parses every
   bundled spec workbook once (`CatalogSnapshotGenerator`, `process-classes`)
@@ -452,7 +454,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.16...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.17...HEAD
+[1.0.17]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.17
 [1.0.16]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.16
 [1.0.15]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.15
 [1.0.14]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.14

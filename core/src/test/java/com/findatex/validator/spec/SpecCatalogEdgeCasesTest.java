@@ -21,6 +21,25 @@ class SpecCatalogEdgeCasesTest {
     }
 
     @Test
+    void matchHeaderToleratesSpellingOfTheColumnName() {
+        for (String h : List.of(
+                "12. CIC code of the instrument",
+                "12 - CIC_code_of_the_instrument",
+                "0012_CIC_CODE_OF_THE_INSTRUMENT",
+                "CIC code of the instrument")) {
+            assertThat(CATALOG.matchHeader(h)).as(h)
+                    .hasValueSatisfying(f -> assertThat(f.numKey()).isEqualTo("12"));
+        }
+    }
+
+    @Test
+    void matchHeaderDoesNotGuessFromLooseText() {
+        assertThat(CATALOG.matchHeader("12 month return")).isEmpty();
+        assertThat(CATALOG.matchHeader("0012")).isEmpty();
+        assertThat(CATALOG.matchHeader("CIC code")).isEmpty();
+    }
+
+    @Test
     void matchHeaderHandlesNumKeyAlone() {
         assertThat(CATALOG.matchHeader("12")).isPresent();
         assertThat(CATALOG.matchHeader("8b")).isPresent();

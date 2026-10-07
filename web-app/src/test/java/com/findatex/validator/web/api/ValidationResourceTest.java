@@ -103,6 +103,36 @@ class ValidationResourceTest {
     }
 
     @Test
+    void templateMismatchNamesWhatWasRead() {
+        Response r = given()
+                .multiPart("templateId", "TPT")
+                .multiPart("templateVersion", "V8.0")
+                .multiPart("file", "TPT_delivery.csv",
+                        "Fund code;Fund name;Currency;Amount;Weight\nX;Y;EUR;1;2\nX;Y;EUR;3;4\n".getBytes())
+                .when().post("/api/validate");
+
+        r.then().statusCode(400);
+        assertThat(r.asString())
+                .contains("TPT V8.0")
+                .contains("none of the 5 column header(s)")
+                .contains("\"Fund code\", \"Fund name\", \"Currency\"")
+                .contains("1_Portfolio_identifying_data");
+    }
+
+    @Test
+    void csvWithTitleLineBeforeTheHeaderValidates() {
+        String csv = "TPT delivery 2026-09-30\n"
+                + "1_Portfolio_identifying_data;3_Portfolio_name;12_CIC_code_of_the_instrument\n"
+                + "FR0000000001;Fund A;FR12\n";
+        given()
+                .multiPart("templateId", "TPT")
+                .multiPart("templateVersion", "V8.0")
+                .multiPart("file", "TPT_delivery.csv", csv.getBytes())
+                .when().post("/api/validate")
+                .then().statusCode(200);
+    }
+
+    @Test
     void externalEnabledFormParamsAreAccepted() {
         // Default profile has external.enabled=false, so the orchestrator silently ignores
         // externalEnabled=true. The point of this test is that supplying the new form

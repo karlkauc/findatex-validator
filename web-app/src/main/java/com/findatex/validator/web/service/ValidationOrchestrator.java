@@ -4,6 +4,7 @@ import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.external.ExternalValidationService;
+import com.findatex.validator.ingest.HeaderMatch;
 import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.report.AnnotatedSourceJson;
 import com.findatex.validator.report.AnnotatedSourceModel;
@@ -11,6 +12,7 @@ import com.findatex.validator.report.QualityReport;
 import com.findatex.validator.report.QualityScorer;
 import com.findatex.validator.report.ScoreCategory;
 import com.findatex.validator.report.XlsxReportWriter;
+import com.findatex.validator.spec.FieldSpec;
 import com.findatex.validator.spec.SpecCatalog;
 import com.findatex.validator.stats.ExternalLookupCounter;
 import com.findatex.validator.stats.FileNameShape;
@@ -31,9 +33,11 @@ import com.findatex.validator.web.dto.FindingDto;
 import com.findatex.validator.web.dto.PerFundScoreDto;
 import com.findatex.validator.web.dto.ScoreDto;
 import com.findatex.validator.web.dto.ValidationResponse;
+import io.quarkus.runtime.StartupEvent;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -94,6 +98,47 @@ public class ValidationOrchestrator {
         concurrencyGate = new Semaphore(Math.max(1, config.maxConcurrency()), true);
         log.info("Validation orchestrator ready (max-concurrency={}, acquire-timeout-ms={})",
                 config.maxConcurrency(), config.acquireTimeoutMillis());
+    }
+
+    /**
+     * Parses the spec workbooks off the request path. Loading one takes seconds on a cold
+     * instance (the EMT/EET workbooks are several MB), which the first validation of each
+     * template would otherwise pay. In the background, so the instance starts serving the
+     * page right away; a validation arriving early simply waits for its own bundle.
+     */
+    void onStart(@Observes StartupEvent event) {
+        Thread warmup = new Thread(this::warmCatalogs, "spec-catalog-warmup");
+        warmup.setDaemon(true);
+        warmup.start();
+    }
+
+    private void warmCatalogs() {
+        long t0 = System.nanoTime();
+        List<TemplateDefinition> templates = TemplateRegistry.all();
+        int depth = templates.stream().mapToInt(d -> d.versions().size()).max().orElse(0);
+        int loaded = 0;
+        // Current versions of every template first — those are what visitors pick.
+        for (int i = 0; i < depth; i++) {
+            for (TemplateDefinition def : templates) {
+                if (i >= def.versions().size()) continue;
+                TemplateVersion version = def.versions().get(i);
+                try {
+                    bundleFor(def, version);
+                    loaded++;
+                } catch (RuntimeException e) {
+                    log.warn("Spec catalog warm-up failed for {} {}: {}", def.id(), version.version(), e.toString());
+                }
+            }
+        }
+        log.info("Spec catalogs warmed up: {} in {} ms", loaded, elapsedMs(t0));
+    }
+
+    private CatalogBundle bundleFor(TemplateDefinition def, TemplateVersion version) {
+        return catalogs.computeIfAbsent(def.id() + "/" + version.version(), k -> {
+            SpecCatalog catalog = def.specLoaderFor(version).load();
+            TemplateRuleSet ruleSet = def.ruleSetFor(version);
+            return new CatalogBundle(catalog, ruleSet, def.profilesFor(version));
+        });
     }
 
     /**
@@ -164,11 +209,7 @@ public class ValidationOrchestrator {
         String templateName = def.id().name();
         String versionName = version.version();
 
-        CatalogBundle bundle = catalogs.computeIfAbsent(def.id() + "/" + version.version(), k -> {
-            SpecCatalog catalog = def.specLoaderFor(version).load();
-            TemplateRuleSet ruleSet = def.ruleSetFor(version);
-            return new CatalogBundle(catalog, ruleSet, profileSet);
-        });
+        CatalogBundle bundle = bundleFor(def, version);
 
         TptFile file;
         try {
@@ -186,19 +227,19 @@ public class ValidationOrchestrator {
                             .build());
         }
 
-        // Pre-flight: zero mapped fields with non-empty headers means the file
-        // doesn't match the chosen template/version. Without this, every row ×
+        // Pre-flight: (next to) no mapped fields means the file doesn't match the chosen
+        // template/version, or its header row was not found. Without this, every row ×
         // every mandatory field becomes a "missing" finding — easily 100k+ findings
         // on a multi-thousand-row file, which exhausts the JVM heap.
-        if (file.headerToNumKey().isEmpty() && !file.rawHeaders().isEmpty()) {
+        HeaderMatch headerMatch = HeaderMatch.of(file);
+        if (headerMatch.mismatch()) {
             recordFailure(UsageEvent.STATUS_TEMPLATE_MISMATCH, templateName, versionName, input, isSample,
                     elapsedMs(t0), ctx);
+            List<FieldSpec> fields = bundle.catalog.fields();
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)
-                            .entity("File does not match template " + def.id() + " " + version.version()
-                                    + ": none of the " + file.rawHeaders().size()
-                                    + " column header(s) are recognized. "
-                                    + "Check that you picked the right template and version.")
+                            .entity(headerMatch.describe(def.id() + " " + version.version(),
+                                    fields.isEmpty() ? "" : fields.get(0).name()))
                             .build());
         }
 

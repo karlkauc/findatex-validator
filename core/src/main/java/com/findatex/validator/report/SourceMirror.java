@@ -1,9 +1,7 @@
 package com.findatex.validator.report;
 
 import com.findatex.validator.domain.TptFile;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+import com.findatex.validator.ingest.CsvLoader;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -13,8 +11,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -120,55 +116,21 @@ public final class SourceMirror {
         byte[] bytes = file.sourceBytes() != null
                 ? file.sourceBytes()
                 : Files.readAllBytes(file.source());
-        char delimiter = detectDelimiter(bytes);
-        CSVFormat format = CSVFormat.DEFAULT.builder()
-                .setDelimiter(delimiter)
-                .setQuote('"')
-                .setIgnoreEmptyLines(true)
-                .setTrim(true)
-                .get();
-        try (Reader r = new java.io.InputStreamReader(
-                        new java.io.ByteArrayInputStream(bytes), StandardCharsets.UTF_8);
-             CSVParser parser = format.parse(r)) {
-            List<CSVRecord> records = parser.getRecords();
-            int width = 0;
-            for (CSVRecord rec : records) width = Math.max(width, rec.size());
-            List<List<SourceCell>> rows = new ArrayList<>(records.size());
-            for (CSVRecord rec : records) {
-                List<SourceCell> row = new ArrayList<>(width);
-                for (int c = 0; c < width; c++) {
-                    row.add(c < rec.size() ? SourceCell.text(rec.get(c)) : SourceCell.BLANK);
-                }
-                rows.add(row);
+        // Same layout the loader settled on: the record that became the file's headers.
+        CsvLoader.Layout layout = CsvLoader.detectLayout(bytes,
+                rec -> rec.equals(file.rawHeaders()) ? Integer.MAX_VALUE : 0);
+        List<List<String>> records = CsvLoader.records(bytes, layout.delimiter());
+        int width = 0;
+        for (List<String> rec : records) width = Math.max(width, rec.size());
+        List<List<SourceCell>> rows = new ArrayList<>(records.size());
+        for (List<String> rec : records) {
+            List<SourceCell> row = new ArrayList<>(width);
+            for (int c = 0; c < width; c++) {
+                row.add(c < rec.size() ? SourceCell.text(rec.get(c)) : SourceCell.BLANK);
             }
-            return new SourceData(rows, 0);
+            rows.add(row);
         }
-    }
-
-    private static char detectDelimiter(byte[] bytes) {
-        // Read the first line out of the buffered bytes and pick the dominant separator.
-        int end = bytes.length;
-        for (int i = 0; i < bytes.length; i++) {
-            if (bytes[i] == '\n' || bytes[i] == '\r') { end = i; break; }
-        }
-        String line = new String(bytes, 0, end, StandardCharsets.UTF_8);
-        int semi = countOutsideQuotes(line, ';');
-        int comma = countOutsideQuotes(line, ',');
-        int tab = countOutsideQuotes(line, '\t');
-        if (semi >= comma && semi >= tab) return ';';
-        if (tab >= comma) return '\t';
-        return ',';
-    }
-
-    private static int countOutsideQuotes(String s, char target) {
-        int count = 0;
-        boolean inQuotes = false;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '"') inQuotes = !inQuotes;
-            else if (!inQuotes && c == target) count++;
-        }
-        return count;
+        return new SourceData(rows, Math.min(layout.headerRecord(), Math.max(0, rows.size() - 1)));
     }
 
     private static SourceCell readCell(Cell cell) {

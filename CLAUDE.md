@@ -153,6 +153,14 @@ filename)` (Multipart upload — no tempfile written through).
    `specLoaderFor(latest()).load()` per template and silently downgrades a
    template to a "Spec nicht installiert" placeholder tab if loading throws.
 
+At runtime `ManifestDrivenSpecLoader.load()` does not open the workbook: the
+core build pre-parses every spec (`CatalogSnapshotGenerator`, exec-maven-plugin
+in `process-classes`) into `<workbook>.catalog.json` on the classpath, guarded
+by a fingerprint of workbook + manifest. No or stale snapshot (IDE-compiled
+classes) → falls back to parsing (`loadFromSpec()`). `CatalogSnapshotTest`
+pins that both paths yield the same catalog — a new `FieldSpec` attribute must
+be added to `CatalogSnapshot` too, or that test fails.
+
 `SpecLoader` is the legacy hand-written TPT V7 loader; **do not extend it for
 new templates** — go through `ManifestDrivenSpecLoader`. It still exists for
 the equivalence regression in `SpecLoaderTest`.

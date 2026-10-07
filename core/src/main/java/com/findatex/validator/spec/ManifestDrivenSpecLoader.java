@@ -11,8 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -60,8 +63,18 @@ public final class ManifestDrivenSpecLoader implements TemplateSpecLoader {
         return manifest;
     }
 
+    /**
+     * The catalog of the bundled spec: from the build's {@link CatalogSnapshot} when one
+     * matching this workbook and manifest is on the classpath, else parsed from the workbook.
+     */
     @Override
     public SpecCatalog load() {
+        SpecCatalog snapshot = loadFromSnapshot();
+        return snapshot != null ? snapshot : loadFromSpec();
+    }
+
+    /** Parses the spec workbook itself — what the snapshot is generated from. */
+    public SpecCatalog loadFromSpec() {
         try (InputStream in = ManifestDrivenSpecLoader.class.getResourceAsStream(xlsxResourcePath)) {
             if (in == null) throw new IOException("Spec XLSX not found on classpath: " + xlsxResourcePath);
             try (Workbook wb = new XSSFWorkbook(in)) {
@@ -69,6 +82,43 @@ public final class ManifestDrivenSpecLoader implements TemplateSpecLoader {
             }
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load spec XLSX " + xlsxResourcePath, e);
+        }
+    }
+
+    /** {@code null} when there is no snapshot, or it was built from another workbook or manifest. */
+    SpecCatalog loadFromSnapshot() {
+        try (InputStream in = ManifestDrivenSpecLoader.class.getResourceAsStream(snapshotResourcePath())) {
+            if (in == null) return null;
+            CatalogSnapshot snapshot = CatalogSnapshot.read(in);
+            if (!fingerprint().equals(snapshot.fingerprint())) {
+                log.warn("Catalog snapshot {} is stale, parsing the workbook instead", snapshotResourcePath());
+                return null;
+            }
+            return snapshot.toCatalog();
+        } catch (IOException | RuntimeException e) {
+            log.warn("Catalog snapshot {} unreadable, parsing the workbook instead: {}",
+                    snapshotResourcePath(), e.toString());
+            return null;
+        }
+    }
+
+    /** Classpath location of the snapshot, next to the workbook. */
+    public String snapshotResourcePath() {
+        int dot = xlsxResourcePath.lastIndexOf('.');
+        return (dot < 0 ? xlsxResourcePath : xlsxResourcePath.substring(0, dot)) + ".catalog.json";
+    }
+
+    /** SHA-256 over the workbook bytes and the manifest: what a snapshot must have been built from. */
+    public String fingerprint() {
+        try (InputStream in = ManifestDrivenSpecLoader.class.getResourceAsStream(xlsxResourcePath)) {
+            if (in == null) throw new IOException("Spec XLSX not found on classpath: " + xlsxResourcePath);
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] buffer = new byte[1 << 16];
+            for (int n; (n = in.read(buffer)) > 0; ) digest.update(buffer, 0, n);
+            digest.update(MAPPER.writeValueAsBytes(manifest));
+            return HexFormat.of().formatHex(digest.digest());
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Failed to fingerprint spec XLSX " + xlsxResourcePath, e);
         }
     }
 

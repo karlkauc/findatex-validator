@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.16] — 2026-10-07
+
+### Fixed
+- **CSV uploads were rejected as "does not match template" when the header was
+  not the first line.** Every failed web run in the usage statistics was such a
+  CSV. `CsvLoader` now picks delimiter and header row together from the first
+  50 records — the CSV counterpart of the XLSX header search — so a title line,
+  Excel's `sep=;` hint, leading blank lines and quoted cells in pipe-delimited
+  files load normally. A numeric data row is never mistaken for the header.
+- **Header spelling variants are recognised.** `1. Portfolio identifying data`,
+  `1 - Portfolio_identifying_data`, zero-padded numbers and the label without
+  its number resolve to the field, as long as the label is unique in the
+  template (`SpecCatalog.matchHeader`).
+- **The Annotated Source of pipe-delimited CSVs** was rendered as one column;
+  `SourceMirror` now uses the loader's layout.
+
+### Changed
+- **The template-mismatch message says what was read.** It lists the first
+  header cells, an example of the expected column name, and where to look
+  (header row within the first 50 lines, delimiter) before suggesting another
+  template. A file with only one or two recognised headers among more than
+  five columns is now rejected the same way instead of producing a report full
+  of "missing" findings (`HeaderMatch`).
+- **Spec catalogs are parsed in the background at startup** (web). The first
+  validation per template on a cold instance no longer pays the workbook parse
+  — several seconds for EMT/EET — which was also counted in `duration_ms`.
+- Dependency updates (Maven and npm minor/patch groups, vitest).
+
 ## [1.0.15] — 2026-09-03
 
 ### Fixed
@@ -407,7 +435,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.15...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.16...HEAD
+[1.0.16]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.16
 [1.0.15]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.15
 [1.0.14]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.14
 [1.0.13]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.13

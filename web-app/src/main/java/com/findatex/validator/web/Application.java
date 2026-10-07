@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Eagerly initialises the shared {@link TemplateRegistry} at application start.
  * The registry is a process-wide singleton that all web requests share
- * read-only. Registering does not parse any spec workbook — that is
- * {@code ValidationOrchestrator}'s background warm-up.
+ * read-only. Registering does not parse any spec workbook — that happens on
+ * the first validation per template and version ({@code ValidationOrchestrator}).
  *
  * <p>Also reports missing demo files. They are mounted onto the classpath from
  * {@code samples/} by the build, and a build context without that directory

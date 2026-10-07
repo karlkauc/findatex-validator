@@ -33,11 +33,9 @@ import com.findatex.validator.web.dto.FindingDto;
 import com.findatex.validator.web.dto.PerFundScoreDto;
 import com.findatex.validator.web.dto.ScoreDto;
 import com.findatex.validator.web.dto.ValidationResponse;
-import io.quarkus.runtime.StartupEvent;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -98,39 +96,6 @@ public class ValidationOrchestrator {
         concurrencyGate = new Semaphore(Math.max(1, config.maxConcurrency()), true);
         log.info("Validation orchestrator ready (max-concurrency={}, acquire-timeout-ms={})",
                 config.maxConcurrency(), config.acquireTimeoutMillis());
-    }
-
-    /**
-     * Parses the spec workbooks off the request path. Loading one takes seconds on a cold
-     * instance (the EMT/EET workbooks are several MB), which the first validation of each
-     * template would otherwise pay. In the background, so the instance starts serving the
-     * page right away; a validation arriving early simply waits for its own bundle.
-     */
-    void onStart(@Observes StartupEvent event) {
-        Thread warmup = new Thread(this::warmCatalogs, "spec-catalog-warmup");
-        warmup.setDaemon(true);
-        warmup.start();
-    }
-
-    private void warmCatalogs() {
-        long t0 = System.nanoTime();
-        List<TemplateDefinition> templates = TemplateRegistry.all();
-        int depth = templates.stream().mapToInt(d -> d.versions().size()).max().orElse(0);
-        int loaded = 0;
-        // Current versions of every template first — those are what visitors pick.
-        for (int i = 0; i < depth; i++) {
-            for (TemplateDefinition def : templates) {
-                if (i >= def.versions().size()) continue;
-                TemplateVersion version = def.versions().get(i);
-                try {
-                    bundleFor(def, version);
-                    loaded++;
-                } catch (RuntimeException e) {
-                    log.warn("Spec catalog warm-up failed for {} {}: {}", def.id(), version.version(), e.toString());
-                }
-            }
-        }
-        log.info("Spec catalogs warmed up: {} in {} ms", loaded, elapsedMs(t0));
     }
 
     private CatalogBundle bundleFor(TemplateDefinition def, TemplateVersion version) {

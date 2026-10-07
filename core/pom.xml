@@ -50,6 +50,34 @@
                 </includes>
             </resource>
         </resources>
+        <plugins>
+            <!--
+                Parses every bundled spec workbook once and writes the result next to it
+                as <name>.catalog.json. At runtime ManifestDrivenSpecLoader reads that
+                instead of opening the workbook with POI, which takes seconds on a cold
+                JVM. No snapshot (e.g. classes compiled by an IDE) = parse as before.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.6.3</version>
+                <executions>
+                    <execution>
+                        <id>catalog-snapshots</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.findatex.validator.spec.CatalogSnapshotGenerator</mainClass>
+                            <arguments>
+                                <argument>${project.build.outputDirectory}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Spec catalogs are pre-parsed at build time.** The core build parses every
+  bundled spec workbook once (`CatalogSnapshotGenerator`, `process-classes`)
+  and ships the result as `<workbook>.catalog.json`; `ManifestDrivenSpecLoader`
+  reads that instead of opening the workbook with POI. Loading a catalog drops
+  from seconds to milliseconds (EMT: ~2 s → ~15 ms locally), which is what the
+  first validation per template paid on every cold instance — and what the
+  desktop paid per tab at start. A snapshot whose fingerprint (workbook +
+  manifest) does not match is ignored and the workbook parsed as before;
+  `CatalogSnapshotTest` asserts both paths yield the same catalog.
+
 ### Fixed
 - **Background warm-up of the spec catalogs removed again.** Cloud Run
   throttles the CPU outside of requests, so the thread introduced in 1.0.16

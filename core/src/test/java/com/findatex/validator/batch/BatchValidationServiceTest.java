@@ -63,6 +63,25 @@ class BatchValidationServiceTest {
     }
 
     @Test
+    void fileOfAnotherTemplateIsReportedAsMismatchNotValidated(@TempDir Path folder) throws Exception {
+        Path other = folder.resolve("other-template.csv");
+        Files.writeString(other, "Fund;Share class;Currency;Launch;Fee;Domicile\nA;B;EUR;2020;1;LU\n");
+        copySample("/sample/clean_v7.xlsx", folder.resolve("clean_v7.xlsx"));
+
+        BatchSummary summary = newService().run(
+                List.of(other, folder.resolve("clean_v7.xlsx")),
+                () -> false);
+
+        BatchResult rejected = summary.results().get(0);
+        assertThat(rejected.status()).isEqualTo(BatchFileStatus.LOAD_ERROR);
+        assertThat(rejected.errorMessage())
+                .contains("does not match template TPT V7.0")
+                .contains("\"Fund\"");
+        assertThat(rejected.findings()).isEmpty();
+        assertThat(summary.results().get(1).status()).isEqualTo(BatchFileStatus.OK);
+    }
+
+    @Test
     void cancellationStopsBetweenFiles(@TempDir Path folder) throws Exception {
         copySample("/sample/clean_v7.xlsx", folder.resolve("a.xlsx"));
         copySample("/sample/clean_v7.xlsx", folder.resolve("b.xlsx"));

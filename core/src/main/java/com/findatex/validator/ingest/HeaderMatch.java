@@ -1,6 +1,8 @@
 package com.findatex.validator.ingest;
 
 import com.findatex.validator.domain.TptFile;
+import com.findatex.validator.spec.FieldSpec;
+import com.findatex.validator.spec.SpecCatalog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,19 @@ public record HeaderMatch(int headers, int recognised, List<String> firstHeaders
             }
         }
         return new HeaderMatch(headers, file.headerToNumKey().size(), List.copyOf(first));
+    }
+
+    /**
+     * Rejects a file that does not belong to the template it is about to be validated against.
+     *
+     * @param template what the file is checked against, e.g. {@code TPT V8.0}
+     * @throws TemplateMismatchException with {@link #describe} as its message
+     */
+    public static void requireMatch(TptFile file, String template, SpecCatalog catalog) {
+        HeaderMatch match = of(file);
+        if (!match.mismatch()) return;
+        List<FieldSpec> fields = catalog.fields();
+        throw new TemplateMismatchException(match.describe(template, fields.isEmpty() ? "" : fields.get(0).name()));
     }
 
     /**

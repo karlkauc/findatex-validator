@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Desktop and folder batch reject a file of the wrong template.** The
+  header check the web app has had since 1.0.16 (`HeaderMatch`) now also runs
+  in the desktop: a single file whose headers the chosen template does not
+  recognise fails with the explanatory message instead of producing one
+  "missing" finding per row and mandatory field; in a folder batch such a file
+  is listed as not validated and the run continues.
+
 ## [1.0.17] — 2026-10-07
 
 ### Changed

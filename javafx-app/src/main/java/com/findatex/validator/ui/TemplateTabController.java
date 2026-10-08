@@ -12,6 +12,8 @@ import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.feedback.GitHubIssueLink;
 import com.findatex.validator.external.ExternalValidationService;
+import com.findatex.validator.ingest.HeaderMatch;
+import com.findatex.validator.ingest.TemplateMismatchException;
 import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.report.CombinedXlsxReportWriter;
 import com.findatex.validator.report.GenerationUi;
@@ -634,6 +636,7 @@ public final class TemplateTabController {
             @Override
             protected QualityReport call() throws Exception {
                 TptFile file = new TptFileLoader(cat).load(path);
+                HeaderMatch.requireMatch(file, template.id() + " " + selectedVersion.version(), cat);
                 TemplateRuleSet ruleSet = template.ruleSetFor(selectedVersion);
                 com.findatex.validator.template.api.FindingContextSpec contextSpec =
                         template.findingContextSpec();
@@ -697,7 +700,8 @@ public final class TemplateTabController {
             // A failed run is still a run for the statistics — only its class, never the message.
             UsageStatsReporter.getInstance().report(UsageEvent.failed(
                     template, selectedVersion, settings, "single",
-                    th instanceof java.io.IOException
+                    th instanceof TemplateMismatchException ? UsageEvent.STATUS_TEMPLATE_MISMATCH
+                            : th instanceof java.io.IOException
                             ? UsageEvent.STATUS_PARSE_ERROR : UsageEvent.STATUS_ERROR,
                     FileNameShape.of(path)));
             progress.setVisible(false);

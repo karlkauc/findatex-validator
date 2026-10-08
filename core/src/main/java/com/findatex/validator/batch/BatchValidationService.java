@@ -3,6 +3,7 @@ package com.findatex.validator.batch;
 import com.findatex.validator.domain.TptFile;
 import com.findatex.validator.external.ExternalValidationConfig;
 import com.findatex.validator.external.ExternalValidationService;
+import com.findatex.validator.ingest.HeaderMatch;
 import com.findatex.validator.ingest.TptFileLoader;
 import com.findatex.validator.report.QualityReport;
 import com.findatex.validator.report.QualityScorer;
@@ -107,6 +108,10 @@ public final class BatchValidationService {
             TptFile tptFile;
             try {
                 tptFile = loader.load(file);
+                // A folder often holds files of several templates; one that is not of this
+                // template is reported as such instead of as thousands of "missing" findings.
+                HeaderMatch.requireMatch(tptFile,
+                        options.template().id() + " " + options.version().version(), catalog);
             } catch (Exception ex) {
                 log.info("Batch: skipping {} — load failed: {}", displayName, ex.getMessage());
                 BatchResult br = BatchResult.loadError(file, ex.getMessage(),

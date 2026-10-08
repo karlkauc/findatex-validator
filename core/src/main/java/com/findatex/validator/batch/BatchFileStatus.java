@@ -4,7 +4,7 @@ package com.findatex.validator.batch;
 public enum BatchFileStatus {
     /** Loaded, validated and scored cleanly. */
     OK,
-    /** TptFileLoader rejected the file (unsupported format / parse failure). */
+    /** The file was rejected before validation: unsupported format, parse failure, or not of the chosen template. */
     LOAD_ERROR,
     /** ValidationEngine threw an unexpected exception. Currently rare — engine swallows per-rule. */
     VALIDATION_ERROR,

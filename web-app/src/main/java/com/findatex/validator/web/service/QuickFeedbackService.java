@@ -2,7 +2,6 @@ package com.findatex.validator.web.service;
 
 import com.findatex.validator.web.config.WebConfig;
 import io.agroal.api.AgroalDataSource;
-import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
@@ -11,17 +10,21 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Persists quick-feedback (star rating) rows to Postgres via plain Agroal/JDBC.
  * Shares the usage-stats datasource and stays fully inert unless it is
  * configured: {@link #enabled()} gates every path so the app boots (and tests
- * run) with no DB. The submission is user-initiated, but persistence is still
- * asynchronous on a single-thread executor — a slow or unreachable remote DB
- * must never block the HTTP response. All DB failures are swallowed
- * (rate-limited WARN, no rethrow).
+ * run) with no DB. All DB failures are swallowed (rate-limited WARN, no
+ * rethrow), so a broken DB never turns a rating into an error for the user.
+ *
+ * <p><b>Delivery.</b> The row is written on the request thread, before the
+ * response — the same reasoning as {@link UsageStatsService}'s
+ * {@code submitNow}: Cloud Run throttles an instance's CPU to near zero once
+ * the response is sent, and with {@code --min-instances=0} a rating is
+ * typically a lone POST with no follow-up request, so a background insert
+ * would stall until the next visitor or be lost on scale-to-zero. The cost is
+ * that the 200 waits for the insert (and, on a failing DB, for the retries).
  *
  * <p>The schema is created out-of-band (see docs/QUICK_FEEDBACK.md); this
  * service never issues DDL. {@code country_code} is supplied by the caller
@@ -45,13 +48,12 @@ public class QuickFeedbackService {
     @Inject
     Instance<AgroalDataSource> dataSource;
 
-    private ExecutorService worker;
     private volatile boolean warnedOnce;
 
     /**
-     * Resilience mirroring {@link UsageStatsService}: Cloud Run throttles the
-     * instance's CPU once the response is sent, so the first attempt may stall
-     * or fail; retries let a later attempt land the row. Package-private so
+     * Resilience mirroring {@link UsageStatsService}: a remote TLS Postgres
+     * can drop a connection or time out an acquisition on a cold instance, so
+     * a couple of retries let a later attempt land the row. Package-private so
      * the retry behaviour is unit-testable without a DB.
      */
     int maxInsertAttempts = 3;
@@ -76,26 +78,24 @@ public class QuickFeedbackService {
     public void record(int rating, String comment, String source, String appVersion,
                        String templateId, String country) {
         if (!enabled()) return;
-        submit(new Row(source, rating, comment, appVersion, templateId, country));
+        submitNow(new Row(source, rating, comment, appVersion, templateId, country));
     }
 
-    private synchronized ExecutorService worker() {
-        if (worker == null) {
-            worker = Executors.newSingleThreadExecutor(r -> {
-                Thread t = new Thread(r, "quick-feedback-db");
-                t.setDaemon(true);
-                return t;
-            });
-        }
-        return worker;
-    }
-
-    private void submit(Row row) {
+    /**
+     * Writes the row on the calling (request) thread so it is committed before
+     * the response leaves — see the class comment. Never throws.
+     */
+    private void submitNow(Row row) {
         try {
-            worker().submit(() -> insertWithRetry(() -> doInsert(row)));
+            insert(row);
         } catch (RuntimeException e) {
-            log.debug("Quick-feedback submit rejected (ignored): {}", e.toString());
+            log.debug("Quick-feedback synchronous insert rejected (ignored): {}", e.toString());
         }
+    }
+
+    /** Insert with retry; package-private seam so delivery tests can observe the thread. */
+    void insert(Row row) {
+        insertWithRetry(() -> doInsert(row));
     }
 
     /**
@@ -163,12 +163,7 @@ public class QuickFeedbackService {
         return t.isEmpty() ? null : t;
     }
 
-    @PreDestroy
-    void shutdown() {
-        if (worker != null) worker.shutdownNow();
-    }
-
-    private record Row(String source, int rating, String comment,
+    record Row(String source, int rating, String comment,
                        String appVersion, String templateId, String country) {
     }
 }

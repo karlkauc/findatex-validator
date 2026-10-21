@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   recording.
 
 ### Fixed
+- **Quick-feedback ratings are no longer lost on Cloud Run.** The star rating
+  was inserted on a background worker after the `200`; with
+  `--min-instances=0` the instance's CPU is throttled once the response is
+  out, so a lone rating stalled and was lost on scale-to-zero. The insert now
+  runs on the request thread before the response (as desktop ingest and page
+  views already do); DB failures are still swallowed and never surface as an
+  error.
 - **Bot filter knows more HTTP libraries, load testers and scanners.** The
   User-Agent heuristic behind `device=bot` now also catches python-httpx,
   aiohttp, libwww-perl, Apache/Java HTTP clients, Postman/Insomnia, k6, Locust,

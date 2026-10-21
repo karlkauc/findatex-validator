@@ -33,8 +33,8 @@ user/host name. The comment text is stored but never written to logs.
 ```
 Web:     React footer widget → POST /api/quick-feedback {rating, comment?, source, templateId?}
                              → QuickFeedbackResource (validate, rate-limit)
-                             → QuickFeedbackService → async JDBC INSERT (Postgres)
-                             → optimistic {status:"ok"} → UI message
+                             → QuickFeedbackService → JDBC INSERT on the request thread (Postgres)
+                             → {status:"ok"} → UI message
 Desktop: header "★ Rate this app" → QuickFeedbackDialog
                              → QuickFeedbackClient (core, proxy/NTLM-aware)
                              → POST same web endpoint → {status} → dialog message
@@ -42,12 +42,18 @@ Gating:  GET /api/quick-feedback-config {enabled} drives whether the SPA shows
          the widget. No DB configured ⇒ feature inert (POST → 503), widget hidden.
 ```
 
-The response is **optimistic**: validation is synchronous (400 `invalid`,
-503 `unavailable`, 429 rate-limited), but the INSERT runs asynchronously with
-the same 3-attempt/1500 ms retry as usage stats — a slow DB connection must
-never block the response. Note the flip side: a `200` means the submission was
-accepted, **not** that the row was persisted. A rating lost to a persistently
-dead DB is acceptable by design.
+Validation is synchronous (400 `invalid`, 503 `unavailable`, 429
+rate-limited), and so is the INSERT: it runs on the request thread, **before**
+the `200`, with the same 3-attempt/1500 ms retry as usage stats. Until
+2026-10 it ran on a background worker after the response — on Cloud Run
+(`--min-instances=0`) that loses the row, because the CPU is throttled once the
+response is out and a rating is usually a lone POST with no follow-up request
+to wake the instance (same reason desktop ingest and page views are written
+synchronously, see `docs/USAGE_STATS.md`). DB failures are still swallowed: a
+`200` is returned even when the row could not be stored, so a dead DB never
+shows the user an error — a rating lost to a persistently dead DB is
+acceptable by design. The price is latency: on a failing DB the response waits
+for the retries (up to ~3 × acquisition timeout + 4.5 s backoff).
 
 ## Status vocabulary
 

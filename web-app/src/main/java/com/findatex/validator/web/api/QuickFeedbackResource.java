@@ -59,7 +59,7 @@ public class QuickFeedbackResource {
         }
 
         // Clamp to the DB CHECK's vocabulary — an unknown source must not fail
-        // the async insert later.
+        // the insert.
         String source = "desktop".equalsIgnoreCase(trimmed(dto.source())) ? "desktop" : "web";
         String country = null;
         try {
@@ -69,6 +69,8 @@ public class QuickFeedbackResource {
         }
         quickFeedback.record(dto.rating(), QuickFeedbackEntry.normaliseComment(dto.comment()),
                 source, dto.appVersion(), dto.templateId(), country);
+        // record() has already written the row (synchronously, failures
+        // swallowed): on Cloud Run nothing may be left for after the response.
         return result(Response.Status.OK, QuickFeedbackStatus.OK);
     }
 

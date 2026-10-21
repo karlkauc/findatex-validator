@@ -70,7 +70,8 @@ One row per event. Columns that do not apply to an event type stay `NULL`.
 | `overall_score` | OVERALL scaled to 0–100 (2 decimals) |
 | `duration_ms` | measured run time |
 | `external_enabled` | whether GLEIF/OpenFIGI ran |
-| `rule_ids` | triggered rule IDs only (e.g. `XF-16`) — never values |
+| `rule_ids` | triggered rule IDs only (e.g. `XF-16`) — never values; all severities (kept for compatibility) |
+| `error_rule_ids`, `warning_rule_ids` | the same IDs split by `Finding.severity()`: rules with at least one ERROR / WARNING finding (a rule can be in both; INFO-only rules are only in `rule_ids`). `'{}'` for non-run events and for rows from desktop builds before 2026-10. Since 2026-10 |
 | `input_format`, `input_bytes`, `name_pattern` | derived file attributes: `xlsx`/`csv`/`mixed` (batch), size in bytes (sum for a batch), and whether the name follows the FinDatEx pattern — `dated_template` (`20260331_TPTV7_…`), `template_token` (a template token anywhere), `other`. The name itself is never sent |
 | `is_sample` | web: the upload was the bundled sample file (matched by its download name) |
 | `ext_lookups`, `ext_cache_hits`, `ext_duration_ms`, `ext_errors` | GLEIF/OpenFIGI phase: remote requests (distinct keys), cache hits, wall-clock, unavailable/cancelled phases |
@@ -120,6 +121,8 @@ CREATE TABLE usage_event (
   duration_ms      int,
   external_enabled boolean,
   rule_ids         text[]      NOT NULL DEFAULT '{}',
+  error_rule_ids   text[]      NOT NULL DEFAULT '{}',
+  warning_rule_ids text[]      NOT NULL DEFAULT '{}',
   input_format     text        CHECK (input_format IS NULL OR input_format IN ('xlsx','csv','mixed')),
   input_bytes      bigint,
   name_pattern     text        CHECK (name_pattern IS NULL OR name_pattern IN ('dated_template','template_token','other')),

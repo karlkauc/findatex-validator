@@ -33,6 +33,10 @@ import java.util.TreeSet;
  * family) from the request; the raw IP is never part of this event and never
  * leaves the desktop.
  *
+ * <p>{@code ruleIds} lists every triggered rule id; {@code errorRuleIds} /
+ * {@code warningRuleIds} split them by {@link Finding#severity()} (INFO-only
+ * rules appear in {@code ruleIds} alone). Ids only, never messages or values.
+ *
  * <p>{@code overallScore} is the OVERALL category scaled to a 0..100 percentage
  * with two decimals (the scorer works on a 0..1 fraction).
  *
@@ -62,6 +66,8 @@ public record UsageEvent(
         Integer durationMs,
         Boolean externalEnabled,
         List<String> ruleIds,
+        List<String> errorRuleIds,
+        List<String> warningRuleIds,
         Input input,
         External external,
         Boolean isSample,
@@ -152,6 +158,8 @@ public record UsageEvent(
                 clampMs(durationMs),
                 settings.external().enabled(),
                 ruleIds(findings),
+                ruleIds(findings, Severity.ERROR),
+                ruleIds(findings, Severity.WARNING),
                 orUnknown(input),
                 external,
                 null,
@@ -169,12 +177,17 @@ public record UsageEvent(
                                        External external) {
         int rows = 0;
         TreeSet<String> rules = new TreeSet<>();
+        TreeSet<String> errorRules = new TreeSet<>();
+        TreeSet<String> warningRules = new TreeSet<>();
         for (BatchResult r : summary.results()) {
             if (r.report() != null) {
                 rows += r.report().file().rows().size();
             }
             for (Finding f : r.findings()) {
-                if (f.ruleId() != null && !f.ruleId().isBlank()) rules.add(f.ruleId());
+                if (f.ruleId() == null || f.ruleId().isBlank()) continue;
+                rules.add(f.ruleId());
+                if (f.severity() == Severity.ERROR) errorRules.add(f.ruleId());
+                else if (f.severity() == Severity.WARNING) warningRules.add(f.ruleId());
             }
         }
         Double score = summary.aggregateOverallScore().isPresent()
@@ -201,6 +214,8 @@ public record UsageEvent(
                 clampMs(durationMs),
                 settings.external().enabled(),
                 List.copyOf(rules),
+                List.copyOf(errorRules),
+                List.copyOf(warningRules),
                 orUnknown(input),
                 external,
                 null,
@@ -244,6 +259,8 @@ public record UsageEvent(
                 clampMs(durationMs),
                 externalEnabled,
                 ruleIds(findings),
+                ruleIds(findings, Severity.ERROR),
+                ruleIds(findings, Severity.WARNING),
                 orUnknown(input),
                 external,
                 isSample,
@@ -277,6 +294,8 @@ public record UsageEvent(
                 null, null, null, null, null, null,
                 settings.external().enabled(),
                 List.of(),
+                List.of(),
+                List.of(),
                 orUnknown(input),
                 null,
                 null,
@@ -306,6 +325,8 @@ public record UsageEvent(
                 Math.max(fileCount, 0),
                 null, null, null, null, null, null,
                 null,
+                List.of(),
+                List.of(),
                 List.of(),
                 Input.UNKNOWN,
                 null,
@@ -345,6 +366,8 @@ public record UsageEvent(
                 null, null, null, null, null, null,
                 null,
                 List.of(),
+                List.of(),
+                List.of(),
                 Input.UNKNOWN,
                 null,
                 null,
@@ -364,9 +387,20 @@ public record UsageEvent(
         return List.copyOf(codes);
     }
 
+    /** Distinct triggered rule ids, any severity (the {@code rule_ids} column, kept for compatibility). */
     private static List<String> ruleIds(List<Finding> findings) {
+        return ruleIds(findings, null);
+    }
+
+    /**
+     * Distinct rule ids of the findings with the given {@link Finding#severity()};
+     * {@code null} = any severity. A rule that yields both errors and warnings
+     * appears in both lists.
+     */
+    static List<String> ruleIds(List<Finding> findings, Severity severity) {
         TreeSet<String> ids = new TreeSet<>();
         for (Finding f : findings) {
+            if (severity != null && f.severity() != severity) continue;
             if (f.ruleId() != null && !f.ruleId().isBlank()) ids.add(f.ruleId());
         }
         return List.copyOf(ids);

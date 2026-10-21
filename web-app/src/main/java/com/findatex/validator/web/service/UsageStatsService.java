@@ -56,18 +56,19 @@ public class UsageStatsService {
 
     private static final Logger log = LoggerFactory.getLogger(UsageStatsService.class);
 
-    private static final String INSERT = """
+    static final String INSERT = """
             INSERT INTO usage_event (
                 event_type, status, client_event_at, install_id, source,
                 app_version, os_name, java_major, visitor_hash, user_agent, device,
                 template_id, template_version, profiles, mode, file_count,
                 row_count, error_count, warning_count, info_count,
                 overall_score, duration_ms, external_enabled, rule_ids,
+                error_rule_ids, warning_rule_ids,
                 input_format, input_bytes, name_pattern, is_sample,
                 ext_lookups, ext_cache_hits, ext_duration_ms, ext_errors,
                 export_kind, path, referrer_host, campaign, country_code)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
     @Inject
@@ -137,6 +138,8 @@ public class UsageStatsService {
         r.durationMs = dto.durationMs();
         r.externalEnabled = dto.externalEnabled();
         r.ruleIds = dto.ruleIds();
+        r.errorRuleIds = dto.errorRuleIds();
+        r.warningRuleIds = dto.warningRuleIds();
         if (dto.input() != null) {
             r.inputFormat = dto.input().format();
             r.inputBytes = dto.input().bytes();
@@ -178,6 +181,8 @@ public class UsageStatsService {
         r.durationMs = ev.durationMs();
         r.externalEnabled = ev.externalEnabled();
         r.ruleIds = ev.ruleIds();
+        r.errorRuleIds = ev.errorRuleIds();
+        r.warningRuleIds = ev.warningRuleIds();
         r.input(ev.input()).external(ev.external());
         r.isSample = ev.isSample();
         r.exportKind = ev.exportKind();
@@ -324,10 +329,23 @@ public class UsageStatsService {
     }
 
     private void doInsert(UsageRow r) throws Exception {
-        try (Connection c = dataSource.get().getConnection();
-             PreparedStatement ps = c.prepareStatement(INSERT)) {
+        try (Connection c = dataSource.get().getConnection()) {
+            write(c, r);
+        }
+        // Failures propagate to insertWithRetry, which retries then drops the
+        // event with a rate-limited WARN — never disturbing the request path.
+    }
+
+    /**
+     * Binds {@code r} to {@link #INSERT} on {@code c} and executes it.
+     * Package-private so the column ↔ parameter mapping is testable without a DB.
+     */
+    static void write(Connection c, UsageRow r) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement(INSERT)) {
             Array profiles = c.createArrayOf("text", toArray(r.profiles));
             Array rules = c.createArrayOf("text", toArray(r.ruleIds));
+            Array errorRules = c.createArrayOf("text", toArray(r.errorRuleIds));
+            Array warningRules = c.createArrayOf("text", toArray(r.warningRuleIds));
             try {
                 Binder b = new Binder(ps);
                 b.str(r.eventType);
@@ -354,6 +372,8 @@ public class UsageStatsService {
                 b.integer(r.durationMs);
                 b.bool(r.externalEnabled);
                 b.array(rules);
+                b.array(errorRules);
+                b.array(warningRules);
                 b.str(r.inputFormat);
                 b.bigint(r.inputBytes);
                 b.str(r.namePattern);
@@ -371,10 +391,10 @@ public class UsageStatsService {
             } finally {
                 profiles.free();
                 rules.free();
+                errorRules.free();
+                warningRules.free();
             }
         }
-        // Failures propagate to insertWithRetry, which retries then drops the
-        // event with a rate-limited WARN — never disturbing the request path.
     }
 
     /** Sequential parameter binding so the column list above stays the single source of order. */

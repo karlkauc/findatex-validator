@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   other usage event; only install id, app version, OS family and Java version.
   **Requires the 2026-10-21 migration in `docs/USAGE_STATS.md` before the web
   container is deployed.**
+- **Usage statistics record the severity per rule.** New columns
+  `error_rule_ids` / `warning_rule_ids` (desktop and web) list the rules that
+  produced errors resp. warnings; `rule_ids` keeps listing all of them.
 
 ### Changed
 - **Only the production instance writes statistics.** New setting

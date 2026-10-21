@@ -62,7 +62,7 @@ class UsageEventTest {
                 "javaMajor", "templateId", "templateVersion", "profiles", "mode",
                 "fileCount", "rowCount", "errorCount", "warningCount", "infoCount",
                 "overallScore", "durationMs", "externalEnabled", "ruleIds",
-                "input", "external", "isSample", "exportKind", "clientEventAt");
+                "errorRuleIds", "warningRuleIds", "input", "external", "isSample", "exportKind", "clientEventAt");
         // No field that could carry instance data — checked recursively through
         // the nested Input / External records as well.
         Set<String> all = new java.util.HashSet<>();
@@ -199,5 +199,37 @@ class UsageEventTest {
         assertThat(UsageEvent.heartbeat(settings).eventType()).isEqualTo("heartbeat");
         assertThat(new ObjectMapper().writeValueAsString(UsageEvent.heartbeat(settings)))
                 .contains("\"eventType\":\"heartbeat\"");
+    }
+
+    @Test
+    void ruleIdsAreSplitBySeverity() {
+        TptFile file = new TestFileBuilder()
+                .row(TestFileBuilder.values("12", "FR0000120271", "3", "FUND"))
+                .build();
+        List<Finding> findings = List.of(
+                Finding.error("ERR-ONLY", TptProfiles.SOLVENCY_II, "5", "f", 1, "v", "m"),
+                Finding.error("BOTH", TptProfiles.SOLVENCY_II, "5", "f", 1, "v", "m"),
+                Finding.warn("BOTH", TptProfiles.SOLVENCY_II, "5", "f", 1, "v", "m"),
+                Finding.warn("WARN-ONLY", TptProfiles.SOLVENCY_II, "5", "f", 1, "v", "m"),
+                Finding.warn("WARN-ONLY", TptProfiles.SOLVENCY_II, "5", "f", 2, "v", "m"),
+                Finding.info("INFO-ONLY", TptProfiles.SOLVENCY_II, "5", "f", 1, "v", "m"));
+        QualityReport report = new QualityScorer(CATALOG).score(file, Set.of(TptProfiles.SOLVENCY_II), findings);
+
+        UsageEvent ev = UsageEvent.from(report, TPT, V, AppSettings.defaults(), "single", 1L, null, null);
+        // rule_ids stays the union of all severities (compatibility).
+        assertThat(ev.ruleIds()).containsExactly("BOTH", "ERR-ONLY", "INFO-ONLY", "WARN-ONLY");
+        assertThat(ev.errorRuleIds()).containsExactly("BOTH", "ERR-ONLY");
+        assertThat(ev.warningRuleIds()).containsExactly("BOTH", "WARN-ONLY");
+
+        UsageEvent web = UsageEvent.forWeb(report, TPT, V, false, 1L, null, null, false);
+        assertThat(web.errorRuleIds()).isEqualTo(ev.errorRuleIds());
+        assertThat(web.warningRuleIds()).isEqualTo(ev.warningRuleIds());
+
+        // Events without findings carry empty lists, never null.
+        UsageEvent failed = UsageEvent.failed(TPT, V, AppSettings.defaults(), "single",
+                UsageEvent.STATUS_ERROR, null);
+        assertThat(failed.errorRuleIds()).isEmpty();
+        assertThat(failed.warningRuleIds()).isEmpty();
+        assertThat(UsageEvent.appStart(AppSettings.defaults()).errorRuleIds()).isEmpty();
     }
 }

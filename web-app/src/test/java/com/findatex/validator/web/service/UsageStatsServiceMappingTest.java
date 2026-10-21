@@ -70,4 +70,25 @@ class UsageStatsServiceMappingTest {
                 + "\"installId\":\"bb2ce218-04c4-424f-bd59-7695fa76f952\"}"), ClientContext.EMPTY);
         assertThat(s.awaitRow().eventType).isEqualTo(UsageEvent.TYPE_VALIDATE);
     }
+
+    @Test
+    void desktopSeverityRuleListsAreMappedAndOldShapeLeavesThemNull() throws Exception {
+        Capture s = new Capture();
+        s.record(dto("{\"installId\":\"bb2ce218-04c4-424f-bd59-7695fa76f952\",\"templateId\":\"TPT\","
+                + "\"ruleIds\":[\"A\",\"B\",\"C\"],\"errorRuleIds\":[\"A\"],"
+                + "\"warningRuleIds\":[\"B\"]}"), ClientContext.EMPTY);
+        UsageRow r = s.awaitRow();
+        assertThat(r.ruleIds).containsExactly("A", "B", "C");
+        assertThat(r.errorRuleIds).containsExactly("A");
+        assertThat(r.warningRuleIds).containsExactly("B");
+        assertThat(UsageStatsInsertTest.bind(r).get("error_rule_ids")).isEqualTo(List.of("A"));
+
+        // Pre-2026-10 desktop JSON: no split lists → bound as empty arrays.
+        Capture old = new Capture();
+        old.record(dto("{\"installId\":\"bb2ce218-04c4-424f-bd59-7695fa76f952\",\"ruleIds\":[\"A\"]}"),
+                ClientContext.EMPTY);
+        UsageRow o = old.awaitRow();
+        assertThat(UsageStatsInsertTest.bind(o).get("error_rule_ids")).isEqualTo(List.of());
+        assertThat(UsageStatsInsertTest.bind(o).get("warning_rule_ids")).isEqualTo(List.of());
+    }
 }

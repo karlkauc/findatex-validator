@@ -52,6 +52,8 @@ final class UsageRow {
     Integer durationMs;
     Boolean externalEnabled;
     List<String> ruleIds = List.of();
+    List<String> errorRuleIds = List.of();
+    List<String> warningRuleIds = List.of();
     String inputFormat;
     Long inputBytes;
     String namePattern;

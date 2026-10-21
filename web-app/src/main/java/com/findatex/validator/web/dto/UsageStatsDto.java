@@ -13,7 +13,9 @@ import java.util.List;
  * <p>Backward compatible: desktop builds from before 2026-09 omit
  * {@code eventType}, {@code status}, {@code javaMajor}, {@code input},
  * {@code external}, {@code exportKind}; the service defaults them to
- * {@code validate} / {@code ok} / null.
+ * {@code validate} / {@code ok} / null. Builds before 2026-10 also omit
+ * {@code errorRuleIds} / {@code warningRuleIds}; those are stored as empty
+ * arrays.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record UsageStatsDto(
@@ -37,6 +39,8 @@ public record UsageStatsDto(
         Integer durationMs,
         Boolean externalEnabled,
         List<String> ruleIds,
+        List<String> errorRuleIds,
+        List<String> warningRuleIds,
         Input input,
         External external,
         Boolean isSample,

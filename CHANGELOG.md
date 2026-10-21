@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Bot filter knows more HTTP libraries, load testers and scanners.** The
+  User-Agent heuristic behind `device=bot` now also catches python-httpx,
+  aiohttp, libwww-perl, Apache/Java HTTP clients, Postman/Insomnia, k6, Locust,
+  JMeter, Artillery, Gatling, zgrab, masscan, Nuclei, Censys, Palo Alto
+  Expanse, WordPressPostChecker, Dataprovider and the frozen fake
+  "iPhone OS 13_2_3" UA used by scanner fleets.
 - **Desktop and folder batch reject a file of the wrong template.** The
   header check the web app has had since 1.0.16 (`HeaderMatch`) now also runs
   in the desktop: a single file whose headers the chosen template does not

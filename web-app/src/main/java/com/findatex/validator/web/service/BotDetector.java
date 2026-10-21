@@ -28,7 +28,19 @@ public final class BotDetector {
             "facebookexternalhit", "whatsapp", "telegrambot", "slackbot",
             "discordbot", "linkedinbot", "embedly", "quora link preview",
             "pingdom", "uptimerobot", "statuscake", "site24x7", "lighthouse",
-            "monitoring", "preview", "validator", "feedfetcher");
+            "monitoring", "preview", "validator", "feedfetcher",
+            // HTTP libraries beyond requests/urllib (python-httpx, python-aiohttp,
+            // Perl, Apache/Java HTTP clients) and API tools
+            "python-", "httpx", "aiohttp", "libwww-perl", "apache-httpclient",
+            "java-http-client", "postmanruntime", "insomnia",
+            // load-testing tools
+            "k6/", "locust", "jmeter", "artillery", "gatling",
+            // internet-wide scanners and crawlers that announce themselves
+            "zgrab", "masscan", "nuclei", "censys", "palo alto",
+            "wordpresspostchecker", "dataprovider",
+            // Frozen fake UA (iOS 13.2.3, 2019) sent by scanner fleets; a real
+            // device still on that exact build is negligible by now.
+            "iphone os 13_2_3 like");
 
     private BotDetector() {
     }

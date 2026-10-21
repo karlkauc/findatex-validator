@@ -18,6 +18,8 @@ class UserAgentClassifierTest {
             "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/141.0 Mobile Safari/537.36 | mobile | Android",
             "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html) | bot | Other",
             "curl/8.5.0 | bot | Other",
+            "python-httpx/0.27.2 | bot | Other",
+            "k6/0.54.0 (https://k6.io/) | bot | Other",
             "Mozilla/5.0 (PlayStation; PlayStation 5/8.20) AppleWebKit/605.1.15 | desktop | Other",
     })
     void classifies(String ua, String device, String os) {

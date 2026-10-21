@@ -69,6 +69,9 @@ services:
       FINDATEX_WEB_USAGE_DB_USER: "${FINDATEX_WEB_USAGE_DB_USER:-}"
       FINDATEX_WEB_USAGE_DB_PASSWORD: "${FINDATEX_WEB_USAGE_DB_PASSWORD:-}"
       FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN: "${FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN:-}"
+      # Only "prod" writes rows; anything else (default dev) keeps the stats
+      # inert even with a DB URL — set prod only for your real stats DB.
+      FINDATEX_WEB_INSTANCE: "${FINDATEX_WEB_INSTANCE:-dev}"
       # Keys the daily-rotating visitor hash of web events; must be the same on
       # every instance. Empty = per-process random salt (counts approximate).
       FINDATEX_WEB_VISITOR_SALT_SECRET: "${FINDATEX_WEB_VISITOR_SALT_SECRET:-}"

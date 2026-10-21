@@ -23,6 +23,9 @@ JAR="$ROOT/web-app/target/quarkus-app/quarkus-run.jar"
 mkdir -p "$WORK"
 cp "$ROOT/samples/tpt/00_showcase.xlsx" "$WORK/2026-06-30_TPT_V7_Showcase.xlsx"
 
+# The DB URL below is unroutable on purpose (it only makes the stats-backed
+# widgets visible); FINDATEX_WEB_INSTANCE=prod is needed for the same reason
+# and is harmless here because nothing can ever be written.
 echo "[demo] starting web app on :$PORT"
 (
     cd "$ROOT/web-app/target/quarkus-app"
@@ -31,6 +34,7 @@ echo "[demo] starting web app on :$PORT"
     FINDATEX_WEB_USAGE_DB_URL="jdbc:postgresql://127.0.0.1:1/demo" \
     FINDATEX_WEB_USAGE_DB_USER=demo FINDATEX_WEB_USAGE_DB_PASSWORD=demo \
     FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT=1s \
+    FINDATEX_WEB_INSTANCE=prod \
     exec java -Dquarkus.http.port="$PORT" -jar quarkus-run.jar > "$WORK/web.log" 2>&1
 ) &
 APP_PID=$!

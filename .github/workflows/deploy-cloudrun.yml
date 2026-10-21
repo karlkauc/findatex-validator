@@ -145,6 +145,11 @@ jobs:
         # spoof X-Forwarded-For to mint fresh per-IP rate-limit buckets; the
         # --concurrency / --max-instances caps above bound the resulting abuse.
         #
+        # FINDATEX_WEB_INSTANCE=prod is what lets this instance write usage
+        # events, page views and quick feedback: every other instance (default
+        # "dev") stays inert even with the DB URL set. Dropping it silently
+        # stops all statistics.
+        #
         # External validation (GLEIF / OpenFIGI) is ON for the public instance;
         # the per-run toggle in the UI still defaults to off. The OpenFIGI key
         # comes from Secret Manager (`findatex-openfigi-key`) — that secret and
@@ -167,7 +172,7 @@ jobs:
             --max-instances=10 \
             --min-instances=0 \
             --timeout=300 \
-            --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=true,FINDATEX_WEB_CANONICAL_HOST=www.findatex-validator.eu,FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=findatex,FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT=10s,PROXY_ADDRESS_FORWARDING=true,PROXY_ALLOW_X_FORWARDED=true \
+            --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=true,FINDATEX_WEB_CANONICAL_HOST=www.findatex-validator.eu,FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=findatex,FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT=10s,FINDATEX_WEB_INSTANCE=prod,PROXY_ADDRESS_FORWARDING=true,PROXY_ALLOW_X_FORWARDED=true \
             --update-secrets=FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest,FINDATEX_WEB_VISITOR_SALT_SECRET=findatex-visitor-salt:latest,FINDATEX_WEB_EXTERNAL_OPENFIGI_KEY=findatex-openfigi-key:latest \
             --quiet
 

@@ -95,6 +95,7 @@ class QuickFeedbackResourceTest {
             return Map.of(
                     // Unroutable on purpose — makes enabled() true without a real DB.
                     "quarkus.datasource.jdbc.url", "jdbc:postgresql://127.0.0.1:1/none",
+                    "findatex.web.usage-stats.instance", "prod",
                     "quarkus.datasource.jdbc.acquisition-timeout", "1S",
                     "findatex.web.quick-feedback.rate-per-ip-per-hour", "2");
         }

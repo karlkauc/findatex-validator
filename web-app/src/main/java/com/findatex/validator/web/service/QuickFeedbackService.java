@@ -63,8 +63,13 @@ public class QuickFeedbackService {
         void run() throws Exception;
     }
 
+    /**
+     * Off unless a datasource is configured <em>and</em> this is the
+     * production instance ({@code FINDATEX_WEB_INSTANCE=prod}) — a dev or
+     * load-test instance pointed at the production DB must not write to it.
+     */
     public boolean enabled() {
-        return config.usageStats().dbConfigured() && dataSource.isResolvable();
+        return config.usageStats().writesRows() && dataSource.isResolvable();
     }
 
     /** {@code country} derived server-side; {@code comment} already normalised. */

@@ -268,13 +268,16 @@ done
 
 # 3) Mount the secrets and add the non-secret DB config as env vars
 gcloud run services update "$SERVICE" --region="$REGION" \
-  --update-env-vars=FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=findatex \
+  --update-env-vars=FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=findatex,FINDATEX_WEB_INSTANCE=prod \
   --update-secrets=FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest
 ```
 
 The deploy workflow (`.github/workflows/deploy-cloudrun.yml`) uses
 `--update-env-vars` / `--update-secrets` (additive, not replace) so the
 above bootstrap survives every subsequent CI deploy without re-applying.
+`FINDATEX_WEB_INSTANCE=prod` is set by the workflow on every deploy as well:
+without it the instance treats itself as `dev` and writes no statistics, even
+with the DB URL configured (see `docs/USAGE_STATS.md`).
 
 ### Country derivation (GeoIP)
 

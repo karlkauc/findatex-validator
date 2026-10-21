@@ -233,6 +233,18 @@ Web (`application.properties` / env):
   stats DB (`...?sslmode=require`; prod: `findatex_stats` on the Hetzner VPS
   `tanzapp-prod`, see [Production database](#production-database)).
   **Empty ⇒ feature inert, app still boots.**
+- `FINDATEX_WEB_INSTANCE` — name of the deployment (default `dev`). **Only
+  `prod` writes rows** (usage events, page views, quick feedback); any other
+  value leaves those features inert even with the DB URL set. The Cloud Run
+  deploy (`.github/workflows/deploy-cloudrun.yml`) sets `prod`; a self-hosted
+  instance with its own stats DB must set it as well, or it records nothing.
+  Background: on 2026-10 a load test from a local instance that carried the
+  production DB URL wrote 3,263 bogus rows into `findatex_stats`.
+
+  > **Never run load tests (or any local instance) with the production DB
+  > URL.** Use a throwaway Postgres or leave `FINDATEX_WEB_USAGE_DB_URL`
+  > empty. The `FINDATEX_WEB_INSTANCE` guard is a safety net, not a licence:
+  > do not set it to `prod` anywhere but the production deployment.
 - `FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT` — Agroal connection-acquisition
   timeout (default `30s`, prod sets `10s`). Web-run inserts are fire-and-forget,
   so a slow acquisition would drop them silently; `UsageStatsService`

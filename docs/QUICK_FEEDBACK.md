@@ -81,6 +81,7 @@ Web (env vars; defaults in `web-app/src/main/resources/application.properties`):
 | Env var | Default | Meaning |
 |---|---|---|
 | `FINDATEX_WEB_USAGE_DB_URL` (+ `_USER`, `_PASSWORD`) | empty | shared datasource; empty ⇒ feature fully inert (503, widget hidden) |
+| `FINDATEX_WEB_INSTANCE` | `dev` | only `prod` stores feedback; any other value ⇒ inert like an empty DB URL (keeps dev/load-test instances out of the prod DB) |
 | `FINDATEX_WEB_QUICK_FEEDBACK_RATE` | `5` | per-IP submissions/hour (Bucket4j, POST only; the config GET is unmetered) |
 
 Desktop: **Settings → Feedback → "App rating / quick feedback"** holds the

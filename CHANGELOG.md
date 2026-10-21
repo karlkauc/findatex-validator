@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Only the production instance writes statistics.** New setting
+  `FINDATEX_WEB_INSTANCE` (`findatex.web.usage-stats.instance`, default `dev`):
+  usage events, page views and quick feedback are stored only when it is
+  `prod`, so a local or load-test instance that carries the production DB URL
+  stays inert. The Cloud Run deploy sets `prod`; **self-hosted instances with
+  their own stats DB must set `FINDATEX_WEB_INSTANCE=prod`**, or they stop
+  recording.
+
 ### Fixed
 - **Bot filter knows more HTTP libraries, load testers and scanners.** The
   User-Agent heuristic behind `device=bot` now also catches python-httpx,

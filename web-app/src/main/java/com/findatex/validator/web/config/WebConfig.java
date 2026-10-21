@@ -82,6 +82,9 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.usage-stats.visitor-salt-secret")
     Optional<String> usageStatsVisitorSaltSecret;
 
+    @ConfigProperty(name = "findatex.web.usage-stats.instance", defaultValue = "dev")
+    String usageStatsInstance;
+
     @ConfigProperty(name = "quarkus.datasource.jdbc.url")
     Optional<String> usageDbUrl;
 
@@ -162,6 +165,7 @@ public class WebConfig {
      * Anonymous usage-stats config. {@code ingestToken} empty => endpoint
      * accepts-and-discards (feature off). {@code dbConfigured} reflects whether
      * a JDBC URL is present at all (drives the inert-when-unconfigured path).
+     * {@code instance} names the deployment; only {@code prod} writes rows.
      */
     public UsageStats usageStats() {
         return new UsageStats(
@@ -169,7 +173,9 @@ public class WebConfig {
                 Math.max(1, usageStatsRatePerIpPerHour),
                 usageStatsGeoipDb.map(String::trim).filter(s -> !s.isEmpty()),
                 usageDbUrl.map(String::trim).filter(s -> !s.isEmpty()).isPresent(),
-                usageStatsVisitorSaltSecret.map(String::trim).filter(s -> !s.isEmpty()));
+                usageStatsVisitorSaltSecret.map(String::trim).filter(s -> !s.isEmpty()),
+                usageStatsInstance == null || usageStatsInstance.isBlank()
+                        ? "dev" : usageStatsInstance.trim().toLowerCase(java.util.Locale.ROOT));
     }
 
     /**
@@ -225,12 +231,25 @@ public class WebConfig {
      * {@code visitorSaltSecret} keys the daily visitor-hash salt
      * ({@link com.findatex.validator.web.service.VisitorHasher}); empty ⇒
      * per-process random salt (visitor counts approximate across instances).
+     *
+     * <p>{@code instance} ({@code FINDATEX_WEB_INSTANCE}, default {@code dev})
+     * guards the production statistics: a local or load-test instance that was
+     * started with the production DB URL must not write into it, so every
+     * insert path is gated on {@link #writesRows()}, i.e. {@code instance=prod}.
      */
     public record UsageStats(Optional<String> ingestToken,
                              int ratePerIpPerHour,
                              Optional<String> geoipDbPath,
                              boolean dbConfigured,
-                             Optional<String> visitorSaltSecret) {
+                             Optional<String> visitorSaltSecret,
+                             String instance) {
+
+        public static final String PROD_INSTANCE = "prod";
+
+        /** True only on the production instance with a datasource configured. */
+        public boolean writesRows() {
+            return dbConfigured && PROD_INSTANCE.equals(instance);
+        }
     }
 
     public record Report(int ttlMinutes) {

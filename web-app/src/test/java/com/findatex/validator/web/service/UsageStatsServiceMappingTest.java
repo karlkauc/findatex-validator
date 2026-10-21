@@ -1,0 +1,73 @@
+package com.findatex.validator.web.service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.findatex.validator.stats.UsageEvent;
+import com.findatex.validator.web.dto.UsageStatsDto;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * What ends up in a {@link UsageRow} for each entry point — after
+ * {@link UsageRow#normalise()}, i.e. exactly what would be inserted. No DB or
+ * CDI: the insert seam is overridden to capture the row.
+ */
+class UsageStatsServiceMappingTest {
+
+    static final class Capture extends UsageStatsService {
+        final List<UsageRow> rows = new CopyOnWriteArrayList<>();
+        final CountDownLatch inserted = new CountDownLatch(1);
+
+        @Override
+        public boolean enabled() {
+            return true;
+        }
+
+        @Override
+        void insert(UsageRow row) {
+            rows.add(row);
+            inserted.countDown();
+        }
+
+        UsageRow awaitRow() throws InterruptedException {
+            assertThat(inserted.await(5, TimeUnit.SECONDS)).isTrue();
+            return rows.get(0);
+        }
+    }
+
+    private static UsageStatsDto dto(String json) throws Exception {
+        return new ObjectMapper().readValue(json, UsageStatsDto.class);
+    }
+
+    @Test
+    void desktopAppStartAndHeartbeatKeepTheirEventType() throws Exception {
+        for (String type : List.of(UsageEvent.TYPE_APP_START, UsageEvent.TYPE_HEARTBEAT)) {
+            Capture s = new Capture();
+            s.record(dto("{\"eventType\":\"" + type + "\",\"status\":\"ok\","
+                    + "\"installId\":\"bb2ce218-04c4-424f-bd59-7695fa76f952\",\"source\":\"desktop\","
+                    + "\"appVersion\":\"1.5.0\",\"osName\":\"Windows\",\"javaMajor\":21,"
+                    + "\"profiles\":[],\"fileCount\":0,\"ruleIds\":[]}"), ClientContext.EMPTY);
+            UsageRow r = s.awaitRow();
+            // Before 2026-10 an unknown type was clamped to 'validate' and
+            // inflated the run counts — app_start/heartbeat must pass through.
+            assertThat(r.eventType).isEqualTo(type);
+            assertThat(r.source).isEqualTo("desktop");
+            assertThat(r.fileCount).isZero();
+            assertThat(r.templateId).isNull();
+            assertThat(r.mode).isNull();
+        }
+    }
+
+    @Test
+    void unknownEventTypeIsStillClampedToValidate() throws Exception {
+        Capture s = new Capture();
+        s.record(dto("{\"eventType\":\"something_new\","
+                + "\"installId\":\"bb2ce218-04c4-424f-bd59-7695fa76f952\"}"), ClientContext.EMPTY);
+        assertThat(s.awaitRow().eventType).isEqualTo(UsageEvent.TYPE_VALIDATE);
+    }
+}

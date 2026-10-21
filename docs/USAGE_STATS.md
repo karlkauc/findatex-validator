@@ -20,6 +20,14 @@ apart by `event_type`:
 | `report_download` | desktop (export) + web (`GET /api/report/{id}`) | the result got used; `export_kind` = `xlsx` \| `per_file` \| `combined` \| `combined_annotated` |
 | `sample_load` | web (`GET /api/samples/{t}`) | "Try an example" clicked (runs on that file additionally carry `is_sample=true`) |
 | `page_view` | web SPA beacon | one page load (was the separate `page_view` table before) |
+| `app_start` | desktop | the app was started (once per launch, after the main window is shown) — counts installations that open the app without validating anything. Since 2026-10 |
+| `heartbeat` | desktop | the app is still running: every 24 h after the start (first one 24 h after `app_start`), from a daemon timer. Since 2026-10 |
+
+`app_start` and `heartbeat` carry only the install id, `app_version`,
+`os_name`, `java_major` and `client_event_at` (`file_count = 0`, no template,
+no counts). They go through the same `UsageStatsReporter`, so the opt-out
+setting and the embedded token apply exactly as for runs; jpackage training
+launches (`-Dfindatex.training`) send nothing.
 
 ## Architecture
 
@@ -88,7 +96,8 @@ CREATE TABLE usage_event (
   install_id       uuid        NOT NULL,
   source           text        NOT NULL CHECK (source IN ('desktop','web')),
   event_type       text        NOT NULL DEFAULT 'validate'
-                               CHECK (event_type IN ('page_view','validate','report_download','sample_load')),
+                               CHECK (event_type IN ('page_view','validate','report_download','sample_load',
+                                                     'app_start','heartbeat')),
   status           text        NOT NULL DEFAULT 'ok'
                                CHECK (status IN ('ok','unsupported_type','parse_error','template_mismatch',
                                                  'bad_request','rate_limited','too_large','busy','error')),
@@ -204,6 +213,34 @@ COMMIT;
 SELECT (SELECT count(*) FROM page_view) legacy,
        (SELECT count(*) FROM usage_event WHERE event_type='page_view') folded;
 ```
+
+### Migration 2026-10-21 (existing DB — run once, **before** deploying the new container)
+
+Desktop `app_start`/`heartbeat` events (X5), severity per rule (X6) and the
+failure reason of failed runs (X7). The `INSERT` in `UsageStatsService` names
+every column explicitly, so a container with these changes **cannot write a
+single row** until this SQL has been applied (every insert fails on the missing
+`error_rule_ids`/`warning_rule_ids`/`fail_reason` columns and is dropped after
+the retries) — **apply the DDL first, then deploy**. Order: **1)** this SQL on
+the Hetzner DB, **2)** the usage dashboard (`apps.py`: `app_start`/`heartbeat`),
+**3)** the web container (tag `v*`), **4)** desktop release. The constraint name
+is the one created by the 2026-09 migration above (confirm with
+`\d usage_event`). The legacy `page_view` *table* is already dropped in
+production; `'page_view'` stays in the CHECK because it is an `event_type`.
+
+```sql
+BEGIN;
+ALTER TABLE usage_event DROP CONSTRAINT usage_event_event_type_check,
+  ADD CONSTRAINT usage_event_event_type_check CHECK (event_type IN
+   ('page_view','validate','report_download','sample_load','app_start','heartbeat'));
+ALTER TABLE usage_event ADD COLUMN fail_reason text,
+  ADD COLUMN error_rule_ids text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN warning_rule_ids text[] NOT NULL DEFAULT '{}';
+COMMIT;
+```
+
+Existing rows keep `fail_reason = NULL` and empty severity arrays; `rule_ids`
+is unchanged and still filled for compatibility.
 
 ## Configuration (all env-overridable; feature off until set)
 

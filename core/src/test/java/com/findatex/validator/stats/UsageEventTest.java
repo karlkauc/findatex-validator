@@ -167,4 +167,37 @@ class UsageEventTest {
         assertThat(UsageEvent.detectAppVersion()).isEqualTo(AppInfo.version());
         assertThat(AppInfo.version()).isNotEqualTo("dev");
     }
+
+    @Test
+    void appStartAndHeartbeatCarryOnlyInstallAndRuntimeClasses() throws Exception {
+        AppSettings settings = AppSettings.defaults();
+        for (UsageEvent ev : List.of(UsageEvent.appStart(settings), UsageEvent.heartbeat(settings))) {
+            assertThat(ev.status()).isEqualTo(UsageEvent.STATUS_OK);
+            assertThat(ev.source()).isEqualTo("desktop");
+            assertThat(ev.installId()).isEqualTo(settings.usageStats().installId());
+            assertThat(ev.appVersion()).isEqualTo(UsageEvent.detectAppVersion());
+            assertThat(ev.osName()).isIn("Windows", "Mac", "Linux", "Other");
+            assertThat(ev.javaMajor()).isEqualTo(Runtime.version().feature());
+            assertThat(ev.clientEventAt()).isNotBlank();
+            // Not a run: no template, no counts, no file attributes.
+            assertThat(ev.templateId()).isNull();
+            assertThat(ev.templateVersion()).isNull();
+            assertThat(ev.mode()).isNull();
+            assertThat(ev.fileCount()).isZero();
+            assertThat(ev.rowCount()).isNull();
+            assertThat(ev.errorCount()).isNull();
+            assertThat(ev.overallScore()).isNull();
+            assertThat(ev.durationMs()).isNull();
+            assertThat(ev.externalEnabled()).isNull();
+            assertThat(ev.profiles()).isEmpty();
+            assertThat(ev.ruleIds()).isEmpty();
+            assertThat(ev.input()).isEqualTo(UsageEvent.Input.UNKNOWN);
+            assertThat(ev.external()).isNull();
+            assertThat(ev.exportKind()).isNull();
+        }
+        assertThat(UsageEvent.appStart(settings).eventType()).isEqualTo("app_start");
+        assertThat(UsageEvent.heartbeat(settings).eventType()).isEqualTo("heartbeat");
+        assertThat(new ObjectMapper().writeValueAsString(UsageEvent.heartbeat(settings)))
+                .contains("\"eventType\":\"heartbeat\"");
+    }
 }

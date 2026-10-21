@@ -21,7 +21,9 @@ import java.util.TreeSet;
 
 /**
  * Anonymous, aggregate-only record of one usage event: a validation run
- * (successful or failed), a report export/download or a sample-file load.
+ * (successful or failed), a report export/download, a sample-file load, or —
+ * desktop only — an app start / daily heartbeat (so installations that never
+ * validate anything still count as active).
  * Carries deliberately coarse counts, classes and identifiers — never file
  * names, paths, fund names, ISIN/LEI/codes, cell values, or
  * {@code Finding.message()/value()}. File-related attributes are reduced to
@@ -74,6 +76,10 @@ public record UsageEvent(
     public static final String TYPE_REPORT_DOWNLOAD = "report_download";
     public static final String TYPE_SAMPLE_LOAD = "sample_load";
     public static final String TYPE_PAGE_VIEW = "page_view";
+    /** Desktop: the app was started (once per launch, after the main window is shown). */
+    public static final String TYPE_APP_START = "app_start";
+    /** Desktop: the app is still running — sent every 24 h after the start. */
+    public static final String TYPE_HEARTBEAT = "heartbeat";
 
     // ---- status values (never a message) -----------------------------------
     public static final String STATUS_OK = "ok";
@@ -305,6 +311,44 @@ public record UsageEvent(
                 null,
                 null,
                 exportKind,
+                Instant.now().toString());
+    }
+
+    /**
+     * Desktop app start: sent once per launch so installations that open the
+     * app without validating anything still count as active. Carries only the
+     * install id and the coarse runtime classes (version, OS family, Java).
+     */
+    public static UsageEvent appStart(AppSettings settings) {
+        return presence(TYPE_APP_START, settings);
+    }
+
+    /** Desktop heartbeat: the app has been running for another 24 h. Same shape as {@link #appStart}. */
+    public static UsageEvent heartbeat(AppSettings settings) {
+        return presence(TYPE_HEARTBEAT, settings);
+    }
+
+    private static UsageEvent presence(String type, AppSettings settings) {
+        return new UsageEvent(
+                type,
+                STATUS_OK,
+                settings.usageStats().installId(),
+                "desktop",
+                detectAppVersion(),
+                osFamily(),
+                detectJavaMajor(),
+                null,
+                null,
+                List.of(),
+                null,
+                0,
+                null, null, null, null, null, null,
+                null,
+                List.of(),
+                Input.UNKNOWN,
+                null,
+                null,
+                null,
                 Instant.now().toString());
     }
 

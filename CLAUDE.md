@@ -328,7 +328,7 @@ headers comes from `AppInfo.githubUrl()` — the single source for the repo URL.
 **Usage statistics (opt-out)** — aggregate-only usage events, default on, per
 install. One table, `usage_event`, told apart by `event_type` (`validate` incl.
 failed runs with a `status` class, `report_download`, `sample_load`,
-`page_view`). Desktop never writes the DB: `core/.../stats/UsageStatsReporter`
+`page_view`, and desktop `app_start` + 24-hourly `heartbeat` from `App`). Desktop never writes the DB: `core/.../stats/UsageStatsReporter`
 fire-and-forgets a `UsageEvent` (aggregate counts and *classes* only — never
 files, names, codes, cell/finding content, or IP) to `POST /api/usage-stats`
 (`X-Usage-Token`); failures are silently dropped (DEBUG), the run is never

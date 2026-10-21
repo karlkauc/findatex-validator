@@ -84,6 +84,22 @@ class UsageStatsResourceTest {
     }
 
     @Test
+    void desktopAppStartAndHeartbeatAre202() {
+        for (String type : new String[]{"app_start", "heartbeat"}) {
+            given().header("X-Forwarded-For", "203.0.113.8")
+                    .header("X-Usage-Token", "test-secret")
+                    .contentType("application/json")
+                    .body("{\"eventType\":\"" + type + "\",\"status\":\"ok\","
+                            + "\"installId\":\"a1b2c3d4-0000-0000-0000-000000000003\","
+                            + "\"source\":\"desktop\",\"appVersion\":\"1.5.0\",\"osName\":\"Mac\","
+                            + "\"javaMajor\":21,\"profiles\":[],\"fileCount\":0,\"ruleIds\":[],"
+                            + "\"clientEventAt\":\"2026-10-21T08:00:00Z\"}")
+                    .when().post("/api/usage-stats")
+                    .then().statusCode(202);
+        }
+    }
+
+    @Test
     void garbageJsonIs202() {
         given().header("X-Forwarded-For", "203.0.113.4")
                 .header("X-Usage-Token", "test-secret")

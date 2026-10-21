@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Desktop app start and daily heartbeat in the usage statistics.** The
+  desktop app now sends one `app_start` event per launch and a `heartbeat`
+  every 24 h while it runs, so installations that are opened without
+  validating anything still count as active. Same opt-out and token as every
+  other usage event; only install id, app version, OS family and Java version.
+  **Requires the 2026-10-21 migration in `docs/USAGE_STATS.md` before the web
+  container is deployed.**
+
 ### Changed
 - **Only the production instance writes statistics.** New setting
   `FINDATEX_WEB_INSTANCE` (`findatex.web.usage-stats.instance`, default `dev`):

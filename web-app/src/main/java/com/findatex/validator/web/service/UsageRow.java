@@ -16,7 +16,8 @@ final class UsageRow {
 
     static final Set<String> EVENT_TYPES = Set.of(
             UsageEvent.TYPE_VALIDATE, UsageEvent.TYPE_REPORT_DOWNLOAD,
-            UsageEvent.TYPE_SAMPLE_LOAD, UsageEvent.TYPE_PAGE_VIEW);
+            UsageEvent.TYPE_SAMPLE_LOAD, UsageEvent.TYPE_PAGE_VIEW,
+            UsageEvent.TYPE_APP_START, UsageEvent.TYPE_HEARTBEAT);
     static final Set<String> STATUSES = Set.of(
             UsageEvent.STATUS_OK, UsageEvent.STATUS_UNSUPPORTED_TYPE, UsageEvent.STATUS_PARSE_ERROR,
             UsageEvent.STATUS_TEMPLATE_MISMATCH, UsageEvent.STATUS_BAD_REQUEST,

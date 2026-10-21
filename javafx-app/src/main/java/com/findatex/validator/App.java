@@ -5,6 +5,8 @@ import com.findatex.validator.config.PasswordCipher;
 import com.findatex.validator.config.SettingsService;
 import com.findatex.validator.external.proxy.ProxyConfig;
 import com.findatex.validator.external.proxy.ProxyService;
+import com.findatex.validator.stats.UsageEvent;
+import com.findatex.validator.stats.UsageStatsReporter;
 import com.findatex.validator.template.api.TemplateRegistry;
 import com.findatex.validator.ui.MainController;
 import javafx.application.Application;
@@ -21,10 +23,16 @@ import java.awt.Taskbar;
 import java.awt.Toolkit;
 import java.io.InputStream;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public final class App extends Application {
 
     private static final Logger log = LoggerFactory.getLogger(App.class);
+
+    /** Interval of the usage-stats heartbeat; the first one fires one interval after the start. */
+    private static final long HEARTBEAT_HOURS = 24;
 
     /** Set the AWT app name early so the macOS menu bar / dock label reads "FinDatEx Validator", not "App". */
     static {
@@ -69,7 +77,38 @@ public final class App extends Application {
         stage.setOnShown(e -> closeAwtSplashScreen());
         stage.show();
 
-        maybeScheduleTrainingExit();
+        if (!maybeScheduleTrainingExit()) reportAppStartAndScheduleHeartbeat();
+    }
+
+    /**
+     * Usage stats: one {@code app_start} per launch and a {@code heartbeat}
+     * every 24 h while the app keeps running, so installations that are opened
+     * without validating anything still count as active. Both go through
+     * {@link UsageStatsReporter}, which honours the opt-out setting and the
+     * embedded ingest token (no token ⇒ nothing is sent) and never blocks.
+     * Skipped in jpackage training runs (see {@link #maybeScheduleTrainingExit}).
+     */
+    private static void reportAppStartAndScheduleHeartbeat() {
+        try {
+            UsageStatsReporter.getInstance().report(
+                    UsageEvent.appStart(SettingsService.getInstance().getCurrent()));
+            ScheduledExecutorService heartbeat = Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread t = new Thread(r, "usage-stats-heartbeat");
+                t.setDaemon(true); // never keeps the JVM alive after the window closes
+                return t;
+            });
+            heartbeat.scheduleAtFixedRate(() -> {
+                try {
+                    UsageStatsReporter.getInstance().report(
+                            UsageEvent.heartbeat(SettingsService.getInstance().getCurrent()));
+                } catch (RuntimeException e) {
+                    // must not cancel the schedule — stats are best-effort
+                    log.debug("Usage-stats heartbeat skipped: {}", e.toString());
+                }
+            }, HEARTBEAT_HOURS, HEARTBEAT_HOURS, TimeUnit.HOURS);
+        } catch (RuntimeException e) {
+            log.debug("Usage-stats app start skipped: {}", e.toString());
+        }
     }
 
     /**
@@ -96,15 +135,17 @@ public final class App extends Application {
      * (-XX:AOTCacheOutput) against a realistically-warmed image.
      * <p>Values: "true" → 2000 ms (default), a number → that many ms.
      * Anything else (incl. unset) → no-op.
+     * <p>Returns {@code true} when training is active, so the caller can skip
+     * the usage-stats start event (a packaging run is not a real start).
      * <p>Fallback chain: Platform.exit() first (clean JavaFX shutdown), then
      * after another 1.5 s a hard System.exit(0). The hard exit is needed under
      * headless / xvfb where the toolkit's render loop sometimes won't process
      * the Platform.exit() event. JVM shutdown hooks still run, so the
      * dynamic-CDS / AOT cache dump completes.
      */
-    private static void maybeScheduleTrainingExit() {
+    private static boolean maybeScheduleTrainingExit() {
         String prop = System.getProperty("findatex.training");
-        if (prop == null || prop.isBlank() || "false".equalsIgnoreCase(prop)) return;
+        if (prop == null || prop.isBlank() || "false".equalsIgnoreCase(prop)) return false;
         long delayMs;
         if ("true".equalsIgnoreCase(prop)) {
             delayMs = 2000L;
@@ -123,6 +164,7 @@ public final class App extends Application {
         }, "findatex-training-exiter");
         t.setDaemon(false); // must NOT be daemon — System.exit needs to actually fire
         t.start();
+        return true;
     }
 
     /**

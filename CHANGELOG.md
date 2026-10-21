@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Usage statistics record the severity per rule.** New columns
   `error_rule_ids` / `warning_rule_ids` (desktop and web) list the rules that
   produced errors resp. warnings; `rule_ids` keeps listing all of them.
+- **Failed runs record why.** New column `fail_reason`: a short code next to
+  the failure status, e.g. `header_mismatch:0/57` (recognised / read column
+  headers), `missing_zip_signature`, `invalid_profile` or the exception class
+  name — never the error message.
 
 ### Changed
 - **Only the production instance writes statistics.** New setting

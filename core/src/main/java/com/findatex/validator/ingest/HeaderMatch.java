@@ -47,7 +47,8 @@ public record HeaderMatch(int headers, int recognised, List<String> firstHeaders
         HeaderMatch match = of(file);
         if (!match.mismatch()) return;
         List<FieldSpec> fields = catalog.fields();
-        throw new TemplateMismatchException(match.describe(template, fields.isEmpty() ? "" : fields.get(0).name()));
+        throw new TemplateMismatchException(
+                match.describe(template, fields.isEmpty() ? "" : fields.get(0).name()), match);
     }
 
     /**
@@ -57,6 +58,14 @@ public record HeaderMatch(int headers, int recognised, List<String> firstHeaders
      */
     public boolean mismatch() {
         return headers > 0 && (recognised == 0 || (recognised < MIN_RECOGNISED && headers > NARROW_FILE));
+    }
+
+    /**
+     * Fail-reason code for the usage statistics: {@code header_mismatch:<recognised>/<headers>},
+     * e.g. {@code header_mismatch:0/57}. Counts only — never a header text.
+     */
+    public String failReason() {
+        return "header_mismatch:" + recognised + "/" + headers;
     }
 
     /**

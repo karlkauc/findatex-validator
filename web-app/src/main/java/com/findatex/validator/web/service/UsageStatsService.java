@@ -66,9 +66,9 @@ public class UsageStatsService {
                 error_rule_ids, warning_rule_ids,
                 input_format, input_bytes, name_pattern, is_sample,
                 ext_lookups, ext_cache_hits, ext_duration_ms, ext_errors,
-                export_kind, path, referrer_host, campaign, country_code)
+                export_kind, path, referrer_host, campaign, country_code, fail_reason)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
     @Inject
@@ -119,6 +119,7 @@ public class UsageStatsService {
         UsageRow r = new UsageRow();
         r.eventType = dto.eventType() == null ? UsageEvent.TYPE_VALIDATE : dto.eventType();
         r.status = dto.status() == null ? UsageEvent.STATUS_OK : dto.status();
+        r.failReason = dto.failReason();
         r.clientEventAt = dto.clientEventAt();
         r.installId = dto.installId();
         r.source = "desktop";
@@ -166,6 +167,7 @@ public class UsageStatsService {
     public void record(UsageEvent ev, ClientContext ctx) {
         if (ev == null || !enabled()) return;
         UsageRow r = UsageRow.web(ev.eventType(), ev.status(), ctx);
+        r.failReason = ev.failReason();
         r.clientEventAt = ev.clientEventAt();
         r.appVersion = ev.appVersion();
         if (ev.osName() != null) r.osName = ev.osName();
@@ -189,14 +191,20 @@ public class UsageStatsService {
         submit(r);
     }
 
-    /** Web validation attempt that produced no report; {@code status} is the failure class. */
-    public void recordFailedRun(String status, String templateId, String templateVersion,
+    /**
+     * Web validation attempt that produced no report; {@code status} is the
+     * failure class, {@code failReason} an optional code refining it (e.g.
+     * {@code header_mismatch:0/57}, an exception's simple class name) — never a
+     * message; sanitised and capped at {@value UsageEvent#MAX_FAIL_REASON} chars.
+     */
+    public void recordFailedRun(String status, String failReason, String templateId, String templateVersion,
                                 UsageEvent.Input input, Boolean isSample, Integer durationMs,
                                 ClientContext ctx) {
         if (!enabled()) return;
         UsageRow r = UsageRow.web(UsageEvent.TYPE_VALIDATE, status, ctx)
                 .template(templateId, templateVersion)
                 .input(input);
+        r.failReason = failReason;
         r.mode = "single";
         r.fileCount = 1;
         r.isSample = isSample;
@@ -387,6 +395,7 @@ public class UsageStatsService {
                 b.str(trimToNull(r.referrerHost));
                 b.str(trimToNull(r.campaign));
                 b.str(trimToNull(r.country));
+                b.str(r.failReason);
                 ps.executeUpdate();
             } finally {
                 profiles.free();

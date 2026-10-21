@@ -62,7 +62,7 @@ class UsageEventTest {
                 "javaMajor", "templateId", "templateVersion", "profiles", "mode",
                 "fileCount", "rowCount", "errorCount", "warningCount", "infoCount",
                 "overallScore", "durationMs", "externalEnabled", "ruleIds",
-                "errorRuleIds", "warningRuleIds", "input", "external", "isSample", "exportKind", "clientEventAt");
+                "errorRuleIds", "warningRuleIds", "input", "external", "isSample", "exportKind", "clientEventAt", "failReason");
         // No field that could carry instance data — checked recursively through
         // the nested Input / External records as well.
         Set<String> all = new java.util.HashSet<>();
@@ -231,5 +231,41 @@ class UsageEventTest {
         assertThat(failed.errorRuleIds()).isEmpty();
         assertThat(failed.warningRuleIds()).isEmpty();
         assertThat(UsageEvent.appStart(AppSettings.defaults()).errorRuleIds()).isEmpty();
+    }
+
+    @Test
+    void failReasonIsACodeNeverAMessage() throws Exception {
+        // Template mismatch: header counts only, not the header texts in the message.
+        com.findatex.validator.ingest.HeaderMatch match =
+                new com.findatex.validator.ingest.HeaderMatch(57, 0, List.of("Secret header"));
+        assertThat(UsageEvent.failReasonOf(new com.findatex.validator.ingest.TemplateMismatchException(
+                "File does not match ... \"Secret header\"", match))).isEqualTo("header_mismatch:0/57");
+        assertThat(match.failReason()).isEqualTo("header_mismatch:0/57");
+
+        // Exceptions: simple class name (+ root cause class), never the message.
+        assertThat(UsageEvent.failReasonOf(new java.io.IOException("C:\\funds\\SECRET.xlsx")))
+                .isEqualTo("IOException");
+        assertThat(UsageEvent.failReasonOf(new java.io.IOException("outer secret",
+                new RuntimeException("mid", new java.util.zip.ZipException("inner secret")))))
+                .isEqualTo("IOException/ZipException");
+        assertThat(UsageEvent.failReasonOf(new com.findatex.validator.ingest.TemplateMismatchException("no match")))
+                .isEqualTo("TemplateMismatchException");
+        assertThat(UsageEvent.failReasonOf(null)).isNull();
+
+        // Sanitiser: allowed chars only, capped, blank -> null.
+        assertThat(UsageEvent.sanitizeFailReason("  ")).isNull();
+        assertThat(UsageEvent.sanitizeFailReason("a b\"c")).isEqualTo("a_b_c");
+        assertThat(UsageEvent.sanitizeFailReason("x".repeat(300))).hasSize(UsageEvent.MAX_FAIL_REASON);
+
+        UsageEvent ev = UsageEvent.failed(TPT, V, AppSettings.defaults(), "single",
+                UsageEvent.STATUS_PARSE_ERROR, null,
+                UsageEvent.failReasonOf(new java.io.IOException("SECRET")));
+        assertThat(ev.failReason()).isEqualTo("IOException");
+        assertThat(new ObjectMapper().writeValueAsString(ev))
+                .contains("\"failReason\":\"IOException\"").doesNotContain("SECRET");
+        // Successful and non-run events carry none.
+        assertThat(UsageEvent.failed(TPT, V, AppSettings.defaults(), "single",
+                UsageEvent.STATUS_ERROR, null).failReason()).isNull();
+        assertThat(UsageEvent.appStart(AppSettings.defaults()).failReason()).isNull();
     }
 }

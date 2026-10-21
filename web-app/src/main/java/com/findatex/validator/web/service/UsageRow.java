@@ -30,6 +30,8 @@ final class UsageRow {
 
     String eventType = UsageEvent.TYPE_VALIDATE;
     String status = UsageEvent.STATUS_OK;
+    /** Failed runs only: a short code refining {@code status}, never a message. */
+    String failReason;
     String clientEventAt;
     String installId = UsageEvent.WEB_INSTALL_ID;
     String source = "web";
@@ -120,6 +122,7 @@ final class UsageRow {
     UsageRow normalise() {
         eventType = oneOf(eventType, EVENT_TYPES, UsageEvent.TYPE_VALIDATE);
         status = oneOf(status, STATUSES, UsageEvent.STATUS_OK);
+        failReason = UsageEvent.STATUS_OK.equals(status) ? null : UsageEvent.sanitizeFailReason(failReason);
         inputFormat = oneOf(inputFormat, FORMATS, null);
         namePattern = oneOf(namePattern, PATTERNS, null);
         exportKind = oneOf(exportKind, EXPORT_KINDS, null);

@@ -91,4 +91,36 @@ class UsageStatsServiceMappingTest {
         assertThat(UsageStatsInsertTest.bind(o).get("error_rule_ids")).isEqualTo(List.of());
         assertThat(UsageStatsInsertTest.bind(o).get("warning_rule_ids")).isEqualTo(List.of());
     }
+
+    @Test
+    void failedRunCarriesItsFailReasonIntoTheInsert() throws Exception {
+        Capture s = new Capture();
+        s.recordFailedRun(UsageEvent.STATUS_TEMPLATE_MISMATCH, "header_mismatch:0/57", "TPT", "V7.0",
+                null, false, 12, ClientContext.EMPTY);
+        UsageRow r = s.awaitRow();
+        assertThat(r.failReason).isEqualTo("header_mismatch:0/57");
+        assertThat(UsageStatsInsertTest.bind(r).get("fail_reason")).isEqualTo("header_mismatch:0/57");
+    }
+
+    @Test
+    void desktopFailReasonIsSanitisedCappedAndDroppedForOkRuns() throws Exception {
+        String longReason = "IOException/" + "X".repeat(200);
+        Capture s = new Capture();
+        s.record(dto("{\"installId\":\"bb2ce218-04c4-424f-bd59-7695fa76f952\",\"status\":\"parse_error\","
+                + "\"failReason\":\"" + longReason + "\"}"), ClientContext.EMPTY);
+        UsageRow r = s.awaitRow();
+        assertThat(r.failReason).hasSize(UsageEvent.MAX_FAIL_REASON).startsWith("IOException/XXX");
+
+        Capture msg = new Capture();
+        msg.record(dto("{\"installId\":\"bb2ce218-04c4-424f-bd59-7695fa76f952\",\"status\":\"error\","
+                + "\"failReason\":\"File C:\\\\secret fund.xlsx\"}"), ClientContext.EMPTY);
+        assertThat(msg.awaitRow().failReason).doesNotContain(" ", "\\").matches("[A-Za-z0-9_.:/-]+");
+
+        Capture ok = new Capture();
+        ok.record(dto("{\"installId\":\"bb2ce218-04c4-424f-bd59-7695fa76f952\",\"status\":\"ok\","
+                + "\"failReason\":\"whatever\"}"), ClientContext.EMPTY);
+        UsageRow o = ok.awaitRow();
+        assertThat(o.failReason).isNull();
+        assertThat(UsageStatsInsertTest.bind(o).get("fail_reason")).isNull();
+    }
 }

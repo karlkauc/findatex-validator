@@ -16,7 +16,7 @@ class UsageStatsReporterTest {
         return new UsageEvent("validate", "ok", "id-1", "desktop", "dev", "Linux", 21, "TPT", "V7",
                 java.util.List.of("EIOPA_QRT"), "single", 1, 10, 0, 0, 0,
                 99.0, 5, false, java.util.List.of("XF-16"), java.util.List.of(), java.util.List.of("XF-16"),
-                UsageEvent.Input.UNKNOWN, null, null, null, "2026-05-17T00:00:00Z");
+                UsageEvent.Input.UNKNOWN, null, null, null, "2026-05-17T00:00:00Z", null);
     }
 
     private UsageStatsReporter reporter(Supplier<AppSettings.UsageStats> cfg, int cap) {

@@ -45,7 +45,8 @@ public record UsageStatsDto(
         External external,
         Boolean isSample,
         String exportKind,
-        String clientEventAt) {
+        String clientEventAt,
+        String failReason) {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Input(String format, Long bytes, String namePattern) {

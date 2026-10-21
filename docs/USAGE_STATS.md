@@ -55,6 +55,7 @@ One row per event. Columns that do not apply to an event type stay `NULL`.
 | `event_id`, `received_at` | server-assigned (PK, `now()`) |
 | `event_type`, `status` | see the table above |
 | `client_event_at` | client timestamp of the event |
+| `fail_reason` | failed runs only (`status <> 'ok'`, else `NULL`): a short **code** refining the status, ≤ 100 chars of `[A-Za-z0-9_.:/-]` — never a message. Web: `header_mismatch:<recognised>/<headers>` (template mismatch: recognised column headers / non-blank headers read), the exception's simple class name plus `/<root cause>` for parse errors (e.g. `IOException/ZipException`), `unsupported_extension`, `missing_zip_signature`, `binary_csv`, `unreadable_upload:<exception>`, `invalid_template` / `invalid_version` / `invalid_profile` (bad request), `concurrency_limit` / `interrupted` (busy), `per_ip_limit` (rate limited). Desktop: `header_mismatch:…` or the exception class name. Since 2026-10 |
 | `install_id` | random UUID in `settings.json` (no PII); web uses the all-zero sentinel |
 | `source` | `desktop` \| `web` |
 | `app_version` | build version |
@@ -81,7 +82,9 @@ One row per event. Columns that do not apply to an event type stay `NULL`.
 
 **Never collected:** file names/paths, fund names, ISIN/LEI/codes, cell
 values, `Finding.message()/value()`, error/exception text, raw IP, user/host
-name, MAC, exact OS version, cookies or any persistent client id.
+name, MAC, exact OS version, cookies or any persistent client id. (`fail_reason`
+is a fixed code or an exception *class* name — the server strips anything
+else.)
 
 **Backward compatibility:** desktop builds from before 2026-09 keep posting the
 old JSON (no `eventType`/`status`/`input`/`external`); the ingest defaults them
@@ -102,6 +105,7 @@ CREATE TABLE usage_event (
   status           text        NOT NULL DEFAULT 'ok'
                                CHECK (status IN ('ok','unsupported_type','parse_error','template_mismatch',
                                                  'bad_request','rate_limited','too_large','busy','error')),
+  fail_reason      text,                      -- failed runs only: code, never a message
   app_version      text,
   os_name          text,
   java_major       int,

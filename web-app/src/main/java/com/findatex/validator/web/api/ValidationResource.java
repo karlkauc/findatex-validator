@@ -79,7 +79,8 @@ public class ValidationResource {
             // Rejected before parsing: still a validation attempt for the stats.
             String status = FileNameShape.format(filename) == null
                     ? UsageEvent.STATUS_UNSUPPORTED_TYPE : UsageEvent.STATUS_PARSE_ERROR;
-            recordRejected(status, templateId, templateVersion, filename, size, ctx);
+            String reason = e instanceof RejectedUpload r ? r.reason : null;
+            recordRejected(status, reason, templateId, templateVersion, filename, size, ctx);
             throw e;
         }
 
@@ -116,10 +117,10 @@ public class ValidationResource {
         }
     }
 
-    private void recordRejected(String status, String templateId, String templateVersion,
+    private void recordRejected(String status, String failReason, String templateId, String templateVersion,
                                 String filename, long size, ClientContext ctx) {
         try {
-            usageStats.recordFailedRun(status, templateId, templateVersion,
+            usageStats.recordFailedRun(status, failReason, templateId, templateVersion,
                     FileNameShape.of(filename, size < 0 ? null : size),
                     SampleFiles.isSampleFilename(filename), null, ctx);
         } catch (RuntimeException e) {
@@ -144,31 +145,39 @@ public class ValidationResource {
         boolean isXlsx = lower.endsWith(".xlsx") || lower.endsWith(".xlsm");
         boolean isCsv = lower.endsWith(".csv") || lower.endsWith(".txt");
         if (!isXlsx && !isCsv) {
-            throw new WebApplicationException(
-                    Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Unsupported file type. Expected .xlsx or .csv").build());
+            throw new RejectedUpload("unsupported_extension", "Unsupported file type. Expected .xlsx or .csv");
         }
         try (InputStream in = Files.newInputStream(path)) {
             byte[] head = in.readNBytes(4096);
             if (isXlsx) {
                 if (head.length < 4 || head[0] != 'P' || head[1] != 'K' || head[2] != 0x03 || head[3] != 0x04) {
-                    throw new WebApplicationException(
-                            Response.status(Response.Status.BAD_REQUEST)
-                                    .entity("File is not a valid XLSX (missing ZIP signature).").build());
+                    throw new RejectedUpload("missing_zip_signature",
+                            "File is not a valid XLSX (missing ZIP signature).");
                 }
             } else { // CSV / TXT
                 for (byte b : head) {
                     if (b == 0) {
-                        throw new WebApplicationException(
-                                Response.status(Response.Status.BAD_REQUEST)
-                                        .entity("File looks binary; CSV must be plain text.").build());
+                        throw new RejectedUpload("binary_csv", "File looks binary; CSV must be plain text.");
                     }
                 }
             }
         } catch (IOException e) {
-            throw new WebApplicationException(
-                    Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Could not read upload header: " + e.getMessage()).build());
+            throw new RejectedUpload("unreadable_upload:" + e.getClass().getSimpleName(),
+                    "Could not read upload header: " + e.getMessage());
+        }
+    }
+
+    /**
+     * A 400 from the up-front content sniffing, carrying a fail-reason code for
+     * the usage stats ({@code unsupported_extension}, {@code missing_zip_signature},
+     * {@code binary_csv}, {@code unreadable_upload:<exception>}) — never the message.
+     */
+    private static final class RejectedUpload extends WebApplicationException {
+        final String reason;
+
+        RejectedUpload(String reason, String message) {
+            super(Response.status(Response.Status.BAD_REQUEST).entity(message).build());
+            this.reason = reason;
         }
     }
 }

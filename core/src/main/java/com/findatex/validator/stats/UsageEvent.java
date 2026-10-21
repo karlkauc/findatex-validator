@@ -5,6 +5,7 @@ import com.findatex.validator.AppInfo;
 import com.findatex.validator.batch.BatchResult;
 import com.findatex.validator.batch.BatchSummary;
 import com.findatex.validator.config.AppSettings;
+import com.findatex.validator.ingest.TemplateMismatchException;
 import com.findatex.validator.report.QualityReport;
 import com.findatex.validator.report.ScoreCategory;
 import com.findatex.validator.template.api.ProfileKey;
@@ -36,6 +37,10 @@ import java.util.TreeSet;
  * <p>{@code ruleIds} lists every triggered rule id; {@code errorRuleIds} /
  * {@code warningRuleIds} split them by {@link Finding#severity()} (INFO-only
  * rules appear in {@code ruleIds} alone). Ids only, never messages or values.
+ *
+ * <p>{@code failReason} (failed runs only) is a short <em>code</em> that
+ * refines {@code status} — e.g. {@code header_mismatch:0/57} or the simple
+ * class name of the exception — never a message (see {@link #sanitizeFailReason(String)}).
  *
  * <p>{@code overallScore} is the OVERALL category scaled to a 0..100 percentage
  * with two decimals (the scorer works on a 0..1 fraction).
@@ -72,7 +77,8 @@ public record UsageEvent(
         External external,
         Boolean isSample,
         String exportKind,
-        String clientEventAt) {
+        String clientEventAt,
+        String failReason) {
 
     /** Sentinel install id used for runs that originate in the web layer. */
     public static final String WEB_INSTALL_ID = "00000000-0000-0000-0000-000000000000";
@@ -97,6 +103,9 @@ public record UsageEvent(
     public static final String STATUS_TOO_LARGE = "too_large";
     public static final String STATUS_BUSY = "busy";
     public static final String STATUS_ERROR = "error";
+
+    /** Upper bound of a {@code fail_reason} code. */
+    public static final int MAX_FAIL_REASON = 100;
 
     // ---- export_kind values ------------------------------------------------
     public static final String EXPORT_XLSX = "xlsx";
@@ -164,7 +173,8 @@ public record UsageEvent(
                 external,
                 null,
                 null,
-                Instant.now().toString());
+                Instant.now().toString(),
+                null);
     }
 
     /** Folder-batch desktop run; counts/score/elapsed come pre-aggregated. */
@@ -220,7 +230,8 @@ public record UsageEvent(
                 external,
                 null,
                 null,
-                Instant.now().toString());
+                Instant.now().toString(),
+                null);
     }
 
     /**
@@ -265,7 +276,8 @@ public record UsageEvent(
                 external,
                 isSample,
                 null,
-                Instant.now().toString());
+                Instant.now().toString(),
+                null);
     }
 
     /**
@@ -278,6 +290,21 @@ public record UsageEvent(
                                     String mode,
                                     String status,
                                     Input input) {
+        return failed(template, version, settings, mode, status, input, null);
+    }
+
+    /**
+     * As {@link #failed(TemplateDefinition, TemplateVersion, AppSettings, String, String, Input)},
+     * plus a fail-reason code (typically {@link #failReasonOf(Throwable)}); it is
+     * sanitised and capped by {@link #sanitizeFailReason(String)}.
+     */
+    public static UsageEvent failed(TemplateDefinition template,
+                                    TemplateVersion version,
+                                    AppSettings settings,
+                                    String mode,
+                                    String status,
+                                    Input input,
+                                    String failReason) {
         return new UsageEvent(
                 TYPE_VALIDATE,
                 status,
@@ -300,7 +327,8 @@ public record UsageEvent(
                 null,
                 null,
                 null,
-                Instant.now().toString());
+                Instant.now().toString(),
+                sanitizeFailReason(failReason));
     }
 
     /** Desktop report export (per-file, single xlsx, combined …). */
@@ -332,7 +360,8 @@ public record UsageEvent(
                 null,
                 null,
                 exportKind,
-                Instant.now().toString());
+                Instant.now().toString(),
+                null);
     }
 
     /**
@@ -372,7 +401,59 @@ public record UsageEvent(
                 null,
                 null,
                 null,
-                Instant.now().toString());
+                Instant.now().toString(),
+                null);
+    }
+
+    /**
+     * Fail-reason code for an exception: the header statistics of a
+     * {@link TemplateMismatchException} ({@code header_mismatch:<recognised>/<headers>}),
+     * otherwise the exception's simple class name, followed by {@code /<root cause>}
+     * when the innermost cause is of another class (e.g.
+     * {@code IOException/ZipException}). Never the message.
+     */
+    public static String failReasonOf(Throwable th) {
+        if (th == null) return null;
+        if (th instanceof TemplateMismatchException tme && tme.match() != null) {
+            return sanitizeFailReason(tme.match().failReason());
+        }
+        Throwable root = th;
+        for (int depth = 0; root.getCause() != null && root.getCause() != root && depth < 20; depth++) {
+            root = root.getCause();
+        }
+        String name = simpleName(th);
+        if (root.getClass() != th.getClass()) name += "/" + simpleName(root);
+        return sanitizeFailReason(name);
+    }
+
+    private static String simpleName(Throwable t) {
+        String name = t.getClass().getSimpleName();
+        if (name.isEmpty()) { // anonymous / hidden class
+            name = t.getClass().getName();
+            name = name.substring(name.lastIndexOf('.') + 1);
+        }
+        return name;
+    }
+
+    /**
+     * Normalises a fail-reason code: only {@code [A-Za-z0-9_.:/-]} survive
+     * (anything else becomes {@code _}), at most {@value #MAX_FAIL_REASON}
+     * chars; blank ⇒ {@code null}. Keeps free text (and with it any instance
+     * data) out of the column even if a client sends one.
+     */
+    public static String sanitizeFailReason(String raw) {
+        if (raw == null) return null;
+        String t = raw.strip();
+        if (t.isEmpty()) return null;
+        if (t.length() > MAX_FAIL_REASON) t = t.substring(0, MAX_FAIL_REASON);
+        StringBuilder sb = new StringBuilder(t.length());
+        for (int i = 0; i < t.length(); i++) {
+            char ch = t.charAt(i);
+            boolean ok = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')
+                    || ch == '_' || ch == '.' || ch == ':' || ch == '/' || ch == '-';
+            sb.append(ok ? ch : '_');
+        }
+        return sb.toString();
     }
 
     private static Input orUnknown(Input input) {

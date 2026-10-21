@@ -81,7 +81,7 @@ public class RateLimitFilter implements ContainerRequestFilter {
      */
     private void recordRateLimited() {
         try {
-            usageStats.recordFailedRun(UsageEvent.STATUS_RATE_LIMITED, null, null,
+            usageStats.recordFailedRun(UsageEvent.STATUS_RATE_LIMITED, "per_ip_limit", null, null,
                     null, null, null, clientContexts.from(request));
         } catch (RuntimeException e) {
             // stats must never affect the request path

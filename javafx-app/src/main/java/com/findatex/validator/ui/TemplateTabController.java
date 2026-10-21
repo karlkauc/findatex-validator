@@ -703,7 +703,7 @@ public final class TemplateTabController {
                     th instanceof TemplateMismatchException ? UsageEvent.STATUS_TEMPLATE_MISMATCH
                             : th instanceof java.io.IOException
                             ? UsageEvent.STATUS_PARSE_ERROR : UsageEvent.STATUS_ERROR,
-                    FileNameShape.of(path)));
+                    FileNameShape.of(path), UsageEvent.failReasonOf(th)));
             progress.setVisible(false);
             validateButton.setDisable(false);
             statusLabel.setText("Validation failed: " + (th == null ? "" : th.getMessage()));
@@ -822,7 +822,8 @@ public final class TemplateTabController {
             Throwable th = task.getException();
             log.error("Batch validation failed", th);
             UsageStatsReporter.getInstance().report(UsageEvent.failed(
-                    template, selectedVersion, settings, "batch", UsageEvent.STATUS_ERROR, null));
+                    template, selectedVersion, settings, "batch", UsageEvent.STATUS_ERROR, null,
+                    UsageEvent.failReasonOf(th)));
             progress.setVisible(false);
             validateButton.setDisable(false);
             statusLabel.setText("Batch validation failed: " + (th == null ? "" : th.getMessage()));

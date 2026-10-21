@@ -128,11 +128,13 @@ public class ValidationOrchestrator {
             acquired = concurrencyGate.tryAcquire(config.acquireTimeoutMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            recordFailure(UsageEvent.STATUS_BUSY, templateId, templateVersion, input, isSample, null, ctx);
+            recordFailure(UsageEvent.STATUS_BUSY, "interrupted", templateId, templateVersion, input, isSample,
+                    null, ctx);
             throw new WebApplicationException("Server busy, try again later.", Response.Status.SERVICE_UNAVAILABLE);
         }
         if (!acquired) {
-            recordFailure(UsageEvent.STATUS_BUSY, templateId, templateVersion, input, isSample, null, ctx);
+            recordFailure(UsageEvent.STATUS_BUSY, "concurrency_limit", templateId, templateVersion, input,
+                    isSample, null, ctx);
             throw new WebApplicationException(
                     Response.status(429)
                             .entity("Server busy: too many concurrent validations. Try again shortly.")
@@ -161,13 +163,16 @@ public class ValidationOrchestrator {
         TemplateVersion version;
         Set<ProfileKey> activeProfiles;
         ProfileSet profileSet;
+        String failedStep = "invalid_template";
         try {
             def = resolveTemplate(templateId);
+            failedStep = "invalid_version";
             version = resolveVersion(def, templateVersion);
+            failedStep = "invalid_profile";
             profileSet = def.profilesFor(version);
             activeProfiles = resolveProfiles(profileSet, profileCodes);
         } catch (WebApplicationException e) {
-            recordFailure(UsageEvent.STATUS_BAD_REQUEST, templateId, templateVersion, input, isSample,
+            recordFailure(UsageEvent.STATUS_BAD_REQUEST, failedStep, templateId, templateVersion, input, isSample,
                     elapsedMs(t0), ctx);
             throw e;
         }
@@ -183,8 +188,8 @@ public class ValidationOrchestrator {
             // Don't echo POI's exception text to the client — it can leak internal
             // class names and host paths. Full detail is logged server-side.
             log.warn("Upload parse failed for filename '{}': {}", filename, e.toString());
-            recordFailure(UsageEvent.STATUS_PARSE_ERROR, templateName, versionName, input, isSample,
-                    elapsedMs(t0), ctx);
+            recordFailure(UsageEvent.STATUS_PARSE_ERROR, UsageEvent.failReasonOf(e), templateName, versionName,
+                    input, isSample, elapsedMs(t0), ctx);
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)
                             .entity("Could not parse upload. Check that the file is a valid XLSX/CSV "
@@ -198,8 +203,8 @@ public class ValidationOrchestrator {
         // on a multi-thousand-row file, which exhausts the JVM heap.
         HeaderMatch headerMatch = HeaderMatch.of(file);
         if (headerMatch.mismatch()) {
-            recordFailure(UsageEvent.STATUS_TEMPLATE_MISMATCH, templateName, versionName, input, isSample,
-                    elapsedMs(t0), ctx);
+            recordFailure(UsageEvent.STATUS_TEMPLATE_MISMATCH, headerMatch.failReason(), templateName,
+                    versionName, input, isSample, elapsedMs(t0), ctx);
             List<FieldSpec> fields = bundle.catalog.fields();
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)
@@ -357,12 +362,15 @@ public class ValidationOrchestrator {
         return java.time.Duration.ofNanos(System.nanoTime() - t0).toMillis();
     }
 
-    /** A validation attempt that produced no report is still an event — only its class is kept. */
-    private void recordFailure(String status, String templateId, String templateVersion,
+    /**
+     * A validation attempt that produced no report is still an event — only its
+     * class and a reason code are kept, never a message.
+     */
+    private void recordFailure(String status, String failReason, String templateId, String templateVersion,
                                UsageEvent.Input input, boolean isSample, Long durationMs,
                                ClientContext ctx) {
         try {
-            usageStatsService.recordFailedRun(status,
+            usageStatsService.recordFailedRun(status, failReason,
                     blankToNull(templateId), blankToNull(templateVersion), input, isSample,
                     durationMs == null ? null : (int) Math.min(durationMs, Integer.MAX_VALUE), ctx);
         } catch (RuntimeException e) {

@@ -27,9 +27,14 @@ import { QuickFeedback } from './components/QuickFeedback';
 import { CollapsibleSection } from './components/CollapsibleSection';
 import { INPUT_COLUMN_ID, SidebarLayout } from './components/SidebarLayout';
 import { usePersistedBoolean } from './lib/usePersistedState';
+import { HANDOFF_LABELS, HandoffFile, clearHandoffParam, handoffSource, receiveHandoff } from './lib/handoff';
 import { RateLimitStatus, ValidationResponse } from './types/api';
 
 const GITHUB_URL = 'https://github.com/karlkauc/findatex-validator';
+// Opened from the TPT converter with a generated file to hand over (see lib/handoff).
+const handoffFrom = handoffSource();
+// The sender gives up after 15 s; no point waiting longer here.
+const HANDOFF_WAIT_MS = 15_000;
 
 export default function App() {
   const queryClient = useQueryClient();
@@ -74,6 +79,9 @@ export default function App() {
   const [profiles, setProfiles] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<ValidationResponse | null>(null);
+  const [handoffWaiting, setHandoffWaiting] = useState(handoffFrom !== null);
+  const [pendingHandoff, setPendingHandoff] = useState<HandoffFile | null>(null);
+  const [handoffError, setHandoffError] = useState<string | null>(null);
 
   // Defaults match AppSettings.defaults() in core: master OFF, LEI lapsed ON, the rest OFF.
   const [externalEnabled, setExternalEnabled] = useState(false);
@@ -145,19 +153,21 @@ export default function App() {
     [file, templateId, version, validateMutation.isPending, quotaExhausted],
   );
 
-  // The override exists for the sample-file action: React state updates are not
-  // visible synchronously, so loading the file and validating it in one click
-  // has to pass the file and version explicitly.
-  const submit = (override?: { file: File; version: string; profiles: string[] }) => {
+  // The override exists for the sample-file action and the hand-over: React
+  // state updates are not visible synchronously, so loading the file and
+  // validating it in one go has to pass the file and version explicitly.
+  const submit = (override?: { file: File; version: string; profiles: string[]; templateId?: string }) => {
     const activeFile = override?.file ?? file;
     const activeVersion = override?.version ?? version;
     const activeProfiles = override?.profiles ?? profiles;
+    const activeTemplateId = override?.templateId ?? templateId;
     if (!activeFile || !activeVersion) return;
     setResult(null);
     setSampleError(null);
-    const useExternal = externalEnabled && (currentTemplate?.externalAvailable ?? false);
+    const activeTemplate = templates.find((t) => t.id === activeTemplateId);
+    const useExternal = externalEnabled && (activeTemplate?.externalAvailable ?? false);
     validateMutation.mutate({
-      templateId,
+      templateId: activeTemplateId,
       templateVersion: activeVersion,
       profiles: activeProfiles,
       file: activeFile,
@@ -197,6 +207,58 @@ export default function App() {
       setSampleLoading(false);
     }
   };
+
+  // Hand-over from a sibling site: announce readiness once, keep the file until
+  // templates and quota are known.
+  useEffect(() => {
+    if (!handoffFrom) return;
+    const stop = receiveHandoff(
+      (handoff) => {
+        setHandoffWaiting(false);
+        setPendingHandoff(handoff);
+      },
+      (reason) => {
+        setHandoffWaiting(false);
+        setHandoffError(reason);
+        clearHandoffParam();
+      },
+    );
+    const timer = window.setTimeout(() => {
+      setHandoffWaiting(false);
+      clearHandoffParam();
+    }, HANDOFF_WAIT_MS);
+    return () => {
+      stop();
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  // Select the template and version the file was generated for and validate it
+  // right away, like the example button; with no quota left the file is only loaded.
+  useEffect(() => {
+    if (!pendingHandoff || !templatesQuery.data || rateLimitQuery.isLoading) return;
+    const handoff = pendingHandoff;
+    setPendingHandoff(null);
+    clearHandoffParam();
+    setFile(handoff.file);
+    const template = templatesQuery.data.find((t) => t.id === handoff.templateId.toUpperCase());
+    const target = template?.versions.find(
+      (v) => v.version.toLowerCase() === handoff.templateVersion.toLowerCase(),
+    );
+    if (!template || !target) {
+      setHandoffError(
+        `${handoff.file.name}: unknown template ${handoff.templateId} ${handoff.templateVersion}. Choose it below and validate.`,
+      );
+      return;
+    }
+    setTemplateId(template.id);
+    setVersion(target.version);
+    setProfiles([]);
+    if (isQuotaExhausted(rateLimitQuery.data)) return;
+    submit({ file: handoff.file, version: target.version, profiles: [], templateId: template.id });
+    // submit is recreated every render; the hand-over runs once per file.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingHandoff, templatesQuery.data, rateLimitQuery.isLoading, rateLimitQuery.data]);
 
   return (
     <div className="min-h-screen">
@@ -362,6 +424,7 @@ export default function App() {
                     <ul className="list-disc space-y-1 pl-4">
                       <li>Uploaded files are <strong>not persisted</strong> on the server and are deleted immediately after the response.</li>
                       <li>The Excel report (single-use link) and the Annotated Source view are kept for 5 minutes, then deleted.</li>
+                      <li>A file handed over from the TPT converter goes directly from that browser tab to this one and is validated like an upload.</li>
                       <li>External validation (GLEIF/OpenFIGI) runs only if you switch it on for a run; only the identifiers from your file are sent.</li>
                       <li>
                         Anonymous usage statistics record aggregates only (template, finding counts, file
@@ -391,6 +454,16 @@ export default function App() {
               </>
             }
           >
+              {handoffWaiting && handoffFrom && (
+                <div
+                  role="status"
+                  className="flex items-center gap-3 rounded-md border border-navy-200 bg-navy-50 p-4 text-sm text-navy-900"
+                >
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  Receiving file from {HANDOFF_LABELS[handoffFrom]}…
+                </div>
+              )}
+              {handoffError != null && <ErrorBanner error={new Error(handoffError)} />}
               <QuotaExhaustedNotice />
               {sampleError != null && <ErrorBanner error={sampleError} />}
               {validateMutation.isError && <ErrorBanner error={validateMutation.error} />}

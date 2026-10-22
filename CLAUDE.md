@@ -249,6 +249,15 @@ FAQ JSON-LD as a second CSP-hashed inline block; `HelpPageTest`), plus the
 generated `GET /sitemap.xml` (`SitemapResource`). These deliberately carry no
 React bundle — see the SEO block below.
 
+**Hand-over from sibling sites** — `/?from=tpt-converter` receives a generated
+TPT file from the TPT ⇄ FundsXML converter (`frontend/src/lib/handoff.ts`):
+the page posts `findatex-validator:ready` to its opener, takes one
+`findatex-validator:file` message (name, ArrayBuffer, templateId,
+templateVersion) and validates it like the example button. Sender origins are
+allow-listed there and must match the converter's list. It only works because
+`SpaOpenerPolicyFilter` sets `Cross-Origin-Opener-Policy: unsafe-none` on `/`
+and `/index.html`; everything else keeps `same-origin`.
+
 **SEO / link previews** — four files must agree on one canonical host
 (`www.findatex-validator.eu`): the `<link rel="canonical">`, OG and JSON-LD tags
 in `web-app/src/main/frontend/index.html`; `robots.txt` and `sitemap.xml` (real

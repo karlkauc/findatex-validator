@@ -148,13 +148,17 @@ public class QuickFeedbackService {
             ps.setString(1, r.source());
             ps.setInt(2, r.rating());
             ps.setString(3, trimToNull(r.comment()));
-            ps.setString(4, trimToNull(r.appVersion()));
-            ps.setString(5, trimToNull(r.templateId()));
-            ps.setString(6, trimToNull(r.country()));
+            ps.setString(4, cap(trimToNull(r.appVersion()), UsageRow.MAX_SHORT));
+            ps.setString(5, cap(trimToNull(r.templateId()), UsageRow.MAX_SHORT));
+            ps.setString(6, cap(trimToNull(r.country()), UsageRow.MAX_SHORT));
             ps.executeUpdate();
         }
         // Failures propagate to insertWithRetry, which retries then drops the
         // feedback with a rate-limited WARN — never disturbing the request path.
+    }
+
+    private static String cap(String s, int max) {
+        return UsageRow.cap(s, max);
     }
 
     private static String trimToNull(String s) {

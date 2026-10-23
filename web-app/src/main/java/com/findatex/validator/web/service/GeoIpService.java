@@ -65,7 +65,10 @@ public class GeoIpService {
         DatabaseReader r = reader;
         if (r == null || ip == null || ip.isBlank()) return null;
         try {
-            InetAddress addr = InetAddress.getByName(ip.trim());
+            // Literal only: a hostname here would mean a DNS query for a name the
+            // client may have chosen (via a forwarded header).
+            InetAddress addr = IpLiterals.parse(ip).orElse(null);
+            if (addr == null) return null;
             CountryResponse resp = r.country(addr);
             String iso = resp.country() == null ? null : resp.country().isoCode();
             return (iso == null || iso.isBlank()) ? null : iso;

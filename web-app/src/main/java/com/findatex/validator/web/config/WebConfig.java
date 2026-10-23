@@ -15,6 +15,9 @@ public class WebConfig {
     @ConfigProperty(name = "findatex.web.rate-limit.per-ip-per-hour", defaultValue = "10")
     int rateLimitPerIpPerHour;
 
+    @ConfigProperty(name = "findatex.web.client-ip.forwarded-hops", defaultValue = "0")
+    int clientIpForwardedHops;
+
     @ConfigProperty(name = "findatex.web.max-concurrency", defaultValue = "4")
     int maxConcurrency;
 
@@ -108,6 +111,17 @@ public class WebConfig {
 
     public RateLimit rateLimit() {
         return new RateLimit(rateLimitPerIpPerHour);
+    }
+
+    /**
+     * How many {@code X-Forwarded-For} entries, counted from the right, were
+     * appended by infrastructure this deployment trusts. {@code 0} (default)
+     * ignores the header and uses the TCP peer; {@code 1} takes the right-most
+     * entry (Cloud Run: the address Google's front end saw). Everything to the
+     * left of that is client-controlled and never read.
+     */
+    public int clientIpForwardedHops() {
+        return Math.max(0, clientIpForwardedHops);
     }
 
     public int maxConcurrency() {

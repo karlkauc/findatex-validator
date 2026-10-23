@@ -28,6 +28,11 @@ final class UsageRow {
     static final Set<String> EXPORT_KINDS = Set.of("xlsx", "per_file", "combined", "combined_annotated");
     static final Set<String> DEVICES = Set.of("desktop", "mobile", "bot", "unknown");
 
+    /** Free-text caps: the desktop ingest token ships in every release, so treat input as hostile. */
+    static final int MAX_SHORT = 64;
+    static final int MAX_LABEL = 128;
+    static final int MAX_LIST = 300;
+
     String eventType = UsageEvent.TYPE_VALIDATE;
     String status = UsageEvent.STATUS_OK;
     /** Failed runs only: a short code refining {@code status}, never a message. */
@@ -129,7 +134,31 @@ final class UsageRow {
         device = oneOf(device, DEVICES, null);
         if (mode != null && !mode.equals("single") && !mode.equals("batch")) mode = null;
         if (!"desktop".equals(source)) source = "web";
+        clientEventAt = cap(clientEventAt, MAX_SHORT);
+        installId = cap(installId, MAX_SHORT);
+        appVersion = cap(appVersion, MAX_SHORT);
+        osName = cap(osName, MAX_SHORT);
+        templateId = cap(templateId, MAX_SHORT);
+        templateVersion = cap(templateVersion, MAX_SHORT);
+        profiles = capList(profiles);
+        ruleIds = capList(ruleIds);
+        errorRuleIds = capList(errorRuleIds);
+        warningRuleIds = capList(warningRuleIds);
         return this;
+    }
+
+    static String cap(String v, int max) {
+        return v == null || v.length() <= max ? v : v.substring(0, max);
+    }
+
+    /** At most {@value #MAX_LIST} entries of at most {@value #MAX_LABEL} chars; null entries dropped. */
+    static List<String> capList(List<String> v) {
+        if (v == null) return List.of();
+        return v.stream()
+                .filter(java.util.Objects::nonNull)
+                .limit(MAX_LIST)
+                .map(e -> cap(e, MAX_LABEL))
+                .toList();
     }
 
     private static String oneOf(String v, Set<String> allowed, String fallback) {

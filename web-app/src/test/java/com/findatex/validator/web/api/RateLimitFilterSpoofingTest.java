@@ -16,9 +16,9 @@ import static io.restassured.RestAssured.given;
  * rate-limit bucket. All requests from the same TCP source IP share one bucket
  * even when the attacker rotates the header on every request.
  *
- * <p>This profile overrides the global %test setting that enables trusted-proxy
- * forwarding, so the bucket key falls back to the TCP source address (127.0.0.1
- * for all RestAssured calls).
+ * <p>This profile overrides the global %test setting that trusts one forwarded
+ * hop, so the bucket key falls back to the TCP source address (127.0.0.1 for all
+ * RestAssured calls).
  */
 @QuarkusTest
 @TestProfile(RateLimitFilterSpoofingTest.NoTrustedProxyProfile.class)
@@ -34,7 +34,8 @@ class RateLimitFilterSpoofingTest {
                     // sanitising LB in front.
                     "quarkus.http.proxy.proxy-address-forwarding", "false",
                     "quarkus.http.proxy.allow-x-forwarded", "false",
-                    "quarkus.http.proxy.trusted-proxies", "");
+                    "quarkus.http.proxy.trusted-proxies", "",
+                    "findatex.web.client-ip.forwarded-hops", "0");
         }
     }
 

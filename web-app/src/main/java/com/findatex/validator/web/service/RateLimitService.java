@@ -1,6 +1,8 @@
 package com.findatex.validator.web.service;
 
 import com.findatex.validator.web.config.WebConfig;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
@@ -11,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -23,18 +23,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>Capacity = {@link WebConfig.RateLimit#perIpPerHour()}; refills 1 token every
  * {@code 3600 / capacity} seconds.
  *
- * <p><b>IP source.</b> The bucket key is the TCP-level source address of the inbound
- * request (the value Quarkus exposes via {@code HttpServerRequest.remoteAddress()}).
- * Client-supplied headers like {@code X-Forwarded-For} / {@code X-Real-IP} are
- * <i>not</i> read by this class — they are trivially forgeable when the service is
- * exposed without a sanitising reverse proxy, and would let an unauthenticated
- * attacker mint a fresh bucket per spoofed value.
+ * <p><b>IP source.</b> Callers pass the address resolved by
+ * {@link ClientContextFactory#clientIp} — the TCP peer, or the trusted right-most
+ * {@code X-Forwarded-For} hop when {@code findatex.web.client-ip.forwarded-hops}
+ * is set. The client-controlled left part of that header is never read, so a
+ * spoofed value cannot mint a fresh bucket.
  *
- * <p>Operators behind a real reverse proxy who want per-original-client buckets
- * must opt in by setting {@code quarkus.http.proxy.proxy-address-forwarding=true}
- * <b>and</b> {@code quarkus.http.proxy.trusted-proxies=<LB-CIDR>} in
- * {@code application.properties}; Quarkus then rewrites {@code remoteAddress()}
- * itself, only honouring forwarded headers from the listed CIDRs.
+ * <p><b>Memory bound.</b> Every bucket map is a Caffeine cache that forgets a key
+ * after {@link #IDLE_EXPIRY} without traffic (by then the bucket has fully
+ * refilled anyway, so forgetting it changes nothing) and holds at most
+ * {@link #MAX_KEYS} keys. Keys are IP literals (IPv6 collapsed to its /64); any
+ * other value shares the single {@code unknown} bucket.
  */
 @ApplicationScoped
 public class RateLimitService {
@@ -42,15 +41,18 @@ public class RateLimitService {
     private static final Logger log = LoggerFactory.getLogger(RateLimitService.class);
 
     private static final int WINDOW_SECONDS = 3600;
+    /** Longer than the 1 h window: an idle bucket is full again long before it is dropped. */
+    static final Duration IDLE_EXPIRY = Duration.ofHours(2);
+    static final long MAX_KEYS = 100_000;
 
     @Inject
     WebConfig config;
 
-    private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, Bucket> usageBuckets = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, Bucket> newsletterBuckets = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, Bucket> quickFeedbackBuckets = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, Bucket> pageViewBuckets = new ConcurrentHashMap<>();
+    private final Cache<String, Bucket> buckets = newCache();
+    private final Cache<String, Bucket> usageBuckets = newCache();
+    private final Cache<String, Bucket> newsletterBuckets = newCache();
+    private final Cache<String, Bucket> quickFeedbackBuckets = newCache();
+    private final Cache<String, Bucket> pageViewBuckets = newCache();
     private final AtomicBoolean unknownWarned = new AtomicBoolean(false);
     private int capacityPerHour;
     private Duration refillInterval;
@@ -91,7 +93,7 @@ public class RateLimitService {
 
     /** Separate, more generous bucket for the lightweight usage-stats ingest. */
     public ConsumptionProbe consumeUsage(String clientIp) {
-        return usageBuckets.computeIfAbsent(normaliseKey(clientIp),
+        return usageBuckets.get(normaliseKey(clientIp),
                 k -> Bucket.builder().addLimit(Bandwidth.builder()
                         .capacity(usageCapacityPerHour)
                         .refillIntervally(1, usageRefillInterval)
@@ -101,7 +103,7 @@ public class RateLimitService {
 
     /** Separate, strict bucket for newsletter sign-up (anti e-mail-bombing). */
     public ConsumptionProbe consumeNewsletter(String clientIp) {
-        return newsletterBuckets.computeIfAbsent(normaliseKey(clientIp),
+        return newsletterBuckets.get(normaliseKey(clientIp),
                 k -> Bucket.builder().addLimit(Bandwidth.builder()
                         .capacity(newsletterCapacityPerHour)
                         .refillIntervally(1, newsletterRefillInterval)
@@ -111,7 +113,7 @@ public class RateLimitService {
 
     /** Separate, strict bucket for quick-feedback submissions (anti-spam). */
     public ConsumptionProbe consumeQuickFeedback(String clientIp) {
-        return quickFeedbackBuckets.computeIfAbsent(normaliseKey(clientIp),
+        return quickFeedbackBuckets.get(normaliseKey(clientIp),
                 k -> Bucket.builder().addLimit(Bandwidth.builder()
                         .capacity(quickFeedbackCapacityPerHour)
                         .refillIntervally(1, quickFeedbackRefillInterval)
@@ -125,7 +127,7 @@ public class RateLimitService {
      * has to be expensive to inflate.
      */
     public ConsumptionProbe consumePageView(String clientIp) {
-        return pageViewBuckets.computeIfAbsent(normaliseKey(clientIp),
+        return pageViewBuckets.get(normaliseKey(clientIp),
                 k -> Bucket.builder().addLimit(Bandwidth.builder()
                         .capacity(pageViewCapacityPerHour)
                         .refillIntervally(1, pageViewRefillInterval)
@@ -145,8 +147,12 @@ public class RateLimitService {
         return bucketFor(clientIp).tryConsumeAndReturnRemaining(1);
     }
 
+    /** Read-only: an address without a bucket has its full quota and gets none created. */
     public RateLimitStatus inspect(String clientIp) {
-        Bucket bucket = bucketFor(clientIp);
+        Bucket bucket = buckets.getIfPresent(normaliseKey(clientIp));
+        if (bucket == null) {
+            return new RateLimitStatus(capacityPerHour, capacityPerHour, WINDOW_SECONDS, 0L);
+        }
         long remaining = bucket.getAvailableTokens();
         long resetInSeconds = 0L;
         if (remaining < capacityPerHour) {
@@ -158,7 +164,7 @@ public class RateLimitService {
     }
 
     private Bucket bucketFor(String clientIp) {
-        return buckets.computeIfAbsent(normaliseKey(clientIp), k -> newBucket());
+        return buckets.get(normaliseKey(clientIp), k -> newBucket());
     }
 
     private Bucket newBucket() {
@@ -170,14 +176,27 @@ public class RateLimitService {
     }
 
     String normaliseKey(String clientIp) {
-        if (clientIp != null && !clientIp.isBlank()) {
-            return clientIp.trim();
+        String key = IpLiterals.rateLimitKey(clientIp).orElse(null);
+        if (key != null) {
+            return key;
         }
         if (unknownWarned.compareAndSet(false, true)) {
-            log.warn("No TCP source address on incoming request — all such traffic shares "
+            log.warn("Request without a usable source IP address — all such traffic shares "
                     + "one rate-limit bucket. This indicates a Quarkus/Vert.x configuration "
                     + "issue; per-IP throttling is effectively disabled until fixed.");
         }
         return "unknown";
+    }
+
+    long trackedKeys() {
+        buckets.cleanUp();
+        return buckets.estimatedSize();
+    }
+
+    private static Cache<String, Bucket> newCache() {
+        return Caffeine.newBuilder()
+                .expireAfterAccess(IDLE_EXPIRY)
+                .maximumSize(MAX_KEYS)
+                .build();
     }
 }

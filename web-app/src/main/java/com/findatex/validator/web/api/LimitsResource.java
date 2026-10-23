@@ -2,6 +2,7 @@ package com.findatex.validator.web.api;
 
 import com.findatex.validator.web.config.WebConfig;
 import com.findatex.validator.web.dto.RateLimitStatusDto;
+import com.findatex.validator.web.service.ClientContextFactory;
 import com.findatex.validator.web.service.RateLimitService;
 import com.findatex.validator.web.service.RateLimitStatus;
 import io.vertx.core.http.HttpServerRequest;
@@ -22,13 +23,13 @@ public class LimitsResource {
     @Inject
     WebConfig config;
 
+    @Inject
+    ClientContextFactory clientContexts;
+
     @GET
     @Path("/status")
     public RateLimitStatusDto status(@Context HttpServerRequest request) {
-        String clientIp = (request != null && request.remoteAddress() != null)
-                ? request.remoteAddress().host()
-                : null;
-        RateLimitStatus s = rateLimits.inspect(clientIp);
+        RateLimitStatus s = rateLimits.inspect(clientContexts.clientIp(request));
         return new RateLimitStatusDto(
                 s.limit(),
                 s.remaining(),

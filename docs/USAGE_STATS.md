@@ -333,11 +333,11 @@ Keys), then wire it per environment:
   `maxmind_license_key` BuildKit secret.
 
 > **Behind a proxy/LB (e.g. Cloud Run):** the DB alone is not enough — the app
-> must also see the real client IP. Set `PROXY_ADDRESS_FORWARDING=true` and
-> `PROXY_ALLOW_X_FORWARDED=true` (the Cloud Run deploy workflow already does).
-> Without it the lookup gets the proxy's internal address and `country_code`
-> stays NULL. See the proxy block in `application.properties` for the
-> rate-limit-spoofing trade-off when no `PROXY_TRUSTED_PROXIES` allowlist is set.
+> must also see the real client IP. Set `FINDATEX_WEB_CLIENT_IP_FORWARDED_HOPS`
+> to the number of proxies that append to `X-Forwarded-For` (Cloud Run: `1`; the
+> deploy workflow already does). Without it the lookup gets the proxy's internal
+> address and `country_code` stays NULL. See the client-IP block in
+> `application.properties`.
 
 Attribution: *“This product includes GeoLite2 data created by MaxMind,
 available from https://www.maxmind.com.”*

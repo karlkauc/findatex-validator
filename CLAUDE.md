@@ -256,7 +256,8 @@ the page posts `findatex-validator:ready` to its opener, takes one
 templateVersion) and validates it like the example button. Sender origins are
 allow-listed there and must match the converter's list. It only works because
 `SpaOpenerPolicyFilter` sets `Cross-Origin-Opener-Policy: unsafe-none` on `/`
-and `/index.html`; everything else keeps `same-origin`.
+and `/index.html` **only with a known `?from=`** (its `HANDOFF_SOURCES` mirrors
+`handoff.ts`); everything else keeps `same-origin`.
 
 **SEO / link previews** — four files must agree on one canonical host
 (`www.findatex-validator.eu`): the `<link rel="canonical">`, OG and JSON-LD tags
@@ -292,6 +293,12 @@ steps: `docs/SEO.md`.
 **Misbrauch-Schutz** (configurable via `FINDATEX_WEB_*` env vars; defaults in
 `web-app/src/main/resources/application.properties`):
 1. **Per-IP rate limit** (Bucket4j, default 30/h) — only on `POST /api/validate`.
+   The client IP comes from `ClientContextFactory.clientIp()`: TCP peer, or with
+   `FINDATEX_WEB_CLIENT_IP_FORWARDED_HOPS=N` the N-th `X-Forwarded-For` entry
+   **from the right** (Cloud Run: 1), IP literals only (`IpLiterals`, never DNS).
+   Never re-enable Quarkus `PROXY_ADDRESS_FORWARDING` without trusted-proxies —
+   it takes the left-most, client-controlled entry. Bucket maps are bounded
+   Caffeine caches; JSON POST endpoints are capped at 64 KB (`JsonBodyLimitFilter`).
 2. **Concurrency cap** (`Semaphore`, default 4 in flight) — overflow → HTTP 429.
 3. **Body size limit** (`quarkus.http.limits.max-body-size=25M`) → HTTP 413.
 4. **Auto-delete uploads + reports** (Quarkus deletes upload tempfiles on

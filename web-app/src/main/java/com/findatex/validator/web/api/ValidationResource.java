@@ -21,6 +21,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +32,8 @@ import java.util.Optional;
 
 @Path("/api/validate")
 public class ValidationResource {
+
+    private static final Logger log = LoggerFactory.getLogger(ValidationResource.class);
 
     @Inject
     ValidationOrchestrator orchestrator;
@@ -101,9 +105,11 @@ public class ValidationResource {
             return orchestrator.validate(templateId, templateVersion, profiles, in,
                     filename, size, opts, ctx);
         } catch (IOException e) {
+            // The message names the upload tempfile path — keep it server-side.
+            log.warn("Could not read upload: {}", e.getClass().getSimpleName());
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Could not read upload: " + e.getMessage()).build());
+                            .entity("Could not read upload.").build());
         }
     }
 
@@ -163,7 +169,7 @@ public class ValidationResource {
             }
         } catch (IOException e) {
             throw new RejectedUpload("unreadable_upload:" + e.getClass().getSimpleName(),
-                    "Could not read upload header: " + e.getMessage());
+                    "Could not read upload header.");
         }
     }
 

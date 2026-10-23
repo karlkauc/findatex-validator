@@ -187,7 +187,10 @@ public class ValidationOrchestrator {
         } catch (IOException e) {
             // Don't echo POI's exception text to the client — it can leak internal
             // class names and host paths. Full detail is logged server-side.
-            log.warn("Upload parse failed for filename '{}': {}", filename, e.toString());
+            // File class only — the name itself often carries fund/client names and
+            // is client-controlled (CR/LF would forge log lines).
+            log.warn("Upload parse failed ({} / {}): {}", com.findatex.validator.stats.FileNameShape.format(filename),
+                    com.findatex.validator.stats.FileNameShape.pattern(filename), e.toString());
             recordFailure(UsageEvent.STATUS_PARSE_ERROR, UsageEvent.failReasonOf(e), templateName, versionName,
                     input, isSample, elapsedMs(t0), ctx);
             throw new WebApplicationException(
@@ -279,7 +282,7 @@ public class ValidationOrchestrator {
         // degrades to "no in-browser view", never to a failed validation.
         AnnotatedSourceModel annotatedModel = buildAnnotatedModel(file, report);
 
-        Path xlsxPath;
+        Path xlsxPath = null;
         try {
             xlsxPath = createOwnerOnlyTempFile("findatex-report-", ".xlsx");
             new XlsxReportWriter(bundle.catalog,
@@ -287,8 +290,10 @@ public class ValidationOrchestrator {
                     version,
                     com.findatex.validator.report.GenerationUi.WEB)
                     .write(report, xlsxPath, annotatedModel);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
             log.error("Could not write report tempfile", e);
+            // Not yet in the ReportStore, so nothing else would ever delete it.
+            deleteQuietly(xlsxPath);
             throw new WebApplicationException(
                     Response.serverError().entity("Could not write report.").build());
         }
@@ -527,6 +532,15 @@ public class ValidationOrchestrator {
             return Files.createTempFile(prefix, suffix, ownerOnly);
         }
         return Files.createTempFile(prefix, suffix);
+    }
+
+    private static void deleteQuietly(Path path) {
+        if (path == null) return;
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            log.warn("Could not delete orphaned report tempfile: {}", e.toString());
+        }
     }
 
     private record CatalogBundle(SpecCatalog catalog, TemplateRuleSet ruleSet, ProfileSet profileSet) {

@@ -30,15 +30,22 @@ public class RulesPageRenderer {
     // The generator never hard-wraps prose, so every soft line break in the
     // source is a real one — the "FundsXML path / Codification / Applicability /
     // Definition" block runs together into one paragraph without this.
+    // escapeHtml + sanitizeUrls: the Markdown is bundled, but the rules docs are
+    // generated from spec XLSX text — raw HTML or a javascript: link in there
+    // must render as text, not reach the page. Neither source uses raw HTML.
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder()
             .extensions(EXTENSIONS)
             .softbreak("<br />")
+            .escapeHtml(true)
+            .sanitizeUrls(true)
             .build();
     // Hand-written prose (HELP.md) is hard-wrapped at ~75 columns; there a soft
     // line break is just the author's editor width and must flow.
     private static final HtmlRenderer PROSE_RENDERER = HtmlRenderer.builder()
             .extensions(EXTENSIONS)
             .softbreak("\n")
+            .escapeHtml(true)
+            .sanitizeUrls(true)
             .build();
 
     private static final String STYLE = """

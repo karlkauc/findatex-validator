@@ -4,6 +4,7 @@ import com.findatex.validator.web.config.WebConfig;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import com.github.benmanes.caffeine.cache.Ticker;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -45,11 +46,18 @@ public class ReportStore {
 
     @Inject
     public ReportStore(WebConfig config) {
-        this(config.report().ttlMinutes(), Ticker.systemTicker());
+        // The system scheduler makes the TTL a promise rather than a hint: without
+        // it Caffeine only expires on the next cache access, so on a quiet
+        // instance an uploaded file's report would outlive the advertised TTL.
+        this(config.report().ttlMinutes(), Ticker.systemTicker(), Scheduler.systemScheduler());
     }
 
     /** Test seam: same wiring with an injectable clock so TTL expiry is deterministic. */
     ReportStore(int ttlMinutes, Ticker ticker) {
+        this(ttlMinutes, ticker, Scheduler.disabledScheduler());
+    }
+
+    private ReportStore(int ttlMinutes, Ticker ticker, Scheduler scheduler) {
         Duration ttl = Duration.ofMinutes(ttlMinutes);
         // Same-thread executor: removal listeners (the file deletes) run inside the
         // maintenance that evicts the entry, so an expired entry never leaves its file
@@ -58,6 +66,7 @@ public class ReportStore {
         this.cache = Caffeine.newBuilder()
                 .expireAfterWrite(ttl)
                 .ticker(ticker)
+                .scheduler(scheduler)
                 .executor(Runnable::run)
                 .removalListener((UUID key, Entry entry, RemovalCause cause) -> {
                     if (entry == null || entry.path() == null) return;
@@ -83,6 +92,7 @@ public class ReportStore {
         this.annotatedSources = Caffeine.newBuilder()
                 .expireAfterWrite(ttl)
                 .ticker(ticker)
+                .scheduler(scheduler)
                 .executor(Runnable::run)
                 .removalListener((UUID key, Path path, RemovalCause cause) -> {
                     if (path == null) return;

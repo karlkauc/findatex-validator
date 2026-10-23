@@ -292,13 +292,16 @@ be in place for it to resolve on Cloud Run:
    `maxmind_license_key` BuildKit secret. No secret ⇒ no DB ⇒ `country_code`
    stays NULL (the image still builds and boots).
 2. **The real client IP.** Cloud Run sits behind Google's front end, so the
-   deploy workflow sets `PROXY_ADDRESS_FORWARDING=true` and
-   `PROXY_ALLOW_X_FORWARDED=true` so Quarkus reads the client IP from
-   `X-Forwarded-For`. Without these the lookup sees an internal Google address
-   and `country_code` stays NULL. Trade-off: with no `PROXY_TRUSTED_PROXIES`
-   allowlist a client can spoof `X-Forwarded-For` to mint fresh per-IP
-   rate-limit buckets; the `--concurrency` / `--max-instances` caps bound the
-   abuse (see the proxy block in `application.properties`).
+   deploy workflow sets `FINDATEX_WEB_CLIENT_IP_FORWARDED_HOPS=1`: the app
+   takes the **right-most** `X-Forwarded-For` entry (the one Google's front end
+   appends) and ignores everything the client put in front of it, so a forged
+   header can neither mint a fresh rate-limit bucket nor skew GeoIP. Without it
+   the lookup sees an internal Google address and `country_code` stays NULL.
+   Quarkus' own `PROXY_ADDRESS_FORWARDING` is pinned to `false` — it reads the
+   *left-most* (client-controlled) entry. Verify after a deploy: the log line
+   `X-Forwarded-For on first request: 1 header(s), 1 entr(ies)` (counts only,
+   never addresses) means one hop is right; with an external HTTPS load
+   balancer in front it is 2 entries → set the variable to `2`.
 
 Both apply only to **new** runs — the IP is never stored, so historical
 `usage_event` rows keep `country_code = NULL`.

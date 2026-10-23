@@ -81,10 +81,11 @@ services:
       # image at /data/geoip by the Dockerfile "geoip" stage (gated on the
       # maxmind_license_key build secret), and FINDATEX_WEB_GEOIP_DB is already
       # set in the image — no override needed here. NOTE: behind a real reverse
-      # proxy, also set PROXY_ADDRESS_FORWARDING=true and PROXY_ALLOW_X_FORWARDED=true
-      # so the lookup sees the client IP rather than the proxy's (see
-      # application.properties proxy block). This compose stack talks to the
-      # container directly, so they stay off here.
+      # proxy that appends to X-Forwarded-For, set
+      # FINDATEX_WEB_CLIENT_IP_FORWARDED_HOPS to the number of proxies you run
+      # (usually 1) so the lookup and the rate limit see the client IP rather than
+      # the proxy's (see the client-IP block in application.properties). This
+      # compose stack talks to the container directly, so it stays 0 here.
 
     volumes:
       # GLEIF/OpenFIGI lookup cache. Persisting it across restarts avoids

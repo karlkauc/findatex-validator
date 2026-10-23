@@ -15,10 +15,9 @@ import jakarta.ws.rs.ext.Provider;
 
 /**
  * Per-IP rate limit on {@code POST /api/validate}. Delegates the bucket map to
- * {@link RateLimitService}; the bucket key is the TCP source IP that Vert.x
- * exposes on {@link HttpServerRequest#remoteAddress()} (overridden by Quarkus
- * itself only when {@code quarkus.http.proxy.proxy-address-forwarding=true} is
- * combined with a {@code trusted-proxies} CIDR list — see application.properties).
+ * {@link RateLimitService}; the bucket key is the client IP as resolved by
+ * {@link ClientContextFactory#clientIp} (TCP peer, or the trusted right-most
+ * {@code X-Forwarded-For} hop — see application.properties).
  */
 @Provider
 public class RateLimitFilter implements ContainerRequestFilter {
@@ -71,7 +70,7 @@ public class RateLimitFilter implements ContainerRequestFilter {
     }
 
     private String clientIp() {
-        return ClientContextFactory.clientIp(request);
+        return clientContexts.clientIp(request);
     }
 
     /**

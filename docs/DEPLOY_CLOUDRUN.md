@@ -92,9 +92,11 @@ gcloud iam service-accounts create github-deploy \
   --display-name="GitHub Actions deployer"
 SA_EMAIL="github-deploy@$PROJECT.iam.gserviceaccount.com"
 
-# 4) Minimal IAM roles for the SA
+# 4) Minimal IAM roles for the deployer SA. serviceAccountUser is granted on
+#    the runtime SA only (see "Security hardening" below) — at project level it
+#    would let the deployer act as every SA in the project, Editor-level
+#    default compute SA included.
 for role in roles/run.admin \
-            roles/iam.serviceAccountUser \
             roles/artifactregistry.writer; do
   gcloud projects add-iam-policy-binding "$PROJECT" \
     --member="serviceAccount:$SA_EMAIL" --role="$role"
@@ -111,7 +113,7 @@ gcloud iam workload-identity-pools providers create-oidc findatex \
   --display-name="FinDatEx repo" \
   --issuer-uri="https://token.actions.githubusercontent.com" \
   --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
-  --attribute-condition="assertion.repository == '$REPO'"
+  --attribute-condition="assertion.repository == '$REPO' && assertion.environment == 'production' && (assertion.ref == 'refs/heads/main' || assertion.ref.startsWith('refs/tags/v'))"
 
 # 6) Allow this specific GitHub repo to impersonate the SA
 gcloud iam service-accounts add-iam-policy-binding "$SA_EMAIL" \
@@ -135,6 +137,8 @@ In the GitHub UI: **Settings → Secrets and variables → Actions → Variables
 | `GCP_PROJECT`      | the project id, e.g. `findatex-validator`                          |
 | `GCP_DEPLOY_SA`    | `github-deploy@<project>.iam.gserviceaccount.com`                  |
 | `GCP_WIF_PROVIDER` | `projects/<project-num>/locations/global/workloadIdentityPools/github/providers/findatex` |
+| `GCP_RUNTIME_SA`   | `findatex-runtime@<project>.iam.gserviceaccount.com` (see "Security hardening") |
+| `GCP_DB_CA_SECRET` | optional: `findatex-usage-db-ca` — enables `sslmode=verify-full` for the stats DB |
 
 ## Running the deploy
 
@@ -347,6 +351,78 @@ way if egress requires a corporate proxy — Cloud Run normally has direct
 internet egress, so usually unnecessary. The GLEIF/OpenFIGI lookup cache
 (`findatex.web.external.cache-dir`, under the instance's tmp dir) is per
 instance and does not survive a scale-to-zero — acceptable at this traffic.
+
+## Security hardening (runtime SA, WIF scope, DB TLS)
+
+Findings of the 2026-10 security review that need console/gcloud access. The
+deploy workflow already supports all of them; each takes effect as soon as the
+matching repo variable is set, and nothing breaks while it is not.
+
+```bash
+PROJECT=findatex-validator
+REGION=europe-west4
+REPO=karlkauc/findatex-validator
+DEPLOY_SA="github-deploy@$PROJECT.iam.gserviceaccount.com"
+
+# 1) Dedicated runtime SA — it only needs to read its own secrets. Without
+#    --service-account the revision runs as the default compute SA, which on
+#    most projects holds roles/editor.
+gcloud iam service-accounts create findatex-runtime --project="$PROJECT" \
+  --display-name="FinDatEx Cloud Run runtime"
+RUNTIME_SA="findatex-runtime@$PROJECT.iam.gserviceaccount.com"
+for s in findatex-usage-db-password findatex-usage-ingest-token \
+         findatex-visitor-salt findatex-openfigi-key; do
+  gcloud secrets add-iam-policy-binding "$s" --project="$PROJECT" \
+    --member="serviceAccount:$RUNTIME_SA" --role=roles/secretmanager.secretAccessor
+done
+
+# 2) The deployer may act as THIS SA only — replace the project-wide grant.
+gcloud iam service-accounts add-iam-policy-binding "$RUNTIME_SA" --project="$PROJECT" \
+  --member="serviceAccount:$DEPLOY_SA" --role=roles/iam.serviceAccountUser
+gcloud projects remove-iam-policy-binding "$PROJECT" \
+  --member="serviceAccount:$DEPLOY_SA" --role=roles/iam.serviceAccountUser
+
+# 3) Tokens only for the protected deploy job on main / v* tags, not for any
+#    workflow or branch of the repo.
+gcloud iam workload-identity-pools providers update-oidc findatex \
+  --project="$PROJECT" --location=global --workload-identity-pool=github \
+  --attribute-condition="assertion.repository == '$REPO' && assertion.environment == 'production' && (assertion.ref == 'refs/heads/main' || assertion.ref.startsWith('refs/tags/v'))"
+```
+
+Then in GitHub:
+
+- **Settings → Environments → `production`** (created by the first run of the
+  workflow, or create it by hand): add *required reviewers* and restrict
+  *deployment branches and tags* to `main` and `v*`.
+- **Variables:** set `GCP_RUNTIME_SA` to the runtime SA e-mail. The next
+  deploy passes `--service-account`; the workflow warns while it is unset.
+
+After the first deploy with the new SA, check that the revision is healthy
+and the statistics still arrive — a missing `secretAccessor` binding makes the
+revision fail to start. The old default compute SA can then lose its
+`secretAccessor` bindings on the four secrets.
+
+### Stats DB: authenticate the server
+
+`sslmode=require` encrypts the connection but accepts **any** certificate, so
+anyone on the path to `62.238.116.11:5432` could impersonate the server and
+read the DB password. With the server's CA certificate (for a self-signed
+server certificate: the certificate itself; for `verify-full` its SAN must
+contain `62.238.116.11`):
+
+```bash
+gcloud secrets create findatex-usage-db-ca --project="$PROJECT" \
+  --replication-policy=automatic --data-file=server-ca.crt
+gcloud secrets add-iam-policy-binding findatex-usage-db-ca --project="$PROJECT" \
+  --member="serviceAccount:$RUNTIME_SA" --role=roles/secretmanager.secretAccessor
+```
+
+and set the repo variable `GCP_DB_CA_SECRET=findatex-usage-db-ca`. The workflow
+then mounts it at `/secrets/pg/ca.crt` and switches the JDBC URL to
+`sslmode=verify-full&sslrootcert=/secrets/pg/ca.crt`. Do the same for
+`tools/usage_report.py` / `psql` (`sslmode=verify-full sslrootcert=…`). Port
+5432 is reachable from the internet because Cloud Run has no fixed egress IP;
+keep `pg_hba` on `hostssl` + `scram-sha-256` and the password long and random.
 
 ## Custom domain
 

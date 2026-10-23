@@ -38,8 +38,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write   # required for Workload Identity Federation
-  packages: read    # required so GITHUB_TOKEN can pull the image from ghcr.io
 
 concurrency:
   group: deploy-cloudrun-${{ github.ref }}
@@ -67,8 +65,23 @@ jobs:
        startsWith(github.event.workflow_run.head_branch, 'v'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Protection rules (required reviewers / allowed refs) are set on the
+    # environment in the repo settings; the WIF provider can additionally
+    # require assertion.environment == 'production' (docs/DEPLOY_CLOUDRUN.md).
+    environment: production
+    permissions:
+      contents: read
+      id-token: write   # required for Workload Identity Federation
+      packages: read    # required so GITHUB_TOKEN can pull the image from ghcr.io
     env:
       PROJECT: ${{ vars.GCP_PROJECT }}
+      # Dedicated runtime service account (secretAccessor on its secrets only).
+      # Unset = the project's default compute SA, which is usually Editor.
+      RUNTIME_SA: ${{ vars.GCP_RUNTIME_SA }}
+      # Secret Manager secret holding the Postgres server's CA certificate.
+      # Set = verify the DB certificate (sslmode=verify-full); unset = the
+      # legacy sslmode=require (encrypted, but not authenticated).
+      DB_CA_SECRET: ${{ vars.GCP_DB_CA_SECRET }}
     steps:
       - name: Resolve image tag
         id: resolve_tag
@@ -162,6 +175,18 @@ jobs:
         # makes the revision fail to start.
         run: |
           set -euo pipefail
+          db_url='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require'
+          secrets='FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest,FINDATEX_WEB_VISITOR_SALT_SECRET=findatex-visitor-salt:latest,FINDATEX_WEB_EXTERNAL_OPENFIGI_KEY=findatex-openfigi-key:latest'
+          if [ -n "${DB_CA_SECRET}" ]; then
+            db_url='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=verify-full&sslrootcert=/secrets/pg/ca.crt'
+            secrets="${secrets},/secrets/pg/ca.crt=${DB_CA_SECRET}:latest"
+          fi
+          sa_args=()
+          if [ -n "${RUNTIME_SA}" ]; then
+            sa_args=(--service-account="${RUNTIME_SA}")
+          else
+            echo "::warning::GCP_RUNTIME_SA unset — the revision runs as the default compute service account"
+          fi
           gcloud run deploy "${SERVICE_NAME}" \
             --image="${image}" \
             --region="${GCP_REGION}" \
@@ -176,8 +201,9 @@ jobs:
             --max-instances=10 \
             --min-instances=0 \
             --timeout=300 \
-            --update-env-vars=FINDATEX_WEB_EXTERNAL_ENABLED=true,FINDATEX_WEB_CANONICAL_HOST=www.findatex-validator.eu,FINDATEX_WEB_USAGE_DB_URL='jdbc:postgresql://62.238.116.11:5432/findatex_stats?sslmode=require',FINDATEX_WEB_USAGE_DB_USER=findatex,FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT=10s,FINDATEX_WEB_INSTANCE=prod,FINDATEX_WEB_CLIENT_IP_FORWARDED_HOPS=1,PROXY_ADDRESS_FORWARDING=false,PROXY_ALLOW_X_FORWARDED=false \
-            --update-secrets=FINDATEX_WEB_USAGE_DB_PASSWORD=findatex-usage-db-password:latest,FINDATEX_WEB_USAGE_STATS_INGEST_TOKEN=findatex-usage-ingest-token:latest,FINDATEX_WEB_VISITOR_SALT_SECRET=findatex-visitor-salt:latest,FINDATEX_WEB_EXTERNAL_OPENFIGI_KEY=findatex-openfigi-key:latest \
+            "${sa_args[@]}" \
+            --update-env-vars="^@^FINDATEX_WEB_EXTERNAL_ENABLED=true@FINDATEX_WEB_CANONICAL_HOST=www.findatex-validator.eu@FINDATEX_WEB_USAGE_DB_URL=${db_url}@FINDATEX_WEB_USAGE_DB_USER=findatex@FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT=10s@FINDATEX_WEB_INSTANCE=prod@FINDATEX_WEB_CLIENT_IP_FORWARDED_HOPS=1@PROXY_ADDRESS_FORWARDING=false@PROXY_ALLOW_X_FORWARDED=false" \
+            --update-secrets="${secrets}" \
             --quiet
 
       - name: Show service URL

@@ -74,7 +74,11 @@ def main() -> None:
         f"host={os.environ.get('USAGE_DB_HOST', DEFAULT_HOST)} "
         f"dbname={os.environ.get('USAGE_DB_NAME', DEFAULT_NAME)} "
         f"user={os.environ.get('USAGE_DB_USER', DEFAULT_USER)} "
-        f"password={resolve_password()} sslmode=require"
+        f"password={resolve_password()} "
+        # USAGE_DB_SSLROOTCERT=<ca.crt> authenticates the server (verify-full);
+        # plain `require` only encrypts and accepts any certificate.
+        + (f"sslmode=verify-full sslrootcert={os.environ['USAGE_DB_SSLROOTCERT']}"
+           if os.environ.get("USAGE_DB_SSLROOTCERT") else "sslmode=require")
     )
     scope = f"last {args.days} days" if args.days else "all time"
     print(f"FinDatEx Validator — usage overview ({scope})")

@@ -25,6 +25,7 @@ import { QuotaExhaustedNotice } from './components/QuotaExhaustedNotice';
 import { NewsletterSignup } from './components/NewsletterSignup';
 import { QuickFeedback } from './components/QuickFeedback';
 import { CollapsibleSection } from './components/CollapsibleSection';
+import { ValidationProgress } from './components/ValidationProgress';
 import { INPUT_COLUMN_ID, SidebarLayout } from './components/SidebarLayout';
 import { usePersistedBoolean } from './lib/usePersistedState';
 import { HANDOFF_LABELS, HandoffFile, clearHandoffParam, handoffSource, receiveHandoff } from './lib/handoff';
@@ -82,6 +83,8 @@ export default function App() {
   const [handoffWaiting, setHandoffWaiting] = useState(handoffFrom !== null);
   const [pendingHandoff, setPendingHandoff] = useState<HandoffFile | null>(null);
   const [handoffError, setHandoffError] = useState<string | null>(null);
+  // Set while a handed-over file is validated: the progress card names its source.
+  const [validatingFrom, setValidatingFrom] = useState<string | null>(null);
 
   // Defaults match AppSettings.defaults() in core: master OFF, LEI lapsed ON, the rest OFF.
   const [externalEnabled, setExternalEnabled] = useState(false);
@@ -145,6 +148,7 @@ export default function App() {
     onError: () => {
       queryClient.invalidateQueries({ queryKey: RATE_LIMIT_QUERY_KEY });
     },
+    onSettled: () => setValidatingFrom(null),
   });
 
   const quotaExhausted = isQuotaExhausted(rateLimitQuery.data);
@@ -164,6 +168,7 @@ export default function App() {
     if (!activeFile || !activeVersion) return;
     setResult(null);
     setSampleError(null);
+    setValidatingFrom(null);
     const activeTemplate = templates.find((t) => t.id === activeTemplateId);
     const useExternal = externalEnabled && (activeTemplate?.externalAvailable ?? false);
     validateMutation.mutate({
@@ -256,6 +261,7 @@ export default function App() {
     setProfiles([]);
     if (isQuotaExhausted(rateLimitQuery.data)) return;
     submit({ file: handoff.file, version: target.version, profiles: [], templateId: template.id });
+    if (handoffFrom) setValidatingFrom(HANDOFF_LABELS[handoffFrom]);
     // submit is recreated every render; the hand-over runs once per file.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingHandoff, templatesQuery.data, rateLimitQuery.isLoading, rateLimitQuery.data]);
@@ -467,7 +473,12 @@ export default function App() {
               <QuotaExhaustedNotice />
               {sampleError != null && <ErrorBanner error={sampleError} />}
               {validateMutation.isError && <ErrorBanner error={validateMutation.error} />}
-              {result ? (
+              {validateMutation.isPending || pendingHandoff ? (
+                <ValidationProgress
+                  fileName={validateMutation.variables?.file.name ?? pendingHandoff?.file.name}
+                  source={validatingFrom ?? (pendingHandoff && handoffFrom ? HANDOFF_LABELS[handoffFrom] : null)}
+                />
+              ) : result ? (
                 <ResultPanel
                   key={result.reportId}
                   result={result}

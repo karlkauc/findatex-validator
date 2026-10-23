@@ -23,16 +23,62 @@ concurrency:
 
 jobs:
   osv:
-    name: OSV-Scanner (Maven + npm)
+    name: OSV-Scanner (Maven SBOM + npm lockfile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
       security-events: write
-      actions: read
-    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@b1d267aea5211fa648d9d442fa64b90dbdcbdd36 # v2.7.0
-    with:
-      scan-args: |-
-        --recursive
-        ./
+    env:
+      OSV_VERSION: v2.7.0
+      OSV_SHA256: 160c6253e2922e9e0a6a9771c5c4c40a4b3c6090b34a3cdd5e80c96cc2e4218b
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # OSV cannot resolve the poms directly: javafx-app / web-app depend on
+      # the reactor-internal core artifact, which is in no registry. Maven
+      # resolves the full (transitive) tree itself and hands OSV a CycloneDX
+      # SBOM instead. Test scope is left out — it never ships.
+      - name: Generate Maven SBOM
+        run: >-
+          mvn -B -ntp -P backend-only
+          org.cyclonedx:cyclonedx-maven-plugin:2.9.3:makeAggregateBom
+          -DoutputFormat=json -DoutputName=maven.cdx -DincludeTestScope=false
+
+      - name: Install osv-scanner (pinned, checksum-verified)
+        run: |
+          set -euo pipefail
+          curl -fsSL -o osv-scanner \
+            "https://github.com/google/osv-scanner/releases/download/${OSV_VERSION}/osv-scanner_linux_amd64"
+          echo "${OSV_SHA256}  osv-scanner" | sha256sum -c -
+          chmod +x osv-scanner
+
+      - name: Scan
+        run: |
+          set -euo pipefail
+          ./osv-scanner scan source --format sarif --output osv.sarif \
+            -L target/maven.cdx.json \
+            -L web-app/src/main/frontend/package-lock.json || rc=$?
+          # Human-readable table in the log as well.
+          ./osv-scanner scan source \
+            -L target/maven.cdx.json \
+            -L web-app/src/main/frontend/package-lock.json || true
+          exit "${rc:-0}"
+
+      - name: Upload SARIF
+        if: always() && hashFiles('osv.sarif') != ''
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4
+        with:
+          sarif_file: osv.sarif
+          category: osv-scanner
 
   npm-audit:
     name: npm audit (frontend)

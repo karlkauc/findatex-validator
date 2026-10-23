@@ -32,7 +32,7 @@ import { HANDOFF_LABELS, HandoffFile, clearHandoffParam, handoffSource, receiveH
 import { RateLimitStatus, ValidationResponse } from './types/api';
 
 const GITHUB_URL = 'https://github.com/karlkauc/findatex-validator';
-// Opened from the TPT converter with a generated file to hand over (see lib/handoff).
+// Opened from the Fund Data Converter with a generated file to hand over (see lib/handoff).
 const handoffFrom = handoffSource();
 // The sender gives up after 15 s; no point waiting longer here.
 const HANDOFF_WAIT_MS = 15_000;
@@ -430,7 +430,7 @@ export default function App() {
                     <ul className="list-disc space-y-1 pl-4">
                       <li>Uploaded files are <strong>not persisted</strong> on the server and are deleted immediately after the response.</li>
                       <li>The Excel report (single-use link) and the Annotated Source view are kept for 5 minutes, then deleted.</li>
-                      <li>A file handed over from the TPT converter goes directly from that browser tab to this one and is validated like an upload.</li>
+                      <li>A file handed over from the Fund Data Converter goes directly from that browser tab to this one and is validated like an upload.</li>
                       <li>External validation (GLEIF/OpenFIGI) runs only if you switch it on for a run; only the identifiers from your file are sent.</li>
                       <li>
                         Anonymous usage statistics record aggregates only (template, finding counts, file

@@ -9,9 +9,9 @@ describe('ValidationProgress', () => {
 
   it('names the file and its source and counts the seconds', () => {
     vi.useFakeTimers();
-    render(<ValidationProgress fileName="fund_TPT_V7.xlsx" source="TPT Converter" />);
+    render(<ValidationProgress fileName="fund_TPT_V7.xlsx" source="Fund Data Converter" />);
     expect(screen.getByRole('status')).toHaveTextContent('Validating fund_TPT_V7.xlsx…');
-    expect(screen.getByText('Received from TPT Converter.')).toBeInTheDocument();
+    expect(screen.getByText('Received from Fund Data Converter.')).toBeInTheDocument();
     expect(screen.getByText('0 s')).toBeInTheDocument();
     act(() => {
       vi.advanceTimersByTime(3000);

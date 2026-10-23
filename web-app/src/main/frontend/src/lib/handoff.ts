@@ -1,7 +1,7 @@
 /**
  * Receive a file handed over from a sibling site.
  *
- * Flow: the TPT ⇄ FundsXML converter opens
+ * Flow: the Fund Data Converter (formerly TPT ⇄ FundsXML converter) opens
  * `https://www.findatex-validator.eu/?from=tpt-converter` in a new tab while
  * keeping the generated TPT file in memory. Once mounted we post
  * `{type: "findatex-validator:ready"}` to the opener; it answers with
@@ -17,11 +17,12 @@
 export const HANDOFF_SOURCES = ['tpt-converter'] as const;
 export type HandoffSource = (typeof HANDOFF_SOURCES)[number];
 
-// Keep in step with the validator origins in the TPT converter (lib/handoff.ts).
-const SENDER_ORIGINS = ['https://converter.status20.net'];
+// Keep in step with the validator origins in the Fund Data Converter (lib/handoff.ts). The old
+// address stays while it redirects to the new one.
+const SENDER_ORIGINS = ['https://www.fund-data-converter.eu', 'https://converter.status20.net'];
 
 export const HANDOFF_LABELS: Record<HandoffSource, string> = {
-  'tpt-converter': 'TPT Converter',
+  'tpt-converter': 'Fund Data Converter',
 };
 
 /** Mirrors FileUpload / quarkus.http.limits.max-body-size=25M. */

@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 
 interface Props {
   fileName?: string;
-  /** Where the file came from, e.g. "TPT Converter" for a hand-over. */
+  /** Where the file came from, e.g. "Fund Data Converter" for a hand-over. */
   source?: string | null;
 }
 

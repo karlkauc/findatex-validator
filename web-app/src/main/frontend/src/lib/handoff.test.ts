@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { clearHandoffParam, handoffSource, receiveHandoff, rejectReason } from './handoff';
 
-const SENDER = 'https://converter.status20.net';
+const SENDER = 'https://www.fund-data-converter.eu';
+const OLD_SENDER = 'https://converter.status20.net';
 
 function fileMessage(overrides: Record<string, unknown> = {}) {
   return {
@@ -48,6 +49,8 @@ describe('receiveHandoff', () => {
   it('announces readiness to the converter', () => {
     receiveHandoff(vi.fn(), vi.fn());
     expect(opener.postMessage).toHaveBeenCalledWith({ type: 'findatex-validator:ready' }, SENDER);
+    // The old address of the converter, while it redirects there.
+    expect(opener.postMessage).toHaveBeenCalledWith({ type: 'findatex-validator:ready' }, OLD_SENDER);
   });
 
   it('does nothing without an opener', () => {

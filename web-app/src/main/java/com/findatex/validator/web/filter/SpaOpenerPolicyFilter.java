@@ -12,7 +12,7 @@ import jakarta.enterprise.event.Observes;
  * <p>The global {@code Cross-Origin-Opener-Policy: same-origin} puts a page
  * opened from another origin into its own browsing-context group: the opener
  * becomes {@code null} and neither side can {@code postMessage} the other. The
- * TPT converter opens {@code /?from=tpt-converter} and posts the generated file
+ * Fund Data Converter opens {@code /?from=tpt-converter} and posts the generated file
  * once this page announces it is ready, so the shell gets {@code unsafe-none} —
  * but only when the request carries a known hand-over source ({@code ?from=},
  * mirrors {@code HANDOFF_SOURCES} in {@code lib/handoff.ts}). A plain visit,

@@ -250,7 +250,7 @@ generated `GET /sitemap.xml` (`SitemapResource`). These deliberately carry no
 React bundle — see the SEO block below.
 
 **Hand-over from sibling sites** — `/?from=tpt-converter` receives a generated
-TPT file from the TPT ⇄ FundsXML converter (`frontend/src/lib/handoff.ts`):
+TPT file from the Fund Data Converter (formerly TPT ⇄ FundsXML converter) (`frontend/src/lib/handoff.ts`):
 the page posts `findatex-validator:ready` to its opener, takes one
 `findatex-validator:file` message (name, ArrayBuffer, templateId,
 templateVersion) and validates it like the example button. Sender origins are

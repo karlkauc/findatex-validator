@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 # Resolve the current immutable digests for every base image referenced in the
-# Dockerfile and print drop-in `FROM image:tag@sha256:…` lines. Use the output
-# to migrate the Dockerfile from floating tags to pinned digests once a
-# Renovate (or equivalent) workflow is in place to refresh them on a schedule.
-#
-# Without an automated refresh, manually-pinned digests go stale and the
-# resulting image stops receiving upstream security patches. That is *worse*
-# than a floating tag — only adopt the pins when the refresh story is solved.
+# Dockerfile and print drop-in `FROM image:tag@sha256:…` lines. The Dockerfile
+# is pinned; Dependabot (docker ecosystem) refreshes the digests weekly — use
+# this script for a manual bump in between.
 #
 # Requires: bash, curl, jq.
 #
@@ -18,9 +14,9 @@
 set -euo pipefail
 
 IMAGES=(
-  "library/eclipse-temurin:25-jdk-jammy"
+  "library/maven:3-eclipse-temurin-26-noble"
   "library/eclipse-temurin:25-jdk-alpine"
-  "library/alpine:3.23"
+  "library/alpine:3.24"
 )
 
 AUTH=""
@@ -33,9 +29,9 @@ done
 
 token_for() {
   local repo="$1"
-  local creds="${AUTH:+-u $AUTH}"
-  # shellcheck disable=SC2086
-  curl -fsSL $creds \
+  local creds=()
+  [ -n "$AUTH" ] && creds=(-u "$AUTH")
+  curl -fsSL "${creds[@]}" \
     "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" \
     | jq -r .token
 }

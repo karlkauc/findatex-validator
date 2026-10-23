@@ -68,7 +68,7 @@
         <commonmark.version>0.30.1</commonmark.version>
 
         <quarkus.platform.version>3.40.1</quarkus.platform.version>
-        <bucket4j.version>8.10.1</bucket4j.version>
+        <bucket4j.version>8.21.0</bucket4j.version>
         <caffeine.version>3.3.1</caffeine.version>
         <rest-assured.version>6.1.0</rest-assured.version>
         <frontend-maven-plugin.version>2.0.2</frontend-maven-plugin.version>
@@ -138,7 +138,7 @@
 
             <dependency>
                 <groupId>com.bucket4j</groupId>
-                <artifactId>bucket4j-core</artifactId>
+                <artifactId>bucket4j_jdk17-core</artifactId>
                 <version>${bucket4j.version}</version>
             </dependency>
 

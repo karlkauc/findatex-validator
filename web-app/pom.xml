@@ -75,7 +75,7 @@
         <!-- In-memory rate-limit + report TTL store. -->
         <dependency>
             <groupId>com.bucket4j</groupId>
-            <artifactId>bucket4j-core</artifactId>
+            <artifactId>bucket4j_jdk17-core</artifactId>
         </dependency>
         <!--
             Server-side Markdown for the public rule-reference pages
@@ -200,7 +200,9 @@
                         <goals><goal>npm</goal></goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>install --no-audit --no-fund</arguments>
+                            <!-- ci, not install: builds exactly the lockfile (fails on drift) instead of
+                                 silently re-resolving it; the audit runs in security-scan.yml. -->
+                            <arguments>ci --no-audit --no-fund</arguments>
                         </configuration>
                     </execution>
                     <execution>

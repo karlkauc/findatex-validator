@@ -1,17 +1,17 @@
 # syntax=docker/dockerfile:1.7
 
-# Base images use floating tags for now. Pinning to immutable @sha256: digests
-# is desirable for supply-chain hardening but only safe once a refresh
-# workflow exists (e.g. Renovate) — a stale manual pin permanently misses
-# upstream security patches and is worse than a floating tag. When you adopt
-# Renovate (or an equivalent), run `tools/refresh-base-images.sh` to capture
-# the current digests and replace the FROM lines below with `image:tag@sha256:…`.
+# Base images are pinned to immutable @sha256: digests (supply-chain
+# hardening: a re-pushed tag cannot change what we build on). The refresh is
+# automated — Dependabot's docker ecosystem (.github/dependabot.yml) bumps the
+# digest weekly, so the pins do not go stale and still pick up upstream
+# security patches. `tools/refresh-base-images.sh` prints current digests for a
+# manual bump.
 
 # ---- Stage 1: Maven build (official Maven image bundles JDK 25 + Maven 3.9) -
 # Apt-Maven on Ubuntu Jammy is stuck at 3.6.3, which fails plugins that
 # require Maven >= 3.9 (e.g. git-commit-id-maven-plugin v10+). The official
 # `maven:3-eclipse-temurin-25-noble` image ships Maven 3.9.x preinstalled.
-FROM maven:3-eclipse-temurin-26-noble AS build
+FROM maven:3-eclipse-temurin-26-noble@sha256:69a6c37f0a91fca2c9d0cdd684c9c0ea7b1bc00d4196749c24440b2e02ad163d AS build
 
 WORKDIR /src
 
@@ -48,7 +48,7 @@ ARG BUILD_TIME=
 RUN mvn -B -pl web-app -am -DskipTests package
 
 # ---- Stage 2: jlink Custom-JRE (Alpine JDK → musl-kompatibel) ---------------
-FROM eclipse-temurin:25-jdk-alpine AS jre-build
+FROM eclipse-temurin:25-jdk-alpine@sha256:1e20ead9eec7234db293f1913438090d533ed47c0b9e12dc8c7627a802a44ed6 AS jre-build
 
 # Module set is hand-curated for Quarkus REST + Apache POI + Netty:
 #   java.base/logging      core
@@ -82,7 +82,7 @@ RUN $JAVA_HOME/bin/jlink \
 # logs a warning and returns null (country_code stays NULL), app still boots.
 # Attribution (MaxMind EULA): "This product includes GeoLite2 data created by
 # MaxMind, available from https://www.maxmind.com."
-FROM alpine:3.24 AS geoip
+FROM alpine:3.24@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a AS geoip
 RUN apk add --no-cache curl tar
 # Cache-bust: BuildKit does NOT include secret *content* in a RUN's cache key,
 # so a layer built once without the license key (skip branch) would otherwise be
@@ -112,7 +112,7 @@ RUN --mount=type=secret,id=maxmind_license_key \
     fi
 
 # ---- Stage 4: Runtime (Alpine + Custom-JRE) ---------------------------------
-FROM alpine:3.24
+FROM alpine:3.24@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a
 
 # fontconfig + ttf-dejavu: Apache POI's autoSizeColumn calls into AWT, which
 # refuses to start without a font configuration on the system.

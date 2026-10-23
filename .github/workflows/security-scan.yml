@@ -1,0 +1,64 @@
+name: Security scan
+
+# Known-vulnerability scan of the dependency tree — Maven (incl. transitive,
+# resolved from the poms) and the frontend lockfile — via OSV, plus npm's own
+# advisory DB. CodeQL (codeql.yml) covers our own code; Dependabot opens the
+# update PRs. Results land in the repo's Security → Code scanning tab.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  osv:
+    name: OSV-Scanner (Maven + npm)
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@b1d267aea5211fa648d9d442fa64b90dbdcbdd36 # v2.7.0
+    with:
+      scan-args: |-
+        --recursive
+        ./
+
+  npm-audit:
+    name: npm audit (frontend)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      # Runtime dependencies only: dev tooling (vite, vitest, …) never ships
+      # in the bundle. Fails the job on high/critical advisories.
+      - name: npm audit
+        working-directory: web-app/src/main/frontend
+        run: npm audit --omit=dev --audit-level=high
+
+  dependency-review:
+    name: Dependency review (PR)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Dependency review
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high

@@ -17,8 +17,8 @@
 export const HANDOFF_SOURCES = ['tpt-converter'] as const;
 export type HandoffSource = (typeof HANDOFF_SOURCES)[number];
 
-// Keep in step with the validator origins in the Fund Data Converter (lib/handoff.ts). The old
-// address stays while it redirects to the new one.
+// Keep in step with the validator origins in the Fund Data Converter (lib/handoff.ts); the second
+// origin is its test instance.
 const SENDER_ORIGINS = ['https://www.fund-data-converter.eu', 'https://converter.status20.net'];
 
 export const HANDOFF_LABELS: Record<HandoffSource, string> = {

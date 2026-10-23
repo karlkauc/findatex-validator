@@ -43,9 +43,10 @@ public final class TemplateRegistry {
     }
 
     private static void configurePoiLimits() {
-        // Reject zip bombs: any single OPC entry whose decompressed size is >200×
-        // its compressed size is treated as malicious. Real OOXML rarely exceeds 50–100×.
-        ZipSecureFile.setMinInflateRatio(0.005d);
+        // Reject zip bombs: any single OPC entry whose decompressed size is >100×
+        // its compressed size is treated as malicious (POI's own default; 0.005
+        // would allow 200×). Real OOXML rarely exceeds 50–100×.
+        ZipSecureFile.setMinInflateRatio(0.01d);
         // Cap any single zip entry at 200 MB decompressed.
         ZipSecureFile.setMaxEntrySize(200L * 1024L * 1024L);
         // Cap entry count per workbook at 10K (largest legitimate spec is <500).

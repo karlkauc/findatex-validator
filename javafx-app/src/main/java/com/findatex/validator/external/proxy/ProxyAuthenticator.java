@@ -36,13 +36,15 @@ import org.slf4j.Logger;
  * <ul>
  *   <li>Password stored as {@code char[]} instead of {@code String} to allow clearing from memory</li>
  *   <li>Only responds to {@code RequestorType.PROXY} requests to prevent credential leakage to web servers</li>
+ *   <li>Only answers challenges from the configured proxy host/port, so a different
+ *       proxy (e.g. one a PAC/WPAD script selected) never receives the credentials</li>
  *   <li>Passwords are never logged or included in debug output</li>
  *   <li>Supports clearing credentials from memory after use</li>
  * </ul>
  *
  * <p><strong>Usage Example:</strong>
  * <pre>{@code
- * ProxyAuthenticator authenticator = new ProxyAuthenticator("proxyuser", "proxypass");
+ * ProxyAuthenticator authenticator = new ProxyAuthenticator("proxy.corp", 8080, "proxyuser", "proxypass");
  * Authenticator.setDefault(authenticator);
  *
  * // Now HttpURLConnection will use these credentials for proxy authentication
@@ -59,16 +61,22 @@ import org.slf4j.Logger;
 public class ProxyAuthenticator extends Authenticator {
     private static final Logger logger = LoggerFactory.getLogger(ProxyAuthenticator.class);
 
+    private final String proxyHost;
+    private final int proxyPort;
     private final String username;
     private final char[] password;
 
     /**
-     * Creates a new ProxyAuthenticator with the given credentials.
+     * Creates a new ProxyAuthenticator bound to one proxy.
      *
+     * @param proxyHost the configured proxy host the credentials belong to
+     * @param proxyPort the configured proxy port
      * @param username the proxy username (not null, but may be empty)
      * @param password the proxy password (may be null)
      */
-    public ProxyAuthenticator(String username, String password) {
+    public ProxyAuthenticator(String proxyHost, int proxyPort, String username, String password) {
+        this.proxyHost = proxyHost == null ? "" : proxyHost.trim();
+        this.proxyPort = proxyPort;
         this.username = username;
         this.password = password != null ? password.toCharArray() : new char[0];
     }
@@ -87,6 +95,13 @@ public class ProxyAuthenticator extends Authenticator {
     protected PasswordAuthentication getPasswordAuthentication() {
         // Only provide credentials for proxy authentication
         if (getRequestorType() == RequestorType.PROXY) {
+            if (!isConfiguredProxy(getRequestingHost(), getRequestingPort())) {
+                // Basic is not disabled for tunnels (NTLM needs the scheme list
+                // emptied), so a stray proxy would get the password in clear text.
+                logger.warn("Proxy authentication requested by {}:{}, which is not the configured "
+                        + "proxy — credentials withheld", getRequestingHost(), getRequestingPort());
+                return null;
+            }
             logger.debug("Providing proxy authentication for: {}:{}",
                     getRequestingHost(), getRequestingPort());
             // DO NOT log username or password!
@@ -98,6 +113,10 @@ public class ProxyAuthenticator extends Authenticator {
         logger.debug("Authenticator called for non-proxy request (type: {}), returning null",
                 getRequestorType());
         return null;
+    }
+
+    boolean isConfiguredProxy(String host, int port) {
+        return host != null && host.equalsIgnoreCase(proxyHost) && port == proxyPort;
     }
 
     /**

@@ -26,6 +26,9 @@ public final class ProxyService {
     /** Apply user's selected mode. Call after settings change. */
     public static void applyMode(ProxyConfig cfg) {
         clearJvmProxyProperties();
+        // Forget any manual credentials from a previous MANUAL run; only
+        // applyManual() installs them again, bound to its own proxy.
+        SystemProxyDetector.installSessionAuthenticator();
         switch (cfg.mode()) {
             case SYSTEM -> applySystem();
             case MANUAL -> applyManual(cfg);
@@ -51,8 +54,8 @@ public final class ProxyService {
         }
         SystemProxyDetector.configureProxy(cfg.host(), cfg.port(), cfg.nonProxyHosts());
         if (!cfg.user().isEmpty()) {
-            Authenticator.setDefault(new ProxyAuthenticator(cfg.user(), cfg.password()));
-            log.info("Manual proxy applied with credentials for user '{}'", cfg.user());
+            Authenticator.setDefault(new ProxyAuthenticator(cfg.host(), cfg.port(), cfg.user(), cfg.password()));
+            log.info("Manual proxy applied with credentials");
         } else {
             log.info("Manual proxy applied without credentials");
         }

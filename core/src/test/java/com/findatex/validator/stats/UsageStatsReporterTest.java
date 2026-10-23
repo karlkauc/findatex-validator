@@ -30,7 +30,7 @@ class UsageStatsReporterTest {
     @Test
     void reportReturnsImmediatelyAndNeverThrowsEvenWhenEndpointDead() {
         UsageStatsReporter r = reporter(
-                () -> new AppSettings.UsageStats(true, "id", "http://10.255.255.1:9/ingest"),
+                () -> new AppSettings.UsageStats(true, "id", "https://10.255.255.1:9/ingest"),
                 1);
         long start = System.nanoTime();
         assertThatCode(() -> {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.findatex.validator.AppInfo;
+import com.findatex.validator.external.http.EndpointPolicy;
 import com.findatex.validator.external.http.HttpExecutor;
 import com.findatex.validator.external.http.RateLimiter;
 import org.slf4j.Logger;
@@ -53,7 +54,7 @@ public final class QuickFeedbackClient {
         if (!QuickFeedbackEntry.isValidRating(rating) || !QuickFeedbackEntry.isValidComment(comment)) {
             return QuickFeedbackStatus.INVALID;
         }
-        if (endpointBaseUrl == null || endpointBaseUrl.isBlank()) {
+        if (!EndpointPolicy.isAllowed(endpointBaseUrl)) { // https only (loopback http for dev)
             return QuickFeedbackStatus.UNAVAILABLE;
         }
         try {

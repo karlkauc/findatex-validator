@@ -80,6 +80,25 @@ public final class SystemProxyDetector {
      * <p>On Windows, when the Authenticator returns {@code null}, the JVM automatically
      * uses the Windows session credentials (SSPI/Kerberos) for NTLM authentication.
      */
+    /**
+     * Installs the default Authenticator that hands out no stored credentials:
+     * returning {@code null} tells the JVM to use integrated Windows
+     * authentication (SSPI) for NTLM/Negotiate. Also used to drop the manual
+     * proxy credentials when the user leaves MANUAL mode.
+     */
+    public static void installSessionAuthenticator() {
+        Authenticator.setDefault(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                if (getRequestorType() == RequestorType.PROXY) {
+                    logger.debug("NTLM Authenticator invoked for proxy: {} (scheme: {})",
+                            getRequestingHost(), getRequestingScheme());
+                }
+                return null;
+            }
+        });
+    }
+
     public static void enableNtlmAuthentication() {
         // Enable NTLM for HTTPS tunneling (disabled by default since Java 8u111)
         System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
@@ -90,20 +109,7 @@ public final class SystemProxyDetector {
         // Force TLS 1.2/1.3 (some corporate MITM proxies block legacy TLS handshakes)
         System.setProperty("https.protocols", "TLSv1.2,TLSv1.3");
 
-        // Install Authenticator that uses Windows session credentials
-        // Returning null tells JVM to use integrated Windows authentication
-        Authenticator.setDefault(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                if (getRequestorType() == RequestorType.PROXY) {
-                    logger.debug("NTLM Authenticator invoked for proxy: {} (scheme: {})",
-                            getRequestingHost(), getRequestingScheme());
-                    // Return null = use Windows session credentials automatically
-                    return null;
-                }
-                return null;
-            }
-        });
+        installSessionAuthenticator();
 
         // Install SOCKS→HTTP converting ProxySelector to prevent "Malformed reply from SOCKS server"
         // when PAC/WPAD returns SOCKS entries for what are actually HTTP proxies

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findatex.validator.AppInfo;
 import com.findatex.validator.config.AppSettings;
 import com.findatex.validator.config.SettingsService;
+import com.findatex.validator.external.http.EndpointPolicy;
 import com.findatex.validator.external.http.HttpExecutor;
 import com.findatex.validator.external.http.RateLimiter;
 import org.slf4j.Logger;
@@ -88,7 +89,7 @@ public final class UsageStatsReporter {
             AppSettings.UsageStats c = cfg.get();
             if (c == null || !c.enabled()) return;
             String endpoint = c.endpointUrl();
-            if (endpoint == null || endpoint.isBlank()) return;
+            if (!EndpointPolicy.isAllowed(endpoint)) return; // https only — the token must not go out in clear
             if (ingestToken.isBlank()) return;
             String json = MAPPER.writeValueAsString(event);
             if (!queue.offer(new Pending(endpoint.trim(), ingestToken, json))) {

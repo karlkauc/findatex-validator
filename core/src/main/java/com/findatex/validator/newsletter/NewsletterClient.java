@@ -2,6 +2,7 @@ package com.findatex.validator.newsletter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.findatex.validator.external.http.EndpointPolicy;
 import com.findatex.validator.external.http.HttpExecutor;
 import com.findatex.validator.external.http.RateLimiter;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public final class NewsletterClient {
         if (!EmailAddress.isValid(email)) {
             return NewsletterStatus.INVALID_EMAIL;
         }
-        if (endpointBaseUrl == null || endpointBaseUrl.isBlank()) {
+        if (!EndpointPolicy.isAllowed(endpointBaseUrl)) { // https only (loopback http for dev)
             return NewsletterStatus.UNAVAILABLE;
         }
         try {

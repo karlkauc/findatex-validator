@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Download } from 'lucide-react';
 import { ValidationResponse } from '../types/api';
 import { reportDownloadUrl } from '../api/client';
@@ -31,13 +31,7 @@ export function ResultPanel({ result, githubRepo, appVersion }: Props) {
       <div className="card">
         <div className="card-header flex flex-wrap items-center justify-between gap-3">
           <span>Validation result</span>
-          <a
-            href={reportDownloadUrl(result.reportId)}
-            className="btn-primary text-xs"
-            download={`findatex-report-${result.summary.filename}.xlsx`}
-          >
-            <Download className="h-4 w-4" /> Download Excel report
-          </a>
+          <ReportDownload reportId={result.reportId} filename={result.summary.filename} />
         </div>
         <div className="card-body space-y-4">
           <SummaryGrid result={result} />
@@ -88,6 +82,44 @@ export function ResultPanel({ result, githubRepo, appVersion }: Props) {
         </TabPanel>
       </div>
     </div>
+  );
+}
+
+// The server keeps the Excel report for 5 minutes and hands it out once. Expire the
+// button a little early: the server clock started before the response arrived.
+const REPORT_TTL_MS = 5 * 60_000 - 15_000;
+
+/**
+ * Download link that knows the report's lifetime. A plain link to an expired or
+ * already fetched report makes the browser save a broken file without a word, so
+ * after the first click or the TTL it turns into a note instead.
+ */
+function ReportDownload({ reportId, filename }: { reportId: string; filename: string }) {
+  const [state, setState] = useState<'ready' | 'downloaded' | 'expired'>('ready');
+  useEffect(() => {
+    const t = window.setTimeout(() => setState((s) => (s === 'ready' ? 'expired' : s)), REPORT_TTL_MS);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  if (state !== 'ready') {
+    return (
+      <span role="status" className="text-xs font-normal normal-case tracking-normal text-slate-500">
+        {state === 'downloaded'
+          ? 'Excel report downloaded — it can be fetched once. Validate the file again for another copy.'
+          : 'The Excel report has expired — it is kept for 5 minutes. Validate the file again to download it.'}
+      </span>
+    );
+  }
+  return (
+    <a
+      href={reportDownloadUrl(reportId)}
+      className="btn-primary text-xs"
+      download={`findatex-report-${filename}.xlsx`}
+      // Defer the swap so the browser still follows this click.
+      onClick={() => window.setTimeout(() => setState('downloaded'), 0)}
+    >
+      <Download className="h-4 w-4" /> Download Excel report
+    </a>
   );
 }
 

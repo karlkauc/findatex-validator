@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ResultPanel } from './ResultPanel';
@@ -89,5 +89,40 @@ describe('ResultPanel', () => {
     expect(grid).toBeVisible();
     expect(fetchMock).toHaveBeenCalledWith('abc');
     expect(document.getElementById('src-1-2')).toHaveClass('src-cell-jump');
+  });
+
+  it('turns the download link into a note once the report expired', () => {
+    vi.useFakeTimers();
+    try {
+      wrap(<ResultPanel result={result} appVersion="web" />);
+      expect(screen.getByRole('link', { name: /Download Excel report/ })).toHaveAttribute('href', '/api/report/abc');
+      act(() => {
+        vi.advanceTimersByTime(5 * 60_000);
+      });
+      expect(screen.queryByRole('link', { name: /Download Excel report/ })).toBeNull();
+      expect(screen.getByRole('status')).toHaveTextContent('The Excel report has expired');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('replaces the link after the one allowed download', () => {
+    vi.useFakeTimers();
+    try {
+      wrap(<ResultPanel result={result} appVersion="web" />);
+      fireEvent.click(screen.getByRole('link', { name: /Download Excel report/ }));
+      act(() => {
+        vi.advanceTimersByTime(0);
+      });
+      expect(screen.queryByRole('link', { name: /Download Excel report/ })).toBeNull();
+      expect(screen.getByRole('status')).toHaveTextContent('Excel report downloaded');
+      // A later expiry must not overwrite the "downloaded" note.
+      act(() => {
+        vi.advanceTimersByTime(5 * 60_000);
+      });
+      expect(screen.getByRole('status')).toHaveTextContent('Excel report downloaded');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

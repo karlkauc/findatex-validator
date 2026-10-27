@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.19] — 2026-10-27
+
+### Fixed
+- **Over-long CSV cells no longer fail the report.** Excel caps a text cell at
+  32,767 characters and POI throws above it, so a single over-long value in a
+  CSV upload ended the whole run with HTTP 500. Text from the file and from
+  findings is now cut to the limit with a `…(truncated)` marker.
+- **Expired Excel reports are explained instead of downloaded broken.** The web
+  report is kept for 5 minutes and handed out once; a later click on the
+  download button saved a broken file without a word. The button now turns
+  into a note after the first download or when the report has expired.
+- **Server errors show up in the usage statistics.** An unexpected failure
+  during a web validation (HTTP 500) is now recorded as `status = error` with
+  the exception class as `fail_reason`; before, it left no trace.
+- **No more "Log4j API could not find a logging provider" on startup.** POI's
+  `log4j-api` calls are routed to SLF4J (`log4j-to-slf4j`).
+
 ## [1.0.18] — 2026-10-27
 
 ### Added
@@ -505,7 +522,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.18...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.19...HEAD
+[1.0.19]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.19
 [1.0.18]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.18
 [1.0.17]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.17
 [1.0.16]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.16

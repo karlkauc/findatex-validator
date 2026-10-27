@@ -67,7 +67,7 @@
         <jackson.version>2.22.3</jackson.version>
         <commonmark.version>0.30.1</commonmark.version>
 
-        <quarkus.platform.version>3.40.1</quarkus.platform.version>
+        <quarkus.platform.version>3.40.1.1</quarkus.platform.version>
         <bucket4j.version>8.21.0</bucket4j.version>
         <!-- Transitive via POI; pinned past GHSA-qv9r-c865-cp47 (fixed in 2.25.5). -->
         <log4j.version>2.26.1</log4j.version>

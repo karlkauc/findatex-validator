@@ -299,6 +299,42 @@ class XlsxReportWriterTest {
     }
 
     @Test
+    void overlongCsvCellIsClippedInsteadOfFailingTheReport(@TempDir Path tmp) throws Exception {
+        // Excel caps a text cell at 32,767 characters and POI throws above it. A CSV
+        // cell has no such cap — one over-long value used to fail the whole report.
+        String huge = "X".repeat(40_000);
+        Path src = tmp.resolve("overlong.csv");
+        Files.writeString(src, String.join("\n",
+                "1_Portfolio_identifying_data;2_Type_of_identification_code_for_the_fund_share_or_portfolio;"
+                        + "3_Portfolio_name;4_Portfolio_currency_(B)",
+                "FR0010000001;1;Demo Bond Fund;" + huge,
+                ""));
+
+        TptFile file = new TptFileLoader(CATALOG).load(src);
+        Set<ProfileKey> profiles = Set.of(TptProfiles.SOLVENCY_II);
+        List<Finding> findings = new ValidationEngine(CATALOG, new TptRuleSet()).validate(file, profiles);
+        QualityReport report = new QualityScorer(CATALOG).score(file, profiles, findings);
+
+        Path out = tmp.resolve("overlong.xlsx");
+        new XlsxReportWriter(CATALOG, TptProfiles.ALL, TptTemplate.V7_0, GenerationUi.WEB).write(report, out);
+
+        try (InputStream in = Files.newInputStream(out);
+             Workbook wb = new XSSFWorkbook(in)) {
+            List<String> clipped = new ArrayList<>();
+            for (String name : List.of("Annotated Source", "Findings")) {
+                for (String v : dumpStrings(wb.getSheet(name)).split("\n")) {
+                    if (v.startsWith("XXXX")) clipped.add(v);
+                }
+            }
+            assertThat(clipped).as("the over-long value appears in the source mirror and the findings").hasSize(2);
+            assertThat(clipped).allSatisfy(v -> {
+                assertThat(v).hasSize(XlsxStyles.MAX_CELL_TEXT);
+                assertThat(v).endsWith("…(truncated)");
+            });
+        }
+    }
+
+    @Test
     void scoresAreWrittenAsPercentages(@TempDir Path tmp) throws Exception {
         QualityReport report = buildReportFor("/sample/clean_v7.xlsx");
         Path out = tmp.resolve("scores.xlsx");

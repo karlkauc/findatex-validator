@@ -1,5 +1,6 @@
 package com.findatex.validator.report;
 
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -14,7 +15,22 @@ import org.apache.poi.ss.usermodel.Workbook;
 /** Shared cell-style + row-write helpers used by both report writers. */
 final class XlsxStyles {
 
+    /** Excel's hard limit per text cell; POI throws above it. */
+    static final int MAX_CELL_TEXT = SpreadsheetVersion.EXCEL2007.getMaxTextLength();
+    private static final String TRUNCATION_MARKER = "…(truncated)";
+
     private XlsxStyles() {}
+
+    /**
+     * Null-safe cell text, cut to {@link #MAX_CELL_TEXT}. Any text that comes from the
+     * uploaded file (raw cells, finding values and messages) must go through this — a
+     * single over-long CSV cell would otherwise fail the whole report.
+     */
+    static String clip(String s) {
+        if (s == null) return "";
+        if (s.length() <= MAX_CELL_TEXT) return s;
+        return s.substring(0, MAX_CELL_TEXT - TRUNCATION_MARKER.length()) + TRUNCATION_MARKER;
+    }
 
     static CellStyle headerStyle(Workbook wb) {
         CellStyle s = wb.createCellStyle();
@@ -45,7 +61,7 @@ final class XlsxStyles {
         Row r = s.createRow(rowIdx);
         for (int c = 0; c < values.length; c++) {
             Cell cell = r.createCell(c);
-            cell.setCellValue(values[c]);
+            cell.setCellValue(clip(values[c]));
             if (style != null) cell.setCellStyle(style);
         }
     }

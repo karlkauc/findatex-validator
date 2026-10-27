@@ -110,11 +110,11 @@ final class AnnotatedSourceSheetWriter {
 
     private static void writeTypedValue(Cell cell, SourceMirror.SourceCell sc, boolean isHeaderRow) {
         if (isHeaderRow) {
-            cell.setCellValue(sc.asText());
+            cell.setCellValue(XlsxStyles.clip(sc.asText()));
             return;
         }
         switch (sc.kind()) {
-            case STRING -> cell.setCellValue(sc.asText());
+            case STRING -> cell.setCellValue(XlsxStyles.clip(sc.asText()));
             case NUMERIC -> cell.setCellValue(((Double) sc.value()).doubleValue());
             case DATE -> {
                 LocalDateTime dt = (LocalDateTime) sc.value();

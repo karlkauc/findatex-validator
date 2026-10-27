@@ -428,5 +428,5 @@ public final class CombinedXlsxReportWriter {
         return m;
     }
 
-    private static String nz(String s) { return s == null ? "" : s; }
+    private static String nz(String s) { return XlsxStyles.clip(s); }
 }

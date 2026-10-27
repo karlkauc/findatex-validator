@@ -343,7 +343,7 @@ public final class XlsxReportWriter {
         s.createFreezePane(3, 1);
     }
 
-    private static String nz(String s) { return s == null ? "" : s; }
+    private static String nz(String s) { return XlsxStyles.clip(s); }
 
     private void writeFieldCoverage(Workbook wb, QualityReport r, CellStyle header) {
         Sheet s = wb.createSheet("Field Coverage");
@@ -421,7 +421,7 @@ public final class XlsxReportWriter {
                 String pname = firstNonEmpty(g, "3");
                 Row hr = s.createRow(row++);
                 org.apache.poi.ss.usermodel.Cell hc = hr.createCell(0);
-                hc.setCellValue("Fund: " + pid + (pname == null ? "" : " — " + pname));
+                hc.setCellValue(XlsxStyles.clip("Fund: " + pid + (pname == null ? "" : " — " + pname)));
                 hc.setCellStyle(header);
             }
             for (TptRow tr : g.rows()) {

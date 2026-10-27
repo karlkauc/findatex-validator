@@ -53,6 +53,14 @@ which was judged not worth it. `--cpu-boost` keeps the cold start to a few
 seconds. Set it to `1` again if the first impression ever matters more than
 the idle bill.
 
+Because of that, the *first validation* on a fresh instance matters more than
+steady-state throughput: on 1 vCPU the C2 JIT competes with the run itself
+(256-row EET: 16–19 s cold vs. ~2 s warm). The image therefore runs C1-only
+(`-XX:TieredStopAtLevel=1` in the Dockerfile's `JAVA_OPTS_APPEND`) and the
+service uses `--execution-environment=gen2`; together that halved the first run
+to 7–8.5 s without extra cost (measured 2026-10-27). `--cpu=2` would buy
+another ~40 % for twice the CPU bill.
+
 `max-instances=10` with `--concurrency=8` is the DoS baseline: one bad actor
 opening 8 slow uploads can pin at most a single instance. **The trade-off is
 real but currently theoretical:** `Bucket4j` (rate limit) and `ReportStore`

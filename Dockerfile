@@ -146,7 +146,11 @@ EXPOSE 8080
 #   MaxRAMPercentage=75 — use most of the container RAM as heap (default 25% leaves money on the table).
 #   G1GC + 200ms pause — good fit for the request/response workload.
 #   ExitOnOutOfMemoryError — let the supervisor restart on OOM rather than thrashing.
-ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ExitOnOutOfMemoryError"
+#   TieredStopAtLevel=1 — C1-only JIT. With scale-to-zero on 1 vCPU almost every
+#     run hits a fresh JVM, and C2 compiling on the same core is what made the
+#     first run slow: 256-row EET 16-19 s -> 7-8.5 s on Cloud Run (gen2), warm
+#     runs unchanged (measured 2026-10-27). Same flag as the desktop installer.
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ExitOnOutOfMemoryError -XX:TieredStopAtLevel=1"
 
 # Surface the build-arg values to the running JVM so BuildInfoResource can
 # report them via /api/build-info. Empty values mean "no info" (the endpoint

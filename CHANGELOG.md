@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.18] — 2026-10-27
+
 ### Added
 - **Desktop app start and daily heartbeat in the usage statistics.** The
   desktop app now sends one `app_start` event per launch and a `heartbeat`
@@ -31,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stays inert. The Cloud Run deploy sets `prod`; **self-hosted instances with
   their own stats DB must set `FINDATEX_WEB_INSTANCE=prod`**, or they stop
   recording.
+- Dependency updates: Apache POI 6.0.0, Quarkus 3.40.1.1, JavaFX 21.0.13,
+  Jackson 2.22.4, commonmark 0.31.0, npm minor/patch group,
+  docker/login-action 4.7.0.
 
 ### Fixed
 - **Quick-feedback ratings are no longer lost on Cloud Run.** The star rating
@@ -500,7 +505,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.17...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.18...HEAD
+[1.0.18]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.18
 [1.0.17]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.17
 [1.0.16]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.16
 [1.0.15]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.15

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.20] — 2026-10-27
+
+### Changed
+- **Faster first validation on the public web instance.** The container JVM
+  now runs with the C1-only JIT (`-XX:TieredStopAtLevel=1`) and Cloud Run uses
+  the gen2 execution environment. With scale-to-zero almost every run lands on
+  a fresh instance; there the first run of a 256-row EET file dropped from
+  16–19 s to 7–8.5 s. Warm runs are unchanged.
+
 ## [1.0.19] — 2026-10-27
 
 ### Fixed
@@ -522,7 +531,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.19...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.20...HEAD
+[1.0.20]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.20
 [1.0.19]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.19
 [1.0.18]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.18
 [1.0.17]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.17

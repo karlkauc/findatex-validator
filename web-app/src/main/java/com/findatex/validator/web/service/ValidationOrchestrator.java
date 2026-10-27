@@ -141,9 +141,18 @@ public class ValidationOrchestrator {
                             .header("Retry-After", "5")
                             .build());
         }
+        long t0 = System.nanoTime();
         try {
             return doValidate(templateId, templateVersion, profileCodes, upload,
                     filename, input, isSample, externalOptions, ctx);
+        } catch (WebApplicationException e) {
+            throw e; // expected outcomes, already recorded with their own status
+        } catch (RuntimeException e) {
+            // Anything else ends as a 500 via ApiExceptionMapper — count it, or server
+            // errors never show up in the stats.
+            recordFailure(UsageEvent.STATUS_ERROR, UsageEvent.failReasonOf(e), templateId, templateVersion,
+                    input, isSample, elapsedMs(t0), ctx);
+            throw e;
         } finally {
             concurrencyGate.release();
         }
@@ -292,6 +301,8 @@ public class ValidationOrchestrator {
                     .write(report, xlsxPath, annotatedModel);
         } catch (IOException | RuntimeException e) {
             log.error("Could not write report tempfile", e);
+            recordFailure(UsageEvent.STATUS_ERROR, UsageEvent.failReasonOf(e), templateName, versionName,
+                    input, isSample, elapsedMs(t0), ctx);
             // Not yet in the ReportStore, so nothing else would ever delete it.
             deleteQuietly(xlsxPath);
             throw new WebApplicationException(

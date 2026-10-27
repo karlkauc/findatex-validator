@@ -91,6 +91,28 @@ class FailReasonRecordingTest {
     }
 
     @Test
+    void unexpectedServerErrorIsRecordedAsError() throws Exception {
+        // Any RuntimeException after parsing ends as a 500; it used to leave no trace
+        // in the stats (no status=error ever, despite real 500s in production).
+        QuarkusMock.installMockForType(new ReportStore(5, () -> 0L) {
+            @Override
+            public java.util.UUID store(java.nio.file.Path file, java.nio.file.Path annotatedOrNull,
+                                        String templateId, String templateVersion) {
+                throw new IllegalStateException("store down");
+            }
+        }, ReportStore.class);
+        given().multiPart("templateId", "TPT")
+                .multiPart("templateVersion", "V7.0")
+                .multiPart("file", TestFixtures.CLEAN_V7_XLSX.toFile())
+                .when().post("/api/validate")
+                .then().statusCode(500);
+        UsageRow r = capture.awaitFailedRun();
+        assertThat(r.status).isEqualTo(UsageEvent.STATUS_ERROR);
+        assertThat(r.failReason).isEqualTo("IllegalStateException");
+        assertThat(r.templateId).isEqualTo("TPT");
+    }
+
+    @Test
     void badRequestNamesTheStepThatFailed() throws Exception {
         given().multiPart("templateId", "UFO")
                 .multiPart("file", TestFixtures.CLEAN_V7_XLSX.toFile())

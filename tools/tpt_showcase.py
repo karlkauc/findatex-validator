@@ -73,6 +73,19 @@ SHOWCASE_NUMS: list[str] = [
 VALUATION_DATE = "2025-12-31"
 REPORTING_DATE = "2025-12-31"
 TPT_VERSION = "V7.0 (official) dated 25 November 2024"
+TPT_VERSION_V8 = "V8.0 (official) dated 8 October 2026"
+
+# TPT V8 (final, 8 October 2026) flags 18 fields "N/A — must be left empty".
+# The ones the V7 showcase fills are dropped from the V8 delivery; 54 (the old
+# NACE field, superseded by 148) stays as a column because real V8 files keep
+# it "for technical reasons" — and carries exactly one leftover value, see
+# CELL_DEFECTS_V8. 150/151 are the two fields V8 adds.
+_V8_NOT_APPLICABLE = {"17b", "29", "31", "35", "36", "44", "54", "58b", "106",
+                      "108", "114", "116", "118", "120", "124", "125", "126", "141"}
+SHOWCASE_NUMS_V8: list[str] = (
+    [n for n in SHOWCASE_NUMS if n not in _V8_NOT_APPLICABLE or n == "54"]
+    + ["150", "151"]
+)
 
 # --------------------------------------------------------------- issuers ---
 # name, LEI, country, NACE (field 54 / 148), issuer-group name + LEI,
@@ -360,6 +373,23 @@ FUND_DEFECTS: dict[int, dict[str, str]] = {
 }
 WEIGHT_SCALE: dict[int, float] = {2: 0.955}
 
+# The V8 delivery shows the same data-entry and cross-field errors where V8
+# still checks them, plus what typically goes wrong when a V7 feed is migrated.
+# Dropped against V7: the custodian-pair defect (XF-09 is gone, 141 is N/A)
+# and the 35/36 blanks (N/A in V8 — XF-10 now only wants 34 and 37).
+CELL_DEFECTS_V8: dict[tuple[int, int, str], str | None] = {
+    **{k: v for k, v in CELL_DEFECTS.items()
+       if k[2] not in _V8_NOT_APPLICABLE and k != (2, 10, "141")},
+    (1, 16, "150"): "3",             # FORMAT/150 — new closed list {0, 1, 2}
+    (1, 8, "50"): None,              # PRESENCE/50 — group id is mandatory in V8
+    (1, 12, "54"): "C2120",          # NOT_APPLICABLE/54 — V7 NACE left in place
+}
+
+VARIANTS: dict[str, tuple[list[str], str, dict]] = {
+    "v7": (SHOWCASE_NUMS, TPT_VERSION, CELL_DEFECTS),
+    "v8": (SHOWCASE_NUMS_V8, TPT_VERSION_V8, CELL_DEFECTS_V8),
+}
+
 # Rows whose identifiers are deliberately broken and must be skipped by
 # assert_identifiers().
 _INTENTIONALLY_BROKEN = {BROKEN_ISIN, BROKEN_LEI}
@@ -506,6 +536,12 @@ def _position_block(inst: dict, mv_pc: float, nav: float) -> dict:
     if kind in ("equity", "fund"):
         row["18"] = _num(mv_qc / price, 4)
         row["93"] = "1"
+        # V8 only (projected away for V7): long-term-equity eligibility of a
+        # fund without look-through (150, CIC 3/4) and legislative-programme
+        # equity (151, CIC 3). 0 = not assessed, 2 = not eligible.
+        row["150"] = "2" if kind == "fund" else "0"
+        if kind == "equity":
+            row["151"] = "0"
         _issuer_block(row, inst["issuer"])
         return row
 
@@ -540,8 +576,37 @@ def _position_block(inst: dict, mv_pc: float, nav: float) -> dict:
     return row
 
 
-def build_showcase() -> list[dict[str, str]]:
-    """The 60 showcase rows, defects applied."""
+def _v8_underlying_issuer(row: dict, inst: dict) -> None:
+    """V8 makes 81/82/85 mandatory for *every* CIC 2 row (V7: "x for 22" only).
+
+    Their XML path sits under DerivativeOrConvertible/UnderlyingInstrument, so
+    the intent is convertibles — but the final sheet marks the whole CIC 2
+    column "x" without a qualifier, and the validator mirrors the sheet
+    literally. A plain corporate bond has no separate underlying, so the V8
+    showcase reports the bond issuer's own identifiers there (and the group
+    LEI in 84), which is what a producer reading the sheet strictly would do.
+    Without this every corporate bond would carry three PRESENCE errors and
+    the clean control fund would not be clean.
+    """
+    if inst["kind"] != "corpbond":
+        return
+    iss = ISSUERS[inst["issuer"]]
+    row["81"] = iss["lei"]
+    row["82"] = "1"
+    row["84"] = _group_lei(iss)
+    row["85"] = "1"
+
+
+def build_showcase(variant: str = "v7") -> list[dict[str, str]]:
+    """The 60 showcase rows, defects applied, keyed by field number.
+
+    ``variant`` is ``"v7"`` or ``"v8"``. Both build from the same book; the V8
+    rows are projected onto :data:`SHOWCASE_NUMS_V8` (so N/A fields vanish),
+    carry the V8 version string and use :data:`CELL_DEFECTS_V8`.
+    """
+    if variant not in VARIANTS:
+        raise ValueError(f"unknown showcase variant {variant!r}")
+    nums, version, defects = VARIANTS[variant]
     out: list[dict[str, str]] = []
     for fi, fund in enumerate(FUNDS):
         book = fund["book"]
@@ -549,16 +614,21 @@ def build_showcase() -> list[dict[str, str]]:
         cash_mv = sum(mv for key, mv in book if INSTRUMENTS[key]["kind"] == "cash")
         share_price = nav / float(fund["shares"])
         portfolio = _portfolio_block(fund, nav, share_price, cash_mv / nav)
+        portfolio["1000"] = version
         portfolio.update(FUND_DEFECTS.get(fi, {}))
         scale = WEIGHT_SCALE.get(fi, 1.0)
 
         for pi, (key, mv) in enumerate(book):
-            row = {n: "" for n in SHOWCASE_NUMS}
-            row.update(portfolio)
-            row.update(_position_block(INSTRUMENTS[key], float(mv), nav))
+            full = dict(portfolio)
+            full.update(_position_block(INSTRUMENTS[key], float(mv), nav))
+            if variant == "v8":
+                _v8_underlying_issuer(full, INSTRUMENTS[key])
+            row = {n: full.get(n, "") for n in nums}
+            if variant == "v8":
+                row["54"] = ""         # N/A in V8 — only a defect may fill it
             if scale != 1.0:
                 row["26"] = _num(float(row["26"]) * scale, 6)
-            for (dfi, dpi, num), value in CELL_DEFECTS.items():
+            for (dfi, dpi, num), value in defects.items():
                 if (dfi, dpi) == (fi, pi):
                     row[num] = value or ""
             out.append(row)
@@ -570,11 +640,12 @@ def _check_defects() -> None:
     and a demo quietly missing a finding is the failure mode this whole file
     exists to avoid. Fail at import instead."""
     bad = []
-    for fi, pi, num in CELL_DEFECTS:
-        if num not in SHOWCASE_NUMS:
-            bad.append(f"field {num} is not in SHOWCASE_NUMS")
-        elif fi >= len(FUNDS) or pi >= len(FUNDS[fi]["book"]):
-            bad.append(f"fund {fi} has no position {pi}")
+    for variant, (nums, _, defects) in VARIANTS.items():
+        for fi, pi, num in defects:
+            if num not in nums:
+                bad.append(f"{variant}: field {num} is not in the showcase columns")
+            elif fi >= len(FUNDS) or pi >= len(FUNDS[fi]["book"]):
+                bad.append(f"{variant}: fund {fi} has no position {pi}")
     for fi in list(FUND_DEFECTS) + list(WEIGHT_SCALE):
         if fi >= len(FUNDS):
             bad.append(f"fund {fi} does not exist")

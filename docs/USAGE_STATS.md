@@ -18,7 +18,7 @@ apart by `event_type`:
 |---|---|---|
 | `validate` | desktop + web | one validation run (single file or folder batch). `status='ok'` when a report was produced; otherwise the failure class (`parse_error`, `template_mismatch`, `unsupported_type`, `bad_request`, `rate_limited`, `busy`, `error`) — never a message |
 | `report_download` | desktop (export) + web (`GET /api/report/{id}`) | the result got used; `export_kind` = `xlsx` \| `per_file` \| `combined` \| `combined_annotated` |
-| `sample_load` | web (`GET /api/samples/{t}`) | "Try an example" clicked (runs on that file additionally carry `is_sample=true`) |
+| `sample_load` | web (`GET /api/samples/{t}/{version}`, legacy `GET /api/samples/{t}`) | "Try an example" clicked (runs on that file additionally carry `is_sample=true`) |
 | `page_view` | web SPA beacon | one page load (was the separate `page_view` table before) |
 | `app_start` | desktop | the app was started (once per launch, after the main window is shown) — counts installations that open the app without validating anything. Since 2026-10 |
 | `heartbeat` | desktop | the app is still running: every 24 h after the start (first one 24 h after `app_start`), from a daemon timer. Since 2026-10 |

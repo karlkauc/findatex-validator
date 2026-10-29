@@ -126,6 +126,10 @@ export default function App() {
   const templates = templatesQuery.data ?? [];
   const currentTemplate = templates.find((t) => t.id === templateId);
   const currentVersion = currentTemplate?.versions.find((v) => v.version === version);
+  // TPT ships one demo per spec version: offer the one for the selected version,
+  // otherwise the template's first sample.
+  const templateSamples = currentTemplate?.samples ?? [];
+  const currentSample = templateSamples.find((s) => s.version === version) ?? templateSamples[0];
 
   // Default to the latest version of the selected template; reset profiles when switching.
   useEffect(() => {
@@ -194,7 +198,7 @@ export default function App() {
   // to hand, and going to find one is where they leave. One click loads the
   // bundled example and validates it.
   const runSample = async () => {
-    const sample = currentTemplate?.sample;
+    const sample = currentSample;
     if (!sample) return;
     setSampleError(null);
     setSampleLoading(true);
@@ -399,7 +403,7 @@ export default function App() {
                         'Validate'
                       )}
                     </button>
-                    {currentTemplate?.sample && (
+                    {currentSample && (
                       <button
                         type="button"
                         className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500"
@@ -415,6 +419,7 @@ export default function App() {
                         <>
                             <Sparkles className="h-4 w-4" aria-hidden="true" />
                             No file at hand? Try an example
+                            {templateSamples.length > 1 && ` (${currentSample.version})`}
                         </>
                         )}
                       </button>

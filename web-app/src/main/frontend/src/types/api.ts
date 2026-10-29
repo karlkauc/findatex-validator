@@ -13,10 +13,11 @@ export interface VersionInfo {
 }
 
 /**
- * The demo file offered for a template. `version` is the spec version the
- * fixture was generated for — the UI switches to it, because validating the
- * file against another version reports findings that are artefacts of the
- * mismatch. Null when the build ships no fixture.
+ * One demo file offered for a template. `version` is the spec version the
+ * fixture was generated for — the UI offers the sample matching the selected
+ * version (else the first one) and switches to its version, because validating
+ * the file against another version reports findings that are artefacts of the
+ * mismatch.
  */
 export interface SampleInfo {
   version: string;
@@ -29,7 +30,8 @@ export interface TemplateInfo {
   displayName: string;
   versions: VersionInfo[];
   externalAvailable: boolean;
-  sample: SampleInfo | null;
+  /** Empty when the build ships no fixture for this template. */
+  samples: SampleInfo[];
 }
 
 export type Severity = 'ERROR' | 'WARNING' | 'INFO';

@@ -69,6 +69,8 @@ validation engine is exactly the same.
 
 Don't have a file to hand? **No file at hand? Try an example** loads the
 bundled example for the selected template and validates it in one click.
+For TPT it follows the selected version: V8.0 and V7.0 each have their own
+example.
 
 The hosted instance has no login. Files are processed in memory and
 discarded the moment the response is sent; the report download link

@@ -9,18 +9,20 @@ Two kinds of file live here:
 * **`00_showcase.xlsx`** — the demo behind *"No file at hand? Try an example"*
   on the web app. A full delivery (60 TPT positions across three funds,
   25 share classes for EET/EMT/EPT) with a curated spread of realistic
-  defects. `SampleFiles` in `web-app` serves exactly these four.
+  defects. `SampleFiles` in `web-app` serves one per template, plus
+  `tpt/v8/00_showcase.xlsx` for TPT V8.0 (the button follows the selected
+  version).
 * **`01_…` and up** — one-rule-family-each regression fixtures, kept small on
   purpose so a failing assertion points at one rule.
 
 Adding a file that has to reach the container means widening three places, all
 of which fail silently: the `<resources>` include in `web-app/pom.xml`, the
-negation in `.dockerignore`, and the `SampleFiles` map.
+negation in `.dockerignore`, and the `SampleFiles` list.
 
 | Folder | Template | Generator | JUnit |
 |--------|----------|-----------|-------|
 | [`tpt/`](tpt/) | TPT V7.0 | `tools/build_examples.py` | `ExampleSamplesTest` |
-| [`tpt/v8/`](tpt/v8/) | TPT V8.0 (regression fixtures only, not bundled) | `tools/build_tpt_v8_samples.py` | `TptV8ExampleSamplesTest` |
+| [`tpt/v8/`](tpt/v8/) | TPT V8.0 (V8 showcase + regression fixtures) | `tools/build_tpt_v8_samples.py` | `TptV8ExampleSamplesTest` |
 | [`eet/`](eet/) | EET V1.1.3 | `tools/build_eet_samples.py` | `EetExampleSamplesTest` |
 | [`emt/`](emt/) | EMT V4.3 | `tools/build_emt_samples.py` | `EmtExampleSamplesTest` |
 | [`ept/`](ept/) | EPT V2.1 | `tools/build_ept_samples.py` | `EptExampleSamplesTest` |

@@ -149,6 +149,8 @@
                 <targetPath>samples</targetPath>
                 <includes>
                     <include>*/00_showcase.xlsx</include>
+                    <!-- TPT carries a second demo per spec version (see SampleFiles). -->
+                    <include>tpt/v8/00_showcase.xlsx</include>
                 </includes>
             </resource>
         </resources>

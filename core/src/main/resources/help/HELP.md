@@ -521,6 +521,7 @@ The repo ships per-template scenario fixtures under `samples/`:
 ```
 samples/
 ├── tpt/   1 clean baseline + ~10 broken variants (presence, format, ISIN, LEI, ~25 cross-field)
+│   └── v8/  TPT V8.0 showcase + V8-specific fixtures (N/A fields, issuer id types, 150/151)
 ├── eet/   clean + broken variants
 ├── emt/   clean + broken variants
 └── ept/   clean + broken variants
@@ -535,6 +536,7 @@ To regenerate them after a spec or rule change:
 ```bash
 python3 tools/build_samples.py        # core test samples
 python3 tools/build_examples.py       # samples/tpt/*
+python3 tools/build_tpt_v8_samples.py # samples/tpt/v8/*
 python3 tools/build_eet_samples.py    # also _emt_, _ept_
 ```
 

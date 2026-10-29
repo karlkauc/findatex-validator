@@ -33,12 +33,14 @@ public class Application {
     }
 
     private static void warnAboutMissingSamples() {
-        var missing = SampleFiles.declared().keySet().stream()
-                .filter(id -> SampleFiles.forTemplate(id).isEmpty())
+        var missing = SampleFiles.declared().stream()
+                .filter(s -> !s.exists())
+                .map(s -> s.templateId() + " " + s.version() + " (" + s.resource() + ")")
                 .toList();
         if (missing.isEmpty()) return;
-        log.warn("Demo file missing for {} — the \"try an example\" action is hidden for "
-                + "those templates. The build did not put samples/*/00_showcase.xlsx on "
-                + "the classpath (see the COPY in the Dockerfile).", missing);
+        log.warn("Demo file missing for {} — the \"try an example\" action is not offered "
+                + "for those template versions. The build did not put them on the classpath "
+                + "(check the <resources> include in web-app/pom.xml, the .dockerignore "
+                + "negation and the COPY in the Dockerfile).", missing);
     }
 }

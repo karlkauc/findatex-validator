@@ -18,7 +18,10 @@ import java.io.InputStream;
 import java.util.Optional;
 
 /**
- * Serves the per-template demo file behind "Try a sample file".
+ * Serves the per-template, per-version demo files behind "Try an example".
+ * {@code GET /api/samples/{templateId}/{version}} is what {@code GET /api/templates}
+ * advertises; {@code GET /api/samples/{templateId}} (the pre-V8 URL) keeps working
+ * and returns the template's first sample.
  *
  * <p>Under {@code /api/} on purpose: {@code robots.txt} disallows that prefix,
  * so the fixtures do not end up indexed as if they were real reference data.
@@ -44,8 +47,22 @@ public class SampleResource {
     @jakarta.ws.rs.Path("/{templateId}")
     @Produces(XLSX)
     public Response download(@PathParam("templateId") String templateId) {
-        SampleFiles.Sample sample = SampleFiles.forTemplate(templateId)
+        SampleFiles.Sample sample = SampleFiles.forTemplate(templateId).stream()
+                .findFirst()
                 .orElseThrow(NotFoundException::new);
+        return serve(sample);
+    }
+
+    @GET
+    @jakarta.ws.rs.Path("/{templateId}/{version}")
+    @Produces(XLSX)
+    public Response download(@PathParam("templateId") String templateId,
+                             @PathParam("version") String version) {
+        return serve(SampleFiles.forTemplate(templateId, version)
+                .orElseThrow(NotFoundException::new));
+    }
+
+    private Response serve(SampleFiles.Sample sample) {
         Optional<InputStream> stream = sample.open();
         if (stream.isEmpty()) throw new NotFoundException();
         try (InputStream in = stream.get()) {

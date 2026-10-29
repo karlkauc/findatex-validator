@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **"Try an example" for TPT V8.0.** The web app's example button now follows
+  the selected version: with TPT V8.0 selected (the default) it loads a new
+  V8 showcase, with V7.0 the existing V7 one. The V8 file is the same
+  three-fund, 60-position book as a V8 delivery — V8 version string, N/A
+  fields left empty, 150/151 filled — with the familiar data-entry and
+  cross-field defects plus three typical V7→V8 migration errors (an
+  out-of-list 150 code, a missing group identifier 50, a leftover value in the
+  N/A field 54). `GET /api/templates` now returns `samples[]` per template
+  (URL `/api/samples/{template}/{version}`); the old `/api/samples/{template}`
+  still serves the template's first sample.
+
 ## [1.0.21] — 2026-10-29
 
 ### Changed

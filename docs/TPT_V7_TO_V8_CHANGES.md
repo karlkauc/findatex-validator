@@ -152,5 +152,11 @@ Feld-1000-Prüfung (XF-15) und die N/A-Warnungen schlagen an.
   `V8_DROPPED_XF_RULES`), typlose `LeiRule`, `InterestRateTypeRule(FLOATING_FIELDS_V8)`,
   neue generische `NotApplicableRule`.
 - Fixtures `samples/tpt/v8/` (`tools/build_tpt_v8_samples.py`,
-  `TptV8ExampleSamplesTest`); Showcase/„Try an example“ bleiben V7.
+  `TptV8ExampleSamplesTest`). „Try an example“ folgt der gewählten Version:
+  V8.0 lädt `samples/tpt/v8/00_showcase.xlsx` (V7-Showcase-Bestand als
+  V8-Lieferung plus `FORMAT/150`, `PRESENCE/50`, `NOT_APPLICABLE/54`), V7.0
+  weiterhin `samples/tpt/00_showcase.xlsx`. Da V8 die Felder 81/82/85 für
+  *jede* CIC-2-Position verpflichtend macht (XML-Pfad und V7 meinen nur
+  Wandelanleihen, CIC 22), befüllt das V8-Showcase sie bei Unternehmensanleihen
+  mit den eigenen Kennungen des Emittenten.
 - Rule-Referenz regeneriert (`docs/rules/tpt-v8-0.md`).

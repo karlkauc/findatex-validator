@@ -46,14 +46,14 @@ public class TemplateResource {
             // been needed yet.
             boolean externalAvailable = operatorEnabled
                     && !def.externalValidationConfigFor(def.latest()).isEmpty();
-            // Null when the build ships no fixture for this template — the SPA
-            // then simply hides the "try a sample file" action.
-            TemplateInfo.SampleInfo sample = SampleFiles.forTemplate(def.id().name())
-                    .map(s -> new TemplateInfo.SampleInfo(
-                            s.version(), "/api/samples/" + def.id().name(), s.filename()))
-                    .orElse(null);
+            // Empty when the build ships no fixture for this template — the SPA
+            // then simply hides the "try an example" action.
+            List<TemplateInfo.SampleInfo> samples = SampleFiles.forTemplate(def.id().name())
+                    .stream()
+                    .map(s -> new TemplateInfo.SampleInfo(s.version(), s.url(), s.filename()))
+                    .toList();
             result.add(new TemplateInfo(def.id().name(), def.displayName(), versions,
-                    externalAvailable, sample));
+                    externalAvailable, samples));
         }
         return result;
     }

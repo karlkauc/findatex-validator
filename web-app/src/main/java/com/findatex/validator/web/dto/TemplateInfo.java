@@ -7,7 +7,7 @@ public record TemplateInfo(
         String displayName,
         List<VersionInfo> versions,
         boolean externalAvailable,
-        SampleInfo sample
+        List<SampleInfo> samples
 ) {
 
     public record VersionInfo(
@@ -25,11 +25,12 @@ public record TemplateInfo(
     }
 
     /**
-     * The demo file offered for this template, or {@code null} when none ships
-     * with the build (the UI then hides the action). {@code version} is the
-     * spec version the fixture was generated for — the UI must switch to it,
-     * since validating the file against another version reports findings that
-     * are artefacts of the mismatch.
+     * One demo file offered for this template; {@link TemplateInfo#samples()} is
+     * empty when none ships with the build (the UI then hides the action).
+     * {@code version} is the spec version the fixture was generated for — the UI
+     * picks the sample matching the selected version, otherwise the first one,
+     * and must then switch to that version, since validating the file against
+     * another version reports findings that are artefacts of the mismatch.
      */
     public record SampleInfo(
             String version,

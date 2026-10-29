@@ -209,7 +209,11 @@ final V8 sheet also has a different column layout than the consultation
 draft (flag col 6, CIC 7–22, NW675/SST/IORP 24/25/26) — see
 `docs/TPT_V7_TO_V8_CHANGES.md`. The V8 regression fixtures live in
 `samples/tpt/v8/` (`tools/build_tpt_v8_samples.py`, `TptV8ExampleSamplesTest`);
-the showcase and "Try an example" stay on V7 until the March-2027 switch.
+`00_showcase.xlsx` there is the V8 demo: "Try an example" follows the selected
+version (V8.0 → `samples/tpt/v8/`, V7.0 → `samples/tpt/`). `tpt_showcase.py`
+builds both from one book (`build_showcase("v7"|"v8")`, `CELL_DEFECTS_V8`); the
+V8 variant fills 81/82/84/85 on corporate bonds because V8 makes 81/82/85 M for
+every CIC 2 row.
 
 ### UI shell (JavaFX)
 
@@ -251,9 +255,10 @@ REST endpoints (all under `/api`):
   third-party list) and Maven version + git metadata of the running container
 - `POST /api/usage-stats` — aggregate usage events from desktop installs (see below)
 - `POST /api/page-view` — SPA page-load beacon, always 204 (see below)
-- `GET  /api/samples/{templateId}` — the demo file behind "Try an example"
-  (`SampleFiles`; the version it was generated for is advertised in
-  `GET /api/templates`)
+- `GET  /api/samples/{templateId}/{version}` — the demo file behind "Try an
+  example" (`SampleFiles`, one per template version; advertised as `samples[]`
+  in `GET /api/templates`). The legacy `GET /api/samples/{templateId}` serves
+  the template's first sample
 
 Outside `/api` the web layer also serves **server-rendered HTML pages**:
 `GET /rules`, `/rules/{slug}` and `/rules/{slug}/field/{num}`
@@ -454,7 +459,7 @@ and `npm run build` during Maven's `generate-resources` phase. Dev mode:
   `tools/build_*_samples.py` whenever the spec or the rule set changes.
   **A new file under `samples/` reaches the container only if you widen all
   three of** `web-app/pom.xml`'s `<resources>` include, the `.dockerignore`
-  negation, and the `SampleFiles` map — each fails silently on its own
+  negation, and the `SampleFiles` list — each fails silently on its own
   (`Application` logs a startup warning as the safety net).
 - `specs/` is the operator's drop zone (verbatim FinDatEx downloads, German
   filenames, .DS_Store noise). Files get **copied** into

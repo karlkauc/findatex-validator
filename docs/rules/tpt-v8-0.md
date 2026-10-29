@@ -1,8 +1,8 @@
 # FinDatEx TPT Validation Reference (V8.0)
 
-Spec: `/spec/tpt/TPT_V8_20260526.xlsx`
+Spec: `/spec/tpt/TPT_V8_20261008.xlsx`
 Manifest: `/spec/tpt/tpt-v8-info.json`
-Released: 2026-05-26  ·  Sheet: `TPT V8.0`
+Released: 2026-10-08  ·  Sheet: `TPT V8.0`
 Profiles: Solvency II (`SOLVENCY_II`), IORP / EIOPA / ECB (`IORP_EIOPA_ECB`), NW 675 (`NW_675`), SST (FINMA) (`SST`)
 
 > Generated file — do not edit by hand. Regenerate via `mvn -pl core -Pdocs exec:java -Dexec.args="docs/rules"`.
@@ -39,10 +39,10 @@ Selecting a profile in the UI tells the validator to enforce the M (mandatory) a
 
 | Code | Display name | Mandatory fields | Conditional fields |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | 36 | 60 |
-| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | 31 | 0 |
-| `NW_675` | NW 675 | 7 | 7 |
-| `SST` | SST (FINMA) | 24 | 45 |
+| `SOLVENCY_II` | Solvency II | 40 | 49 |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | 26 | 0 |
+| `NW_675` | NW 675 | 7 | 6 |
+| `SST` | SST (FINMA) | 24 | 42 |
 
 ## 3. General rules
 
@@ -61,14 +61,14 @@ The engines below run on every applicable field/row independently of the templat
 - **What it checks:** for every `FieldSpec` flagged M for an active profile and applicable to the row's CIC, the cell value must be non-empty.
 - **Severity:** ERROR.
 - **Score impact:** Each missing cell lowers MANDATORY_COMPLETENESS (40 %) by 1 / total mandatory slots, and lowers the per-profile PROFILE_COMPLETENESS leg (10 %, M-weighted 0.7).
-- **Active rule instances:** 94 (one per field × profile).
+- **Active rule instances:** 97 (one per field × profile).
 
 ### Conditional-presence engine (`COND_PRESENCE/{numKey}/{profile}`)
 
 - **What it checks:** for every `FieldSpec` flagged C for an active profile and whose CIC applicability matches the row's CIC, the cell value must be non-empty.
 - **Severity:** WARNING.
 - **Score impact:** Each missing cell lowers PROFILE_COMPLETENESS (10 %, C-weighted 0.3) by 1 / total conditional slots. Severity = WARNING — does not affect MANDATORY_COMPLETENESS or FORMAT_CONFORMANCE.
-- **Active rule instances:** 84 (one per CIC-restricted field × profile).
+- **Active rule instances:** 82 (one per CIC-restricted field × profile).
 
 ### Format engine (`FORMAT/{numKey}`)
 
@@ -85,24 +85,31 @@ The engines below run on every applicable field/row independently of the templat
 - `ISIN/14/15` — code field `14`, type field `15`
 - `ISIN/68/69` — code field `68`, type field `69`
 
-### LEI engine (`LEI/{code}/{type}`)
+### LEI engine (`LEI/{code}/{type}` or `LEI/{code}`)
 
-- **What it checks:** when the type cell is `1` (LEI), the code cell must be a 20-character ISO 17442 LEI with the mod-97 checksum.
+- **What it checks:** when the type cell is `1` (LEI) — or always, for a single-purpose LEI column without a type field — the code cell must be a 20-character ISO 17442 LEI with the mod-97 checksum.
 - **Severity:** ERROR.
 - **Score impact:** Each ERROR lowers FORMAT_CONFORMANCE (20 %) by 1 / non-empty cells.
 - `LEI/47/48` — code field `47`, type field `48`
 - `LEI/50/51` — code field `50`, type field `51`
 - `LEI/81/82` — code field `81`, type field `82`
 - `LEI/84/85` — code field `84`, type field `85`
-- `LEI/115/116` — code field `115`, type field `116`
-- `LEI/119/120` — code field `119`, type field `120`
-- `LEI/140/141` — code field `140`, type field `141`
+- `LEI/115` — code field `115`, single-purpose LEI column (no type field)
+- `LEI/119` — code field `119`, single-purpose LEI column (no type field)
+- `LEI/140` — code field `140`, single-purpose LEI column (no type field)
+
+### Not-applicable engine (`NOT_APPLICABLE/{num}`)
+
+- **What it checks:** fields the spec flags `N/A` are retained for technical reasons only and must be left empty; any non-blank value is reported.
+- **Severity:** WARN.
+- **Score impact:** none (reported only).
+- **Fields:** `17b`, `29`, `31`, `35`, `36`, `44`, `54`, `58b`, `106`, `108`, `114`, `116`, `118`, `120`, `124`, `125`, `126`, `141`
 
 ### External validation (opt-in)
 
 - **Off by default.** Operators enable it via the Settings dialog (desktop) or the `FINDATEX_WEB_EXTERNAL_ENABLED` env var (web).
 - **ISIN lookup (OpenFIGI):** field `14` (when type field `15` = `1`); field `68` (when type field `69` = `1`)
-- **LEI lookup (GLEIF):** field `47` (when type field `48` = `1`); field `50` (when type field `51` = `1`); field `81` (when type field `82` = `1`); field `84` (when type field `85` = `1`); field `115` (when type field `116` = `1`); field `119` (when type field `120` = `1`); field `140` (when type field `141` = `1`)
+- **LEI lookup (GLEIF):** field `47` (when type field `48` = `1`); field `50` (when type field `51` = `1`); field `81` (when type field `82` = `1`); field `84` (when type field `85` = `1`); field `115` (single-purpose, no type flag); field `119` (single-purpose, no type flag); field `140` (single-purpose, no type flag)
 - **Score impact:** External-validation findings are advisory and do not affect any score dimension.
 
 ## 4. Cross-field rules
@@ -154,22 +161,13 @@ Each rule below fires per row when its trigger condition holds and the expected 
 - **Target field(s):** `38`
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
 
-### XF-09/CUSTODIAN_PAIR — Custodian identification code (field 140) and its type indicator (field 141) must be paired: filling one without the other is a finding.
-
-- **Severity:** ERROR
-- **Trigger:** Field 140 or field 141 is populated
-- **Required:** Both fields 140 and 141 must be populated as a pair.
-- **Source field(s):** `140`, `141`
-- **Target field(s):** `140`, `141`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
-### XF-10/INTEREST_RATE_TYPE — When field 32 (interest-rate type) is Floating/Variable, fields 34..37 are mandatory; when Fixed, field 33 (Coupon rate) is mandatory.
+### XF-10/INTEREST_RATE_TYPE — When field 32 (interest-rate type) is Floating/Variable, fields 34, 37 are mandatory; when Fixed, field 33 (Coupon rate) is mandatory.
 
 - **Severity:** ERROR
 - **Trigger:** Field 32 is Floating/Variable, or Fixed
-- **Required:** Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory.
+- **Required:** Floating/Variable → fields 34, 37 mandatory; Fixed → field 33 mandatory.
 - **Source field(s):** `32`
-- **Target field(s):** `33`, `34`, `35`, `36`, `37`
+- **Target field(s):** `33`, `34`, `37`
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
 
 ### XF-12/DATE_ORDER — Field 7 (Reporting date) must not precede field 6 (Valuation date).
@@ -208,33 +206,6 @@ Each rule below fires per row when its trigger condition holds and the expected 
 - **Target field(s):** `67`
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
 
-### XF-16/THIRD_CURRENCY_WEIGHT — Conditional presence of field 31
-
-- **Severity:** ERROR
-- **Trigger:** Field `29` is not blank
-- **Required:** Field `31` must be non-empty.
-- **Source field(s):** `29`
-- **Target field(s):** `31`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
-### XF-17/INDEX_TYPE — Conditional presence of field 35
-
-- **Severity:** ERROR
-- **Trigger:** Field `34` is not blank
-- **Required:** Field `35` must be non-empty.
-- **Source field(s):** `34`
-- **Target field(s):** `35`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
-### XF-17/INDEX_NAME — Conditional presence of field 36
-
-- **Severity:** ERROR
-- **Trigger:** Field `34` is not blank
-- **Required:** Field `36` must be non-empty.
-- **Source field(s):** `34`
-- **Target field(s):** `36`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
 ### XF-17/INDEX_MARGIN — Conditional presence of field 37
 
 - **Severity:** ERROR
@@ -253,15 +224,6 @@ Each rule below fires per row when its trigger condition holds and the expected 
 - **Target field(s):** `43`
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
 
-### XF-18/OPTION_DIRECTION — Conditional presence of field 44
-
-- **Severity:** ERROR
-- **Trigger:** Field `42` ∈ [CAL, PUT]
-- **Required:** Field `44` must be non-empty.
-- **Source field(s):** `42`
-- **Target field(s):** `44`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
 ### XF-19/STRIKE_PRICE — Conditional presence of field 45
 
 - **Severity:** ERROR
@@ -269,51 +231,6 @@ Each rule below fires per row when its trigger condition holds and the expected 
 - **Required:** Field `45` must be non-empty.
 - **Source field(s):** `42`
 - **Target field(s):** `45`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
-### XF-20/ISSUER_LEI_PRESENT — Conditional presence of field 47
-
-- **Severity:** ERROR
-- **Trigger:** Field `48` = "1"
-- **Required:** Field `47` must be non-empty.
-- **Source field(s):** `48`
-- **Target field(s):** `47`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
-### XF-21/GROUP_LEI_PRESENT — Conditional presence of field 50
-
-- **Severity:** ERROR
-- **Trigger:** Field `51` = "1"
-- **Required:** Field `50` must be non-empty.
-- **Source field(s):** `51`
-- **Target field(s):** `50`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
-### XF-22/UNDERLYING_GROUP_LEI — Conditional presence of field 84
-
-- **Severity:** ERROR
-- **Trigger:** Field `85` = "1"
-- **Required:** Field `84` must be non-empty.
-- **Source field(s):** `85`
-- **Target field(s):** `84`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
-### XF-23/FUND_ISSUER_LEI — Conditional presence of field 115
-
-- **Severity:** ERROR
-- **Trigger:** Field `116` = "1"
-- **Required:** Field `115` must be non-empty.
-- **Source field(s):** `116`
-- **Target field(s):** `115`
-- **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
-
-### XF-24/FUND_GROUP_LEI — Conditional presence of field 119
-
-- **Severity:** ERROR
-- **Trigger:** Field `120` = "1"
-- **Required:** Field `119` must be non-empty.
-- **Source field(s):** `120`
-- **Target field(s):** `119`
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
 
 ### XF-25/COLLATERAL_VALUE — Conditional presence of field 139
@@ -331,7 +248,7 @@ One entry per `FieldSpec` in spec order. Each entry lists every check that can f
 
 ### Field 1 — 1_Portfolio_identifying_data
 
-FundsXML path: `Portfolio / PortfolioID / Code`
+FundsXML path: `/FundsXML4/RegulatoryReportings/IndirectReporting/TripartiteTemplateSolvencyII_V8/Portfolio/PortfolioID/PortfolioIdentifyingData`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identification of the fund or share class
@@ -359,7 +276,7 @@ Definition: Identification of the fund or share class
 
 ### Field 2 — 2_Type_of_identification_code_for_the_fund_share_or_portfolio
 
-FundsXML path: `Portfolio / PortfolioID / CodificationSystem`
+FundsXML path: `.../Portfolio/PortfolioID/TypeOfIdentificationCodeForTheFundShareOrPortfolio`
 Codification: CLOSED_LIST, closed list of 10 entries
 Applicability: all rows
 Definition: Codification chosen to identify the share of the CIS
@@ -387,7 +304,7 @@ Definition: Codification chosen to identify the share of the CIS
 
 ### Field 3 — 3_Portfolio_name
 
-FundsXML path: `Portfolio / PorfolioName`
+FundsXML path: `.../Portfolio/PortfolioName`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: Name of the Portfolio or name of the CIS
@@ -415,7 +332,7 @@ Definition: Name of the Portfolio or name of the CIS
 
 ### Field 4 — 4_Portfolio_currency_(B)
 
-FundsXML path: `Portfolio / PortfolioCurrency`
+FundsXML path: `.../Portfolio/PortfolioCurrency`
 Codification: ISO_4217
 Applicability: all rows
 Definition: Valuation currency of the portfolio
@@ -443,7 +360,7 @@ Definition: Valuation currency of the portfolio
 
 ### Field 5 — 5_Net_asset_valuation_of_the_portfolio_or_the_share_class_in_portfolio_currency
 
-FundsXML path: `Portfolio / TotalNetAssets`
+FundsXML path: `.../Portfolio/NetAssetValuationInPortfolioCurrency`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Portfolio valuation
@@ -473,7 +390,7 @@ Definition: Portfolio valuation
 
 ### Field 6 — 6_Valuation_date
 
-FundsXML path: `Portfolio / ValuationDate`
+FundsXML path: `.../Portfolio/ValuationDate`
 Codification: DATE
 Applicability: all rows
 Definition: Date of valuation (date positions valid for)
@@ -502,7 +419,7 @@ Definition: Date of valuation (date positions valid for)
 
 ### Field 7 — 7_Reporting_date
 
-FundsXML path: `Portfolio / ReportingDate`
+FundsXML path: `.../Portfolio/ReportingDate`
 Codification: DATE
 Applicability: all rows
 Definition: Date of reference for the reporting
@@ -532,7 +449,7 @@ Definition: Date of reference for the reporting
 
 ### Field 8 — 8_Share_price
 
-FundsXML path: `Portfolio / ShareClass / SharePrice`
+FundsXML path: `.../Portfolio/ShareClass/SharePrice`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Share price of the fund/share class
@@ -561,7 +478,7 @@ Definition: Share price of the fund/share class
 
 ### Field 8b — 8b_Total_number_of_shares
 
-FundsXML path: `Portfolio / ShareClass / TotalNumberOfShares`
+FundsXML path: `.../Portfolio/ShareClass/TotalNumberOfShares`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Total number of shares (per share class, if applicable)
@@ -590,7 +507,7 @@ Definition: Total number of shares (per share class, if applicable)
 
 ### Field 9 — 9_Cash_ratio
 
-FundsXML path: `Portfolio / CashPercentage`
+FundsXML path: `.../Portfolio/CashRatio`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Amount of cash of the fund / total net asset value of the fund, in %
@@ -616,7 +533,7 @@ Definition: Amount of cash of the fund / total net asset value of the fund, in %
 
 ### Field 10 — 10_Portfolio_modified_duration
 
-FundsXML path: `Portfolio / PortfolioModifiedDuration`
+FundsXML path: `.../Portfolio/PortfolioModifiedDuration`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Weighted average modified duration of portfolio positions
@@ -641,7 +558,7 @@ Definition: Weighted average modified duration of portfolio positions
 
 ### Field 11 — 11_Complete_SCR_delivery
 
-FundsXML path: `Portfolio / CompleteSCRDelivery`
+FundsXML path: `.../Portfolio/CompleteSCRDelivery`
 Codification: ALPHA (max 1)
 Applicability: all rows
 Definition: Y/N
@@ -668,7 +585,7 @@ Definition: Y/N
 
 ### Field 12 — 12_CIC_code_of_the_instrument
 
-FundsXML path: `Position / InstrumentCIC`
+FundsXML path: `.../Portfolio/Positions/Position/CICCodeOfTheInstrument`
 Codification: CIC
 Applicability: all rows
 Definition: CIC Code (Complementary Identification Code).
@@ -698,7 +615,7 @@ Definition: CIC Code (Complementary Identification Code).
 
 ### Field 13 — 13_Economic_zone_of_the_quotation_place
 
-FundsXML path: `Position / EconomicArea`
+FundsXML path: `.../Portfolio/Positions/Position/EconomicZoneOfTheQuotationPlace`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC3
 Definition: Indication of the economic zone of the quotation place
@@ -724,7 +641,7 @@ Definition: Indication of the economic zone of the quotation place
 
 ### Field 14 — 14_Identification_code_of_the_instrument
 
-FundsXML path: `Position / InstrumentCode / Code`
+FundsXML path: `.../Portfolio/Positions/Position/InstrumentCode/IdentificationCodeOfTheInstrument`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Identification code of the financial instrument - including identifier for leg of instrument if required
@@ -754,7 +671,7 @@ Definition: Identification code of the financial instrument - including identifi
 
 ### Field 15 — 15_Type_of_identification_code_for_the_instrument
 
-FundsXML path: `Position / InstrumentCode / CodificationSystem`
+FundsXML path: `.../Portfolio/Positions/Position/InstrumentCode/TypeOfIdentificationCodeForTheInstrument`
 Codification: CLOSED_LIST, closed list of 10 entries
 Applicability: all rows
 Definition: Codification chosen to identify the instrument
@@ -782,7 +699,7 @@ Definition: Codification chosen to identify the instrument
 
 ### Field 16 — 16_Grouping_code_for_multiple_leg_instruments
 
-FundsXML path: `Position / GroupID`
+FundsXML path: `.../Portfolio/Positions/Position/GroupingCodeForMultipleLegInstruments`
 Codification: ALPHANUMERIC (max 255)
 Applicability: CIC categories CICA, CICB, CICC, CICD, CICE; CICE sub-categories [2]; CICC sub-categories [3]; CICB sub-categories [3]; CICA sub-categories [3]
 Definition: grouping code for operations on multi leg instruments
@@ -809,7 +726,7 @@ Definition: grouping code for operations on multi leg instruments
 
 ### Field 17 — 17_Instrument_name
 
-FundsXML path: `Position / InstrumentName`
+FundsXML path: `.../Portfolio/Positions/Position/InstrumentName`
 Codification: ALPHANUMERIC (max 255)
 Applicability: all rows
 Definition: instrument name
@@ -837,32 +754,31 @@ Definition: instrument name
 
 ### Field 17b — 17b_Asset_liability
 
-FundsXML path: `Position / Valuation / AssetOrLiability`
-Codification: CLOSED_LIST, closed list of 2 entries
+Codification: UNKNOWN
 Applicability: all rows
-Definition: Asset/Liability identification if needed
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
 | `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
-| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | O | Optional — populate when applicable. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/17b` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/17b` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/17b` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 18 — 18_Quantity
 
-FundsXML path: `Position / Valuation / Quantity`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/Quantity`
 Codification: NUMERIC
 Applicability: CIC categories CIC0, CIC2, CIC3, CIC4, CICA, CICB, CICC, CICD; CICD sub-categories [4, 5, 9]; CICC sub-categories [1, 4, 5, 9]; CIC2 sub-categories [2, 9]; CICB sub-categories [1, 4, 5, 9]; CICA sub-categories [1, 5, 9]
 Definition: Number of instruments on position
@@ -889,7 +805,7 @@ Definition: Number of instruments on position
 
 ### Field 19 — 19_Nominal_amount
 
-FundsXML path: `Position / Valuation / TotalNominalValueQC`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/NominalAmount`
 Codification: NUMERIC
 Applicability: CIC categories CIC0, CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF; CICC sub-categories [2, 3, 6, 7, 8, 9]; CICB sub-categories [2, 3, 6, 7, 8, 9]; CICA sub-categories [2, 3, 9]
 Definition: Quantity * nominal unit amount
@@ -917,7 +833,7 @@ Definition: Quantity * nominal unit amount
 
 ### Field 20 — 20_Contract_size_for_derivatives
 
-FundsXML path: `Position / Valuation / ContractSize`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/ContractSizeForDerivatives`
 Codification: NUMERIC
 Applicability: CIC categories CICA, CICB, CICC
 Definition: Contract size
@@ -944,7 +860,7 @@ Definition: Contract size
 
 ### Field 21 — 21_Quotation_currency_(A)
 
-FundsXML path: `Position / Valuation / QuotationCurrency`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/QuotationCurrency`
 Codification: ISO_4217
 Applicability: all rows
 Definition: Currency of quotation for the instrument or denomination
@@ -973,7 +889,7 @@ Definition: Currency of quotation for the instrument or denomination
 
 ### Field 22 — 22_Market_valuation_in_quotation_currency_(A)
 
-FundsXML path: `Position / Valuation / MarketValueQC`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/MarketValuationInQuotationCurrency`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation of the position accrued interest included in quotation currency
@@ -1001,7 +917,7 @@ Definition: Market valuation of the position accrued interest included in quotat
 
 ### Field 23 — 23_Clean_market_valuation_in_quotation_currency_(A)
 
-FundsXML path: `Position / Valuation / CleanValueQC`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/CleanMarketValuationInQuotationCurrency`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation of the position accrued interest excluded in quotation currency
@@ -1028,7 +944,7 @@ Definition: Market valuation of the position accrued interest excluded in quotat
 
 ### Field 24 — 24_Market_valuation_in_portfolio_currency_(B)
 
-FundsXML path: `Position / Valuation / MarketValuePC`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/MarketValuationInPortfolioCurrency`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation of the position accrued interest included in portfolio currency
@@ -1058,7 +974,7 @@ Definition: Market valuation of the position accrued interest included in portfo
 
 ### Field 25 — 25_Clean_market_valuation_in_portfolio_currency_(B)
 
-FundsXML path: `Position / Valuation / CleanValuePC`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/CleanMarketValuationInPortfolioCurrency`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation of the position accrued interest excluded in portfolio currency
@@ -1085,7 +1001,7 @@ Definition: Market valuation of the position accrued interest excluded in portfo
 
 ### Field 26 — 26_Valuation_weight
 
-FundsXML path: `Position / Valuation / PositionWeight`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/ValuationWeight`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market valuation in portfolio currency / portfolio net asset value in %
@@ -1115,7 +1031,7 @@ Definition: Market valuation in portfolio currency / portfolio net asset value i
 
 ### Field 27 — 27_Market_exposure_amount_in_quotation_currency_(A)
 
-FundsXML path: `Position / Valuation / MarketExposureQC`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/MarketExposureAmountInQuotationCurrency`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market exposure amount different from market valuation for derivatives (valuation of the equivalent position on the underlying asset)
@@ -1143,7 +1059,7 @@ Definition: Market exposure amount different from market valuation for derivativ
 
 ### Field 28 — 28_Market_exposure_amount_in_portfolio_currency_(B)
 
-FundsXML path: `Position / Valuation / MarketExposurePC`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/MarketExposureAmountInPortfolioCurrency`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Market exposure amount different from market valuation for derivatives (valuation of the equivalent position on the underlying asset) in the quotation currency of the portfolio
@@ -1171,33 +1087,31 @@ Definition: Market exposure amount different from market valuation for derivativ
 
 ### Field 29 — 29_Market_exposure_amount_for_the_3rd_quotation_currency_(C)
 
-FundsXML path: `Position / Valuation / MarketExposureLeg2`
-Codification: NUMERIC
+Codification: UNKNOWN
 Applicability: all rows
-Definition: Market exposure amount different from market valuation for derivatives (valuation of the equivalent position on the underlying asset) in the quotation currency of the underlying asset
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/29` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/29` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/29` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
-**Referenced as source by:** `XF-16/THIRD_CURRENCY_WEIGHT`
 
 ---
 
 ### Field 30 — 30_Market_exposure_in_weight
 
-FundsXML path: `Position / Valuation / MarketExposureWeight`
+FundsXML path: `.../Portfolio/Positions/Position/Valuation/MarketExposureInWeight`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Exposure valuation in portfolio currency / total net asset value of the fund, in %
@@ -1224,36 +1138,34 @@ Definition: Exposure valuation in portfolio currency / total net asset value of 
 
 ### Field 31 — 31_Market_exposure_for_the_3rd_currency_in_weight_over_NAV
 
-FundsXML path: `Position / Valuation / MarketExposureWeightLeg2`
-Codification: NUMERIC
-Applicability: CIC categories CICE
-Definition: Exposure valuation for leg 2 in portfolio currency / total net asset value of the fund, in %
+Codification: UNKNOWN
+Applicability: all rows
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/31` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-16/THIRD_CURRENCY_WEIGHT` | (all) | ERROR | Field `29` is not blank | Field `31` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `FORMAT/31` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/31` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 32 — 32_Interest_rate_type
 
-FundsXML path: `Position / BondCharacteristics / RateType`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/InterestRateType`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]; CICE sub-categories [1]; CICD sub-categories [1, 3]
-Definition: * Fixed - plain vanilla fixed coupon rate * Floating - plain vanilla floating coupon rates (for all interest rates, which refer to a reference interest rate like EONIA or EURIBOR + margin in BP) * Variable - all other variable interest rates like step-up or step-down or fixed-to-float bonds. The variable feature is the (credit) margin or the change between fixed and float. * Infation_linked for inflation linked bonds in order to identify them.
+Definition: * Fixed - plain vanilla fixed coupon rate * Floating - plain vanilla floating coupon rates (for all interest rates, which refer to a reference interest rate like EONIA or EURIBOR + margin in BP) * Variable - all other variable interest rates like step-up or step-down or fixed-to-float bonds. The variable feature is the (credit) margin or the change between fixed and float. * Inflation_linked for inflation linked bonds in order to identify them.
 
 #### Flag per profile
 
@@ -1280,7 +1192,7 @@ Definition: * Fixed - plain vanilla fixed coupon rate * Floating - plain vanilla
 
 ### Field 33 — 33_Coupon_rate
 
-FundsXML path: `Position / BondCharacteristics / CouponRate`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/CouponRate`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]; CICF sub-categories [1, 3, 4]; CICE sub-categories [1]; CICD sub-categories [1, 3]
 Definition: Fixed rate: coupon rate as a percentage of nominal amount Floating rate: last fixing rate + margin as a percentage of nominal amount Variable rate: estimation of current rate over the period + margin as a percentage of nominal amount all rates are expressed on an annual basis
@@ -1299,7 +1211,7 @@ Definition: Fixed rate: coupon rate as a percentage of nominal amount Floating r
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/33` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34, 37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 | `XF-13/PIK` | (all) | ERROR | Field 146 (PIK) is populated | Value must be one of {0,1,2,3,4} and case-specific fields must be present. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 
@@ -1307,7 +1219,7 @@ Definition: Fixed rate: coupon rate as a percentage of nominal amount Floating r
 
 ### Field 34 — 34_Interest_rate_reference_identification
 
-FundsXML path: `Position / BondCharacteristics / VariableRate / IndexID / Code`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/VariableRate/InterestRateReferenceIdentification`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF
 Definition: identification code for interest rate index
@@ -1326,69 +1238,63 @@ Definition: identification code for interest rate index
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/34` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34, 37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
-**Referenced as source by:** `XF-17/INDEX_TYPE`, `XF-17/INDEX_NAME`, `XF-17/INDEX_MARGIN`
+**Referenced as source by:** `XF-17/INDEX_MARGIN`
 
 ---
 
 ### Field 35 — 35_Identification_type_for_interest_rate_index
 
-FundsXML path: `Position / BondCharacteristics / VariableRate / IndexID / CodificationSystem`
-Codification: FREE_TEXT
-Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF
-Definition: Type of codification used for interest rate index
+Codification: UNKNOWN
+Applicability: all rows
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/35` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
-| `XF-17/INDEX_TYPE` | (all) | ERROR | Field `34` is not blank | Field `35` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `FORMAT/35` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/35` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 36 — 36_Interest_rate_index_name
 
-FundsXML path: `Position / BondCharacteristics / VariableRate / IndexName`
-Codification: FREE_TEXT
-Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF
-Definition: name of interest rate index
+Codification: UNKNOWN
+Applicability: all rows
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/36` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
-| `XF-17/INDEX_NAME` | (all) | ERROR | Field `34` is not blank | Field `36` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `FORMAT/36` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/36` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 37 — 37_Interest_rate_margin
 
-FundsXML path: `Position / BondCharacteristics / VariableRate / Margin`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/VariableRate/InterestRateMargin`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF
 Definition: Facial margin as a percentage of nominal amount on an annual basis
@@ -1407,7 +1313,7 @@ Definition: Facial margin as a percentage of nominal amount on an annual basis
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/37` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34, 37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 | `XF-17/INDEX_MARGIN` | (all) | ERROR | Field `34` is not blank | Field `37` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 
@@ -1415,7 +1321,7 @@ Definition: Facial margin as a percentage of nominal amount on an annual basis
 
 ### Field 38 — 38_Coupon_payment_frequency
 
-FundsXML path: `Position / BondCharacteristics / CouponFrequency`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/CouponPaymentFrequency`
 Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]; CICF sub-categories [1, 3, 4]; CICE sub-categories [1]; CICD sub-categories [1, 3]
 Definition: number of coupon payment per year 0 = other than below options: 1= annual 2= biannual 4= quarterly 12= monthly 52= weekly
@@ -1445,7 +1351,7 @@ Definition: number of coupon payment per year 0 = other than below options: 1= a
 
 ### Field 39 — 39_Maturity_date
 
-FundsXML path: `Position / BondCharacteristics / Redemption / MaturityDate`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/Redemption/MaturityDate`
 Codification: DATE
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]
 Definition: Last redemption date
@@ -1474,7 +1380,7 @@ Definition: Last redemption date
 
 ### Field 40 — 40_Redemption_type
 
-FundsXML path: `Position / BondCharacteristics / Redemption /Type`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/Redemption/RedemptionType`
 Codification: CLOSED_LIST, closed list of 3 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE; CIC7 sub-categories [3, 4, 5]; CICE sub-categories [1]; CICD sub-categories [1, 3]
 Definition: Type of redemption payment schedule : bullet, constant annuity…
@@ -1502,7 +1408,7 @@ Definition: Type of redemption payment schedule : bullet, constant annuity…
 
 ### Field 41 — 41_Redemption_rate
 
-FundsXML path: `Position / BondCharacteristics / Redemption / Rate`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/Redemption/RedemptionRate`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICE; CIC7 sub-categories [3, 4, 5]; CICE sub-categories [1]; CICD sub-categories [1, 3]
 Definition: Redemption amount in % of nominal amount
@@ -1530,7 +1436,7 @@ Definition: Redemption amount in % of nominal amount
 
 ### Field 42 — 42_Callable_putable
 
-FundsXML path: `Position / BondCharacteristics / OptionalCallPut / CallPutType`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/EmbeddedOption/CallablePutable`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8
 Definition: Cal = Call Put = Put Cap = Cap Flr= Floor empty if none
@@ -1552,13 +1458,13 @@ Definition: Cal = Call Put = Put Cap = Cap Flr= Floor empty if none
 | `COND_PRESENCE/42/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
 | `FORMAT/42` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
-**Referenced as source by:** `XF-18/CALL_PUT_DATE`, `XF-18/OPTION_DIRECTION`, `XF-19/STRIKE_PRICE`
+**Referenced as source by:** `XF-18/CALL_PUT_DATE`, `XF-19/STRIKE_PRICE`
 
 ---
 
 ### Field 43 — 43_Call_put_date
 
-FundsXML path: `Position / BondCharacteristics / OptionalCallPut / CallPutDate`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/EmbeddedOption/CallPutDate`
 Codification: DATE
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8
 Definition: Next call/put date
@@ -1584,33 +1490,31 @@ Definition: Next call/put date
 
 ### Field 44 — 44_Issuer_bearer_option_exercise
 
-FundsXML path: `Position / BondCharacteristics / OptionalCallPut / OptionDirection`
-Codification: CLOSED_LIST, closed list of 3 entries
-Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8
-Definition: I : issuer B : bearer O : Both
+Codification: UNKNOWN
+Applicability: all rows
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/44` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-18/OPTION_DIRECTION` | (all) | ERROR | Field `42` ∈ [CAL, PUT] | Field `44` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `FORMAT/44` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/44` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 45 — 45_Strike_price_for_embedded_(call_put)_options
 
-FundsXML path: `Position / BondCharacteristics / OptionalCallPut / StrikePrice`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/EmbeddedOption/StrikePriceForEmbeddedCallPutOptions`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8
 Definition: strike price, floor or cap rate for embedded options expressed as a percentage of the nominal amount.
@@ -1636,7 +1540,7 @@ Definition: strike price, floor or cap rate for embedded options expressed as a 
 
 ### Field 46 — 46_Issuer_name
 
-FundsXML path: `Position / CreditRiskData / InstrumentIssuer / Name`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/InstrumentIssuer/IssuerName`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: name of the issuer
@@ -1663,16 +1567,16 @@ Definition: name of the issuer
 
 ### Field 47 — 47_Issuer_identification_code
 
-FundsXML path: `Position / CreditRiskData / InstrumentIssuer / Code / Code`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/InstrumentIssuer/IssuerIdentificationCode`
 Codification: ALPHANUMERIC (max 20)
-Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
-Definition: LEI
+Applicability: CIC categories CIC0, CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
+Definition: Identification code of the issuer
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
 | `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
@@ -1681,9 +1585,10 @@ Definition: LEI
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
+| `PRESENCE/47/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
+| `COND_PRESENCE/47/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
 | `FORMAT/47` | (all) | ERROR | Populated cell does not match the codification (ALPHANUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 | `LEI/47/48` | (all) | ERROR | Type field `48` = `1` and this cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
-| `XF-20/ISSUER_LEI_PRESENT` | (all) | ERROR | Field `48` = "1" | Field `47` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 **External validation:** GLEIF LEI lookup (active when field `48` = `1`)
 
@@ -1691,16 +1596,16 @@ Definition: LEI
 
 ### Field 48 — 48_Type_of_identification_code_for_issuer
 
-FundsXML path: `Position / CreditRiskData / InstrumentIssuer / Code / CodificationSystem`
-Codification: FREE_TEXT
-Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
-Definition: C0220 1- LEI 9 - None
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/InstrumentIssuer/TypeOfIdentificationCodeForIssuer`
+Codification: CLOSED_LIST, closed list of 3 entries
+Applicability: CIC categories CIC0, CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
+Definition: Codification chosen to identify the issuer
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
 | `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
@@ -1709,17 +1614,16 @@ Definition: C0220 1- LEI 9 - None
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `COND_PRESENCE/48/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `PRESENCE/48/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `COND_PRESENCE/48/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/48` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/48` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
-**Referenced as source by:** `XF-20/ISSUER_LEI_PRESENT`
 
 ---
 
 ### Field 49 — 49_Name_of_the_group_of_the_issuer
 
-FundsXML path: `Position / CreditRiskData / IssuerGroup / Name`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/IssuerGroup/NameOfTheGroupOfTheIssuer`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: Name of the highest parent company
@@ -1746,16 +1650,16 @@ Definition: Name of the highest parent company
 
 ### Field 50 — 50_Identification_of_the_group
 
-FundsXML path: `Position / CreditRiskData / IssuerGroup / Code / Code`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/IssuerGroup/IdentificationOfTheGroup`
 Codification: ALPHANUMERIC (max 20)
-Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
-Definition: LEI
+Applicability: CIC categories CIC0, CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
+Definition: Identification code of the issuer group
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
 | `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
@@ -1764,9 +1668,10 @@ Definition: LEI
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
+| `PRESENCE/50/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
+| `COND_PRESENCE/50/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
 | `FORMAT/50` | (all) | ERROR | Populated cell does not match the codification (ALPHANUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 | `LEI/50/51` | (all) | ERROR | Type field `51` = `1` and this cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
-| `XF-21/GROUP_LEI_PRESENT` | (all) | ERROR | Field `51` = "1" | Field `50` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 **External validation:** GLEIF LEI lookup (active when field `51` = `1`)
 
@@ -1774,16 +1679,16 @@ Definition: LEI
 
 ### Field 51 — 51_Type_of_identification_code_for_issuer_group
 
-FundsXML path: `Position / CreditRiskData / IssuerGroup / Code / CodificationSystem`
-Codification: FREE_TEXT
-Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
-Definition: C0260 1- LEI 9 - None
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/IssuerGroup/TypeOfIdentificationCodeForIssuerGroup`
+Codification: CLOSED_LIST, closed list of 3 entries
+Applicability: CIC categories CIC0, CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
+Definition: Codification chosen to identify the issuer
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
 | `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
@@ -1792,17 +1697,16 @@ Definition: C0260 1- LEI 9 - None
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `COND_PRESENCE/51/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `PRESENCE/51/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `COND_PRESENCE/51/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/51` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/51` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
-**Referenced as source by:** `XF-21/GROUP_LEI_PRESENT`
 
 ---
 
 ### Field 52 — 52_Issuer_country
 
-FundsXML path: `Position / CreditRiskData / IssuerCountry`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/IssuerCountry`
 Codification: ISO_3166_A2
 Applicability: all rows
 Definition: Country of the issuer company
@@ -1831,7 +1735,7 @@ Definition: Country of the issuer company
 
 ### Field 53 — 53_Issuer_economic_area
 
-FundsXML path: `Position / CreditRiskData / EconomicArea`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/IssuerEconomicArea`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
@@ -1856,34 +1760,31 @@ Definition: Economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
 
 ### Field 54 — 54_Economic_sector
 
-FundsXML path: `Position / CreditRiskData / EconomicSector`
-Codification: NACE
-Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
-Definition: Economic sector
+Codification: UNKNOWN
+Applicability: all rows
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
-| `NW_675` | NW 675 | C | Conditional — required when the spec's applicability/condition holds. |
-| `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
+| `NW_675` | NW 675 | — | Profile column not present in this version. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `COND_PRESENCE/54/NW_675` | NW 675 | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `COND_PRESENCE/54/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/54` | (all) | ERROR | Populated cell does not match the codification (NACE) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/54` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/54` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 55 — 55_Covered_not_covered
 
-FundsXML path: `Position / CreditRiskData / Covered`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/CoveredNotCovered`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: CIC categories CIC1, CIC2
 
@@ -1909,7 +1810,7 @@ Applicability: CIC categories CIC1, CIC2
 
 ### Field 56 — 56_Securitisation
 
-FundsXML path: `Position / Securitisation / Securitised`
+FundsXML path: `.../Portfolio/Positions/Position/Securitisation`
 Codification: CLOSED_LIST, closed list of 13 entries
 Applicability: CIC categories CIC5, CIC6
 Definition: Securitisation typology
@@ -1936,7 +1837,7 @@ Definition: Securitisation typology
 
 ### Field 57 — 57_Explicit_guarantee_by_the_country_of_issue
 
-FundsXML path: `Position / CreditRiskData / StateGuarantee`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/ExplicitGuaranteeByTheCountryOfIssue`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6
 Definition: Y = guaranteed N = without guarantee
@@ -1963,7 +1864,7 @@ Definition: Y = guaranteed N = without guarantee
 
 ### Field 58 — 58_Subordinated_debt
 
-FundsXML path: `Position / SubordinatedDebt`
+FundsXML path: `.../Portfolio/Positions/Position/SubordinatedDebt`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: all rows
 Definition: Subordinated or not ?
@@ -1988,32 +1889,31 @@ Definition: Subordinated or not ?
 
 ### Field 58b — 58b_Nature_of_the_tranche
 
-FundsXML path: `Position / Securitisation / TrancheLevel`
-Codification: FREE_TEXT
+Codification: UNKNOWN
 Applicability: all rows
-Definition: Tranche level (seniority)
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/58b` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/58b` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/58b` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 59 — 59_Credit_quality_step
 
-FundsXML path: `Position / CreditRiskData / CreditQualitStep`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/CreditQualityStep`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICB, CICC, CICD, CICE, CICF; CIC7 sub-categories [3, 4, 5]
 Definition: Credit quality step as defined by S2 regulation
@@ -2038,7 +1938,7 @@ Definition: Credit quality step as defined by S2 regulation
 
 ### Field 60 — 60_Call_Put_Cap_Floor
 
-FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / CallPutType`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/OptionCharacteristics/CallPutCapFloor`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CIC2, CICB, CICC, CICE; CIC2 sub-categories [2]
 Definition: Cal = Call Put = Put Cap = Cap Flr= Floor empty if none
@@ -2065,7 +1965,7 @@ Definition: Cal = Call Put = Put Cap = Cap Flr= Floor empty if none
 
 ### Field 61 — 61_Strike_price
 
-FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / StrikePrice`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/OptionCharacteristics/StrikePrice`
 Codification: NUMERIC
 Applicability: CIC categories CIC2, CICB, CICC, CICE; CIC2 sub-categories [2]
 Definition: Strike price expressed as the quotation of the underlying asset
@@ -2090,9 +1990,9 @@ Definition: Strike price expressed as the quotation of the underlying asset
 
 ---
 
-### Field 62 — 62_Conversion_factor_(convertibles)_concordance_factor_parity_(options)
+### Field 62 — 62_Conversion_factor
 
-FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / ConversionRatio`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/OptionCharacteristics/ConversionFactor`
 Codification: NUMERIC
 Applicability: CIC categories CIC2; CIC2 sub-categories [2]
 Definition: Conversion factor for convertible
@@ -2119,7 +2019,7 @@ Definition: Conversion factor for convertible
 
 ### Field 63 — 63_Effective_date_of_instrument
 
-FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / Effective Date`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/EffectiveDateOfInstrument`
 Codification: DATE
 Applicability: all rows
 Definition: Effective Date
@@ -2144,7 +2044,7 @@ Definition: Effective Date
 
 ### Field 64 — 64_Exercise_type
 
-FundsXML path: `Position / DerivativeOrConvertible / OptionCharacteristics / OptionStyle`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/OptionCharacteristics/ExerciseType`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CICB, CICC
 Definition: AMerican, EUropean, ASiatic, BErmudian
@@ -2171,7 +2071,7 @@ Definition: AMerican, EUropean, ASiatic, BErmudian
 
 ### Field 65 — 65_Hedging_rolling
 
-FundsXML path: `Position / HedgingStrategy`
+FundsXML path: `.../Portfolio/Positions/Position/HedgingRolling`
 Codification: CLOSED_LIST, closed list of 3 entries
 Applicability: CIC categories CICA, CICB, CICC, CICD, CICE, CICF
 Definition: Indication of existing Risk Mitigation program ( Y = used for Risk Mitigation purpose and the position is systematically rolled before maturity, N = used for hedging purpose but no systematic roll before maturity); EPM = Efficient Portfolio Management / not used for hedging purpose .
@@ -2198,7 +2098,7 @@ Definition: Indication of existing Risk Mitigation program ( Y = used for Risk M
 
 ### Field 67 — 67_CIC_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / InstrumentCIC`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CICOfTheUnderlyingAsset`
 Codification: CIC
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: CIC Code (Complementary Identification Code).
@@ -2224,7 +2124,7 @@ Definition: CIC Code (Complementary Identification Code).
 
 ### Field 68 — 68_Identification_code_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / InstrumentCode / Code`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/InstrumentCode/IdentificationCodeOfTheUnderlyingAsset`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: identification code of underlying asset
@@ -2253,7 +2153,7 @@ Definition: identification code of underlying asset
 
 ### Field 69 — 69_Type_of_identification_code_for_the_underlying_asset
 
-FundsXML path: `Position / UnderlyingInstrument / InstrumentCode / CodificationSystem`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/InstrumentCode/TypeOfIdentificationCodeForTheUnderlyingAsset`
 Codification: CLOSED_LIST, closed list of 10 entries
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: name of the codification used for identification of the underlying asset
@@ -2280,7 +2180,7 @@ Definition: name of the codification used for identification of the underlying a
 
 ### Field 70 — 70_Name_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / InstrumentName`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/NameOfTheUnderlyingAsset`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: Name
@@ -2307,7 +2207,7 @@ Definition: Name
 
 ### Field 71 — 71_Quotation_currency_of_the_underlying_asset_(C)
 
-FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / Currency`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/Valuation/QuotationCurrencyOfTheUnderlyingAsset`
 Codification: ISO_4217
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: currency of quotation for the asset
@@ -2334,7 +2234,7 @@ Definition: currency of quotation for the asset
 
 ### Field 72 — 72_Last_valuation_price_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / MarketPrice`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/Valuation/LastValuationPriceOfTheUnderlyingAsset`
 Codification: NUMERIC
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICD sub-categories [4, 5]; CIC2 sub-categories [2]
 Definition: Last valuation price of the underlying asset
@@ -2361,7 +2261,7 @@ Definition: Last valuation price of the underlying asset
 
 ### Field 73 — 73_Country_of_quotation_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / Country`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/Valuation/CountryOfQuotationOfTheUnderlyingAsset`
 Codification: ISO_3166_A2
 Applicability: all rows
 Definition: Country of quotation of the underlying asset
@@ -2386,7 +2286,7 @@ Definition: Country of quotation of the underlying asset
 
 ### Field 74 — 74_Economic_area_of_quotation_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible /  UnderlyingInstrument / Valuation / EconomicArea`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/Valuation/EconomicAreaOfQuotationOfTheUnderlyingAsset`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: economic area of quotation 0= non listed, listed 1=EEA / 2=NON EEA / 3=NON OECD
@@ -2412,7 +2312,7 @@ Definition: economic area of quotation 0= non listed, listed 1=EEA / 2=NON EEA /
 
 ### Field 75 — 75_Coupon_rate_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / CouponRate`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/Coupon/CouponRateOfTheUnderlyingAsset`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Fixed rate : coupon rate as a percentage of nominal amount all rates are expressed on an annual basis
@@ -2437,7 +2337,7 @@ Definition: Fixed rate : coupon rate as a percentage of nominal amount all rates
 
 ### Field 76 — 76_Coupon_payment_frequency_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / CouponFrequency`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/Coupon/CouponPaymentFrequencyOfTheUnderlyingAsset`
 Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: all rows
 Definition: number of coupon payment per year 0 = other than below options: 1= annual 2= biannual 4= quarterly 12= monthly 52= weekly
@@ -2462,7 +2362,7 @@ Definition: number of coupon payment per year 0 = other than below options: 1= a
 
 ### Field 77 — 77_Maturity_date_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / Redemption / MaturityDate`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/Redemption/MaturityDateOfTheUnderlyingAsset`
 Codification: DATE
 Applicability: all rows
 Definition: Last redemption date
@@ -2487,7 +2387,7 @@ Definition: Last redemption date
 
 ### Field 78 — 78_Redemption_profile_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / Redemption / Type`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/Redemption/RedemptionProfileOfTheUnderlyingAsset`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: all rows
 Definition: Type of redemption payment schedule : bullet, constant annuity…
@@ -2512,7 +2412,7 @@ Definition: Type of redemption payment schedule : bullet, constant annuity…
 
 ### Field 79 — 79_Redemption_rate_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / BondCharacteristics / Redemption / Rate`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/Redemption/RedemptionRateOfTheUnderlyingAsset`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Redemption amount in % of nominal amount
@@ -2537,7 +2437,7 @@ Definition: Redemption amount in % of nominal amount
 
 ### Field 80 — 80_Issuer_name_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / InstrumentIssuer / Name`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/InstrumentIssuer/IssuerNameOfTheUnderlyingAsset`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: name of the issuer
@@ -2563,16 +2463,16 @@ Definition: name of the issuer
 
 ### Field 81 — 81_Issuer_identification_code_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / InstrumentIssuer / Code / Code`
-Codification: FREE_TEXT
-Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
-Definition: identification code of the issuer
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/InstrumentIssuer/IssuerIdentificationCodeOfTheUnderlyingAsset`
+Codification: ALPHANUMERIC (max 20)
+Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF
+Definition: Idenitification code of the issuer of the underlying security
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
 | `SST` | SST (FINMA) | O | Optional — populate when applicable. |
@@ -2581,8 +2481,8 @@ Definition: identification code of the issuer
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `COND_PRESENCE/81/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/81` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `PRESENCE/81/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
+| `FORMAT/81` | (all) | ERROR | Populated cell does not match the codification (ALPHANUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 | `LEI/81/82` | (all) | ERROR | Type field `82` = `1` and this cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
 
 **External validation:** GLEIF LEI lookup (active when field `82` = `1`)
@@ -2591,33 +2491,34 @@ Definition: identification code of the issuer
 
 ### Field 82 — 82_Type_of_issuer_identification_code_of_the_underlying_asset
 
-FundsXML path: `Position / UnderlyingInstrument / Issuer / InstrumentIssuer / Identification / Code`
-Codification: FREE_TEXT
-Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
-Definition: C0220 1- LEI 9 - None
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/InstrumentIssuer/TypeOfIssuerIdentificationCodeOfTheUnderlyingAsset`
+Codification: CLOSED_LIST, closed list of 3 entries
+Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF
+Definition: Codification chosen to identify the issuer
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `COND_PRESENCE/82/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/82` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `PRESENCE/82/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
+| `COND_PRESENCE/82/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `FORMAT/82` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
 
 ---
 
 ### Field 83 — 83_Name_of_the_group_of_the_issuer_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / IssuerGroup / Name`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/IssuerGroup/NameOfTheGroupOfTheIssuerOfTheUnderlyingAsset`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: Name of the highest parent company
@@ -2643,10 +2544,10 @@ Definition: Name of the highest parent company
 
 ### Field 84 — 84_Identification_of_the_group_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / IssuerGroup / Code / Code`
-Codification: FREE_TEXT
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/IssuerGroup/IdentificationOfTheGroupOfTheUnderlyingAsset`
+Codification: ALPHANUMERIC (max 20)
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF
-Definition: Identification code of the group
+Definition: Idenitification code of the issuer group of the underlying security
 
 #### Flag per profile
 
@@ -2661,9 +2562,9 @@ Definition: Identification code of the group
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/84` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `COND_PRESENCE/84/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `FORMAT/84` | (all) | ERROR | Populated cell does not match the codification (ALPHANUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 | `LEI/84/85` | (all) | ERROR | Type field `85` = `1` and this cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
-| `XF-22/UNDERLYING_GROUP_LEI` | (all) | ERROR | Field `85` = "1" | Field `84` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 **External validation:** GLEIF LEI lookup (active when field `85` = `1`)
 
@@ -2671,34 +2572,34 @@ Definition: Identification code of the group
 
 ### Field 85 — 85_Type_of_the_group_identification_code_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / IssuerGroup / Code / CodificationSystem`
-Codification: FREE_TEXT
-Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
-Definition: C0260 1- LEI 9 - None
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/IssuerGroup/TypeOfTheGroupIdentificationCodeOfTheUnderlyingAsset`
+Codification: CLOSED_LIST, closed list of 3 entries
+Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF
+Definition: Codification chosen to identify the issuer
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | C | Conditional — required when the spec's applicability/condition holds. |
+| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | C | Conditional — required when the spec's applicability/condition holds. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `COND_PRESENCE/85/SOLVENCY_II` | Solvency II | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
-| `FORMAT/85` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `PRESENCE/85/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
+| `COND_PRESENCE/85/SST` | SST (FINMA) | WARNING | Row's CIC matches the field's applicability list and the cell is empty | Conditionally-required cell missing for this profile. | PROFILE_COMPLETENESS (C leg) −1/N |
+| `FORMAT/85` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
 
-**Referenced as source by:** `XF-22/UNDERLYING_GROUP_LEI`
 
 ---
 
 ### Field 86 — 86_Issuer_country_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / Country`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/IssuerCountryOfTheUnderlyingAsset`
 Codification: ISO_3166_A2
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICD, CICF; CICF sub-categories [1, 3, 4]; CICD sub-categories [4, 5]; CICC sub-categories [1, 4]; CIC2 sub-categories [2]; CICB sub-categories [1, 4]; CICA sub-categories [1]
 Definition: Country of the issuer company
@@ -2724,7 +2625,7 @@ Definition: Country of the issuer company
 
 ### Field 87 — 87_Issuer_economic_area_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / EconomicArea`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/IssuerEconomicAreaOfTheUnderlyingAsset`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
@@ -2749,7 +2650,7 @@ Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
 
 ### Field 88 — 88_Explicit_guarantee_by_the_country_of_issue_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData  / StateGuarantee`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/ExplicitGuaranteeByTheCountryOfIssueOfTheUnderlyingAsset`
 Codification: CLOSED_LIST, closed list of 2 entries
 Applicability: all rows
 Definition: Y = Guaranteed N = without guarantee
@@ -2774,7 +2675,7 @@ Definition: Y = Guaranteed N = without guarantee
 
 ### Field 89 — 89_Credit_quality_step_of_the_underlying_asset
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData  / CreditQualityStep`
+FundsXML path: `.../Portfolio/Positions/Position/DerivativeOrConvertible/UnderlyingInstrument/CreditRiskData/CreditQualityStepOfTheUnderlyingAsset`
 Codification: FREE_TEXT
 Applicability: CIC categories CIC2, CICA, CICB, CICC, CICF; CICF sub-categories [1, 2]; CICC sub-categories [2]; CIC2 sub-categories [2]; CICB sub-categories [2]; CICA sub-categories [2]
 Definition: Credit quality step as defined by S2 regulation
@@ -2799,7 +2700,7 @@ Definition: Credit quality step as defined by S2 regulation
 
 ### Field 90 — 90_Modified_duration_to_maturity_date
 
-FundsXML path: `Position / Analytics / ModifiedDurationToMaturity`
+FundsXML path: `.../Portfolio/Positions/Position/Analytics/ModifiedDurationToMaturityDate`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD; CIC7 sub-categories [3, 4, 5]; CIC6 sub-categories [2, 4]; CIC5 sub-categories [2, 4]; CICD sub-categories [1, 3]; CICC sub-categories [2]; CICB sub-categories [2]; CICA sub-categories [2]
 
@@ -2826,7 +2727,7 @@ Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CI
 
 ### Field 91 — 91_Modified_duration_to_next_option_exercise_date
 
-FundsXML path: `Position / Analytics / ModifiedDurationToCall`
+FundsXML path: `.../Portfolio/Positions/Position/Analytics/ModifiedDurationToNextOptionExerciseDate`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICB, CICC, CICD; CIC7 sub-categories [3, 4, 5]; CIC6 sub-categories [2, 4]; CIC5 sub-categories [2, 4]; CICD sub-categories [1, 3]; CICC sub-categories [2]; CICB sub-categories [2]
 
@@ -2853,7 +2754,7 @@ Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICB, CICC, CI
 
 ### Field 92 — 92_Credit_sensitivity
 
-FundsXML path: `Position / Analytics / CreditSensitivity`
+FundsXML path: `.../Portfolio/Positions/Position/Analytics/CreditSensitivity`
 Codification: NUMERIC
 Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICF; CIC7 sub-categories [3, 4, 5]; CIC6 sub-categories [2, 4]; CIC5 sub-categories [2, 4]; CICD sub-categories [1, 3]
 
@@ -2879,7 +2780,7 @@ Applicability: CIC categories CIC1, CIC2, CIC5, CIC6, CIC7, CIC8, CICD, CICF; CI
 
 ### Field 93 — 93_Sensitivity_to_underlying_asset_price_(delta)
 
-FundsXML path: `Position / Analytics / Delta`
+FundsXML path: `.../Portfolio/Positions/Position/Analytics/SensitivityToUnderlyingAssetPriceDelta`
 Codification: NUMERIC
 Applicability: CIC categories CIC2, CIC5, CIC6, CICA, CICB, CICC, CICE, CICF; CIC6 sub-categories [1, 3, 6]; CIC5 sub-categories [1, 3, 6]; CIC2 sub-categories [2]; CICA sub-categories [3, 5]
 Definition: Sensitivity to the underlying asset
@@ -2906,7 +2807,7 @@ Definition: Sensitivity to the underlying asset
 
 ### Field 94 — 94_Convexity_gamma_for_derivatives
 
-FundsXML path: `Position / Analytics / Convexity`
+FundsXML path: `.../Portfolio/Positions/Position/Analytics/ConvexityGammaForDerivatives`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Convexity for interest rates instruments; or gamma for derivatives with optional components
@@ -2931,7 +2832,7 @@ Definition: Convexity for interest rates instruments; or gamma for derivatives w
 
 ### Field 94b — 94b_Vega
 
-FundsXML path: `Position / Analytics / Vega`
+FundsXML path: `.../Portfolio/Positions/Position/Analytics/Vega`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -2955,7 +2856,7 @@ Applicability: all rows
 
 ### Field 95 — 95_Identification_of_the_original_portfolio_for_positions_embedded_in_a_fund
 
-FundsXML path: `Position / LookThroughISIN`
+FundsXML path: `.../Portfolio/Positions/Position/OriginalPortfolioIdentification`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: identification code of the investee funds
@@ -2980,7 +2881,7 @@ Definition: identification code of the investee funds
 
 ### Field 97 — 97_SCR_mrkt_IR_up_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktIntUp`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/SCRMrktIRUpWeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for interest rate risk for the "up" shock (Delta between Market value before and market value after stress)
@@ -3006,7 +2907,7 @@ Definition: Capital requirement for interest rate risk for the "up" shock (Delta
 
 ### Field 98 — 98_SCR_mrkt_IR_down_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktintDown`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/SCRMrktIRDownWeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for interest rate risk for the "down" shock (Delta between Market value before and market value after stress)
@@ -3032,7 +2933,7 @@ Definition: Capital requirement for interest rate risk for the "down" shock (Del
 
 ### Field 99 — 99_SCR_mrkt_eq_type1_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktEqGlobal`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/SCRMrktEqType1WeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for equity risk - Type 1 *) (Delta between Market value before and market value after stress)
@@ -3058,7 +2959,7 @@ Definition: Capital requirement for equity risk - Type 1 *) (Delta between Marke
 
 ### Field 100 — 100_SCR_mrkt_eq_type2_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktEqOther`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/SCRMrktEqType2WeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for equity risk - Type 2 *) (Delta between Market value before and market value after stress)
@@ -3084,7 +2985,7 @@ Definition: Capital requirement for equity risk - Type 2 *) (Delta between Marke
 
 ### Field 101 — 101_SCR_mrkt_prop_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktProp`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/SCRMrktPropWeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for property risk (Delta between Market value before and market value after stress)
@@ -3110,7 +3011,7 @@ Definition: Capital requirement for property risk (Delta between Market value be
 
 ### Field 102 — 102_SCR_mrkt_spread_bonds_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktSpread / Bonds`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/MktSpread/SCRMrktSpreadBondsWeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for spread risk on bonds (Delta between Market value before and market value after stress)
@@ -3136,7 +3037,7 @@ Definition: Capital requirement for spread risk on bonds (Delta between Market v
 
 ### Field 103 — 103_SCR_mrkt_spread_structured_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktSpread / Structured`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/MktSpread/SCRMrktSpreadStructuredWeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for spread risk on structured products (Delta between Market value before and market value after stress)
@@ -3162,7 +3063,7 @@ Definition: Capital requirement for spread risk on structured products (Delta be
 
 ### Field 104 — 104_SCR_mrkt_spread_derivatives_up_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktSpread / DerivativesUp`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/MktSpread/SCRMrktSpreadDerivativesUpWeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for spread risk - credit derivatives (upward shock) (Delta between Market value before and market value after stress)
@@ -3188,7 +3089,7 @@ Definition: Capital requirement for spread risk - credit derivatives (upward sho
 
 ### Field 105 — 105_SCR_mrkt_spread_derivatives_down_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktSpread / DerivativesDown`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/MktSpread/SCRMrktSpreadDerivativesDownWeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for spread risk - credit derivatives (downward shock) (Delta between Market value before and market value after stress)
@@ -3214,7 +3115,7 @@ Definition: Capital requirement for spread risk - credit derivatives (downward s
 
 ### Field 105a — 105a_SCR_mrkt_FX_up_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktFXUp`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/SCRMrktFXUpWeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for FX (upward shock) (Delta between Market value before and market value after stress)
@@ -3240,7 +3141,7 @@ Definition: Capital requirement for FX (upward shock) (Delta between Market valu
 
 ### Field 105b — 105b_SCR_mrkt_FX_down_weight_over_NAV
 
-FundsXML path: `Position / ContributionToSCR / MktFXDown`
+FundsXML path: `.../Portfolio/Positions/Position/ContributionToSCR/SCRMrktFXDownWeightOverNAV`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Capital requirement for FX (downward shock) (Delta between Market value before and market value after stress)
@@ -3266,32 +3167,31 @@ Definition: Capital requirement for FX (downward shock) (Delta between Market va
 
 ### Field 106 — 106_Asset_pledged_as_collateral
 
-FundsXML path: `Position / QRTPositionInformation / CollateralisedAsset`
-Codification: CLOSED_LIST, closed list of 5 entries
+Codification: UNKNOWN
 Applicability: all rows
-Definition: Indicator used to identify the under-written instruments (Assets D1)
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/106` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/106` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/106` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 107 — 107_Place_of_deposit
 
-FundsXML path: `Position / QRTPositionInformation / PlaceOfDeposit`
+FundsXML path: `.../Portfolio/Positions/Position/QRTPositionInformation/PlaceOfDeposit`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Instruments' place of deposit (S.06.02 - old: Assets D1)
@@ -3316,32 +3216,31 @@ Definition: Instruments' place of deposit (S.06.02 - old: Assets D1)
 
 ### Field 108 — 108_Participation
 
-FundsXML path: `Position / QRTPositionInformation / Participation`
-Codification: FREE_TEXT
+Codification: UNKNOWN
 Applicability: all rows
-Definition: Indicator used to identify the guidelines of participation in accountancy terms
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/108` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/108` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/108` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 110 — 110_Valorisation_method
 
-FundsXML path: `Position / QRTPositionInformation / ValorisationMethod`
+FundsXML path: `.../Portfolio/Positions/Position/QRTPositionInformation/ValorisationMethod`
 Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: all rows
 Definition: valuation method (cf specifications QRT) (S.06.02 - old: Assets D1)
@@ -3366,7 +3265,7 @@ Definition: valuation method (cf specifications QRT) (S.06.02 - old: Assets D1)
 
 ### Field 111 — 111_Value_of_acquisition
 
-FundsXML path: `Position / QRTPositionInformation / AverageBuyPrice`
+FundsXML path: `.../Portfolio/Positions/Position/QRTPositionInformation/ValueOfAcquisition`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Value of acquisition (S.06.02 - old: Assets D1)
@@ -3391,7 +3290,7 @@ Definition: Value of acquisition (S.06.02 - old: Assets D1)
 
 ### Field 112 — 112_Credit_rating
 
-FundsXML path: `Position / QRTPositionInformation / CounterpartyRating / RatingValue`
+FundsXML path: `.../Portfolio/Positions/Position/QRTPositionInformation/CounterpartyRating/CreditRating`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Rating of the counterparty / issuer (cf specifications QRT) (S.06.02 - old: Assets D1)
@@ -3416,7 +3315,7 @@ Definition: Rating of the counterparty / issuer (cf specifications QRT) (S.06.02
 
 ### Field 113 — 113_Rating_agency
 
-FundsXML path: `Position / QRTPositionInformation / CounterpartyRating / RatingAgency`
+FundsXML path: `.../Portfolio/Positions/Position/QRTPositionInformation/CounterpartyRating/RatingAgency`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Name of the rating agency (cf specification QRT) (S.06.02 - old: Assets D1)
@@ -3441,10 +3340,8 @@ Definition: Name of the rating agency (cf specification QRT) (S.06.02 - old: Ass
 
 ### Field 114 — 114_Issuer_economic_area
 
-FundsXML path: `Position / QRTPositionInformation / IssuerEconomicArea`
-Codification: FREE_TEXT
+Codification: UNKNOWN
 Applicability: all rows
-Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
 
 #### Flag per profile
 
@@ -3453,20 +3350,21 @@ Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
 | `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/114` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/114` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/114` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 115 — 115_Fund_issuer_code
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / Code / Code`
+FundsXML path: `.../Portfolio/QRTPortfolioInformation/FundIssuer/FundIssuerCode`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: LEI
@@ -3484,45 +3382,42 @@ Definition: LEI
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
+| `PRESENCE/115/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
+| `PRESENCE/115/IORP_EIOPA_ECB` | IORP / EIOPA / ECB | ERROR | Cell is empty for an active row of profile IORP / EIOPA / ECB | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `FORMAT/115` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `LEI/115/116` | (all) | ERROR | Type field `116` = `1` and this cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
-| `XF-23/FUND_ISSUER_LEI` | (all) | ERROR | Field `116` = "1" | Field `115` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `LEI/115` | (all) | ERROR | This cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
 
-**External validation:** GLEIF LEI lookup (active when field `116` = `1`)
+**External validation:** GLEIF LEI lookup
 
 ---
 
 ### Field 116 — 116_Fund_issuer_code_type
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / Code / CodificationSystem`
 Codification: UNKNOWN
 Applicability: all rows
-Definition: C0220 1- LEI 9 - None
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
-| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | M | Mandatory — must always be present. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `PRESENCE/116/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `PRESENCE/116/IORP_EIOPA_ECB` | IORP / EIOPA / ECB | ERROR | Cell is empty for an active row of profile IORP / EIOPA / ECB | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `FORMAT/116` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/116` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
-**Referenced as source by:** `XF-23/FUND_ISSUER_LEI`
 
 ---
 
 ### Field 117 — 117_Fund_issuer_name
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / Name`
+FundsXML path: `.../Portfolio/QRTPortfolioInformation/FundIssuer/FundIssuerName`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: Name of Issuer of Fund or Share Class
@@ -3548,34 +3443,31 @@ Definition: Name of Issuer of Fund or Share Class
 
 ### Field 118 — 118_Fund_issuer_sector
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / EconomicSector`
-Codification: FREE_TEXT
+Codification: UNKNOWN
 Applicability: all rows
-Definition: NACE code of Issuer of Fund or Share Class
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
-| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | M | Mandatory — must always be present. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `PRESENCE/118/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `PRESENCE/118/IORP_EIOPA_ECB` | IORP / EIOPA / ECB | ERROR | Cell is empty for an active row of profile IORP / EIOPA / ECB | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `FORMAT/118` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `FORMAT/118` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/118` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 119 — 119_Fund_issuer_group_code
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Code / Code`
+FundsXML path: `.../Portfolio/QRTPortfolioInformation/FundIssuerGroup/FundIssuerGroupCode`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: LEI of ultimate parent
@@ -3593,45 +3485,42 @@ Definition: LEI of ultimate parent
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
+| `PRESENCE/119/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
+| `PRESENCE/119/IORP_EIOPA_ECB` | IORP / EIOPA / ECB | ERROR | Cell is empty for an active row of profile IORP / EIOPA / ECB | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `FORMAT/119` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `LEI/119/120` | (all) | ERROR | Type field `120` = `1` and this cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
-| `XF-24/FUND_GROUP_LEI` | (all) | ERROR | Field `120` = "1" | Field `119` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `LEI/119` | (all) | ERROR | This cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
 
-**External validation:** GLEIF LEI lookup (active when field `120` = `1`)
+**External validation:** GLEIF LEI lookup
 
 ---
 
 ### Field 120 — 120_Fund_issuer_group_code_type
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Code / CodificationSystem`
 Codification: UNKNOWN
 Applicability: all rows
-Definition: C0260 1- LEI 9 - None
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | M | Mandatory — must always be present. |
-| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | M | Mandatory — must always be present. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `PRESENCE/120/SOLVENCY_II` | Solvency II | ERROR | Cell is empty for an active row of profile Solvency II | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
-| `PRESENCE/120/IORP_EIOPA_ECB` | IORP / EIOPA / ECB | ERROR | Cell is empty for an active row of profile IORP / EIOPA / ECB | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `FORMAT/120` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/120` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
-**Referenced as source by:** `XF-24/FUND_GROUP_LEI`
 
 ---
 
 ### Field 121 — 121_Fund_issuer_group_name
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuerGroup / Name`
+FundsXML path: `.../Portfolio/QRTPortfolioInformation/FundIssuerGroup/FundIssuerGroupName`
 Codification: UNKNOWN
 Applicability: all rows
 Definition: Name of Ultimate parent of issuer of Fund or Share Class
@@ -3658,7 +3547,7 @@ Definition: Name of Ultimate parent of issuer of Fund or Share Class
 
 ### Field 122 — 122_Fund_issuer_country
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / FundIssuer / Country`
+FundsXML path: `.../Portfolio/QRTPortfolioInformation/FundIssuer/FundIssuerCountry`
 Codification: ISO_3166_A2
 Applicability: all rows
 Definition: Country ISO of Issuer of Fund or Share Class
@@ -3685,10 +3574,10 @@ Definition: Country ISO of Issuer of Fund or Share Class
 
 ### Field 123 — 123_Fund_CIC
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / PortfolioCIC`
+FundsXML path: `.../Portfolio/QRTPortfolioInformation/FundCIC`
 Codification: UNKNOWN
 Applicability: all rows
-Definition: CIC code - Fund or Share Class (4 digits)
+Definition: CIC code - Fund or Share Class (4 characters)
 
 #### Flag per profile
 
@@ -3712,10 +3601,10 @@ Definition: CIC code - Fund or Share Class (4 digits)
 
 ### Field 123a — 123a_Fund_custodian_country
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / FundCustodianCountry`
+FundsXML path: `.../Portfolio/QRTPortfolioInformation/FundCustodianCountry`
 Codification: ISO_3166_A2
 Applicability: all rows
-Definition: First level of Custody - Fund or seggregated account Custodian
+Definition: First level of Custody - Fund or segregated account Custodian
 
 #### Flag per profile
 
@@ -3739,77 +3628,72 @@ Definition: First level of Custody - Fund or seggregated account Custodian
 
 ### Field 124 — 124_Duration
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / PortfolioModifiedDuration`
 Codification: UNKNOWN
 Applicability: all rows
-Definition: For funds or portfolios mainly invested in debt instruments (>50%) - Fund modified Duration (Residual modified duration)
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
-| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | M | Mandatory — must always be present. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `PRESENCE/124/IORP_EIOPA_ECB` | IORP / EIOPA / ECB | ERROR | Cell is empty for an active row of profile IORP / EIOPA / ECB | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `FORMAT/124` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/124` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 125 — 125_Accrued_income_(Security Denominated Currency)
 
-FundsXML path: `Portfolio / QRTPortfolioInformation /  AccruedIncomeQC ????`
 Codification: UNKNOWN
 Applicability: all rows
-Definition: Amount of accrued income in security denomination currency at report date
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
-| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | O | Optional — populate when applicable. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/125` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/125` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
 
 ### Field 126 — 126_Accrued_income_(Portfolio Denominated Currency)
 
-FundsXML path: `Portfolio / QRTPortfolioInformation / AccruedIncomePC`
 Codification: UNKNOWN
 Applicability: all rows
-Definition: Amount of accrued income in portfolio denomination currency at report date
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
-| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | M | Mandatory — must always be present. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
+| `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
-| `SST` | SST (FINMA) | O | Optional — populate when applicable. |
+| `SST` | SST (FINMA) | — | Profile column not present in this version. |
 
 #### Checks
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `PRESENCE/126/IORP_EIOPA_ECB` | IORP / EIOPA / ECB | ERROR | Cell is empty for an active row of profile IORP / EIOPA / ECB | The mandatory cell is missing — file is incomplete for this profile. | MANDATORY_COMPLETENESS −1/N, PROFILE_COMPLETENESS (M leg) −1/N |
 | `FORMAT/126` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/126` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
@@ -3866,7 +3750,7 @@ Definition: Premium of the embedded option of a convertible bond in quotation cu
 
 ### Field 129 — 129_Valuation_yield
 
-FundsXML path: `Position / BondCharacteristics / ValuationYieldCurve /  Yield`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/ValuationYieldCurve/ValuationYield`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Valuation Yield of the interest rate instrument
@@ -3891,7 +3775,7 @@ Definition: Valuation Yield of the interest rate instrument
 
 ### Field 130 — 130_Valuation_z_spread
 
-FundsXML path: `Position / BondCharacteristics / ValuationYieldCurve /  Spread`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/ValuationYieldCurve/ValuationZSpread`
 Codification: NUMERIC
 Applicability: all rows
 Definition: Issuer spread calculated from Z coupon IRS curve of quotation currency
@@ -3916,7 +3800,7 @@ Definition: Issuer spread calculated from Z coupon IRS curve of quotation curren
 
 ### Field 131 — 131_Underlying_asset_category
 
-FundsXML path: `Position / Instrument/ UAC`
+FundsXML path: `.../Portfolio/Positions/Position/QRTPositionInformation/UnderlyingAssetCategory`
 Codification: CLOSED_LIST, closed list of 18 entries
 Applicability: all rows
 Definition: SII definition as per QRT S.06.03
@@ -3943,7 +3827,7 @@ Definition: SII definition as per QRT S.06.03
 
 ### Field 132 — 132_Infrastructure_investment
 
-FundsXML path: `To be defined with Fundxml`
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/InfrastructureInvestment`
 Codification: CLOSED_LIST, closed list of 6 entries
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC5, CIC6, CIC8, CIC9
 Definition: Type of infrastructure investment according to Type of infrastructure investment according to COMMISSION DELEGATED REGULATION (EU) 2016/467 of 30 September 2015 amending Commission Delegated Regulation (EU) 2015/35 concerning the calculation of regulatory capital requirements for several categories of assets held by insurance and reinsurance undertakings and COMMISSION DELEGATED REGULATION (EU) 2017/1542 as of 8 June 2017 amending Delegated Regulation (EU) 2015/35 concerning the calculation of regulatory capital requirements for certain categories of assets held by insurance and reinsurance undertakings (infrastructure corporates).
@@ -3968,10 +3852,10 @@ Definition: Type of infrastructure investment according to Type of infrastructur
 
 ### Field 133 — 133_custodian_name
 
-FundsXML path: `To be defined with Fundxml`
+FundsXML path: `.../Portfolio/QRTPortfolioInformation/CustodianName`
 Codification: FREE_TEXT
 Applicability: all rows
-Definition: Name of the custodian of the seggregated account
+Definition: Name of the custodian of the segregated account
 
 #### Flag per profile
 
@@ -3995,6 +3879,7 @@ Definition: Name of the custodian of the seggregated account
 
 ### Field 134 — 134_type1_private_equity_portfolio_eligibility
 
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/Type1PrivateEquityPortfolioEligibility`
 Codification: CLOSED_LIST, closed list of 3 entries
 Applicability: CIC categories CIC3, CIC4
 Definition: Eligibility of the investment to art 168a of the regulation UE DR 2019/981
@@ -4019,6 +3904,7 @@ Definition: Eligibility of the investment to art 168a of the regulation UE DR 20
 
 ### Field 135 — 135_type1_private_equity_issuer_beta
 
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/Type1PrivateEquityIssuerBeta`
 Codification: NUMERIC
 Applicability: CIC categories CIC3, CIC4
 Definition: Beta of the issuer of the private equity calculated according to art 168a of the regulation UE DR 2019/981
@@ -4043,6 +3929,7 @@ Definition: Beta of the issuer of the private equity calculated according to art
 
 ### Field 137 — 137_Counterparty_sector
 
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/CounterpartySector`
 Codification: CLOSED_LIST, closed list of 13 entries
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: Classification of the issuer or counterparty according to IORP II regulation based on FINREP breakdown ( ESA 2010) and EIOPA specifications
@@ -4069,6 +3956,7 @@ Definition: Classification of the issuer or counterparty according to IORP II re
 
 ### Field 138 — 138_Collateral_eligibility
 
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/CollateralEligibility`
 Codification: CLOSED_LIST, closed list of 5 entries
 Applicability: CIC categories CIC2, CIC5, CIC6, CIC8
 Definition: Eligibility of the collateral according to solvency regulation (RD UE 2015/35 art 176.5 and related art197, art214)
@@ -4095,6 +3983,7 @@ Definition: Eligibility of the collateral according to solvency regulation (RD U
 
 ### Field 139 — 139_Collateral_Market_valuation_in_portfolio_currency
 
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/CollateralMarketValuationInPortfolioCurrency`
 Codification: NUMERIC
 Applicability: CIC categories CIC2, CIC5, CIC8
 Definition: Market valuation of the collateral in portfolio currency
@@ -4120,7 +4009,7 @@ Definition: Market valuation of the collateral in portfolio currency
 
 ### Field 140 — 140_Custodian_identification_code
 
-FundsXML path: `Position / DerivativeOrConvertible / UnderlyingInstrument / CreditRiskData / InstrumentIssuer / Code / Code`
+FundsXML path: `.../Portfolio/QRTPortfolioInformation/CustodianIdentificationCode`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: identification code of the custodian
@@ -4139,26 +4028,22 @@ Definition: identification code of the custodian
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/140` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `LEI/140/141` | (all) | ERROR | Type field `141` = `1` and this cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
-| `XF-09/CUSTODIAN_PAIR` | (all) | ERROR | Field 140 or field 141 is populated | Both fields 140 and 141 must be populated as a pair. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `LEI/140` | (all) | ERROR | This cell is not a valid 20-char LEI with mod-97 checksum | Identifier cannot be resolved against ISO 17442 (GLEIF). | FORMAT_CONFORMANCE −1/M |
 
-**Referenced as source by:** `XF-09/CUSTODIAN_PAIR`
-**External validation:** GLEIF LEI lookup (active when field `141` = `1`)
+**External validation:** GLEIF LEI lookup
 
 ---
 
 ### Field 141 — 141_Type_of_custodian_identification_code
 
-FundsXML path: `Position / UnderlyingInstrument / Issuer / InstrumentIssuer / Identification / Code`
-Codification: CLOSED_LIST, closed list of 2 entries
+Codification: UNKNOWN
 Applicability: all rows
-Definition: C0220 1-LEI, 9-None or internal
 
 #### Flag per profile
 
 | Code | Display name | Flag | Meaning |
 |---|---|---|---|
-| `SOLVENCY_II` | Solvency II | O | Optional — populate when applicable. |
+| `SOLVENCY_II` | Solvency II | NA | Not applicable to this profile. |
 | `IORP_EIOPA_ECB` | IORP / EIOPA / ECB | — | Profile column not present in this version. |
 | `NW_675` | NW 675 | — | Profile column not present in this version. |
 | `SST` | SST (FINMA) | — | Profile column not present in this version. |
@@ -4167,15 +4052,15 @@ Definition: C0220 1-LEI, 9-None or internal
 
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
-| `FORMAT/141` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-09/CUSTODIAN_PAIR` | (all) | ERROR | Field 140 or field 141 is populated | Both fields 140 and 141 must be populated as a pair. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `FORMAT/141` | (all) | ERROR | Populated cell does not match the codification (UNKNOWN) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/141` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
-**Referenced as source by:** `XF-09/CUSTODIAN_PAIR`
 
 ---
 
 ### Field 142 — 142_Bail-in_Rule
 
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/BailInRule`
 Codification: CLOSED_LIST, closed list of 4 entries
 Applicability: CIC categories CIC2, CIC5
 Definition: Indicate if there is a "Bail-in" Rule applicable for debt instrument
@@ -4201,7 +4086,7 @@ Definition: Indicate if there is a "Bail-in" Rule applicable for debt instrument
 
 ### Field 143 — 143_Maturity_date_expected
 
-FundsXML path: `Expected redemption date after considering an expected prepayment / extension of the contractual terms based on the options in the instrument`
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/Redemption/MaturityDateExpected`
 Codification: DATE
 Applicability: all rows
 Definition: Expected redemption date after considering an expected prepayment / extension of the contractual terms based on the options in the instrument
@@ -4226,6 +4111,7 @@ Definition: Expected redemption date after considering an expected prepayment / 
 
 ### Field 144 — 144_Modified_duration_to_maturity_date_expected
 
+FundsXML path: `.../Portfolio/Positions/Position/Analytics/ModifiedDurationToMaturityDateExpected`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -4249,6 +4135,7 @@ Applicability: all rows
 
 ### Field 145 — 145_Credit_sensitivity_expected
 
+FundsXML path: `.../Portfolio/Positions/Position/Analytics/CreditSensitivityExpected`
 Codification: NUMERIC
 Applicability: all rows
 
@@ -4272,6 +4159,7 @@ Applicability: all rows
 
 ### Field 146 — 146_PIK
 
+FundsXML path: `.../Portfolio/Positions/Position/InterestRateInstrumentCharacteristics/Redemption/PIK`
 Codification: CLOSED_LIST, closed list of 5 entries
 Applicability: all rows
 
@@ -4297,7 +4185,7 @@ Applicability: all rows
 
 ### Field 147 — 147_Infrastructure_investment_additional_QRT
 
-FundsXML path: `To be defined with Fundxml`
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/InfrastructureInvestmentAdditionalQRT`
 Codification: CLOSED_LIST, closed list of 10 entries
 Applicability: all rows
 Definition: (for mandate or segregated account especially) Identify if the asset is an infrastructure investment as defined in Article 1(55a) and (55b) of Delegated Regulation (EU) 2015/35. One of the options in the following closed list shall be used:
@@ -4322,7 +4210,7 @@ Definition: (for mandate or segregated account especially) Identify if the asset
 
 ### Field 148 — 148_Economic_sector_NACE
 
-FundsXML path: `Position / CreditRiskData / EconomicSector`
+FundsXML path: `.../Portfolio/Positions/Position/CreditRiskData/EconomicSectorNACE`
 Codification: NACE
 Applicability: CIC categories CIC1, CIC2, CIC3, CIC4, CIC5, CIC6, CIC7, CIC8, CICA, CICB, CICC, CICD, CICE, CICF
 Definition: Economic sector
@@ -4348,11 +4236,12 @@ Definition: Economic sector
 
 ---
 
-### Field 150 — 150_LTEI_Fund_Elligibility
+### Field 150 — 150_LTEI_Fund_Eligibility
 
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/LTEIFundEligibility`
 Codification: CLOSED_LIST, closed list of 3 entries
 Applicability: CIC categories CIC3, CIC4
-Definition: Elligibility of the held fund to LTEI dispositions according to regulation
+Definition: Eligibility of the held fund to LTEI dispositions according to regulation
 
 #### Flag per profile
 
@@ -4375,9 +4264,10 @@ Definition: Elligibility of the held fund to LTEI dispositions according to regu
 
 ### Field 151 — 151_Legislative_program_investment
 
+FundsXML path: `.../Portfolio/Positions/Position/AdditionalInformation/LegislativeProgramInvestment`
 Codification: CLOSED_LIST, closed list of 3 entries
 Applicability: CIC categories CIC3
-Definition: Elligibility of the held equities to legislative programmes dispositions
+Definition: Eligibility of the held equities to legislative programmes dispositions
 
 #### Flag per profile
 
@@ -4400,6 +4290,7 @@ Definition: Elligibility of the held equities to legislative programmes disposit
 
 ### Field 1000 — 1000_TPT_Version
 
+FundsXML path: `.../Portfolio/TPTVersion`
 Codification: FREE_TEXT
 Applicability: all rows
 Definition: TPT Published Version

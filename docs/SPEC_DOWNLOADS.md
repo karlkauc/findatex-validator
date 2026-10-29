@@ -33,8 +33,14 @@ in `core/src/main/resources/spec/`.
 
 | Version | Release    | Target path                                                  | Status   | Source page |
 |---------|------------|--------------------------------------------------------------|----------|-------------|
-| V8.0    | 2026-05-26 | `src/main/resources/spec/tpt/TPT_V8_20260526.xlsx`           | present  | findatex.eu → Templates → Tripartite Template (TPT) |
+| V8.0    | 2026-10-08 | `src/main/resources/spec/tpt/TPT_V8_20261008.xlsx`           | present  | findatex.eu → Templates → Tripartite Template (TPT) ("TPT V8 post consultation 261008V2.xlsx", published 2026-10-28) |
 | V7.0    | 2024-11-25 | `src/main/resources/spec/tpt/TPT_V7_20241125.xlsx`           | present  | findatex.eu → Templates → Tripartite Template (TPT) |
+
+Companion artefact: `TPT V8 - Technical Annex with Key changes and
+implementation timeline.pdf` (FinDatEx, 3 pages: timeline, the 18 N/A
+fields, issuer-identifier codes 1/2/9, securitisation e1/e2/e3, renamed 62
+and 148). Kept under `specs/TPT/v80/` next to the final workbook; the
+condensed diff is `docs/TPT_V7_TO_V8_CHANGES.md`.
 
 Companion artefact: `PIK guidelines 240913.xlsx` (Payment-in-Kind loan rules,
 referenced by TPT V7 cross-field rule `PikRule`). Currently bundled in the

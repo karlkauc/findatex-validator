@@ -401,7 +401,7 @@ public final class TemplateTabController {
 
     /**
      * Renders a {@link TemplateVersion} by its human-readable {@code label()} (e.g. "TPT V8.0 —
-     * 2026-05-26"). Without a converter the ComboBox falls back to the record's {@code toString()},
+     * 2026-10-08"). Without a converter the ComboBox falls back to the record's {@code toString()},
      * which starts with {@code TemplateVersion[templateId=…} and gets truncated so the version
      * itself is no longer visible.
      */

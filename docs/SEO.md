@@ -175,8 +175,8 @@ Worth checking once, because all of it fails silently:
 
 Ordered by expected effect, not effort:
 
-1. **`docs/TPT_V7_TO_V8_CHANGES.md` as a public page.** TPT V8 shipped
-   2026-05-26; "what changes from V7 to V8" is a time-limited traffic peak.
+1. **`docs/TPT_V7_TO_V8_CHANGES.md` as a public page.** TPT V8 final shipped
+   2026-10-08 (draft 2026-05-26); "what changes from V7 to V8" is a time-limited traffic peak.
 2. **A German variant.** The audience sits in DE/AT/CH/LU; roughly double the
    search volume for the same content, at the cost of `hreflang` upkeep.
 3. **Watch the rule pages in Search Console.** ~2000 pages generated from one

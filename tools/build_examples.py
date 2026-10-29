@@ -79,17 +79,21 @@ HEADERS = [
 ]
 
 
-def spec_headers(nums: list[str]) -> list[str]:
+def spec_headers(nums: list[str], manifest_path: Path = SPEC_MANIFEST,
+                 xlsx_path: Path = SPEC_XLSX) -> list[str]:
     """Turn field numbers into the exact header strings the spec itself uses.
 
     HeaderMapper matches on the token before the first underscore
     (SpecCatalog.matchHeader), so only the number has to be right — but taking
     the whole string from the spec sheet keeps the showcase readable and
     guarantees it can never drift from the field it claims to be.
+
+    Defaults to the V7 spec; ``tools/build_tpt_v8_samples.py`` passes the V8
+    manifest/workbook pair.
     """
-    manifest = json.loads(SPEC_MANIFEST.read_text(encoding="utf-8"))
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     cols = manifest["columns"]
-    sheet = openpyxl.load_workbook(SPEC_XLSX, data_only=True)[manifest["sheetName"]]
+    sheet = openpyxl.load_workbook(xlsx_path, data_only=True)[manifest["sheetName"]]
     # In the TPT manifests "numData" is the column holding the "<num>_<label>"
     # token (the header form); "path" is the dotted XML path. The EET/EMT/EPT
     # manifests split those differently — see findatex_sample_helpers.load_spec.
@@ -107,7 +111,7 @@ def spec_headers(nums: list[str]) -> list[str]:
         by_num.setdefault(num, token)
     missing = [n for n in nums if n not in by_num]
     if missing:
-        raise SystemExit(f"build_examples: no TPT V7 field for {missing}")
+        raise SystemExit(f"build_examples: no {manifest['templateId']} {manifest['version']} field for {missing}")
     return [by_num[n] for n in nums]
 
 
@@ -257,11 +261,12 @@ def make_lei(body18: str) -> str:
 
 # ---------------------------------------------------------------- writers --
 
-def write_xlsx(path: Path, rows: list[dict], headers: list[str] | None = None) -> None:
+def write_xlsx(path: Path, rows: list[dict], headers: list[str] | None = None,
+               sheet_title: str = "TPT V7") -> None:
     headers = headers or HEADERS
     wb = openpyxl.Workbook()
     ws = wb.active
-    ws.title = "TPT V7"
+    ws.title = sheet_title
     for c, h in enumerate(headers, start=1):
         ws.cell(row=1, column=c).value = h
     for r, row in enumerate(rows, start=2):

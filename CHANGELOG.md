@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **TPT V8.0 is now the final FinDatEx release (8 October 2026).** The bundled
+  consultation draft (26 May 2026) is replaced by "TPT V8 post consultation
+  261008V2" published on 28 October 2026, together with FinDatEx's Technical
+  Annex. The final sheet has a different column layout (no helper columns,
+  single IORP column), so the V8 manifest was rewritten. What changes for
+  users of V8:
+  - 18 fields are retained but "must be left empty" (17b, 29, 31, 35, 36, 44,
+    54, 58b, 106, 108, 114, 116, 118, 120, 124, 125, 126, 141). A value there
+    is reported as a new `NOT_APPLICABLE/<num>` warning (not scored).
+  - Issuer and group identifiers 47/48, 50/51, 81/82, 85 are mandatory; type
+    codes are `1` = LEI, `2` = external identifier (VAT id or country code +
+    national number), `9` = internal. Only `1` triggers the LEI checksum.
+  - 115, 119 and 140 must hold an LEI outright and are checked without a type
+    column (`LEI/115`, `LEI/119`, `LEI/140`); the custodian pair rule XF-09 and
+    the conditionals XF-16, XF-17 (index type/name), XF-18 (option direction),
+    XF-20..XF-24 no longer apply to V8. XF-10 requires only 34 and 37 for
+    floating-rate instruments.
+  - Field 56 accepts `e1`/`e2`/`e3` instead of `e`; field 62 is renamed
+    `Conversion_factor`, 148 `Economic_sector_NACE`; 150/151 are closed lists
+    0/1/2. Field 1000 must read `V8.0 (official) dated 8 October 2026`.
+  - V7 stays the production version for December 2026; the showcase and
+    "Try an example" remain on V7. New V8 regression fixtures under
+    `samples/tpt/v8/`.
+
 ## [1.0.20] — 2026-10-27
 
 ### Changed

@@ -13,6 +13,10 @@ import java.util.Locale;
 /**
  * Where the field type indicates "1 - LEI" (e.g. fields 82, 85, 99, 102, 141 carry "1" or "9"),
  * the corresponding code field must be a 20-char LEI matching ISO 17442 (mod-97 check).
+ *
+ * <p>A rule built with the single-argument constructor has no type column: the spec fixes the
+ * column to LEI outright (TPT V8 fields 115, 119, 140, whose former type columns are N/A), so
+ * every non-blank value is checked.
  */
 public final class LeiRule implements Rule {
 
@@ -21,15 +25,23 @@ public final class LeiRule implements Rule {
 
     public LeiRule(String codeNumKey, String typeNumKey) {
         this.codeNumKey = codeNumKey;
-        this.typeNumKey = typeNumKey;
+        this.typeNumKey = typeNumKey == null ? "" : typeNumKey;
+    }
+
+    /** Single-purpose LEI column: no sibling type flag, every non-blank value must be an LEI. */
+    public LeiRule(String codeNumKey) {
+        this(codeNumKey, "");
     }
 
     public String codeNumKey() { return codeNumKey; }
 
+    /** Sibling type column, or {@code ""} when the column is single-purpose. */
     public String typeNumKey() { return typeNumKey; }
 
+    public boolean hasTypeFlag() { return !typeNumKey.isEmpty(); }
+
     @Override
-    public String id() { return "LEI/" + codeNumKey + "/" + typeNumKey; }
+    public String id() { return hasTypeFlag() ? "LEI/" + codeNumKey + "/" + typeNumKey : "LEI/" + codeNumKey; }
 
     @Override
     public List<Finding> evaluate(ValidationContext ctx) {
@@ -38,8 +50,10 @@ public final class LeiRule implements Rule {
                 .map(com.findatex.validator.spec.FieldSpec::name)
                 .orElse("LEI check on field " + codeNumKey);
         for (TptRow row : ctx.file().rows()) {
-            String type = row.stringValue(typeNumKey).orElse("");
-            if (!"1".equals(type.trim())) continue;
+            if (hasTypeFlag()) {
+                String type = row.stringValue(typeNumKey).orElse("");
+                if (!"1".equals(type.trim())) continue;
+            }
             String code = row.stringValue(codeNumKey).orElse("");
             if (code.isBlank()) continue;
             String c = code.trim().toUpperCase(Locale.ROOT);

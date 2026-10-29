@@ -18,6 +18,7 @@ import com.findatex.validator.validation.rules.ConditionalPresenceRule;
 import com.findatex.validator.validation.rules.FormatRule;
 import com.findatex.validator.validation.rules.IsinRule;
 import com.findatex.validator.validation.rules.LeiRule;
+import com.findatex.validator.validation.rules.NotApplicableRule;
 import com.findatex.validator.validation.rules.PresenceRule;
 import com.findatex.validator.validation.rules.RuleDoc;
 import com.findatex.validator.validation.rules.crossfield.CashPercentageRule;
@@ -271,15 +272,28 @@ public final class RuleDocGenerator {
         }
 
         if (!buckets.leiRules.isEmpty()) {
-            md.heading3("LEI engine (`LEI/{code}/{type}`)");
-            md.bullet("**What it checks:** when the type cell is `1` (LEI), the code cell must be a"
+            md.heading3("LEI engine (`LEI/{code}/{type}` or `LEI/{code}`)");
+            md.bullet("**What it checks:** when the type cell is `1` (LEI) — or always, for a"
+                    + " single-purpose LEI column without a type field — the code cell must be a"
                     + " 20-character ISO 17442 LEI with the mod-97 checksum.");
             md.bullet("**Severity:** ERROR.");
             md.bullet("**Score impact:** " + ScoreImpactDescriber.forIdentifier());
             for (LeiRule r : buckets.leiRules) {
-                md.bullet("`" + r.id() + "` — code field `" + r.codeNumKey()
-                        + "`, type field `" + r.typeNumKey() + "`");
+                md.bullet("`" + r.id() + "` — code field `" + r.codeNumKey() + "`, "
+                        + (r.hasTypeFlag() ? "type field `" + r.typeNumKey() + "`"
+                                           : "single-purpose LEI column (no type field)"));
             }
+            md.blank();
+        }
+
+        if (!buckets.notApplicableByField.isEmpty()) {
+            md.heading3("Not-applicable engine (`NOT_APPLICABLE/{num}`)");
+            md.bullet("**What it checks:** fields the spec flags `N/A` are retained for technical"
+                    + " reasons only and must be left empty; any non-blank value is reported.");
+            md.bullet("**Severity:** WARN.");
+            md.bullet("**Score impact:** none (reported only).");
+            md.bullet("**Fields:** " + buckets.notApplicableByField.keySet().stream()
+                    .map(k -> "`" + k + "`").reduce((a, b) -> a + ", " + b).orElse("—"));
             md.blank();
         }
 
@@ -435,10 +449,23 @@ public final class RuleDocGenerator {
                         "`" + r.id() + "`",
                         "(all)",
                         "ERROR",
-                        "Type field `" + r.typeNumKey() + "` = `1` and this cell is not a valid 20-char LEI with mod-97 checksum",
+                        (r.hasTypeFlag() ? "Type field `" + r.typeNumKey() + "` = `1` and this cell"
+                                         : "This cell")
+                                + " is not a valid 20-char LEI with mod-97 checksum",
                         "Identifier cannot be resolved against ISO 17442 (GLEIF).",
                         "FORMAT_CONFORMANCE −1/M"));
             }
+        }
+        // Not-applicable rule where this field is flagged N/A
+        NotApplicableRule na = buckets.notApplicableByField.get(spec.numKey());
+        if (na != null) {
+            checkRows.add(MarkdownEmitter.row(
+                    "`" + na.id() + "`",
+                    na.profile().displayName(),
+                    "WARN",
+                    "This cell is not empty",
+                    "Field is N/A (no longer maintained) and must be left empty.",
+                    "none"));
         }
         // Cross-field rules where this field is the target
         for (CrossFieldEntry e : buckets.crossField) {
@@ -517,6 +544,7 @@ public final class RuleDocGenerator {
         final Map<String, FormatRule> formatByField = new LinkedHashMap<>();
         final List<IsinRule> isinRules = new ArrayList<>();
         final List<LeiRule> leiRules = new ArrayList<>();
+        final Map<String, NotApplicableRule> notApplicableByField = new LinkedHashMap<>();
         final List<CrossFieldEntry> crossField = new ArrayList<>();
         VersionRuleInfo versionRule;
         int presenceCount;
@@ -550,6 +578,8 @@ public final class RuleDocGenerator {
                 out.formatCount++;
             } else if (r instanceof IsinRule i) {
                 out.isinRules.add(i);
+            } else if (r instanceof NotApplicableRule na) {
+                out.notApplicableByField.put(na.spec().numKey(), na);
             } else if (r instanceof LeiRule l) {
                 out.leiRules.add(l);
             } else if (r instanceof TptVersionRule v) {
@@ -626,7 +656,8 @@ public final class RuleDocGenerator {
             } else if (r instanceof InterestRateTypeRule c) {
                 addRuleDoc(out, r.id(), c.describe(),
                         "Field 32 is Floating/Variable, or Fixed",
-                        "Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory.");
+                        "Floating/Variable → fields " + String.join(", ", c.requiredWhenFloating())
+                                + " mandatory; Fixed → field 33 mandatory.");
             } else if (r instanceof MaturityAfterReportingRule c) {
                 addRuleDoc(out, r.id(), c.describe(),
                         "Row CIC matches the field-39 applicability scope (CIC 1, 2, 5, 6,"

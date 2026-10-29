@@ -1,141 +1,156 @@
-# TPT V7.0 → V8.0 — Änderungsreport
+# TPT V7.0 → V8.0 — Änderungsreport (finale V8, 8. Oktober 2026)
 
 Vergleich der gebündelten Spec-Dateien:
 
 - **V7.0** — `core/src/main/resources/spec/tpt/TPT_V7_20241125.xlsx` (Sheet `TPT V7.0`, Release 2024-11-25)
-- **V8.0** — `core/src/main/resources/spec/tpt/TPT_V8_20260526.xlsx` (Sheet `TPT V8.0`, Release 2026-05-26)
+- **V8.0** — `core/src/main/resources/spec/tpt/TPT_V8_20261008.xlsx` (Sheet `TPT V8.0`, Release 2026-10-08;
+  FinDatEx-Datei „TPT V8 post consultation 261008V2.xlsx“, veröffentlicht 2026-10-28)
 
-> Methodik: zellgenauer Diff aller nummerierten Datenfelder (NUM_DATA-Präfix)
-> über Pfad, Definition, Codification, Comment, M/C/O-Flag, CIC-Applicability
-> sowie die Profil-Spalten NW 675 / SST / IORP.
+Quellen: FinDatEx News 93 („FinDatEx publishes version 8 of the Tripartite
+Template“), der Technical Annex „TPT V8 – Key changes and implementation
+timeline“ (3 Seiten, unter `specs/TPT/v80/`) und ein zellgenauer Diff aller
+nummerierten Datenfelder (Pfad, Definition, Codification, Comment, Flag,
+CIC-Applicability, Profil-Spalten NW 675 / SST / IORP).
+
+> Die zuvor gebündelte V8 vom 26.05.2026 war der **Konsultationsentwurf**. Die
+> finale Fassung unterscheidet sich davon im Sheet-Layout und in rund 30
+> Feldern (siehe Abschnitt 7).
+
+## Zeitplan (FinDatEx)
+
+| Produktion | Version |
+|------------|---------|
+| Dezember 2026 | **V7** |
+| Januar / Februar 2027 | V7 oder V8 (parallel) |
+| ab März 2027 | **V8** verpflichtend |
+
+Der Dateiname muss die Version tragen (`…_TPTV8_…`), Feld 1000 muss
+`V8.0 (official) dated 8 October 2026` enthalten.
 
 ## Auf einen Blick
 
-| Kennzahl | V7.0 | V8.0 |
-|----------|------|------|
-| Nummerierte Datenfelder | 145 | 147 (**+2**) |
-| Spaltenlayout (Sheet) | 35 Spalten | 35 Spalten (**unverändert**) |
-| CIC-Applicability-Spalten | 12–27 | 12–27 (**unverändert**) |
-| Profil-Spalten (NW675/SST/IORP) | 29 / 30 / 31–35 | identisch |
-| ISIN/LEI-Spalten für externe Validierung | 14/68, 47–141 | **unverändert** (inkl. Custodian-LEI 140/141) |
-| Entfernte Felder | — | **keine** |
+| Kennzahl | V7.0 | V8.0 final |
+|----------|------|------------|
+| Katalogfelder (Validator) | 152 | 154 (**+2**) |
+| Spalten im Sheet | 35 | **26** |
+| Primary-Flag-Spalte (M/C/O/I/N/A) | 11 | **6** |
+| CIC-Applicability-Spalten | 12–27 | **7–22** |
+| Profil-Spalten NW 675 / SST / IORP | 29 / 30 / 31–35 | **24 / 25 / 26** |
+| Physisch entfernte Felder | — | **keine** (18 Felder N/A) |
+| Neue Felder | — | 150, 151 |
+| Umbenannte Felder | — | 62, 148 |
 
-**Fazit:** V8 ist eine inhaltlich kleine, **strukturell deckungsgleiche**
-Revision von V7. Die Validierung läuft manifest-getrieben — V8 nutzt dieselbe
-`tpt-v8-info.json` (Kopie von V7 mit geänderten Versions-/Datums-Metadaten) und
-dieselbe External-Validation-Config wie V7.
-
----
-
-## 1. Neue Felder (2)
-
-Beide sind **konditional (`C`)**, regulatorisch motiviert (Solvency II,
-RD UE 2015/35) und werden — gemäß Projektregel „never invent regulatory logic" —
-**rein mechanisch** geprüft (Vorhandensein/Format/Closed-List), ohne eigene
-Trigger-Logik.
-
-### Feld 150 — `150_LTEI_Fund_Elligibility` (`C`)
-- **Definition:** Elligibility of the held fund to LTEI dispositions according to regulation
-- **Codification (Closed List):** `0 – Not assessed` · `1 – Eligible` · `2 – Not elligible`
-- **Hintergrund:** Art. 171d RD UE 2015/35 (revidiert) — bestimmte OGAW mit
-  niedrigerem Risikoprofil können für Long-Term-Equity-Investment-Regelungen
-  qualifizieren und von einer reduzierten Kapitalanforderung profitieren.
-
-### Feld 151 — `151_Legislative_program_investment` (`C`)
-- **Definition:** Elligibility of the held equities to legislative programmes dispositions
-- **Codification (Closed List):** `0 – Not assessed` · `1 – Eligible` · `2 – Not elligible`
-- **Hintergrund:** Art. 173 RD UE 2015/35 — Aktieninvestments (direkt oder über
-  OGAW) unter bestimmten Legislativprogrammen können von einer reduzierten
-  Kapitalanforderung profitieren.
+**Fazit:** Inhaltlich eine moderate Revision, strukturell aber ein neues
+Sheet-Layout (Hilfsspalten „Reference data / Identification / SCR / QRT /
+Control“ und die vier EIOPA-Teilspalten sind weg). Manifest
+`tpt-v8-info.json` ist deshalb kein V7-Klon mehr; IORP ist eine einzelne
+`flag`-Spalte statt `presenceMerge`.
 
 ---
 
-## 2. Umbenanntes Feld (1)
+## 1. Neue Felder (2) — konditional, Closed List `0 / 1 / 2`
 
-### Feld 148 — `Economic_sector_NACE2.1` → `Economic_sector_NACE`
-- **Codification:** `NACE V2.1 Code` → `Latest version of NACE codification in force`
-- **Comment:** Der Satz „if V2.1 is not available, please provide V2.0
-  codification in datapoint 54." wurde **entfernt**.
-- **Wirkung:** Versions-Pinning auf NACE 2.1 aufgehoben; verweist nun generisch
-  auf die jeweils aktuelle NACE-Codification. Manifest-getrieben → automatisch.
+| Feld | Header | Flag | CIC | Hintergrund |
+|------|--------|------|-----|-------------|
+| 150 | `150_LTEI_Fund_Eligibility` | C | 3, 4 | Art. 171a/171d DelVO (EU) 2015/35 – Long-Term-Equity-Regime für Fonds ohne Look-Through |
+| 151 | `151_Legislative_program_investment` | C | 3 | Art. 173 DelVO (EU) 2015/35 – Aktien unter Legislativprogrammen |
 
----
+Codification: `0 – Not assessed`, `1 – Eligible`, `2 – Not eligible`. Der
+Validator prüft rein mechanisch (Format/Closed List); keine Trigger-Logik.
 
-## 3. Geänderte Codification (Closed-List-relevant)
+## 2. Felder „retained but no longer maintained“ (18) — N/A, müssen leer sein
 
-### Feld 56 — Securitisation-Eligibility unter Solvency II
-Der bisherige Einzelcode **`"e"`** wurde in **drei Codes aufgeteilt**:
+`17b, 29, 31, 35, 36, 44, 54, 58b, 106, 108, 114, 116, 118, 120, 124, 125, 126, 141`
 
-| V7 | V8 | Bedeutung |
-|----|----|-----------|
-| `e` (Art. 178(8)/(9)) | `e1` | senior non-STS (Art. 178(8)) |
-|    | `e2` | junior non-STS (Art. 178(8a)) |
-|    | `e3` | others (Art. 178(9)) |
+Codification, CIC-Spalten und alle Profil-Flags sind in der Spec geleert;
+Comment: „No longer maintained by Findatex. Kept for technical reasons and
+deletion in 2028 under consideration.“ Der Technical Annex: *must be left
+empty (Null)*.
 
-Comment-Ergänzung in V8: „According to S2 amendment UE tbd. e) categorie has
-been divided in 3 categories e1, e2, e3." Daneben rein kosmetische
-Whitespace-Bereinigungen in den übrigen Codes (a–d, f–j).
+**Validator:** `NotApplicableRule` → `NOT_APPLICABLE/<num>` als **WARNING**
+bei befülltem Feld (nicht im Score). Presence-/Conditional-Regeln entfallen
+automatisch über das Manifest. 127/128 (Bond Floor, Option Premium) wurden in
+der Konsultation zur Streichung diskutiert, **bleiben aber optional**.
 
-> **Validierungs-Hinweis:** Der Closed-List-Check liest die zulässigen Codes aus
-> der Spec — die neuen `e1/e2/e3` werden für V8 automatisch akzeptiert. Falls
-> Sample-Fixtures oder Tests den alten Code `"e"` hartkodieren, gilt dieser unter
-> V8 als ungültig.
+## 3. Issuer- und Gruppen-Identifikation — jetzt Pflicht
 
----
+| Feld | V7 | V8 final |
+|------|----|----------|
+| 47 Issuer_identification_code | C | **M**, alle CIC inkl. CIC 0, `Alphanumeric (max 20)` |
+| 48 Type_of_identification_code_for_issuer | C, `1 or 9` | **M**, Closed List `1 / 2 / 9` |
+| 50 Identification_of_the_group | C | **M**, alle CIC inkl. CIC 0 |
+| 51 Type … issuer_group | C, `1 or 9` | **M**, `1 / 2 / 9` |
+| 81 Issuer … underlying | C („x for 22“, A1 …) | **M**, CIC 2/A/B/C/D/F pauschal |
+| 82 Type … underlying issuer | C | **M**, `1 / 2 / 9`, SST O→C |
+| 84 Group … underlying | C („if 85 = 1“) | C, Qualifier entfernt |
+| 85 Type … underlying group | C | **M**, `1 / 2 / 9`, SST O→C |
 
-## 4. Definition-/Comment-Präzisierungen (keine Validierungswirkung)
+Typ-Codes: `1` LEI · `2` externer Identifier (VAT-ID im EWR, sonst
+ISO-3166-α2 + nationale Registernummer, z. B. `US` + EIN) · `9` intern.
+**Achtung:** In V7 bedeutete `9` „none“ – Mappingtabellen anpassen. Reihenfolge
+laut Annex: LEI vor externem vor internem Identifier.
 
-Reine Textanpassungen; sie ändern weder Flags, Format noch Closed-Lists.
+**115, 119, 140** (Fund issuer, Fund issuer group, Custodian) **müssen LEIs
+enthalten**; die Typspalten 116/120/141 sind N/A. 140 bleibt O („LEI of the
+custodian … if none is available this item shall not be reported“).
 
-| Feld | Art | V7 → V8 (Kurzfassung) |
-|------|-----|------------------------|
-| 1 | Comment | Umformuliert (Identifikation Fonds/Anteilsklasse bei mehreren Klassen) |
-| 4 | Comment | Gekürzt (Share-Class-Currency) |
-| 46–51 | Comment | „OTC derivatives" → „derivatives … (Central clearing house for listed one)"; Gegenpartei-/Underlying-Hinweise klarer gefasst |
-| 51 | Comment | „Only LEI should be used" → „LEI is required" |
-| 115 | Definition | „LEI when available, otherwise not reported" → „LEI" |
-| 119 | Definition | „LEI of ultimate parent when available, otherwise not reported" → „LEI of ultimate parent" |
-| 140 | Codification | „Depend on the nomenclature used" → „LEI of the custodian" |
-| 1000 | Codification | Versionshistorie um Zeile „V8 (official) dated XXXXXXXXXX" ergänzt (Platzhalter-Datum im Draft) |
+**Validator:** `LeiRule("47","48")` etc. prüfen nur bei Typ `1`;
+`LeiRule("115")`, `("119")`, `("140")` prüfen jeden Wert; externe Validierung
+(GLEIF) analog über `TptTemplate.EXTERNAL_VALIDATION_V8`. `CustodianPairRule`
+(XF-09) und die Konditionalregeln XF-20…XF-24 gelten nur noch für V7.
 
----
+## 4. Securitisation (Feld 56)
 
-## 5. CIC-Applicability-Notation (Felder 47, 50)
+`e` → `e1` (senior non-STS, Art. 178 (8)), `e2` (junior non-STS, Art. 178 (8a)),
+`e3` (other, Art. 178 (9)). Übrige Codes a–d, f–j unverändert. Closed List im
+Validator automatisch aus der Codification.
 
-In V7 trugen die CIC-Zellen den konditionalen Text
-`x\nif item 48 set to "1"` (Feld 47) bzw. `…item 51…` (Feld 50). In V8 steht
-nur noch ein schlichtes `x`.
+## 5. Umbenannte Felder / revidierte Definitionen
 
-> Der manifest-getriebene Loader wertet eine **nicht-leere** CIC-Zelle als
-> „anwendbar". Da beide Versionen nicht-leere Zellen haben, ist der **geparste
-> Applicability-Scope identisch** — keine funktionale Auswirkung, nur
-> Notations-Bereinigung in der Spec.
+| Feld | V7 | V8 |
+|------|----|----|
+| 62 | `Conversion_factor_(convertibles)_concordance_factor_parity_(options)` | `62_Conversion_factor` — nur Convertibles (CIC 22), nicht mehr für Optionen/Derivate |
+| 148 | `Economic_sector_NACE2.1` | `148_Economic_sector_NACE` — „latest NACE version in force“; NW 675 jetzt C |
 
----
+HeaderMapper matcht auf die Feldnummer, alte Header werden also weiterhin
+zugeordnet. Dateien mit V7-Headern laufen daher gegen V8 durch; nur die
+Feld-1000-Prüfung (XF-15) und die N/A-Warnungen schlagen an.
 
-## 6. Nicht-Feld-Änderungen
+## 6. Konditionalregeln – was in V8 noch gilt
 
-- **Intro-/Disclaimer-Prosa** (Zeilen vor der Tabelle) wurde umgeschrieben
-  (Solvency-II-Erläuterung statt FinDatEx-Disclaimer). Kein Validierungsbezug.
-- Versions-Zelle im Sheet: „Version 8 dated 26/05/19" — vermutlich Draft-Typo;
-  wir verwenden bewusst **2026-05-26** als Release-Datum (siehe CHANGELOG).
+| Regel | V7 | V8 | Grund |
+|-------|----|----|-------|
+| XF-09 Custodian pair 140/141 | ✔ | ✘ | 141 N/A |
+| XF-10 Floating → 34, 35, 36, 37 | ✔ | **34, 37** | 35/36 N/A |
+| XF-16 29 → 31 | ✔ | ✘ | beide N/A |
+| XF-17 34 → 35 / 36 / 37 | ✔ | **nur 37** | 35/36 N/A |
+| XF-18 42 = Cal/Put → 43 / 44 | ✔ | **nur 43** | 44 N/A |
+| XF-19 42 → 45 | ✔ | ✔ | |
+| XF-20/21 48/51 = 1 → 47/50 | ✔ | ✘ | 47/50 sind M → PresenceRule |
+| XF-22 85 = 1 → 84 | ✔ | ✘ | Qualifier aus Spec entfernt, 84 C |
+| XF-23/24 116/120 = 1 → 115/119 | ✔ | ✘ | 116/120 N/A, 115/119 M |
+| XF-25 138 ∈ {1,2,3} → 139 | ✔ | ✔ | |
+| Übrige XF-01…XF-15 | ✔ | ✔ | SCR-Felder strukturell unverändert |
 
----
+## 7. Finale V8 vs. Konsultationsentwurf (26.05.2026)
 
-## 7. Auswirkung auf den Validator
+- Sheet-Layout 35 → 26 Spalten (siehe Tabelle oben); Spalte B heißt jetzt
+  „FundsXML XPath“ mit vollständigen Pfaden `/FundsXML4/RegulatoryReportings/IndirectReporting/TripartiteTemplateSolvencyII_V8/…`.
+- Nur 2 Felder im Entwurf N/A → 18 in der finalen Fassung.
+- 47/48/50/51/81/82/85 im Entwurf noch C → final M; Typ-Code `2` neu.
+- 56: `e1/e2/e3` neu; 140: „LEI of the custodian“.
+- Tippfehler korrigiert (`Elligibility` → `Eligibility`, `Not Aplicable` …).
+- Versionszeile: „Version 8 dated 26/05/19“ → „Version 8.0 dated 08/10/26“;
+  Feld 1000 nennt jetzt das offizielle Datum.
 
-| Bereich | Auswirkung |
-|---------|-----------|
-| Spec-Loader / Manifest | Keine — V8 nutzt dieselbe Manifest-Struktur (config-only) |
-| Presence/Format/Closed-List | Felder 150/151 + neue `e1/e2/e3`-Codes (56) automatisch aus der Spec |
-| Cross-Field-Regeln (XF-*) | Keine neuen Regeln; 150/151 mechanisch (kein SME-Trigger) |
-| External Validation (ISIN/LEI) | Keine — identisches Spaltenlayout, Config geteilt mit V7 |
-| `TptVersionRule` (XF-15) | Erwartet bei V8-Ruleset Token „V8"/„8.0" in Feld 1000 |
+## 8. Umsetzung im Validator (Kurzfassung)
 
-### Offene Punkte
-- Felder **150/151** sind absichtlich **nur mechanisch** geprüft; eine
-  regulatorische Trigger-Logik (LTEI- bzw. Legislativprogramm-Bedingungen)
-  ist **DEFERRED** und bräuchte SME-Freigabe.
-- Feld **1000** trägt in der Draft-Spec ein Platzhalter-Datum
-  („XXXXXXXXXX"); bei einer finalen FinDatEx-Veröffentlichung ggf. Release-Datum
-  und Versionshistorie nachziehen.
+- `tpt-v8-info.json` neu (Flag 6, CIC 7–22, NW/SST/IORP 24/25/26).
+- `TptTemplate.V8_0` → `TPT_V8_20261008.xlsx`, Label „TPT V8.0 — 2026-10-08“,
+  eigenes `EXTERNAL_VALIDATION_V8`.
+- `TptRuleSet` versionsabhängig (`isV8OrLater()`, `CONDITIONAL_REQUIREMENTS_V8`,
+  `V8_DROPPED_XF_RULES`), typlose `LeiRule`, `InterestRateTypeRule(FLOATING_FIELDS_V8)`,
+  neue generische `NotApplicableRule`.
+- Fixtures `samples/tpt/v8/` (`tools/build_tpt_v8_samples.py`,
+  `TptV8ExampleSamplesTest`); Showcase/„Try an example“ bleiben V7.
+- Rule-Referenz regeneriert (`docs/rules/tpt-v8-0.md`).

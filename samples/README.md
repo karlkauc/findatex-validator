@@ -20,6 +20,7 @@ negation in `.dockerignore`, and the `SampleFiles` map.
 | Folder | Template | Generator | JUnit |
 |--------|----------|-----------|-------|
 | [`tpt/`](tpt/) | TPT V7.0 | `tools/build_examples.py` | `ExampleSamplesTest` |
+| [`tpt/v8/`](tpt/v8/) | TPT V8.0 (regression fixtures only, not bundled) | `tools/build_tpt_v8_samples.py` | `TptV8ExampleSamplesTest` |
 | [`eet/`](eet/) | EET V1.1.3 | `tools/build_eet_samples.py` | `EetExampleSamplesTest` |
 | [`emt/`](emt/) | EMT V4.3 | `tools/build_emt_samples.py` | `EmtExampleSamplesTest` |
 | [`ept/`](ept/) | EPT V2.1 | `tools/build_ept_samples.py` | `EptExampleSamplesTest` |

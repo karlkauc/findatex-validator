@@ -20,13 +20,20 @@ class TptExternalValidationConfigTest {
     }
 
     @Test
-    void v8SharesV7sIsinAndLeiLayout() {
+    void v8ChecksFundIssuerGroupAndCustodianLeisWithoutATypeColumn() {
         ExternalValidationConfig cfg = tpt.externalValidationConfigFor(TptTemplate.V8_0);
         assertThat(cfg.isEmpty()).isFalse();
         assertThat(cfg.isinFields()).hasSize(2);
         assertThat(cfg.leiFields()).hasSize(7);
-        assertThat(cfg.leiFields()).extracting(ExternalValidationConfig.IdentifierRef::codeKey)
-                .contains("140");
+        // 116/120/141 are "N/A, must be left empty" in V8 → 115/119/140 are single-purpose.
+        assertThat(cfg.leiFields())
+                .filteredOn(r -> !r.hasTypeFlag())
+                .extracting(ExternalValidationConfig.IdentifierRef::codeKey)
+                .containsExactlyInAnyOrder("115", "119", "140");
+        assertThat(cfg.leiFields())
+                .filteredOn(ExternalValidationConfig.IdentifierRef::hasTypeFlag)
+                .extracting(ExternalValidationConfig.IdentifierRef::typeKey)
+                .containsExactlyInAnyOrder("48", "51", "82", "85");
     }
 
     @Test

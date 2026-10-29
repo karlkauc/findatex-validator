@@ -25,10 +25,10 @@ public final class TptTemplate implements TemplateDefinition {
     public static final TemplateVersion V8_0 = new TemplateVersion(
             TemplateId.TPT,
             "V8.0",
-            "TPT V8.0 — 2026-05-26",
-            "/spec/tpt/TPT_V8_20260526.xlsx",
+            "TPT V8.0 — 2026-10-08",
+            "/spec/tpt/TPT_V8_20261008.xlsx",
             "TPT V8.0",
-            LocalDate.of(2026, 5, 26),
+            LocalDate.of(2026, 10, 8),
             "/spec/tpt/tpt-v8-info.json");
 
     public static final TemplateVersion V7_0 = new TemplateVersion(
@@ -43,10 +43,9 @@ public final class TptTemplate implements TemplateDefinition {
     private static final List<TemplateVersion> VERSIONS = List.of(V8_0, V7_0);
 
     /**
-     * TPT V7/V8 column numbering for ISIN/LEI candidates and contextual cross-checks.
+     * TPT V7 column numbering for ISIN/LEI candidates and contextual cross-checks.
      * Type-of-code flag {@code "1"} maps to ISIN (fields 14/68 with their sibling type
-     * columns 15/69) and to LEI (seven LEI/type column pairs). V8 added two conditional
-     * fields (150/151) but did not change any ISIN/LEI columns, so it shares this config.
+     * columns 15/69) and to LEI (seven LEI/type column pairs).
      */
     public static final ExternalValidationConfig EXTERNAL_VALIDATION_V7 = new ExternalValidationConfig(
             List.of(
@@ -62,8 +61,26 @@ public final class TptTemplate implements TemplateDefinition {
                     new IdentifierRef("140", "141", "1")),
             "21", "11", "46", "52");
 
-    /** V8 shares V7's ISIN/LEI column layout (no identifier columns changed in V8). */
-    public static final ExternalValidationConfig EXTERNAL_VALIDATION_V8 = EXTERNAL_VALIDATION_V7;
+    /**
+     * TPT V8 (final, 2026-10-08). ISIN columns and the four issuer/group LEI pairs keep V7's
+     * layout (type code {@code "1"} = LEI; V8 adds {@code "2"} = external identifier and
+     * redefines {@code "9"} as internal). The fund-issuer, fund-issuer-group and custodian
+     * codes (115, 119, 140) must now hold an LEI outright — their former type columns
+     * 116/120/141 are "N/A, must be left empty" — so they are single-purpose references.
+     */
+    public static final ExternalValidationConfig EXTERNAL_VALIDATION_V8 = new ExternalValidationConfig(
+            List.of(
+                    new IdentifierRef("14", "15", "1"),
+                    new IdentifierRef("68", "69", "1")),
+            List.of(
+                    new IdentifierRef("47", "48", "1"),
+                    new IdentifierRef("50", "51", "1"),
+                    new IdentifierRef("81", "82", "1"),
+                    new IdentifierRef("84", "85", "1"),
+                    new IdentifierRef("115", "", ""),
+                    new IdentifierRef("119", "", ""),
+                    new IdentifierRef("140", "", "")),
+            "21", "11", "46", "52");
 
     /** Default-pointing constant for callers that don't care about version drift (tests, etc.). */
     public static final ExternalValidationConfig EXTERNAL_VALIDATION = EXTERNAL_VALIDATION_V7;

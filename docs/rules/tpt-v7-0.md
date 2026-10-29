@@ -85,9 +85,9 @@ The engines below run on every applicable field/row independently of the templat
 - `ISIN/14/15` — code field `14`, type field `15`
 - `ISIN/68/69` — code field `68`, type field `69`
 
-### LEI engine (`LEI/{code}/{type}`)
+### LEI engine (`LEI/{code}/{type}` or `LEI/{code}`)
 
-- **What it checks:** when the type cell is `1` (LEI), the code cell must be a 20-character ISO 17442 LEI with the mod-97 checksum.
+- **What it checks:** when the type cell is `1` (LEI) — or always, for a single-purpose LEI column without a type field — the code cell must be a 20-character ISO 17442 LEI with the mod-97 checksum.
 - **Severity:** ERROR.
 - **Score impact:** Each ERROR lowers FORMAT_CONFORMANCE (20 %) by 1 / non-empty cells.
 - `LEI/47/48` — code field `47`, type field `48`
@@ -97,6 +97,13 @@ The engines below run on every applicable field/row independently of the templat
 - `LEI/115/116` — code field `115`, type field `116`
 - `LEI/119/120` — code field `119`, type field `120`
 - `LEI/140/141` — code field `140`, type field `141`
+
+### Not-applicable engine (`NOT_APPLICABLE/{num}`)
+
+- **What it checks:** fields the spec flags `N/A` are retained for technical reasons only and must be left empty; any non-blank value is reported.
+- **Severity:** WARN.
+- **Score impact:** none (reported only).
+- **Fields:** `17b`, `114`
 
 ### External validation (opt-in)
 
@@ -163,11 +170,11 @@ Each rule below fires per row when its trigger condition holds and the expected 
 - **Target field(s):** `140`, `141`
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
 
-### XF-10/INTEREST_RATE_TYPE — When field 32 (interest-rate type) is Floating/Variable, fields 34..37 are mandatory; when Fixed, field 33 (Coupon rate) is mandatory.
+### XF-10/INTEREST_RATE_TYPE — When field 32 (interest-rate type) is Floating/Variable, fields 34, 35, 36, 37 are mandatory; when Fixed, field 33 (Coupon rate) is mandatory.
 
 - **Severity:** ERROR
 - **Trigger:** Field 32 is Floating/Variable, or Fixed
-- **Required:** Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory.
+- **Required:** Floating/Variable → fields 34, 35, 36, 37 mandatory; Fixed → field 33 mandatory.
 - **Source field(s):** `32`
 - **Target field(s):** `33`, `34`, `35`, `36`, `37`
 - **Score impact:** Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1).
@@ -856,6 +863,7 @@ Definition: Asset/Liability identification if needed
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/17b` | (all) | ERROR | Populated cell does not match the codification (CLOSED_LIST) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/17b` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---
@@ -1299,7 +1307,7 @@ Definition: Fixed rate: coupon rate as a percentage of nominal amount Floating r
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/33` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34, 35, 36, 37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 | `XF-13/PIK` | (all) | ERROR | Field 146 (PIK) is populated | Value must be one of {0,1,2,3,4} and case-specific fields must be present. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 
@@ -1326,7 +1334,7 @@ Definition: identification code for interest rate index
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/34` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34, 35, 36, 37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 **Referenced as source by:** `XF-17/INDEX_TYPE`, `XF-17/INDEX_NAME`, `XF-17/INDEX_MARGIN`
 
@@ -1353,7 +1361,7 @@ Definition: Type of codification used for interest rate index
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/35` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34, 35, 36, 37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 | `XF-17/INDEX_TYPE` | (all) | ERROR | Field `34` is not blank | Field `35` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 
@@ -1380,7 +1388,7 @@ Definition: name of interest rate index
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/36` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34, 35, 36, 37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 | `XF-17/INDEX_NAME` | (all) | ERROR | Field `34` is not blank | Field `36` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 
@@ -1407,7 +1415,7 @@ Definition: Facial margin as a percentage of nominal amount on an annual basis
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/37` | (all) | ERROR | Populated cell does not match the codification (NUMERIC) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
-| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34..37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
+| `XF-10/INTEREST_RATE_TYPE` | (all) | ERROR | Field 32 is Floating/Variable, or Fixed | Floating/Variable → fields 34, 35, 36, 37 mandatory; Fixed → field 33 mandatory. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 | `XF-17/INDEX_MARGIN` | (all) | ERROR | Field `34` is not blank | Field `37` must be non-empty. | Each ERROR lowers CROSS_FIELD_CONSISTENCY (15 %) by 1 / max(distinct cross-field rules × rows, 1). |
 
 
@@ -3460,6 +3468,7 @@ Definition: economic area of the Issuer 1=EEA / 2=NON EEA / 3=NON OECD
 | Rule ID | Profile(s) | Severity | Triggers when | Failure consequence | Score impact |
 |---|---|---|---|---|---|
 | `FORMAT/114` | (all) | ERROR | Populated cell does not match the codification (FREE_TEXT) | Value cannot be parsed/used downstream. | FORMAT_CONFORMANCE −1/M (or CLOSED_LIST_CONFORMANCE −1/M for closed-list mismatches) |
+| `NOT_APPLICABLE/114` | Solvency II | WARN | This cell is not empty | Field is N/A (no longer maintained) and must be left empty. | none |
 
 
 ---

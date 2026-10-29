@@ -195,7 +195,21 @@ ISIN/LEI columns via `externalValidationConfigFor(version)` returning an
 references into the constant; never add hardcoded field codes back into
 `ExternalValidationService`. Per-version drift is supported via a
 per-version `ExternalValidationConfig` (e.g. the custodian LEI columns
-140/141 were introduced in TPT V7; V8 reuses V7's identifier layout).
+140/141 were introduced in TPT V7; in the final TPT V8 the type columns
+116/120/141 are N/A, so 115/119/140 are single-purpose LEI references
+without a type flag — `TptTemplate.EXTERNAL_VALIDATION_V8`).
+
+TPT V8 (final, 2026-10-08) differs from V7 in the rule wiring too:
+`TptRuleSet` is version-aware (`isV8OrLater()`), drops the XF conditionals
+whose targets are N/A or became mandatory (`V8_DROPPED_XF_RULES`), registers
+typeless `LeiRule`s for 115/119/140, omits `CustodianPairRule`, and trims the
+floating-rate requirement of `InterestRateTypeRule` to 34/37. Any field a spec
+flags `N/A` gets a `NotApplicableRule` (WARN when filled, not scored). The
+final V8 sheet also has a different column layout than the consultation
+draft (flag col 6, CIC 7–22, NW675/SST/IORP 24/25/26) — see
+`docs/TPT_V7_TO_V8_CHANGES.md`. The V8 regression fixtures live in
+`samples/tpt/v8/` (`tools/build_tpt_v8_samples.py`, `TptV8ExampleSamplesTest`);
+the showcase and "Try an example" stay on V7 until the March-2027 switch.
 
 ### UI shell (JavaFX)
 

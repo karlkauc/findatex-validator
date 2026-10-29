@@ -4,7 +4,7 @@ Tracks which FinDatEx spec XLSX files are physically present in `src/main/resour
 
 | Template | Version | Path                                                       | Status  |
 |----------|---------|------------------------------------------------------------|---------|
-| TPT  | V8.0   | `src/main/resources/spec/tpt/TPT_V8_20260526.xlsx`             | present |
+| TPT  | V8.0   | `src/main/resources/spec/tpt/TPT_V8_20261008.xlsx`             | present |
 | TPT  | V7.0   | `src/main/resources/spec/tpt/TPT_V7_20241125.xlsx`             | present |
 | EET  | V1.1.3 | `src/main/resources/spec/eet/EET_V1_1_3_20260410.xlsx`         | present |
 | EET  | V1.1.2 | `src/main/resources/spec/eet/EET_V1_1_2_20231205.xlsx`         | present |

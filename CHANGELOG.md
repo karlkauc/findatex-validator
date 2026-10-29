@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.22] — 2026-10-29
+
 ### Added
 - **"Try an example" for TPT V8.0.** The web app's example button now follows
   the selected version: with TPT V8.0 selected (the default) it loads a new
@@ -570,7 +572,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.21...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.22...HEAD
+[1.0.22]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.22
 [1.0.21]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.21
 [1.0.20]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.20
 [1.0.19]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.19

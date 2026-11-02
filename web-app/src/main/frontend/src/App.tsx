@@ -438,9 +438,13 @@ export default function App() {
                       <li>A file handed over from the Fund Data Converter goes directly from that browser tab to this one and is validated like an upload.</li>
                       <li>External validation (GLEIF/OpenFIGI) runs only if you switch it on for a run; only the identifiers from your file are sent.</li>
                       <li>
-                        Anonymous usage statistics record aggregates only (template, finding counts, file
-                        format and size, browser OS family, a daily-rotating visitor hash) — never file
-                        content, file names or your IP address.
+                        Usage statistics record template, finding counts, file format and size, browser OS
+                        family and a daily-rotating visitor hash — never file content, file names or your
+                        raw IP address. See the{' '}
+                        <a href="/privacy" className="underline">
+                          privacy policy
+                        </a>
+                        .
                       </li>
                       <li>
                         For daily validations without web upload,{' '}
@@ -536,6 +540,14 @@ export default function App() {
             {' · '}
             <a href="/rules" className="underline hover:text-slate-700">
               Rule reference
+            </a>
+            {' · '}
+            <a href="/imprint" className="underline hover:text-slate-700">
+              Imprint
+            </a>
+            {' · '}
+            <a href="/privacy" className="underline hover:text-slate-700">
+              Privacy
             </a>
           </div>
           <div>

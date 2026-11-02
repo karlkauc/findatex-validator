@@ -1,4 +1,4 @@
-# Anonymous usage statistics (opt-out)
+# Usage statistics (opt-out)
 
 The validator can report **aggregate-only** usage events so development can be
 prioritised by real usage (which templates/versions, success/error rates,
@@ -8,8 +8,10 @@ instance data ever leaves the machine**: no files, file names, paths, fund
 names, ISIN/LEI/codes, cell values, finding messages/values, user/host name,
 MAC, or exact OS version. File attributes are reduced to non-identifying
 *classes* (format, size, naming pattern — see `FileNameShape`). The raw client
-**IP is never stored or logged** — the server derives only an ISO country code
-and, for web visitors, a daily-rotating hash from it.
+**IP is not stored or logged by the application** — the server derives only an ISO
+country code and, for web visitors, a daily-rotating hash from it. Cloud Run's request
+logs do hold it (30 days, `_Default` log bucket). Web events are pseudonymous, not
+anonymous; the public statement is `web-app/src/main/resources/legal/privacy.md`.
 
 Since **2026-09** every event kind lands in the one `usage_event` table, told
 apart by `event_type`:

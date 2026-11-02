@@ -190,7 +190,7 @@ the private process in [`SECURITY.md`](SECURITY.md) instead.
 
 ---
 
-## Anonymous usage statistics (opt-out)
+## Usage statistics (opt-out)
 
 To understand which templates and versions are actually used, the tool
 records **aggregate-only** usage events (validation runs — including
@@ -201,8 +201,9 @@ lookup counts, a server-derived country code and, for the web app, the
 browser's OS family / device class plus a **daily-rotating visitor hash**
 (`sha256(secret-salt | ip | user-agent)`, not reversible, not linkable across
 days). It **never** records your files, file names, fund names, ISINs/LEIs,
-cell or finding content, or your IP address. The raw IP is never stored or
-logged.
+cell or finding content, or your raw IP address. The application neither
+stores nor logs the raw IP; Cloud Run's request logs do, for 30 days. `/privacy`
+states this publicly (`web-app/src/main/resources/legal/privacy.md`); keep it true.
 
 This is **on by default and easy to switch off**:
 

@@ -123,6 +123,27 @@ public class RulesPageRenderer {
      */
     public String page(String title, String description, String canonical,
                        String crumbs, String bodyHtml) {
+        return document(title, description, canonical, crumbs, bodyHtml, "", CTA_BOX);
+    }
+
+    /** Like {@link #page} for the imprint and privacy policy: not indexed, no call to action. */
+    public String legalPage(String title, String description, String canonical,
+                            String crumbs, String bodyHtml) {
+        return document(title, description, canonical, crumbs, bodyHtml,
+                "<meta name=\"robots\" content=\"noindex\">\n", "");
+    }
+
+    private static final String CTA_BOX = """
+            <div class="cta-box">
+              <strong>Check your own file against these rules</strong>
+              <p>Upload a TPT, EET, EMT or EPT file and get a quality score, every finding
+                 grouped by rule, and an Excel report. No login; the file is not kept.</p>
+              <a class="button" href="/">Open the validator</a>
+            </div>
+            """;
+
+    private String document(String title, String description, String canonical,
+                            String crumbs, String bodyHtml, String robots, String cta) {
         return """
                 <!doctype html>
                 <html lang="en">
@@ -134,7 +155,7 @@ public class RulesPageRenderer {
                 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
                 <title>%s</title>
                 <meta name="description" content="%s">
-                <link rel="canonical" href="%s">
+                %s<link rel="canonical" href="%s">
                 <meta property="og:type" content="article">
                 <meta property="og:title" content="%s">
                 <meta property="og:description" content="%s">
@@ -154,27 +175,22 @@ public class RulesPageRenderer {
                 <main>
                 <nav class="crumbs">%s</nav>
                 %s
-                <div class="cta-box">
-                  <strong>Check your own file against these rules</strong>
-                  <p>Upload a TPT, EET, EMT or EPT file and get a quality score, every finding
-                     grouped by rule, and an Excel report. No login; the file is never stored.</p>
-                  <a class="button" href="/">Open the validator</a>
-                </div>
-                </main>
+                %s</main>
                 <footer class="site"><div>
                   Generated from the official FinDatEx spec sheets bundled with the validator.
                   <strong>Not an official FinDatEx tool</strong> — a private, open-source project,
                   not affiliated with or endorsed by the FinDatEx initiative. Provided as-is,
                   without warranty; validation results may be incomplete or wrong.
+                  <a href="/imprint">Imprint</a> · <a href="/privacy">Privacy</a>
                 </div></footer>
                 <script src="/rules-page.js" defer></script>
                 </body>
                 </html>
                 """.formatted(
-                escape(title), escape(description), escape(canonical),
+                escape(title), escape(description), robots, escape(canonical),
                 escape(title), escape(description), escape(canonical),
                 escape(origin(canonical) + "/og-image.png"),
-                STYLE, crumbs, bodyHtml);
+                STYLE, crumbs, bodyHtml, cta);
     }
 
     /** Scheme + host of an absolute URL, for building sibling asset URLs. */

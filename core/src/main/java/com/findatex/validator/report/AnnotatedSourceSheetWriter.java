@@ -69,6 +69,12 @@ final class AnnotatedSourceSheetWriter {
         CreationHelper helper = wb.getCreationHelper();
         StyleResolver styles = new StyleResolver(wb, err, warn, info);
         int totalCols = model.width() + 1;
+        // Every cell gets an explicit style. An unstyled SXSSF cell asks the sheet for its
+        // column's default style when it is flushed, and POI answers that with a linear
+        // XmlBeans scan over all <col> definitions — one per source column, so a 600-column
+        // EET source cost cells x columns lookups (~13 s for 256 rows). Style 0 is the
+        // workbook default, so the output is unchanged.
+        CellStyle plainStyle = wb.getCellStyleAt(0);
 
         for (AnnotatedSourceModel.Row mr : model.rows()) {
             Row rr = sheet.createRow(mr.mirrorIndex());
@@ -83,8 +89,9 @@ final class AnnotatedSourceSheetWriter {
             } else {
                 zeile.setCellValue("");
             }
-            if (!isHeaderRow && mr.rowSeverity() != null) {
-                zeile.setCellStyle(styleFor(mr.rowSeverity(), err, warn, info));
+            if (!isHeaderRow) {
+                zeile.setCellStyle(mr.rowSeverity() != null
+                        ? styleFor(mr.rowSeverity(), err, warn, info) : plainStyle);
             }
             if (!mr.rowLevelFindings().isEmpty()) {
                 attachComment(drawing, helper, zeile, mr.rowLevelFindings());
@@ -96,7 +103,7 @@ final class AnnotatedSourceSheetWriter {
                 Cell cell = rr.createCell(c + 1);
                 writeTypedValue(cell, ac.source(), isHeaderRow);
                 CellStyle target = resolveStyle(styles, headerStyle, ac, isHeaderRow);
-                if (target != null) cell.setCellStyle(target);
+                cell.setCellStyle(target != null ? target : plainStyle);
                 if (ac.hasFindings()) {
                     attachComment(drawing, helper, cell, ac.findings());
                 }

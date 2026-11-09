@@ -1,5 +1,6 @@
 package com.findatex.validator.web.api;
 
+import com.findatex.validator.ingest.CsvLoader;
 import com.findatex.validator.stats.FileNameShape;
 import com.findatex.validator.stats.UsageEvent;
 import com.findatex.validator.web.dto.ExternalOptions;
@@ -161,9 +162,18 @@ public class ValidationResource {
                             "File is not a valid XLSX (missing ZIP signature).");
                 }
             } else { // CSV / TXT
-                for (byte b : head) {
-                    if (b == 0) {
-                        throw new RejectedUpload("binary_csv", "File looks binary; CSV must be plain text.");
+                if (head.length >= 4 && head[0] == 'P' && head[1] == 'K' && head[2] == 0x03 && head[3] == 0x04) {
+                    // An Excel workbook saved or renamed as .csv — say so instead of "binary".
+                    throw new RejectedUpload("binary_csv:zip",
+                            "This file is an Excel workbook (XLSX), not a CSV. Upload it with the .xlsx extension.");
+                }
+                // UTF-16 text (Excel's "Unicode Text" export) is full of NUL bytes but is
+                // plain text — CsvLoader re-encodes it.
+                if (CsvLoader.utf16Charset(head) == null) {
+                    for (byte b : head) {
+                        if (b == 0) {
+                            throw new RejectedUpload("binary_csv", "File looks binary; CSV must be plain text.");
+                        }
                     }
                 }
             }

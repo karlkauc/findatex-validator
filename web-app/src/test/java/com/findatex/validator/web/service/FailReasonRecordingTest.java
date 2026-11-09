@@ -91,6 +91,19 @@ class FailReasonRecordingTest {
     }
 
     @Test
+    void xlsxUploadedAsCsvIsNamedAsSuch() throws Exception {
+        // A workbook with a .csv name used to be rejected as "binary" with no hint why.
+        given().multiPart("templateId", "TPT")
+                .multiPart("file", "delivery.csv", java.nio.file.Files.readAllBytes(TestFixtures.CLEAN_V7_XLSX))
+                .when().post("/api/validate")
+                .then().statusCode(400)
+                .body(org.hamcrest.Matchers.containsString(".xlsx"));
+        UsageRow r = capture.awaitFailedRun();
+        assertThat(r.status).isEqualTo(UsageEvent.STATUS_PARSE_ERROR);
+        assertThat(r.failReason).isEqualTo("binary_csv:zip");
+    }
+
+    @Test
     void unexpectedServerErrorIsRecordedAsError() throws Exception {
         // Any RuntimeException after parsing ends as a 500; it used to leave no trace
         // in the stats (no status=error ever, despite real 500s in production).

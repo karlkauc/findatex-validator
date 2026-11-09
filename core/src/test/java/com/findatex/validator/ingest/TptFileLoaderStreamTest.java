@@ -50,6 +50,40 @@ class TptFileLoaderStreamTest {
     }
 
     @Test
+    void utf16CsvLoadsLikeTheUtf8Original() throws IOException {
+        // Excel's "Unicode Text" export: UTF-16LE with BOM. Production saw such uploads
+        // rejected as binary; they must parse to the same rows as the UTF-8 file.
+        Path sample = Path.of("src/test/resources/sample/missing_mandatory.csv");
+        TptFile utf8 = new TptFileLoader(CATALOG).load(sample);
+        String text = Files.readString(sample);
+        byte[][] variants = {
+                concat(new byte[]{(byte) 0xFF, (byte) 0xFE}, text.getBytes(java.nio.charset.StandardCharsets.UTF_16LE)),
+                text.getBytes(java.nio.charset.StandardCharsets.UTF_16LE),          // no BOM
+                text.getBytes(java.nio.charset.StandardCharsets.UTF_16),            // BE with BOM
+        };
+        for (byte[] v : variants) {
+            TptFile loaded;
+            try (ByteArrayInputStream in = new ByteArrayInputStream(v)) {
+                loaded = new TptFileLoader(CATALOG).load(in, "missing_mandatory.csv");
+            }
+            assertEquivalent(utf8, loaded, "missing_mandatory.csv");
+        }
+    }
+
+    @Test
+    void utf8CsvIsNotMistakenForUtf16() throws IOException {
+        byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/sample/missing_mandatory.csv"));
+        assertThat(CsvLoader.utf16Charset(bytes)).isNull();
+        assertThat(CsvLoader.toUtf8(bytes)).isSameAs(bytes);
+    }
+
+    private static byte[] concat(byte[] a, byte[] b) {
+        byte[] out = java.util.Arrays.copyOf(a, a.length + b.length);
+        System.arraycopy(b, 0, out, a.length, b.length);
+        return out;
+    }
+
+    @Test
     void streamLoaderRejectsUnknownExtension() {
         byte[] payload = "garbage".getBytes();
         assertThatThrownBy(() ->

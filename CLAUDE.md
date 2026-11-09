@@ -325,6 +325,17 @@ steps: `docs/SEO.md`.
    The annotated-source JSON sits in a sibling cache under the same uuid:
    readable repeatedly, deleted at TTL — the XLSX `take()` never touches it).
 
+**Logging / warm-up** — in `%prod` the console logs are JSON with `level`
+renamed to `severity` (Cloud Logging reads it; `quarkus-logging-json`). Upload
+file names never go to INFO (`XlsxLoader`/`CsvLoader` log them at DEBUG only);
+`ValidationOrchestrator` logs one line per run with phase timings. `Application`
+(a `StartupEvent` observer, not the constructor) starts
+`ValidationOrchestrator.warmUp()` on a daemon thread
+(`findatex.web.warmup.enabled`, off in `%test`). Report-writer perf trap: an
+SXSSF cell without an explicit style costs a linear XmlBeans scan over all
+`<col>` definitions at flush time, so wide sheets (EET's ~600 columns in
+*Annotated Source*) must give every cell a style (`wb.getCellStyleAt(0)`).
+
 External validation (GLEIF/OpenFIGI) is **off by default in the web layer**.
 Operators flip it on via `FINDATEX_WEB_EXTERNAL_ENABLED=true` and provide
 keys/proxy creds via env. The public Cloud Run instance has it **on** (the

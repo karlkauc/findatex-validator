@@ -57,6 +57,26 @@ class ValidationResourceTest {
     }
 
     @Test
+    void utf16CsvIsAcceptedNotRejectedAsBinary() throws Exception {
+        // Excel's "Unicode Text" export (UTF-16LE + BOM) is plain text full of NUL bytes;
+        // production rejected it as binary_csv.
+        String text = java.nio.file.Files.readString(TestFixtures.MISSING_MANDATORY_CSV);
+        byte[] body = text.getBytes(java.nio.charset.StandardCharsets.UTF_16LE);
+        byte[] withBom = new byte[body.length + 2];
+        withBom[0] = (byte) 0xFF;
+        withBom[1] = (byte) 0xFE;
+        System.arraycopy(body, 0, withBom, 2, body.length);
+        given()
+                .multiPart("templateId", "TPT")
+                .multiPart("file", "missing_mandatory.csv", withBom)
+                .when().post("/api/validate")
+                .then()
+                .statusCode(200)
+                .body("summary.errorCount", org.hamcrest.Matchers.greaterThan(0))
+                .body("summary.cleanRowCount", org.hamcrest.Matchers.lessThan(3));
+    }
+
+    @Test
     void missingFilePartReturns400() {
         given()
                 .multiPart("templateId", "TPT")

@@ -49,10 +49,13 @@ public class SpaFallbackResource {
 
     /**
      * True when the last path segment carries an extension — the shape of a
-     * static asset request, never of an SPA route.
+     * static asset request, never of an SPA route — or when any segment is a
+     * dot-file / dot-directory ({@code /.env}, {@code /.git/config}): vulnerability
+     * scanners probe those constantly and a 200 reads to them as a hit.
      */
-    private static boolean looksLikeFile(String path) {
+    static boolean looksLikeFile(String path) {
         if (path == null) return false;
+        if (path.startsWith(".") || path.contains("/.")) return true;
         int lastSlash = path.lastIndexOf('/');
         String segment = lastSlash < 0 ? path : path.substring(lastSlash + 1);
         int dot = segment.lastIndexOf('.');

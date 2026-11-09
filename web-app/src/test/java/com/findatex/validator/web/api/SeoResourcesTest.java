@@ -107,6 +107,14 @@ class SeoResourcesTest {
     }
 
     @Test
+    void dotFileProbesAre404NotTheSpaShell() {
+        // Scanners probe these by the hundred; a 200 with the SPA shell reads as a hit.
+        given().when().get("/.env").then().statusCode(404);
+        given().when().get("/.git/config").then().statusCode(404);
+        given().when().get("/backend/.env").then().statusCode(404);
+    }
+
+    @Test
     void unknownExtensionlessPathsStillGetTheSpaShell() {
         // Client-side routes must survive a full-page reload.
         given()

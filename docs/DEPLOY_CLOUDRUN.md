@@ -318,6 +318,29 @@ be in place for it to resolve on Cloud Run:
 Both apply only to **new** runs — the IP is never stored, so historical
 `usage_event` rows keep `country_code = NULL`.
 
+## Logs
+
+In the `prod` profile the app writes **JSON lines** (`quarkus-logging-json`)
+with the level under the key `severity`, so Cloud Logging assigns real
+severities. Before that, every line arrived as `DEFAULT`, so
+`severity>=WARNING` matched nothing. Useful queries:
+
+```bash
+F='resource.type="cloud_run_revision" AND resource.labels.service_name="findatex-validator-web"'
+gcloud logging read "$F AND severity>=WARNING" --freshness=7d          # app warnings/errors
+gcloud logging read "$F AND jsonPayload.message:\"Validation \"" --freshness=7d \
+  --format='value(timestamp,jsonPayload.message)'                        # per-run phase timings
+```
+
+Each run logs one line with counts and phase timings
+(`Validation EET V1.1.3: 256 rows, 990 findings; ms spec=… load=… validate=… xlsx=… total=…`),
+never the file name. After every start a background warm-up builds each
+template's latest spec bundle and runs its sample once (`Warm-up done: 4
+template(s) in … ms`); switch it off with `FINDATEX_WEB_WARMUP_ENABLED=false`.
+For alerting, a log-based alert policy on `severity>=ERROR` for this service
+is enough (Console → Logging → Create alert); it is not part of the deploy
+workflow.
+
 ## External validation (prerequisite: OpenFIGI secret)
 
 External validation (GLEIF + OpenFIGI) is **on** in the deployed service since

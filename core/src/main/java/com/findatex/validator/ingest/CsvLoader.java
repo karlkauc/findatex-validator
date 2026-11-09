@@ -48,7 +48,10 @@ public final class CsvLoader {
         return load(bytes, Path.of(filename == null || filename.isBlank() ? "uploaded.csv" : filename), bytes);
     }
 
-    private TptFile load(byte[] bytes, Path source, byte[] sourceBytes) throws IOException {
+    private TptFile load(byte[] raw, Path source, byte[] rawSourceBytes) throws IOException {
+        byte[] bytes = toUtf8(raw);
+        // Keep the decoded bytes for the Annotated-Source re-read, so both sides see the same text.
+        byte[] sourceBytes = rawSourceBytes == null ? null : bytes;
         Layout layout = detectLayout(bytes, this::recognisedHeaders);
         log.debug("CSV layout for {}: delimiter {}, header record {}",
                 source.getFileName(), (int) layout.delimiter(), layout.headerRecord());
@@ -73,8 +76,11 @@ public final class CsvLoader {
             }
             rows.add(row);
         }
-        log.info("Loaded CSV {} ({} rows, {} mapped fields, {} unmapped headers)",
-                source.getFileName(), rows.size(), map.size(), unmapped.size());
+        // The file name stays out of INFO: on the web it is the uploader's file name, often a
+        // fund name, and INFO lands in the hosting provider's logs.
+        log.info("Loaded CSV ({} rows, {} mapped fields, {} unmapped headers)",
+                rows.size(), map.size(), unmapped.size());
+        log.debug("Loaded CSV file {}", source.getFileName());
         return new TptFile(source, "csv", headers, map, unmapped, rows, sourceBytes);
     }
 
@@ -229,6 +235,39 @@ public final class CsvLoader {
             }
         }
         return new String(bytes, 0, end, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * The UTF-16 byte order of {@code bytes}, or {@code null} when it is not UTF-16. Excel's
+     * "Unicode Text" export writes UTF-16LE with a BOM; without a BOM the NUL byte in every
+     * second position of ASCII text gives it away. Looks at the first 4 KB only.
+     */
+    public static java.nio.charset.Charset utf16Charset(byte[] bytes) {
+        if (bytes.length >= 2) {
+            int b0 = bytes[0] & 0xFF, b1 = bytes[1] & 0xFF;
+            if (b0 == 0xFF && b1 == 0xFE) return StandardCharsets.UTF_16LE;
+            if (b0 == 0xFE && b1 == 0xFF) return StandardCharsets.UTF_16BE;
+        }
+        int n = Math.min(bytes.length, 4096) & ~1;
+        if (n < 4) return null;
+        int evenNul = 0, oddNul = 0;
+        for (int i = 0; i < n; i += 2) {
+            if (bytes[i] == 0) evenNul++;
+            if (bytes[i + 1] == 0) oddNul++;
+        }
+        int pairs = n / 2;
+        if (oddNul * 10 >= pairs * 7 && evenNul * 10 <= pairs) return StandardCharsets.UTF_16LE;
+        if (evenNul * 10 >= pairs * 7 && oddNul * 10 <= pairs) return StandardCharsets.UTF_16BE;
+        return null;
+    }
+
+    /** {@code bytes} re-encoded as UTF-8 when they are UTF-16 (BOM dropped), else unchanged. */
+    public static byte[] toUtf8(byte[] bytes) {
+        java.nio.charset.Charset cs = utf16Charset(bytes);
+        if (cs == null) return bytes;
+        String text = new String(bytes, cs);
+        if (!text.isEmpty() && text.charAt(0) == '\uFEFF') text = text.substring(1);
+        return text.getBytes(StandardCharsets.UTF_8);
     }
 
     /** Drop a leading UTF-8 BOM ({@code EF BB BF}) so the first header parses cleanly.

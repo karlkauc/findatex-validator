@@ -56,6 +56,7 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -104,6 +105,51 @@ public class ValidationOrchestrator {
             TemplateRuleSet ruleSet = def.ruleSetFor(version);
             return new CatalogBundle(catalog, ruleSet, def.profilesFor(version));
         });
+    }
+
+    /**
+     * Pre-builds the spec catalog + rule set of each template's latest version and pushes
+     * its bundled sample once through the whole pipeline (load, validate, score, XLSX,
+     * annotated JSON), so the classes are loaded and the JIT has seen the hot paths before
+     * the first real upload. Without it the first run on a fresh Cloud Run instance took
+     * 10-30 s instead of 1-3 s. Writes nothing that outlives the call, records no usage
+     * event, never throws.
+     */
+    public void warmUp() {
+        long t0 = System.nanoTime();
+        int runs = 0;
+        for (TemplateDefinition def : TemplateRegistry.all()) {
+            try {
+                TemplateVersion version = def.latest();
+                CatalogBundle bundle = bundleFor(def, version);
+                var sample = SampleFiles.forTemplate(def.id().name(), version.version());
+                if (sample.isEmpty()) continue;
+                Optional<InputStream> opened = sample.get().open();
+                if (opened.isEmpty()) continue;
+                TptFile file;
+                try (InputStream in = opened.get()) {
+                    file = new TptFileLoader(bundle.catalog).load(in, sample.get().filename());
+                }
+                Set<ProfileKey> profiles = new java.util.LinkedHashSet<>(bundle.profileSet.all());
+                List<Finding> findings = new ValidationEngine(bundle.catalog, bundle.ruleSet,
+                        def.findingContextSpec()).validate(file, profiles);
+                QualityReport report = new QualityScorer(bundle.catalog).score(file, profiles, findings);
+                AnnotatedSourceModel model = AnnotatedSourceModel.build(report);
+                Path xlsx = createOwnerOnlyTempFile("findatex-warmup-", ".xlsx");
+                try {
+                    new XlsxReportWriter(bundle.catalog, bundle.profileSet, version,
+                            com.findatex.validator.report.GenerationUi.WEB).write(report, xlsx, model);
+                    AnnotatedSourceJson.write(model, report.findings(), java.io.OutputStream.nullOutputStream());
+                } finally {
+                    deleteQuietly(xlsx);
+                }
+                runs++;
+            } catch (IOException | RuntimeException e) {
+                // Best effort: a failed warm-up only means the first real run is slower.
+                log.warn("Warm-up skipped for {}: {}", def.id(), e.toString());
+            }
+        }
+        log.info("Warm-up done: {} template(s) in {} ms", runs, ms(System.nanoTime() - t0));
     }
 
     /**
@@ -189,6 +235,7 @@ public class ValidationOrchestrator {
         String versionName = version.version();
 
         CatalogBundle bundle = bundleFor(def, version);
+        long tLoad = System.nanoTime();
 
         TptFile file;
         try {
@@ -241,8 +288,10 @@ public class ValidationOrchestrator {
             }
         }
 
+        long tValidate = System.nanoTime();
         List<Finding> findings = new ValidationEngine(bundle.catalog, bundle.ruleSet, def.findingContextSpec())
                 .validate(file, gatedProfiles);
+        long tExternal = System.nanoTime();
         if (!profileGateNotes.isEmpty()) {
             List<Finding> merged = new ArrayList<>(findings.size() + profileGateNotes.size());
             merged.addAll(profileGateNotes);
@@ -283,6 +332,7 @@ public class ValidationOrchestrator {
             }
         }
 
+        long tScore = System.nanoTime();
         QualityReport report = new QualityScorer(bundle.catalog).score(file, gatedProfiles, findings);
 
         // The annotated-source model is shared by the XLSX sheet and the JSON side artifact
@@ -291,6 +341,7 @@ public class ValidationOrchestrator {
         // degrades to "no in-browser view", never to a failed validation.
         AnnotatedSourceModel annotatedModel = buildAnnotatedModel(file, report);
 
+        long tXlsx = System.nanoTime();
         Path xlsxPath = null;
         try {
             xlsxPath = createOwnerOnlyTempFile("findatex-report-", ".xlsx");
@@ -310,8 +361,16 @@ public class ValidationOrchestrator {
         }
         // The JSON's findingCells index into report.findings() — the very list
         // assembleResponse() maps 1:1 into ValidationResponse.findings (see there).
+        long tJson = System.nanoTime();
         Path annotatedPath = annotatedModel == null
                 ? null : writeAnnotatedSource(annotatedModel, report.findings());
+        long tEnd = System.nanoTime();
+        // Counts and timings only — never the file name or content.
+        log.info("Validation {} {}: {} rows, {} findings; ms spec={} load={} validate={} external={} "
+                        + "score+model={} xlsx={} json={} total={}",
+                templateName, versionName, file.rows().size(), report.findings().size(),
+                ms(tLoad - t0), ms(tValidate - tLoad), ms(tExternal - tValidate), ms(tScore - tExternal),
+                ms(tXlsx - tScore), ms(tJson - tXlsx), ms(tEnd - tJson), ms(tEnd - t0));
         UUID reportId = reportStore.store(xlsxPath, annotatedPath, templateName, versionName);
 
         try {
@@ -552,6 +611,10 @@ public class ValidationOrchestrator {
         } catch (IOException e) {
             log.warn("Could not delete orphaned report tempfile: {}", e.toString());
         }
+    }
+
+    private static long ms(long nanos) {
+        return nanos / 1_000_000;
     }
 
     private record CatalogBundle(SpecCatalog catalog, TemplateRuleSet ruleSet, ProfileSet profileSet) {

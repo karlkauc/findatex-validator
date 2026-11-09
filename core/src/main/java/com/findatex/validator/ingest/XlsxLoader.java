@@ -75,8 +75,11 @@ public final class XlsxLoader {
                 }
                 rows.add(row);
             }
-            log.info("Loaded XLSX {} ({} rows, {} mapped fields, {} unmapped headers)",
-                    source.getFileName(), rows.size(), map.size(), unmapped.size());
+            // The file name stays out of INFO: on the web it is the uploader's file name, often a
+            // fund name, and INFO lands in the hosting provider's logs.
+            log.info("Loaded XLSX ({} rows, {} mapped fields, {} unmapped headers)",
+                    rows.size(), map.size(), unmapped.size());
+            log.debug("Loaded XLSX file {}", source.getFileName());
             return new TptFile(source, "xlsx", headers, map, unmapped, rows, sourceBytes);
         }
     }

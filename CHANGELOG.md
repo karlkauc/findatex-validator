@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Excel report on wide files was very slow.** Every unformatted cell made POI
+  scan all column definitions of its sheet, which on EET's ~600 columns
+  (*Annotated Source*) made the report take most of a run (~30 s for 256 rows on
+  the public instance). Cells now carry the default style explicitly; the output
+  is unchanged and the report is ~5x faster.
+- **UTF-16 CSVs** (Excel's "Unicode Text" export) are read instead of being
+  rejected as binary; an XLSX uploaded with a `.csv` name gets a clear message
+  (`fail_reason` `binary_csv:zip`).
+- Web: dot-file probes (`/.env`, `/.git/config`, …) answer 404 instead of the
+  SPA shell; the startup hook no longer runs twice.
+
+### Changed
+- Web: a background warm-up after each start runs every template's sample once,
+  so the first upload on a fresh instance no longer pays class loading and JIT
+  (`FINDATEX_WEB_WARMUP_ENABLED`, default on).
+- Web: JSON console logs in prod with a Cloud Logging `severity`; one log line
+  per run with phase timings; upload file names are no longer logged at INFO.
+
 ## [1.0.22] — 2026-10-29
 
 ### Added

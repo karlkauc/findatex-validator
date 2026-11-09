@@ -115,7 +115,7 @@ public final class SourceMirror {
         // Web uploads carry the original bytes; on-disk sources read from the path.
         byte[] bytes = file.sourceBytes() != null
                 ? file.sourceBytes()
-                : Files.readAllBytes(file.source());
+                : CsvLoader.toUtf8(Files.readAllBytes(file.source()));
         // Same layout the loader settled on: the record that became the file's headers.
         CsvLoader.Layout layout = CsvLoader.detectLayout(bytes,
                 rec -> rec.equals(file.rawHeaders()) ? Integer.MAX_VALUE : 0);

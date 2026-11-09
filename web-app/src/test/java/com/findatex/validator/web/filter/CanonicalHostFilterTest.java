@@ -53,6 +53,16 @@ class CanonicalHostFilterTest {
     }
 
     @Test
+    void startupProbeEndpointIsNeverRedirected() {
+        // Cloud Run's startup probe uses an internal Host header and treats 3xx as
+        // success — a redirect would mark a still-warming instance ready.
+        given().redirects().follow(false)
+                .when().get("/_internal/health/started")
+                .then()
+                .statusCode(200);
+    }
+
+    @Test
     void postIsNeverRedirected() {
         // Browsers turn a 301'd POST into a GET, which would silently drop an
         // upload. Uploads must fail loudly or succeed, never half-redirect.

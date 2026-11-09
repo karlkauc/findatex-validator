@@ -45,12 +45,11 @@ public class Application {
         log.info("FinDatEx web app started. Templates registered: {}", TemplateRegistry.all().size());
         warnAboutMissingSamples();
         if (warmUpEnabled) {
-            // Off the startup thread: a cold start triggered by a page view or crawler must not
-            // wait for it. It still runs inside Cloud Run's startup CPU boost; a validation
-            // arriving meanwhile simply waits for the same catalog bundle.
+            // Off the main thread so Quarkus finishes booting; the startup probe
+            // (/_internal/health/started, WarmUpStartupCheck) holds traffic back until it is done,
+            // which is also the phase in which Cloud Run grants full (boosted) CPU.
             Thread t = new Thread(orchestrator::warmUp, "findatex-warmup");
             t.setDaemon(true);
-            t.setPriority(Thread.MIN_PRIORITY);
             t.start();
         }
     }

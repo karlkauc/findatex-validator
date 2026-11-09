@@ -22,7 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Web: a background warm-up after each start runs every template's sample once,
   so the first upload on a fresh instance no longer pays class loading and JIT
-  (`FINDATEX_WEB_WARMUP_ENABLED`, default on).
+  (`FINDATEX_WEB_WARMUP_ENABLED`, default on). Cloud Run routes traffic to a
+  new instance only once it is done (HTTP startup probe on
+  `/_internal/health/started`).
 - Web: JSON console logs in prod with a Cloud Logging `severity`; one log line
   per run with phase timings; upload file names are no longer logged at INFO.
 

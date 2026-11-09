@@ -334,9 +334,15 @@ gcloud logging read "$F AND jsonPayload.message:\"Validation \"" --freshness=7d 
 
 Each run logs one line with counts and phase timings
 (`Validation EET V1.1.3: 256 rows, 990 findings; ms spec=… load=… validate=… xlsx=… total=…`),
-never the file name. After every start a background warm-up builds each
-template's latest spec bundle and runs its sample once (`Warm-up done: 4
-template(s) in … ms`); switch it off with `FINDATEX_WEB_WARMUP_ENABLED=false`.
+never the file name. After every start a warm-up builds each template's
+latest spec bundle and runs its sample once (`Warm-up done: 4 template(s) in
+… ms`). The deploy sets an **HTTP startup probe** on
+`/_internal/health/started`, which stays 503 until the warm-up is done
+(`WarmUpStartupCheck`, UP after 60 s at the latest): Cloud Run gives a starting
+instance full (boosted) CPU but throttles background threads to ~0 once it is
+ready, so a warm-up after readiness only slowed the first upload down. Cost:
+a cold start takes a few seconds longer. Switch it off with
+`FINDATEX_WEB_WARMUP_ENABLED=false` (the check then reports UP at once).
 For alerting, a log-based alert policy on `severity>=ERROR` for this service
 is enough (Console → Logging → Create alert); it is not part of the deploy
 workflow.

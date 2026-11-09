@@ -331,7 +331,9 @@ file names never go to INFO (`XlsxLoader`/`CsvLoader` log them at DEBUG only);
 `ValidationOrchestrator` logs one line per run with phase timings. `Application`
 (a `StartupEvent` observer, not the constructor) starts
 `ValidationOrchestrator.warmUp()` on a daemon thread
-(`findatex.web.warmup.enabled`, off in `%test`). Report-writer perf trap: an
+(`findatex.web.warmup.enabled`, off in `%test`); `WarmUpStartupCheck` keeps
+`/_internal/health/started` (Cloud Run's HTTP startup probe) DOWN until it is
+done — after readiness Cloud Run throttles background CPU to ~0. Report-writer perf trap: an
 SXSSF cell without an explicit style costs a linear XmlBeans scan over all
 `<col>` definitions at flush time, so wide sheets (EET's ~600 columns in
 *Annotated Source*) must give every cell a style (`wb.getCellStyleAt(0)`).

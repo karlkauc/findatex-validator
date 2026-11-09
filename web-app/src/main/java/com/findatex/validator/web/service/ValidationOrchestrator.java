@@ -113,10 +113,30 @@ public class ValidationOrchestrator {
      * annotated JSON), so the classes are loaded and the JIT has seen the hot paths before
      * the first real upload. Without it the first run on a fresh Cloud Run instance took
      * 10-30 s instead of 1-3 s. Writes nothing that outlives the call, records no usage
-     * event, never throws.
+     * event, never throws. {@code WarmUpStartupCheck} keeps the instance out of traffic
+     * until it is done: on Cloud Run a background thread only gets CPU during startup or
+     * while a request is in flight, so a warm-up after readiness would just compete with
+     * the first upload.
      */
     public void warmUp() {
         long t0 = System.nanoTime();
+        int runs = 0;
+        try {
+            runs = warmUpAll();
+        } finally {
+            warmedUp = true;
+            log.info("Warm-up done: {} template(s) in {} ms", runs, ms(System.nanoTime() - t0));
+        }
+    }
+
+    /** True once {@link #warmUp()} has finished (successfully or not). */
+    public boolean warmedUp() {
+        return warmedUp;
+    }
+
+    private volatile boolean warmedUp;
+
+    private int warmUpAll() {
         int runs = 0;
         for (TemplateDefinition def : TemplateRegistry.all()) {
             try {
@@ -149,7 +169,7 @@ public class ValidationOrchestrator {
                 log.warn("Warm-up skipped for {}: {}", def.id(), e.toString());
             }
         }
-        log.info("Warm-up done: {} template(s) in {} ms", runs, ms(System.nanoTime() - t0));
+        return runs;
     }
 
     /**

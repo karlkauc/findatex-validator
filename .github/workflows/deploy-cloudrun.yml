@@ -142,6 +142,11 @@ jobs:
         # Combined with quarkus.http.{read,idle}-timeout in the app this caps
         # blast radius without adding Cloud Armor.
         #
+        # --startup-probe on /_internal/health/started (WarmUpStartupCheck): the instance gets
+        #   traffic only after the warm-up ran. Cloud Run grants full (boosted) CPU
+        #   while starting and throttles a background thread to ~0 once ready, so a
+        #   warm-up after readiness only competed with the first upload (seen
+        #   2026-11-09). The check turns UP after 60 s regardless.
         # --min-instances=0: scale-to-zero (since 2026-09-03, on request — the
         # ~8-10 EUR/month idle billing of a warm instance was not worth it at
         # this traffic level). The first visitor after an idle period pays the
@@ -207,6 +212,7 @@ jobs:
             --max-instances=10 \
             --min-instances=0 \
             --timeout=300 \
+            --startup-probe=httpGet.path=/_internal/health/started,httpGet.port=8080,initialDelaySeconds=0,periodSeconds=1,timeoutSeconds=1,failureThreshold=90 \
             "${sa_args[@]}" \
             --update-env-vars="^@^FINDATEX_WEB_EXTERNAL_ENABLED=true@FINDATEX_WEB_CANONICAL_HOST=www.findatex-validator.eu@FINDATEX_WEB_USAGE_DB_URL=${db_url}@FINDATEX_WEB_USAGE_DB_USER=findatex@FINDATEX_WEB_USAGE_DB_ACQUISITION_TIMEOUT=10s@FINDATEX_WEB_INSTANCE=prod@FINDATEX_WEB_CLIENT_IP_FORWARDED_HOPS=1@PROXY_ADDRESS_FORWARDING=false@PROXY_ALLOW_X_FORWARDED=false" \
             --update-secrets="${secrets}" \

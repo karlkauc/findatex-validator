@@ -93,6 +93,9 @@ public class RulesPageResource {
                 body.toString()));
     }
 
+    // The raw path parameters only select a document/field; everything written
+    // into the page comes from the bundled index (ref.slug(), field.num()), so no
+    // request value is ever echoed — not even escaped.
     @GET
     @Path("/{slug}")
     public Response document(@PathParam("slug") String slug) {
@@ -106,7 +109,7 @@ public class RulesPageResource {
                             + "codification it must match and every rule that can fire on it.</p>")
                     .append("<ul class=\"fields\">");
             doc.fields().values().forEach(f -> body
-                    .append("<li><a href=\"/rules/").append(escape(slug)).append("/field/")
+                    .append("<li><a href=\"/rules/").append(escape(ref.slug())).append("/field/")
                     .append(escape(f.num())).append("\"><span class=\"num\">Field ")
                     .append(escape(f.num())).append("</span><span class=\"name\">")
                     .append(escape(f.name())).append("</span></a></li>"));
@@ -119,7 +122,7 @@ public class RulesPageResource {
                 "Every check applied to a " + ref.templateDisplayName() + " " + ref.version()
                         + " file: mandatory and conditional fields per profile, formats, closed "
                         + "code lists and cross-field rules, with the score impact of each.",
-                urls.absolute(request, "/rules/" + slug),
+                urls.absolute(request, "/rules/" + ref.slug()),
                 "<a href=\"/\">Validator</a> › <a href=\"/rules\">Rules</a> › "
                         + escape(ref.label()),
                 body.toString()));
@@ -149,9 +152,9 @@ public class RulesPageResource {
         return html(renderer.page(
                 heading + " — " + field.name(),
                 truncate(description, 300),
-                urls.absolute(request, "/rules/" + slug + "/field/" + field.num()),
+                urls.absolute(request, "/rules/" + ref.slug() + "/field/" + field.num()),
                 "<a href=\"/\">Validator</a> › <a href=\"/rules\">Rules</a> › "
-                        + "<a href=\"/rules/" + escape(slug) + "\">" + escape(ref.label())
+                        + "<a href=\"/rules/" + escape(ref.slug()) + "\">" + escape(ref.label())
                         + "</a> › Field " + escape(field.num()),
                 body));
     }

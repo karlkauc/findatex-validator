@@ -52,6 +52,12 @@ updates:
       - "dependencies"
       - "ci"
     open-pull-requests-limit: 5
+    groups:
+      # init / analyze / upload-sarif must run the same version, or the
+      # CodeQL job fails ("Loaded a configuration file for version …").
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
 
   - package-ecosystem: "docker"
     directory: "/"

@@ -83,7 +83,7 @@ RUN $JAVA_HOME/bin/jlink \
 # logs a warning and returns null (country_code stays NULL), app still boots.
 # Attribution (MaxMind EULA): "This product includes GeoLite2 data created by
 # MaxMind, available from https://www.maxmind.com."
-FROM alpine:3.24@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a AS geoip
+FROM alpine:3.24@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf AS geoip
 RUN apk add --no-cache curl tar
 # Cache-bust: BuildKit does NOT include secret *content* in a RUN's cache key,
 # so a layer built once without the license key (skip branch) would otherwise be
@@ -113,7 +113,7 @@ RUN --mount=type=secret,id=maxmind_license_key \
     fi
 
 # ---- Stage 4: Runtime (Alpine + Custom-JRE) ---------------------------------
-FROM alpine:3.24@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a
+FROM alpine:3.24@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf
 
 # fontconfig + ttf-dejavu: Apache POI's autoSizeColumn calls into AWT, which
 # refuses to start without a font configuration on the system.

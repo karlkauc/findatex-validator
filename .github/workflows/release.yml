@@ -67,7 +67,8 @@ jobs:
         include:
           - { os: ubuntu-latest,  target: linux-x64,   installer_ext: deb, portable_ext: tar.gz }
           - { os: windows-latest, target: windows-x64, installer_ext: msi, portable_ext: zip    }
-          - { os: macos-14,       target: macos-arm64, installer_ext: dmg, portable_ext: tar.gz }
+          - { os: macos-15,       target: macos-arm64, installer_ext: dmg, portable_ext: tar.gz }
+          # macos-14 was retired by GitHub (2026-11: "configuration not supported").
           # macos-x64 dropped: GitHub's macos-13 runner pool is contested and
           # being phased out. Intel Mac users can run the shaded JAR directly.
     steps:

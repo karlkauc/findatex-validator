@@ -108,8 +108,8 @@ public class ValidationOrchestrator {
     }
 
     /**
-     * Pre-builds the spec catalog + rule set of each template's latest version and pushes
-     * its bundled sample once through the whole pipeline (load, validate, score, XLSX,
+     * Pre-builds the spec catalog + rule set of every template version, and pushes each
+     * template's latest-version bundled sample once through the whole pipeline (load, validate, score, XLSX,
      * annotated JSON), so the classes are loaded and the JIT has seen the hot paths before
      * the first real upload. Without it the first run on a fresh Cloud Run instance took
      * 10-30 s instead of 1-3 s. Writes nothing that outlives the call, records no usage
@@ -127,6 +127,11 @@ public class ValidationOrchestrator {
             warmedUp = true;
             log.info("Warm-up done: {} template(s) in {} ms", runs, ms(System.nanoTime() - t0));
         }
+    }
+
+    /** Keys ({@code TEMPLATE/version}) of the catalogs built so far (tests). */
+    java.util.Set<String> cachedBundles() {
+        return java.util.Set.copyOf(catalogs.keySet());
     }
 
     /** True once {@link #warmUp()} has finished (successfully or not). */
@@ -167,6 +172,20 @@ public class ValidationOrchestrator {
             } catch (IOException | RuntimeException e) {
                 // Best effort: a failed warm-up only means the first real run is slower.
                 log.warn("Warm-up skipped for {}: {}", def.id(), e.toString());
+            }
+        }
+        // Older versions get their catalog and rule set built too (no sample run: the code paths
+        // are the same, the JIT is warm by now). Users still upload them a lot (TPT V7.0 was 16 of
+        // 22 TPT runs in Oct/Nov 2026), and building one on the first upload cost a cold
+        // instance's first user up to ~0.4 s; here all of them take ~0.15 s together.
+        for (TemplateDefinition def : TemplateRegistry.all()) {
+            for (TemplateVersion older : def.versions()) {
+                if (older.equals(def.latest())) continue;
+                try {
+                    bundleFor(def, older);
+                } catch (RuntimeException e) {
+                    log.warn("Warm-up skipped for {} {}: {}", def.id(), older.version(), e.toString());
+                }
             }
         }
         return runs;

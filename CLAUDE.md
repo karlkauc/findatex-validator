@@ -325,6 +325,15 @@ steps: `docs/SEO.md`.
    The annotated-source JSON sits in a sibling cache under the same uuid:
    readable repeatedly, deleted at TTL — the XLSX `take()` never touches it).
 
+**Excel add-in (prototype)** — Office.js task pane under `/addin/`
+(`frontend/addin/taskpane.html` = second Vite entry, code in `src/addin/`;
+manifest + icons are static backend resources in `META-INF/resources/addin/`).
+It uploads the open workbook to `/api/validate` and paints the cells from the
+annotated source's `findingCells` (`marks.ts`). `AddinFramingFilter` is the
+only place the frame/script CSP is relaxed — and only for `/addin/*`; never
+widen it to other paths. No page-view beacon in the pane. Keep the manifest
+`<Id>` fixed. Details: `docs/EXCEL_ADDIN.md`.
+
 **Logging / warm-up** — in `%prod` the console logs are JSON with `level`
 renamed to `severity` (Cloud Logging reads it; `quarkus-logging-json`). Upload
 file names never go to INFO (`XlsxLoader`/`CsvLoader` log them at DEBUG only);

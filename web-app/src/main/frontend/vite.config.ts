@@ -10,6 +10,14 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, '../../../target/classes/META-INF/resources'),
     emptyOutDir: true,
     sourcemap: false,
+    // Second entry: the Excel add-in task pane, served as /addin/taskpane.html
+    // (docs/EXCEL_ADDIN.md). Manifest and icons are static backend resources.
+    rollupOptions: {
+      input: {
+        index: path.resolve(import.meta.dirname, 'index.html'),
+        addin: path.resolve(import.meta.dirname, 'addin/taskpane.html'),
+      },
+    },
   },
   server: {
     port: 5173,

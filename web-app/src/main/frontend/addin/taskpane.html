@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <title>FinDatEx Validator — Excel add-in</title>
+    <!-- Must come from Microsoft's CDN (store/sideload requirement); allowed by
+         AddinFramingFilter's CSP for /addin/* only. -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  </head>
+  <body class="bg-white">
+    <div id="root"></div>
+    <script type="module" src="/src/addin/main.tsx"></script>
+  </body>
+</html>

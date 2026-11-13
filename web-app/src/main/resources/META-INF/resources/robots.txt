@@ -11,5 +11,6 @@ Allow: /
 # and crawling them burns the per-IP quota for real users.
 Disallow: /api/
 Disallow: /_internal/
+Disallow: /addin/
 
 Sitemap: https://www.findatex-validator.eu/sitemap.xml

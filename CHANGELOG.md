@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Excel add-in (prototype).** A task pane for Excel on the web and Excel for
+  Microsoft 365 validates the open workbook and colours the cells with
+  findings; clicking a finding selects its cell. Sideload
+  `https://www.findatex-validator.eu/addin/manifest.xml` — see
+  `docs/EXCEL_ADDIN.md`.
+
 ## [1.0.23] — 2026-11-13
 
 ### Fixed

@@ -46,6 +46,23 @@ class SettingsServiceTest {
     }
 
     @Test
+    void partialFileGetsDefaultsForMissingBlocks(@TempDir Path tmp) throws Exception {
+        Path file = tmp.resolve("settings.json");
+        // Hand-edited file with only the usage-stats block: no external, no proxy.
+        Files.writeString(file, "{\"usageStats\":{\"enabled\":true,\"installId\":\"\","
+                + "\"endpointUrl\":\"http://127.0.0.1:1/api/usage-stats\"},"
+                + "\"external\":{\"enabled\":true}}");
+        AppSettings s = new SettingsService(file).getCurrent();
+        AppSettings d = AppSettings.defaults();
+        assertThat(s.proxy()).isEqualTo(d.proxy());
+        assertThat(s.external().enabled()).isTrue();
+        assertThat(s.external().lei()).isEqualTo(d.external().lei());
+        assertThat(s.external().isin()).isEqualTo(d.external().isin());
+        assertThat(s.external().cache()).isEqualTo(d.external().cache());
+        assertThat(s.usageStats().endpointUrl()).isEqualTo("http://127.0.0.1:1/api/usage-stats");
+    }
+
+    @Test
     void legacyFileWithoutFeedbackBlockLoadsWithEmptyRepo(@TempDir Path tmp) throws Exception {
         Path file = tmp.resolve("settings.json");
         // A settings.json written by a pre-feedback release: no "feedback" key.

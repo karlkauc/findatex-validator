@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Desktop app crashed on start with an incomplete `settings.json`.** A
+  hand-edited file without the `proxy` or `external` block (or their sub-blocks)
+  now falls back to the defaults for the missing parts instead of a
+  `NullPointerException` in the start method.
 - **Excel report on wide files was very slow.** Every unformatted cell made POI
   scan all column definitions of its sheet, which on EET's ~600 columns
   (*Annotated Source*) made the report take most of a run (~30 s for 256 rows on

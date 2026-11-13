@@ -15,6 +15,10 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback,
      * the id stays stable across runs.
      */
     public AppSettings {
+        // A hand-edited or truncated file may lack whole blocks too; every
+        // caller dereferences external()/proxy() without a null check.
+        if (external == null) external = new External(false, null, null, null);
+        if (proxy == null) proxy = new Proxy(null, null);
         if (feedback == null) feedback = new Feedback("");
         if (usageStats == null) usageStats = new UsageStats(true, "", null);
         if (newsletter == null) newsletter = new Newsletter("");
@@ -44,13 +48,24 @@ public record AppSettings(External external, Proxy proxy, Feedback feedback,
 
     public enum ProxyMode { SYSTEM, MANUAL, NONE }
 
-    public record External(boolean enabled, Lei lei, Isin isin, Cache cache) {}
+    public record External(boolean enabled, Lei lei, Isin isin, Cache cache) {
+        public External {
+            if (lei == null) lei = new Lei(true, true, false, false);
+            if (isin == null) isin = new Isin(true, "", false, false);
+            if (cache == null) cache = new Cache(7, "");
+        }
+    }
     public record Lei(boolean enabled, boolean checkLapsedStatus,
                       boolean checkIssuerName, boolean checkIssuerCountry) {}
     public record Isin(boolean enabled, String openFigiApiKey,
                        boolean checkCurrency, boolean checkCicConsistency) {}
     public record Cache(int ttlDays, String directory) {}
-    public record Proxy(ProxyMode mode, ManualProxy manual) {}
+    public record Proxy(ProxyMode mode, ManualProxy manual) {
+        public Proxy {
+            if (mode == null) mode = ProxyMode.SYSTEM;
+            if (manual == null) manual = new ManualProxy("", 0, "", "", "localhost|127.0.0.1");
+        }
+    }
     public record ManualProxy(String host, int port, String user,
                               String passwordEncrypted, String nonProxyHosts) {}
 

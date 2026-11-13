@@ -14,7 +14,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public final class SourceMirror {
 
@@ -52,7 +55,28 @@ public final class SourceMirror {
 
     public record SourceData(List<List<SourceCell>> rows, int headerRowIndex) {}
 
+    /**
+     * Mirrors captured by the loader while it still had the workbook open (web uploads, see
+     * {@link #capture}). Weak keys: an entry goes away with its {@link TptFile}.
+     */
+    private static final Map<TptFile, SourceData> CAPTURED =
+            Collections.synchronizedMap(new WeakHashMap<>());
+
+    /**
+     * Records the mirror of {@code sheet} for {@code file}, so {@link #read} does not parse the
+     * workbook a second time. Parsing an XLSX into POI's object model was about a fifth of a web
+     * validation request (EET: hundreds of columns), and the report always needs the mirror.
+     *
+     * @return {@code file}
+     */
+    public static TptFile capture(TptFile file, Sheet sheet) {
+        CAPTURED.put(file, fromSheet(sheet, file.rawHeaders()));
+        return file;
+    }
+
     public static SourceData read(TptFile file) throws IOException {
+        SourceData captured = CAPTURED.get(file);
+        if (captured != null) return captured;
         String fmt = file.inputFormat();
         if ("xlsx".equals(fmt)) return readXlsx(file);
         if ("csv".equals(fmt)) return readCsv(file);
@@ -65,33 +89,36 @@ public final class SourceMirror {
                 ? new java.io.ByteArrayInputStream(file.sourceBytes())
                 : Files.newInputStream(file.source());
              Workbook wb = new XSSFWorkbook(in)) {
-            Sheet sheet = wb.getNumberOfSheets() > 0 ? wb.getSheetAt(0) : null;
-            if (sheet == null || sheet.getLastRowNum() < 0) {
-                return new SourceData(List.of(), 0);
-            }
-            int last = sheet.getLastRowNum();
-            int width = 0;
-            for (int r = 0; r <= last; r++) {
-                Row row = sheet.getRow(r);
-                if (row != null) width = Math.max(width, row.getLastCellNum());
-            }
-            int headerRowIndex = locateHeader(sheet, file.rawHeaders(), last);
-            List<List<SourceCell>> rows = new ArrayList<>(last + 1);
-            for (int r = 0; r <= last; r++) {
-                Row row = sheet.getRow(r);
-                List<SourceCell> cells = new ArrayList<>(width);
-                if (row == null) {
-                    for (int c = 0; c < width; c++) cells.add(SourceCell.BLANK);
-                } else {
-                    int rowWidth = Math.max(width, row.getLastCellNum());
-                    for (int c = 0; c < rowWidth; c++) {
-                        cells.add(readCell(row.getCell(c)));
-                    }
-                }
-                rows.add(cells);
-            }
-            return new SourceData(rows, headerRowIndex);
+            return fromSheet(wb.getNumberOfSheets() > 0 ? wb.getSheetAt(0) : null, file.rawHeaders());
         }
+    }
+
+    private static SourceData fromSheet(Sheet sheet, List<String> rawHeaders) {
+        if (sheet == null || sheet.getLastRowNum() < 0) {
+            return new SourceData(List.of(), 0);
+        }
+        int last = sheet.getLastRowNum();
+        int width = 0;
+        for (int r = 0; r <= last; r++) {
+            Row row = sheet.getRow(r);
+            if (row != null) width = Math.max(width, row.getLastCellNum());
+        }
+        int headerRowIndex = locateHeader(sheet, rawHeaders, last);
+        List<List<SourceCell>> rows = new ArrayList<>(last + 1);
+        for (int r = 0; r <= last; r++) {
+            Row row = sheet.getRow(r);
+            List<SourceCell> cells = new ArrayList<>(width);
+            if (row == null) {
+                for (int c = 0; c < width; c++) cells.add(SourceCell.BLANK);
+            } else {
+                int rowWidth = Math.max(width, row.getLastCellNum());
+                for (int c = 0; c < rowWidth; c++) {
+                    cells.add(readCell(row.getCell(c)));
+                }
+            }
+            rows.add(cells);
+        }
+        return new SourceData(rows, headerRowIndex);
     }
 
     private static int locateHeader(Sheet sheet, List<String> rawHeaders, int lastRow) {

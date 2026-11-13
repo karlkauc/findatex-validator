@@ -330,9 +330,9 @@ public final class CombinedXlsxReportWriter {
 
     private void writeAggregateFieldCoverage(Workbook wb, BatchSummary s, CellStyle header) {
         Sheet sheet = wb.createSheet("Aggregate Field Coverage");
-        XlsxReportWriter.enableAutoSizeTracking(sheet);
         int row = 0;
         List<ProfileKey> profiles = profileSet.all();
+        XlsxReportWriter.setFieldCoverageWidths(sheet, profiles.size());
         java.util.List<String> headers = new java.util.ArrayList<>();
         headers.add("Field#");
         headers.add("Field name");
@@ -379,8 +379,6 @@ public final class CombinedXlsxReportWriter {
             rr.createCell(col++).setCellValue(c == null ? 0 : c[2]);
         }
         sheet.createFreezePane(2, 1);
-        int totalCols = 3 + profiles.size() + 3;
-        for (int c = 0; c < totalCols; c++) sheet.autoSizeColumn(c);
     }
 
     private void writePerFileScores(Workbook wb, BatchSummary s,

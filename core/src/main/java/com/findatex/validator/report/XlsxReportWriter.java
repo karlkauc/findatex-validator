@@ -345,11 +345,26 @@ public final class XlsxReportWriter {
 
     private static String nz(String s) { return XlsxStyles.clip(s); }
 
+    /**
+     * Fixed column widths for a field-coverage sheet (Field#, name, FundsXML path, one column per
+     * profile, Present/Missing/Invalid). Not autoSize: the sheet has one row per spec field (about
+     * 600 for EET) and SXSSF's autoSize tracking measures every cell with font metrics as rows are
+     * flushed; for an EET report that was about a fifth of the whole validation request.
+     */
+    static void setFieldCoverageWidths(Sheet s, int profileCount) {
+        int c = 0;
+        s.setColumnWidth(c++, 2200);   // Field#
+        s.setColumnWidth(c++, 12000);  // Field name
+        s.setColumnWidth(c++, 10000);  // FundsXML path
+        for (int p = 0; p < profileCount; p++) s.setColumnWidth(c++, 3800);
+        for (int k = 0; k < 3; k++) s.setColumnWidth(c++, 2600);  // Present, Missing, Invalid
+    }
+
     private void writeFieldCoverage(Workbook wb, QualityReport r, CellStyle header) {
         Sheet s = wb.createSheet("Field Coverage");
-        enableAutoSizeTracking(s);
         int row = 0;
         java.util.List<ProfileKey> profiles = profileSet.all();
+        setFieldCoverageWidths(s, profiles.size());
         java.util.List<String> headers = new java.util.ArrayList<>();
         headers.add("Field#");
         headers.add("Field name");
@@ -393,8 +408,6 @@ public final class XlsxReportWriter {
             rr.createCell(col++).setCellValue(c == null ? 0 : c[2]);
         }
         s.createFreezePane(2, 1);
-        int totalCols = 3 + profiles.size() + 3;
-        for (int c = 0; c < totalCols; c++) s.autoSizeColumn(c);
     }
 
     private static void writePerPosition(Workbook wb, QualityReport r,

@@ -80,7 +80,10 @@ public final class XlsxLoader {
             log.info("Loaded XLSX ({} rows, {} mapped fields, {} unmapped headers)",
                     rows.size(), map.size(), unmapped.size());
             log.debug("Loaded XLSX file {}", source.getFileName());
-            return new TptFile(source, "xlsx", headers, map, unmapped, rows, sourceBytes);
+            TptFile file = new TptFile(source, "xlsx", headers, map, unmapped, rows, sourceBytes);
+            // Web upload (bytes kept for the report): mirror the sheet for the Annotated-Source
+            // tab now, while it is parsed, instead of parsing the workbook again for the report.
+            return sourceBytes != null ? com.findatex.validator.report.SourceMirror.capture(file, sheet) : file;
         }
     }
 

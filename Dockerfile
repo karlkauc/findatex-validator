@@ -49,7 +49,7 @@ ARG BUILD_TIME=
 RUN mvn -B -pl web-app -am -DskipTests package
 
 # ---- Stage 2: jlink Custom-JRE (Alpine JDK → musl-kompatibel) ---------------
-FROM eclipse-temurin:25-jdk-alpine@sha256:1e20ead9eec7234db293f1913438090d533ed47c0b9e12dc8c7627a802a44ed6 AS jre-build
+FROM eclipse-temurin:25-jdk-alpine@sha256:c7c3d0bdf7f2bbc5a05a6712ed334d198360105634ea9adf76fca94f381b1e3f AS jre-build
 
 # Module set is hand-curated for Quarkus REST + Apache POI + Netty:
 #   java.base/logging      core

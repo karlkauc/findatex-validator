@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.23] — 2026-11-13
+
 ### Fixed
 - **Desktop app crashed on start with an incomplete `settings.json`.** A
   hand-edited file without the `proxy` or `external` block (or their sub-blocks)
@@ -31,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `/_internal/health/started`).
 - Web: JSON console logs in prod with a Cloud Logging `severity`; one log line
   per run with phase timings; upload file names are no longer logged at INFO.
+- Dependencies: Jackson 2.23, Logback 1.6.6, commonmark 0.32, Bucket4j 8.22,
+  frontend packages, Temurin/Alpine base images.
 
 ## [1.0.22] — 2026-10-29
 
@@ -597,7 +601,8 @@ First public release.
 - Apache-2.0 license; CI workflow with xvfb-run JavaFX tests, JaCoCo
   coverage, and a Docker smoke build.
 
-[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.22...HEAD
+[Unreleased]: https://github.com/karlkauc/findatex-validator/compare/v1.0.23...HEAD
+[1.0.23]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.23
 [1.0.22]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.22
 [1.0.21]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.21
 [1.0.20]: https://github.com/karlkauc/findatex-validator/releases/tag/v1.0.20

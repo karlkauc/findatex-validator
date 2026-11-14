@@ -6,9 +6,12 @@ dieselben wie auf <https://www.findatex-validator.eu> und in der Desktop-App.
 
 > **Status: Prototyp.** Funktionsumfang und Bedienung können sich noch ändern.
 
+![Der FinDatEx Validator in Excel im Browser: markierte Zellen, rechts Score und Befundliste](screenshots/excel-addin.png)
+
 ## Voraussetzungen
 
-- **Excel im Browser** (Microsoft 365) oder **Excel für Microsoft 365** unter
+- **Excel im Browser** (Microsoft 365 oder einfach ein kostenloses
+  Microsoft-Konto auf <https://www.office.com>) oder **Excel für Microsoft 365** unter
   Windows oder Mac. Excel 2016/2019 als Kaufversion unter Windows und Excel
   2013 oder älter werden nicht unterstützt.
 - Keine Installation und keine Admin-Rechte nötig. Manche Firmen sperren
@@ -114,6 +117,7 @@ erneut über *Meine Add-ins* geöffnet werden.
 |---|---|
 | „Mein Add-in hochladen“ fehlt | Die Firma hat das Hochladen gesperrt. Unter Windows die Variante mit freigegebenem Ordner probieren, sonst die IT um Freigabe bitten. |
 | Seitenbereich bleibt leer | Excel neu laden. In Excel im Browser zeigt die Entwicklerkonsole (F12) blockierte Adressen – bitte melden. |
+| Zertifikatsfehler beim Laden in Excel Desktop (Firmennetz) | Das Firmennetz prüft HTTPS-Verbindungen mit einem eigenen Zertifikat (Aussteller z. B. die interne IT), das Excel Desktop ablehnt. Excel im Browser verwenden oder die IT bitten, `www.findatex-validator.eu` von der TLS-Inspection auszunehmen. |
 | „Rate limit reached“ | Prüflimit erreicht; nach der angegebenen Zeit erneut versuchen. |
 | „The workbook is larger than the 25 MB upload limit“ | Datei verkleinern (z. B. andere Blätter entfernen) oder als CSV auf der Webseite prüfen. |
 | Falsches Blatt geprüft | Das Datenblatt in Excel an die erste Position verschieben und erneut prüfen. |

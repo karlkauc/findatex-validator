@@ -39,7 +39,7 @@ The output has two parts:
   weighted to reflect how badly each issue category breaks downstream
   consumption.
 
-You get the same engine in two delivery modes:
+You get the same engine in three delivery modes:
 
 - **Desktop app (JavaFX)** — files never leave your machine. Use this for
   daily validations on confidential fund data. Besides the findings table
@@ -50,9 +50,12 @@ You get the same engine in two delivery modes:
   is not an option, or for occasional use. Uploads are processed in
   memory and discarded immediately; reports are available for 5 minutes
   via a single-use URL.
+- **Excel add-in (prototype)** — validates the workbook open in Excel and
+  colours the cells with findings (see §1.2). It sends the workbook to the
+  web app, so the web app's privacy rules and limits apply.
 
-Both modes share the same validation core, the same rules, the same
-reports.
+All modes share the same validation core, the same rules, the same
+results.
 
 ### 1.1 Every rule, documented
 
@@ -63,6 +66,43 @@ rule with its severity and effect on the score. Generated from the official
 spec sheets, one page per field — so you can look up why a finding fired
 without opening the tool. The same reference is bundled in both apps as the
 per-template tabs of this Help window.
+
+### 1.2 Excel add-in (prototype)
+
+The add-in checks the file you have open in Excel, without saving or
+uploading it by hand, and marks the findings directly in the sheet. It runs
+in **Excel on the web** (a free Microsoft account is enough) and in Excel
+for Microsoft 365 on Windows and Mac; Excel 2016/2019 perpetual on Windows
+and older versions are not supported.
+
+Load it once — no install and no admin rights needed:
+
+1. Save the manifest file from
+   <https://www.findatex-validator.eu/addin/manifest.xml>.
+2. In Excel: **Home → Add-ins → More Add-ins → My Add-ins → Upload My
+   Add-in**, and choose the saved `manifest.xml`.
+3. **Home → FinDatEx → Validate file** opens the side pane.
+
+In the pane pick template, version and profiles and click **Validate**.
+Every cell with a finding is filled by its worst severity — red for errors,
+amber for warnings, blue for infos; findings that concern a whole row sit
+on column A. The list below the score shows every finding with its cell;
+click one to jump there. Correct the values and validate again — the old
+markers are removed first.
+
+Good to know:
+
+- Only the **first worksheet** is checked; move the data sheet to the front
+  if needed.
+- The colours are saved with the workbook. Click **Remove markers** before
+  saving or sending the file — it restores the original fills as long as
+  the pane has stayed open.
+- No GLEIF / OpenFIGI cross-check in the add-in; use the web or desktop app
+  for that.
+- Some corporate networks re-sign HTTPS traffic; Excel desktop may then
+  refuse to load the add-in with a certificate warning. Excel on the web
+  usually still works, or ask IT to exempt `www.findatex-validator.eu`
+  from TLS inspection.
 
 ---
 
@@ -118,6 +158,10 @@ compliance departments it is — use the desktop app instead. It runs the
 identical validation engine locally: no upload, no rate limit, no file-size
 ceiling, and nothing leaves your machine except an optional GLEIF/OpenFIGI
 lookup you switch on yourself.
+
+The Excel add-in (§1.2) uploads the open workbook to the web app and is
+handled exactly like a web upload; only the cell colours are written back
+into your workbook.
 
 ---
 

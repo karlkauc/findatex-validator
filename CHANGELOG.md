@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `https://www.findatex-validator.eu/addin/manifest.xml` — see
   `docs/EXCEL_ADDIN.md`.
 
+### Docs
+- The Excel add-in is documented as the third way to use the validator: README
+  (Option C with screenshot, privacy table), Help §1.2 (desktop Help, web Help,
+  `/help`), both About texts and a footer link in the web app.
+
 ## [1.0.23] — 2026-11-13
 
 ### Fixed

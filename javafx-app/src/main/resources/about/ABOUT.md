@@ -8,6 +8,11 @@ The desktop edition validates FinDatEx data templates (TPT, EET, EMT, EPT)
 against the official spec sheets — completeness, format conformance,
 codification, and cross-field rules. Files never leave your machine.
 
+The same engine is also available as a web app
+(<https://www.findatex-validator.eu>) and as an Excel add-in that marks the
+findings directly in the open workbook (Help, §1.2). Both of those upload
+the file for validation; this desktop app does not.
+
 ---
 
 ## Author

@@ -38,6 +38,9 @@ and an expandable list, so a recurring problem across thousands of
 rows reads as one entry instead of thousands. The Excel report keeps
 the full one-row-per-finding detail.
 
+The same engine runs as a web app, as a desktop app, and as an **Excel
+add-in** that checks the open workbook and colours the cells with findings.
+
 Bundled templates: **TPT V8.0 + V7.0**, **EET V1.1.3 + V1.1.2**,
 **EMT V4.3 + V4.2**, **EPT V2.1 + V2.0**.
 
@@ -47,7 +50,7 @@ Bundled templates: **TPT V8.0 + V7.0**, **EET V1.1.3 + V1.1.2**,
 
 ## How to use it
 
-There are two ways. Pick whichever is more convenient — the
+There are three ways. Pick whichever is more convenient — the
 validation engine is exactly the same.
 
 ### Option A — Web app (no install)
@@ -157,6 +160,36 @@ file.
 
 ![Animated walkthrough: a folder of deliveries validated in one run, one row per file, combined export](docs/screenshots/desktop-batch.gif)
 
+### Option C — Excel add-in (prototype)
+
+Validate the workbook you have open in Excel and see the findings right in
+the sheet: every cell with a finding is coloured by its worst severity
+(red = error, amber = warning, blue = info), and clicking a finding in the
+side pane jumps to its cell. Fix the values, click *Validate* again.
+
+![The FinDatEx Validator task pane in Excel on the web: a TPT file with coloured cells, score and finding list on the right](docs/screenshots/excel-addin.png)
+
+Load it once (no install, no admin rights):
+
+1. Save the manifest:
+   <https://www.findatex-validator.eu/addin/manifest.xml>.
+2. In Excel: **Home → Add-ins → More Add-ins → My Add-ins → Upload My
+   Add-in**, choose `manifest.xml`.
+3. **Home → FinDatEx → Validate file** opens the pane. Pick template,
+   version and profiles, click **Validate**.
+
+Runs in **Excel on the web** (a free Microsoft account is enough) and
+Excel for Microsoft 365 on Windows and Mac (ExcelApi 1.9); not in Excel
+2016/2019 perpetual on Windows or older. It checks the **first worksheet**.
+The workbook is uploaded to the web app for validation, so the web app's
+privacy rules and limits apply. The cell colours are saved with the
+workbook unless you click **Remove markers** first. Some corporate networks
+that re-sign HTTPS traffic make Excel desktop reject the add-in — Excel on
+the web usually still works.
+
+Details: [`docs/EXCEL_ADDIN.md`](docs/EXCEL_ADDIN.md) · German user guide:
+[`docs/EXCEL_ADDIN_ANLEITUNG.md`](docs/EXCEL_ADDIN_ANLEITUNG.md).
+
 ---
 
 ## Privacy
@@ -165,6 +198,7 @@ file.
 |------|---------------------------|
 | **Desktop app** | Files stay on your machine. The only outbound call is the optional GLEIF / OpenFIGI lookup, which sends only the LEIs / ISINs from your file — never the full file. |
 | **Hosted web app** | Files are processed in memory and discarded immediately after the response. Reports live for 5 minutes via a single-use URL, then are deleted. No login; no file content or file names are logged — only derived attributes (format, size, naming-pattern class) reach the usage statistics. The annotated-source view shares the report's 5-minute lifetime. External validation (GLEIF / OpenFIGI) is opt-in per run; when enabled, only the LEIs / ISINs from your file are sent to those registries. A file handed over from the TPT ⇄ FundsXML converter (`/?from=tpt-converter`) goes directly from that browser tab to this one and is then validated like an upload. |
+| **Excel add-in** | The open workbook is uploaded to the hosted web app and handled exactly like a web upload (row above). The cell colours are written into your workbook locally. |
 
 For confidential fund data, prefer the desktop app.
 

@@ -5,9 +5,11 @@ Excel and colours the cells that have findings. It is served by the web app
 under `/addin/` (unlinked, `Disallow`ed in robots.txt) and talks to the same
 `/api/*` endpoints as the React app — there is no second rule engine.
 
+![The task pane in Excel on the web: TPT showcase with coloured cells, score and finding list](screenshots/excel-addin.png)
+
 | | |
 |---|---|
-| Runs in | Excel on the web (Microsoft 365), Excel for Microsoft 365 on Windows and Mac, Excel 2019+ on Mac (ExcelApi 1.9) |
+| Runs in | Excel on the web (Microsoft 365 or a free Microsoft account), Excel for Microsoft 365 on Windows and Mac, Excel 2019+ on Mac (ExcelApi 1.9) |
 | Does not run in | Excel 2016/2019 perpetual on Windows (ExcelApi ≤ 1.8), Excel 2013 and older; Excel 2021/2024 perpetual is untested |
 | Install | Sideload of `manifest.xml` — no admin rights, unless the tenant blocks user add-ins |
 | Data | The workbook is uploaded to the server for validation, exactly like the web upload (not kept) |
@@ -71,7 +73,17 @@ external (GLEIF/OpenFIGI) checks, a store listing.
   `npx office-addin-manifest validate web-app/src/main/resources/META-INF/resources/addin/manifest.xml`.
   Its `<Id>` is fixed — a new one makes Office treat it as another add-in.
 
-## Open questions for the prototype test
+## Test status
+
+- **Excel on the web: works** (tested 2026-11-14 with `samples/tpt/00_showcase.xlsx`,
+  personal Microsoft account): sideload, validate, cell colours, jump to cell.
+- **Excel desktop behind TLS inspection:** a corporate proxy that re-signs
+  HTTPS (its own CA as issuer) can make Excel desktop reject the add-in with a
+  certificate warning while Edge opens the same URLs fine. Nothing to fix on
+  the server; use Excel on the web or have `www.findatex-validator.eu`
+  exempted from inspection.
+
+## Open questions
 
 - Does `getFileAsync` include unsaved edits in Excel on Windows? (If not, the
   pane must ask the user to save first.)

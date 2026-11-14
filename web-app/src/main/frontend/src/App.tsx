@@ -542,6 +542,15 @@ export default function App() {
               Rule reference
             </a>
             {' · '}
+            <a
+              href={`${GITHUB_URL}/blob/main/docs/EXCEL_ADDIN.md`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-slate-700"
+            >
+              Excel add-in
+            </a>
+            {' · '}
             <a href="/imprint" className="underline hover:text-slate-700">
               Imprint
             </a>

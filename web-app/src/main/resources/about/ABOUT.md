@@ -17,6 +17,14 @@ Yes, you can. The web app ships as a Docker image
 installer for Windows, macOS and Linux on the GitHub Releases page. Both are
 on GitHub: <https://github.com/karlkauc/findatex-validator>.
 
+## Excel add-in
+
+The same validation is available inside Excel (Excel on the web, Excel for
+Microsoft 365): it checks the open workbook and colours the cells with
+findings. Upload the manifest
+<https://www.findatex-validator.eu/addin/manifest.xml> under *Home → Add-ins
+→ More Add-ins → My Add-ins → Upload My Add-in* — see the Help, §1.2.
+
 ---
 
 ## Author

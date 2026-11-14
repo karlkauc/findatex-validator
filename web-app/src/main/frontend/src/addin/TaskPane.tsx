@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { fetchAnnotatedSource, fetchTemplates, validateUpload } from '../api/client';
 import { ApiError, FindingDto, Severity, TemplateInfo, ValidationResponse } from '../types/api';
-import { ExcelMark, addressByFinding, toExcelMarks, unplacedFindings } from './marks';
+import {
+  ExcelMark,
+  addressByFinding,
+  fieldLabel,
+  toExcelMarks,
+  unplacedFindings,
+} from './marks';
 import {
   SavedFills,
   applyMarkers,
@@ -266,7 +272,7 @@ export default function TaskPane() {
                     <span className="font-mono text-xs">{addr ?? 'file'}</span>{' '}
                     <span className="text-xs text-slate-500">{f.ruleId}</span>
                     <span className="block text-xs">
-                      {f.fieldNum ? `${f.fieldNum} ${f.fieldName ?? ''}: ` : ''}
+                      {fieldLabel(f) ? `${fieldLabel(f)}: ` : ''}
                       {f.message}
                     </span>
                   </button>

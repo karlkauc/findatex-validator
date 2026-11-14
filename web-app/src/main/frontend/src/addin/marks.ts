@@ -79,3 +79,14 @@ export const SEVERITY_FILL: Record<Severity, string> = {
   WARNING: '#FDE68A',
   INFO: '#BFDBFE',
 };
+
+/**
+ * Field label of a finding for the list. The server's fieldName already
+ * reads "Field 14 (Identification code …)", so the number is not repeated;
+ * without a name the bare number is shown as "Field 14".
+ */
+export function fieldLabel(f: Pick<FindingDto, 'fieldNum' | 'fieldName'>): string {
+  if (f.fieldName && f.fieldName.trim()) return f.fieldName.trim();
+  if (f.fieldNum && f.fieldNum.trim()) return `Field ${f.fieldNum.trim()}`;
+  return '';
+}

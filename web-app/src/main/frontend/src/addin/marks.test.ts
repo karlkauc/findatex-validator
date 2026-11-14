@@ -4,6 +4,7 @@ import {
   addressByFinding,
   chunkAddresses,
   excelAddress,
+  fieldLabel,
   toExcelMarks,
   unplacedFindings,
 } from './marks';
@@ -69,5 +70,17 @@ describe('chunkAddresses', () => {
     const chunks = chunkAddresses(['A1', 'B2', 'C3', 'D4'], 6);
     expect(chunks).toEqual(['A1,B2', 'C3,D4']);
     expect(chunkAddresses([])).toEqual([]);
+  });
+});
+
+describe('fieldLabel', () => {
+  it('does not repeat the field number already in the name', () => {
+    expect(fieldLabel({ fieldNum: '14', fieldName: 'Field 14 (Identification code of the instrument)' }))
+      .toBe('Field 14 (Identification code of the instrument)');
+  });
+
+  it('falls back to the number, or nothing', () => {
+    expect(fieldLabel({ fieldNum: '14', fieldName: null })).toBe('Field 14');
+    expect(fieldLabel({ fieldNum: null, fieldName: null })).toBe('');
   });
 });

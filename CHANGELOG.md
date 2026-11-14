@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `https://www.findatex-validator.eu/addin/manifest.xml` — see
   `docs/EXCEL_ADDIN.md`.
 
+### Fixed
+- Excel add-in: the finding list showed the field number twice
+  ("14 Field 14 (…)"); it now shows the field name only, as the web app does.
+
 ### Docs
 - The Excel add-in is documented as the third way to use the validator: README
   (Option C with screenshot, privacy table), Help §1.2 (desktop Help, web Help,
